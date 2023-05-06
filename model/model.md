@@ -7,44 +7,43 @@ erDiagram
 
   %% entities
 
-Tournament {
-    name
-    shortName
-    startDate
-    endDate
-    location
-    isOnline
+  Tournament {
+    string name
+    string shortName
+    date startDate
+    date endDate
+    string country
+    string location
+    boolean isOnline
   }
 
   Round {
-    number
+    int number
   }
 
   Game {
-    black
-    white
-    result
+    string result
   }
 
   Player {
-    lastname
-    firstname
-    country
-    club
+    string lastname
+    string firstname
+    string country
+    string club
   }
 
   Ladder {
-    name
-    lastUpdated
+    string name
+    date lastUpdated
   }
   
   %% relationships
 
-  Tournament ||--|{ Round
-  Round ||--|{ Game
-  Game |}--|| Player : black
-  Game |}--|| Player : white
-  Player }o--o{ Ladder : rating
+  Tournament ||--|{ Round: ""
+  Round ||--|{ Game: ""
+  Game ||--|| Player: "black"
+  Game ||--|| Player: "white"
+  Player }o--o{ Ladder: "rating"
   
 ```
 
