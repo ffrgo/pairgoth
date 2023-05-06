@@ -40,6 +40,7 @@ erDiagram
   %% relationships
 
   Tournament ||--|{ Round: ""
+  Round }o--|{ Player: "participate"
   Round ||--|{ Game: ""
   Game ||--|| Player: "black"
   Game ||--|| Player: "white"
