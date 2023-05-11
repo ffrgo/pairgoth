@@ -1,0 +1,15 @@
+# webapp
+webapp.env = dev
+webapp.url = http://localhost:8080
+
+# smtp
+smtp.sender = 
+smtp.host = 
+smtp.port = 587
+smtp.user = 
+smtp.password = 
+
+# logging
+logger.level = trace
+logger.notification = false
+# logger.notification = <level>:smtp:<smtp-host>:<smtp-port>:<from-address>:<to-address>
