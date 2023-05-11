@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+  <!-- Listeners -->
+  <!-- we're not using @WebListener annotations so that our manager is initialized *after* the webapp logger -->
+  <listener>
+    <listener-class>com.republicate.slf4j.impl.ServletContextLoggerListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.jeudego.pairgoth.web.WebappManager</listener-class>
+  </listener>
+
+  <!-- filters -->
+  <filter>
+    <filter-name>webapp-slf4j-logger-ip-tag-filter</filter-name>
+    <filter-class>com.republicate.slf4j.impl.IPTagFilter</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
+
+  <!-- filters mapping -->
+  <filter-mapping>
+    <filter-name>webapp-slf4j-logger-ip-tag-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <!-- servlets -->
+  <servlet>
+    <servlet-name>api</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.ApiServlet</servlet-class>
+  </servlet>
+
+  <!-- servlet mappings -->
+  <servlet-mapping>
+    <servlet-name>api</servlet-name>
+    <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+
+  <!-- context params -->
+  <context-param>
+    <param-name>webapp-slf4j-logger.format</param-name>
+    <param-value>%logger [%level] [%ip] %message @%file:%line:%column</param-value>
+  </context-param>
+  <context-param>
+    <param-name>webapp-slf4j-logger.level</param-name>
+    <param-value>${logger.level}</param-value>
+  </context-param>
+  <context-param>
+    <param-name>webapp-slf4j-logger.notification</param-name>
+    <param-value>${logger.notification}</param-value>
+  </context-param>
+
+</web-app>

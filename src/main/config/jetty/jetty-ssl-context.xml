@@ -1,0 +1,16 @@
+<?xml version="1.0"?><!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+<Configure id="sslContextFactory" class="org.eclipse.jetty.util.ssl.SslContextFactory$Server">
+    <Set name="TrustAll">true</Set>
+    <Set name="KeyStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.keystore" default="src/test/resources/jetty.keystore"/></Set>
+    <Set name="KeyStorePassword"><Property name="jetty.keystore.password" default="secret"/></Set>
+    <Set name="KeyManagerPassword"><Property name="jetty.keymanager.password" default="secret"/></Set>
+    <Set name="TrustStorePath"><Property name="jetty.base" default="." />/<Property name="jetty.truststore" default="src/test/resources/jetty.keystore"/></Set>
+    <Set name="TrustStorePassword"><Property name="jetty.truststore.password" default="secret"/></Set>
+    <Set name="EndpointIdentificationAlgorithm"></Set>
+    <New id="sslHttpConfig" class="org.eclipse.jetty.server.HttpConfiguration">
+        <Arg><Ref refid="httpConfig"/></Arg>
+        <Call name="addCustomizer">
+            <Arg><New class="org.eclipse.jetty.server.SecureRequestCustomizer"/></Arg>
+        </Call>
+    </New>
+</Configure>
