@@ -41,6 +41,9 @@ class ApiServlet : HttpServlet() {
     }
 
     private fun doRequest(request: HttpServletRequest, response: HttpServletResponse) {
+        val uri = request.requestURI
+        logger.logRequest(request, !uri.contains(".") && uri.length > 1)
+
         var payload: Json? = null
         var reason = "OK"
         try {
@@ -49,8 +52,6 @@ class ApiServlet : HttpServlet() {
             }
             validateContentType(request)
             validateAccept(request);
-            val uri = request.requestURI
-            logger.logRequest(request, !uri.contains(".") && uri.length > 1)
 
             val parts = uri.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
             if (parts.size < 3 || parts.size > 5) throw ApiException(HttpServletResponse.SC_BAD_REQUEST)
