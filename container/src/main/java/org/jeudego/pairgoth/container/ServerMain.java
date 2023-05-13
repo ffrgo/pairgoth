@@ -21,6 +21,7 @@ package org.jeudego.pairgoth.container;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -54,7 +55,13 @@ public class ServerMain
     {
         Server server = new Server(8080);
 
-        WebAppContext context = new WebAppContext();
+        WebAppContext context = new WebAppContext() {
+            @Override
+            public boolean isServerResource(String name, URL url)
+            {
+                return super.isServerResource(name, url) || url.getFile().contains("/WEB-INF/jetty-server/");
+            }
+        };
         context.setContextPath("/");
 
         switch (getOperationalMode())

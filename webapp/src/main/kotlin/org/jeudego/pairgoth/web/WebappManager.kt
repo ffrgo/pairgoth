@@ -4,9 +4,11 @@ import com.republicate.mailer.SmtpLoop
 import org.apache.commons.lang3.tuple.Pair
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.lang.IllegalAccessError
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.*
+import java.util.IllegalFormatCodePointException
 import javax.net.ssl.*
 import javax.servlet.*
 import javax.servlet.annotation.WebListener
@@ -48,8 +50,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
 
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
-        // overcome a Jetty's bug (v9.4.10.v20180503) whereas if a @WebListener is also listed in the descriptor
-        // it will be instanciated twice...
+        if (1==1) throw IllegalAccessError("sgdfgsdfg");
         context = sce.servletContext
         logger.info("---------- Starting Web Application ----------")
         context.setAttribute("manager", this)
