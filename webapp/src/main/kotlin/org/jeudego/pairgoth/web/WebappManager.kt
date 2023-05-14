@@ -50,7 +50,6 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
 
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
-        if (1==1) throw IllegalAccessError("sgdfgsdfg");
         context = sce.servletContext
         logger.info("---------- Starting Web Application ----------")
         context.setAttribute("manager", this)

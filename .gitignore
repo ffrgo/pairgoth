@@ -2,3 +2,4 @@ target
 docker/data
 .idea
 docker/.env
+pairgoth.properties
