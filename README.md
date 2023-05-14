@@ -8,13 +8,13 @@
 ├── debug.bat ................................. Executable debug script, windows
 ├── run.sh .................................... Executable run script, linux
 ├── run.bat ................................... Executable run script, windows
+├── test.sh ................................... Executable test script, linux
 ├── application ............................... Executable final packaging
 ├── bootstrap ................................. Executable entry point
 ├── container ................................. Web container
 ├── docker .................................... Docker packaging
 │   ├── pairgoth.properties.example ........... Docker property file to instanciate
-│   ├── run.sh ................................ Docker launch script
-│   └── test.sh ............................... Docker test script
+│   └── run.sh ................................ Docker launch script
 └── webapp .................................... Engine web application
     └── src
         ├── main
