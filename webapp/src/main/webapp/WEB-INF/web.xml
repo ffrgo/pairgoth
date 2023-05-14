@@ -31,11 +31,21 @@
     <servlet-name>api</servlet-name>
     <servlet-class>org.jeudego.pairgoth.web.ApiServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>sse</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.sse.SSEServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
     <servlet-name>api</servlet-name>
     <url-pattern>/api/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>sse</servlet-name>
+    <url-pattern>/events/*</url-pattern>
   </servlet-mapping>
 
   <!-- context params -->

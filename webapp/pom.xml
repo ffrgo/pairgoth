@@ -225,6 +225,12 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.28</version>
         </dependency>
+        <!-- server-side events -->
+        <dependency>
+            <groupId>com.republicate</groupId>
+            <artifactId>jeasse-servlet3</artifactId>
+            <version>1.2</version>
+        </dependency>
         <!-- test emails -->
         <dependency>
             <groupId>com.icegreen</groupId>

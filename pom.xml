@@ -8,6 +8,19 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <!-- CB: Temporary add my repository, while waiting for SSE Java server module author to incorporate my PR or for me to fork it --> 
+  <repositories>
+    <repository>
+      <id>republicate.com</id>
+      <url>https://republicate.com/maven2</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+        <checksumPolicy>fail</checksumPolicy>
+      </releases>
+    </repository>
+  </repositories>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
