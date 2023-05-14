@@ -6,10 +6,8 @@ services:
     working_dir: /home/app/pairgoth
     user: "${APP_UID}:${APP_GID}"
     entrypoint: bash -c
-    command: '"mvn -e -Duser.home=/home/app clean package jetty:run"'
-    # command: mvn -X -e -Pdev clean verify -Dit.test=ApiTokenIT#test01NoVersionHeader -Dorg.slf4j.simpleLogger.log.level=trace jetty:run
+    command: '"mvn -e -Duser.home=/home/app clean package && java -jar application/target/pairgoth-engine.war"'
     volumes:
-      - ./pairgoth.properties:/var/lib/pairgoth/pairgoth.properties
       - ..:/home/app/pairgoth
       - ./data/jetty:/var/lib/pairgoth/jetty
       - ./data/maven:/home/app/.m2
