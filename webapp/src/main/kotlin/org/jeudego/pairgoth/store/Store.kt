@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.store
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.Tournament
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.math.E
 
 object Store {
     private val _nextTournamentId = AtomicInteger()
@@ -21,4 +22,8 @@ object Store {
     fun getTournament(id: Int) = tournaments[id]
 
     fun getTournamentsIDs(): Set<Int> = tournaments.keys
+    fun addPlayer(player: Player) {
+        if (players.containsKey(player.id)) throw Error("player id #${player.id} already exists")
+        players[player.id] = player
+    }
 }
