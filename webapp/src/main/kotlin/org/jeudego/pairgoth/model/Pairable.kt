@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.model
 
-sealed class Pairable(val id: Int, val name: String, val rating: Double, val rank: Int)
+sealed class Pairable(val id: Int, val name: String, val rating: Double, val rank: Int) {
+}
 
 fun Pairable.displayRank(): String = when {
     rank < 0 -> "${-rank}k"
@@ -22,3 +23,4 @@ fun Pairable.setRank(rankStr: String): Int {
         else -> throw Error("impossible")
     }
 }
+

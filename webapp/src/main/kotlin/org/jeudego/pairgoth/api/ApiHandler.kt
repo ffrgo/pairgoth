@@ -38,16 +38,33 @@ interface ApiHandler {
     }
 
     fun getPayload(request: HttpServletRequest): Json {
-        return request.getAttribute(PAYLOAD_KEY) as Json ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+        return request.getAttribute(PAYLOAD_KEY) as Json? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+    }
+
+    fun getObjectPayload(request: HttpServletRequest): Json.Object {
+        val json = request.getAttribute(PAYLOAD_KEY) as Json? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+        if (!json.isObject) badRequest("expecting a json object")
+        return json.asObject()
+    }
+
+    fun getArrayPayload(request: HttpServletRequest): Json.Array {
+        val json = request.getAttribute(PAYLOAD_KEY) as Json? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+        if (!json.isArray) badRequest("expecting a json array")
+        return json.asArray()
     }
 
     fun getSelector(request: HttpServletRequest): String? {
         return request.getAttribute(SELECTOR_KEY) as String?
     }
 
+    fun getSubSelector(request: HttpServletRequest): String? {
+        return request.getAttribute(SUBSELECTOR_KEY) as String?
+    }
+
     companion object {
         const val PAYLOAD_KEY = "PAYLOAD"
         const val SELECTOR_KEY = "SELECTOR"
+        const val SUBSELECTOR_KEY = "SUBSELECTOR"
         val logger = LoggerFactory.getLogger("api")
         fun badRequest(msg: String = "bad request"): Nothing = throw ApiException(HttpServletResponse.SC_BAD_REQUEST, msg)
     }

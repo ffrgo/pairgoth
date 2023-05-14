@@ -16,12 +16,10 @@ import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
 import javax.servlet.http.HttpServletRequest
 
-class TournamentHandler(): ApiHandler {
+object TournamentHandler: ApiHandler {
 
     override fun post(request: HttpServletRequest): Json {
-        val json = getPayload(request)
-        if (!json.isObject) badRequest("expecting a json object")
-        val payload = json.asObject()
+        val payload = getObjectPayload(request)
 
         // tournament parsing
         val tournament = Tournament.fromJson(payload)

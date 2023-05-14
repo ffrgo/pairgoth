@@ -2,27 +2,21 @@ package org.jeudego.pairgoth.web
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
+import org.jeudego.pairgoth.api.RegistrationHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.TournamentHandler
-import org.jeudego.pairgoth.util.Colorizer
 import org.jeudego.pairgoth.util.Colorizer.green
 import org.jeudego.pairgoth.util.Colorizer.red
 import org.jeudego.pairgoth.util.parse
 import org.jeudego.pairgoth.util.toString
-import org.jeudego.pairgoth.web.ApiException
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.io.StringWriter
 import java.util.*
-import javax.servlet.ServletException
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 class ApiServlet : HttpServlet() {
-
-    val tournamentHandler = TournamentHandler()
-    val playerHandler = PlayerHandler()
 
     public override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         doRequest(request, response)
@@ -47,29 +41,47 @@ class ApiServlet : HttpServlet() {
         var payload: Json? = null
         var reason = "OK"
         try {
+
+            // validate request
+
             if ("dev" == WebappManager.getProperty("webapp.env")) {
                 response.addHeader("Access-Control-Allow-Origin", "*")
             }
             validateContentType(request)
             validateAccept(request);
 
-            val parts = uri.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            if (parts.size < 3 || parts.size > 5) throw ApiException(HttpServletResponse.SC_BAD_REQUEST)
-            if (parts.size >= 4) {
-                request.setAttribute(ApiHandler.SELECTOR_KEY, parts[3])
-            }
-            val entity = parts[2]
+            // parse request URI
+
+            val parts = uri.split("/").filter { !it.isEmpty() }
+            if (parts.size !in 2..5 || parts[0] != "api") throw ApiException(HttpServletResponse.SC_BAD_REQUEST)
+
+            val entity = parts[1]
+            val selector = parts.getOrNull(2)?.also { request.setAttribute(ApiHandler.SELECTOR_KEY, it) }
+            val subEntity = parts.getOrNull(3)
+            val subSelector = parts.getOrNull(4)?.also { request.setAttribute(ApiHandler.SUBSELECTOR_KEY, it) }
+
+            // choose handler
+
             val handler = when (entity) {
-                "tournament" -> tournamentHandler
-                "player" -> playerHandler
-                else -> ApiHandler.badRequest("unknown entity")
+                "tournament" ->
+                    when (subEntity) {
+                        null -> TournamentHandler
+                        "registration" -> RegistrationHandler
+                        else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
+                    }
+                "player" -> PlayerHandler
+                else -> ApiHandler.badRequest("unknown entity: $entity")
             }
+
+            // call handler
+
             payload = handler.route(request, response)
             // if payload is null, it means the handler already sent the response
             if (payload != null) {
                 setContentType(response)
                 payload.toString(response.writer)
             }
+
         } catch (apiException: ApiException) {
             reason = apiException.message ?: "unknown API error"
             if (reason == null) error(response, apiException.code) else error(

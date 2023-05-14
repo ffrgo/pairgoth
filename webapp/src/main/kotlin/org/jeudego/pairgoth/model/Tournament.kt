@@ -33,8 +33,9 @@ data class Tournament(
     var gobanSize: Int = 19,
     var komi: Double = 7.5
 ) {
-    companion object {}
-    val pairables = mutableMapOf<Int, Pairable>()
+    companion object
+    // player/team id -> set of skipped rounds
+    val pairables = mutableMapOf<Int, MutableSet<Int>>()
 }
 
 // Serialization

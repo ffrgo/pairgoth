@@ -22,8 +22,13 @@ object Store {
     fun getTournament(id: Int) = tournaments[id]
 
     fun getTournamentsIDs(): Set<Int> = tournaments.keys
+
     fun addPlayer(player: Player) {
         if (players.containsKey(player.id)) throw Error("player id #${player.id} already exists")
         players[player.id] = player
     }
+
+    fun getPlayer(id: Int) = players[id]
+
+    fun getPlayersIDs(): Set<Int> = players.keys
 }
