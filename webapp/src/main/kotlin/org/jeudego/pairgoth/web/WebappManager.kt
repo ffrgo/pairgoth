@@ -55,7 +55,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
         context.setAttribute("manager", this)
         webappRoot = context.getRealPath("/")
         try {
-            properties.load(context.getResourceAsStream("/WEB-INF/webapp.properties"))
+            properties.load(context.getResourceAsStream("/WEB-INF/pairgoth.properties"))
             val submaps: MutableMap<String, MutableMap<String, String>> = HashMap()
             for (prop in properties.stringPropertyNames()) {
                 val value = properties.getProperty(prop)

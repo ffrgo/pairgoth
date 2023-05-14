@@ -102,7 +102,7 @@ class ApiServlet : HttpServlet() {
             }
             if (payload != null) {
                 try {
-                    logger.logPayload(green(">>     "), payload, false)
+                    logger.logPayload(">>     ", payload, false)
                 } catch (ioe: IOException) {
                 }
             }

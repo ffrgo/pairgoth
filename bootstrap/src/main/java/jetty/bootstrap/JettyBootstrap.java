@@ -42,6 +42,12 @@ public class JettyBootstrap
             File warFile = new File(warLocation.toURI());
             System.setProperty("org.eclipse.jetty.livewar.LOCATION",warFile.toPath().toRealPath().toString());
 
+            // CB we want colorized output on linux
+            if (System.getProperty("os.name").equalsIgnoreCase("linux"))
+            {
+                System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", "false");
+            }
+
             Class<?> mainClass = Class.forName("org.jeudego.pairgoth.container.ServerMain",false,clWar);
             Method mainMethod = mainClass.getMethod("main",args.getClass());
             mainMethod.invoke(mainClass,new Object[] { args });
