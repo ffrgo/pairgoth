@@ -5,14 +5,19 @@ import org.jeudego.pairgoth.model.Tournament
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.E
 
+// CB TODO - handle concurrency:
+// - either with concurrent maps
+// - or with a thread isolation (better, covers more operations)
+
 object Store {
     private val _nextTournamentId = AtomicInteger()
     private val _nextPlayerId = AtomicInteger()
+    private val _nextGameId = AtomicInteger()
     val nextTournamentId get() = _nextTournamentId.incrementAndGet()
     val nextPlayerId get() = _nextPlayerId.incrementAndGet()
+    val nextGameId get() = _nextGameId.incrementAndGet()
 
     private val tournaments = mutableMapOf<Int, Tournament>()
-    private val players = mutableMapOf<Int, Player>()
 
     fun addTournament(tournament: Tournament) {
         if (tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} already exists")
@@ -23,12 +28,14 @@ object Store {
 
     fun getTournamentsIDs(): Set<Int> = tournaments.keys
 
-    fun addPlayer(player: Player) {
-        if (players.containsKey(player.id)) throw Error("player id #${player.id} already exists")
-        players[player.id] = player
+    fun replaceTournament(tournament: Tournament) {
+        if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")
+        tournaments[tournament.id] = tournament
     }
 
-    fun getPlayer(id: Int) = players[id]
+    fun deleteTournament(tournament: Tournament) {
+        if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")
+        tournaments.remove(tournament.id)
 
-    fun getPlayersIDs(): Set<Int> = players.keys
+    }
 }

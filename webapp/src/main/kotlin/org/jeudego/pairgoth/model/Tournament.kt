@@ -6,55 +6,69 @@ import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
 
-enum class TournamentType(val playersNumber: Int) {
-    INDIVIDUAL(1),
-    PAIRGO(2),
-    RENGO2(2),
-    RENGO3(3),
-    TEAM2(2),
-    TEAM3(3),
-    TEAM4(4),
-    TEAM5(5);
-}
-
 data class Tournament(
-    var id: Int,
-    var type: TournamentType,
-    var name: String,
-    var shortName: String,
-    var startDate: LocalDate,
-    var endDate: LocalDate,
-    var country: String,
-    var location: String,
-    var online: Boolean,
-    var timeSystem: TimeSystem,
-    var pairing: Pairing,
-    var rules: Rules = Rules.FRENCH,
-    var gobanSize: Int = 19,
-    var komi: Double = 7.5
+    val id: Int,
+    val type: Type,
+    val name: String,
+    val shortName: String,
+    val startDate: LocalDate,
+    val endDate: LocalDate,
+    val country: String,
+    val location: String,
+    val online: Boolean,
+    val timeSystem: TimeSystem,
+    val pairing: Pairing,
+    val rules: Rules = Rules.FRENCH,
+    val gobanSize: Int = 19,
+    val komi: Double = 7.5
 ) {
-    companion object
-    // player/team id -> set of skipped rounds
-    val pairables = mutableMapOf<Int, MutableSet<Int>>()
+    companion object {}
+    enum class Type(val playersNumber: Int) {
+        INDIVIDUAL(1),
+        PAIRGO(2),
+        RENGO2(2),
+        RENGO3(3),
+        TEAM2(2),
+        TEAM3(3),
+        TEAM4(4),
+        TEAM5(5);
+    }
+
+    enum class Criterion {
+        NBW, MMS, SOS, SOSOS, SODOS
+    }
+
+    // pairables
+    val pairables = mutableMapOf<Int, Pairable>()
+
+    // games per round
+    val games = mutableListOf<MutableMap<Int, Game>>()
+
+    // standings criteria
+    val criteria = mutableListOf<Criterion>(
+        if (pairing.type == Pairing.PairingType.MACMAHON) Criterion.MMS else Criterion.NBW,
+        Criterion.SOS,
+        Criterion.SOSOS
+    )
 }
 
 // Serialization
 
-fun Tournament.Companion.fromJson(json: Json.Object) = Tournament(
-    id = json.getInt("id") ?: Store.nextTournamentId,
-    type = json.getString("type")?.uppercase()?.let { TournamentType.valueOf(it) } ?: badRequest("missing type"),
-    name = json.getString("name") ?: ApiHandler.badRequest("missing name"),
-    shortName = json.getString("shortName") ?: ApiHandler.badRequest("missing shortName"),
-    startDate = json.getLocalDate("startDate") ?: ApiHandler.badRequest("missing startDate"),
-    endDate = json.getLocalDate("endDate") ?: ApiHandler.badRequest("missing endDate"),
-    country = json.getString("country") ?: ApiHandler.badRequest("missing country"),
-    location = json.getString("location") ?: ApiHandler.badRequest("missing location"),
-    online = json.getBoolean("online") ?: false,
-    komi = json.getDouble("komi") ?: 7.5,
-    rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: Rules.FRENCH,
-    gobanSize = json.getInt("gobanSize") ?: 19,
-    timeSystem = TimeSystem.fromJson(json.getObject("timeSystem") ?: badRequest("missing timeSystem")),
-    pairing = MacMahon()
+fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament? = null) = Tournament(
+    id = json.getInt("id") ?: default?.id ?: Store.nextTournamentId,
+    type = json.getString("type")?.uppercase()?.let { Tournament.Type.valueOf(it) } ?: default?.type ?:  badRequest("missing type"),
+    name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
+    shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
+    startDate = json.getLocalDate("startDate") ?: default?.startDate ?: badRequest("missing startDate"),
+    endDate = json.getLocalDate("endDate") ?: default?.endDate ?: badRequest("missing endDate"),
+    country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
+    location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
+    online = json.getBoolean("online") ?: default?.online ?: false,
+    komi = json.getDouble("komi") ?: default?.komi ?: 7.5,
+    rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: Rules.FRENCH,
+    gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
+    timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
+    pairing = json.getObject("pairing")?.let { Pairing.fromJson(it) } ?: default?.pairing ?: badRequest("missing pairing")
 )
 
 fun Tournament.toJson() = Json.Object(

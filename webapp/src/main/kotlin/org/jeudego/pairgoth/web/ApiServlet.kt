@@ -2,7 +2,7 @@ package org.jeudego.pairgoth.web
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
-import org.jeudego.pairgoth.api.RegistrationHandler
+import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.TournamentHandler
 import org.jeudego.pairgoth.util.Colorizer.green
@@ -63,10 +63,11 @@ class ApiServlet : HttpServlet() {
             // choose handler
 
             val handler = when (entity) {
-                "tournament" ->
+                "tour" ->
                     when (subEntity) {
                         null -> TournamentHandler
-                        "registration" -> RegistrationHandler
+                        "part" -> PlayerHandler
+                        "pair" -> PairingHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
                 "player" -> PlayerHandler
@@ -223,8 +224,8 @@ class ApiServlet : HttpServlet() {
     }
 
     companion object {
-        protected var logger = LoggerFactory.getLogger("api")
-        protected const val EXPECTED_CHARSET = "utf8"
+        private var logger = LoggerFactory.getLogger("api")
+        private const val EXPECTED_CHARSET = "utf8"
         const val AUTH_HEADER = "Authorization"
         const val AUTH_PREFIX = "Bearer"
         private fun isJson(mimeType: String): Boolean {
