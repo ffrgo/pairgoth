@@ -21,7 +21,6 @@ object PlayerHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         // player parsing (CB TODO - team handling, based on tournament type)
         val player = Player.fromJson(payload)
-        // CB TODO - handle concurrency
         tournament.pairables[player.id] = player
         // CB TODO - handle event broadcasting
         return Json.Object("success" to true, "id" to player.id)

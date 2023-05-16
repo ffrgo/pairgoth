@@ -5,10 +5,6 @@ import org.jeudego.pairgoth.model.Tournament
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.math.E
 
-// CB TODO - handle concurrency:
-// - either with concurrent maps
-// - or with a thread isolation (better, covers more operations)
-
 object Store {
     private val _nextTournamentId = AtomicInteger()
     private val _nextPlayerId = AtomicInteger()

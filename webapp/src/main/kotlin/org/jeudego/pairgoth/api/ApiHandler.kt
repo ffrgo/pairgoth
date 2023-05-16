@@ -42,13 +42,13 @@ interface ApiHandler {
     }
 
     fun getObjectPayload(request: HttpServletRequest): Json.Object {
-        val json = request.getAttribute(PAYLOAD_KEY) as Json? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+        val json = getPayload(request)
         if (!json.isObject) badRequest("expecting a json object")
         return json.asObject()
     }
 
     fun getArrayPayload(request: HttpServletRequest): Json.Array {
-        val json = request.getAttribute(PAYLOAD_KEY) as Json? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
+        val json = getPayload(request)
         if (!json.isArray) badRequest("expecting a json array")
         return json.asArray()
     }

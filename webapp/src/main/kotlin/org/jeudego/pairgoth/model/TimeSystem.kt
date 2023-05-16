@@ -2,9 +2,10 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
+import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
 
-
-sealed class TimeSystem(
+data class TimeSystem(
     val type: TimeSystemType,
     val mainTime: Int,
     val increment: Int,
@@ -14,12 +15,12 @@ sealed class TimeSystem(
     val stones: Int
 ) {
     companion object {}
-    enum class TimeSystemType { CANADIAN, STANDARD, FISHER, SUDDEN_DEATH }
+    enum class TimeSystemType { CANADIAN, STANDARD, FISCHER, SUDDEN_DEATH }
 }
 
-class CanadianByoyomi(mainTime: Int, byoyomi: Int, stones: Int):
+fun CanadianByoyomi(mainTime: Int, byoyomi: Int, stones: Int) =
     TimeSystem(
-        type = TimeSystemType.CANADIAN,
+        type = CANADIAN,
         mainTime = mainTime,
         increment = 0,
         byoyomi = byoyomi,
@@ -27,9 +28,9 @@ class CanadianByoyomi(mainTime: Int, byoyomi: Int, stones: Int):
         stones = stones
     )
 
-class StandardByoyomi(mainTime: Int, byoyomi: Int, periods: Int):
+fun StandardByoyomi(mainTime: Int, byoyomi: Int, periods: Int) =
         TimeSystem(
-            type = TimeSystemType.STANDARD,
+            type = STANDARD,
             mainTime = mainTime,
             increment = 0,
             byoyomi = byoyomi,
@@ -37,9 +38,9 @@ class StandardByoyomi(mainTime: Int, byoyomi: Int, periods: Int):
             stones = 1
         )
 
-class FisherTime(mainTime: Int, increment: Int, maxTime: Int = Int.MAX_VALUE):
+fun FischerTime(mainTime: Int, increment: Int, maxTime: Int = Int.MAX_VALUE) =
         TimeSystem(
-            type = TimeSystemType.FISHER,
+            type = FISCHER,
             mainTime = mainTime,
             increment = increment,
             maxTime = maxTime,
@@ -48,9 +49,9 @@ class FisherTime(mainTime: Int, increment: Int, maxTime: Int = Int.MAX_VALUE):
             stones = 0
         )
 
-class SuddenDeath(mainTime: Int):
+fun SuddenDeath(mainTime: Int) =
     TimeSystem(
-        type = TimeSystemType.SUDDEN_DEATH,
+        type = SUDDEN_DEATH,
         mainTime = mainTime,
         increment = 0,
         byoyomi = 0,
@@ -61,32 +62,33 @@ class SuddenDeath(mainTime: Int):
 // Serialization
 
 fun TimeSystem.Companion.fromJson(json: Json.Object) =
-    when (json.getString("type")?.uppercase() ?: ApiHandler.badRequest("missing timeSystem type")) {
+    when (json.getString("type")?.uppercase() ?: badRequest("missing timeSystem type")) {
         "CANADIAN" -> CanadianByoyomi(
-            mainTime = json.getInt("mainTime") ?: ApiHandler.badRequest("missing timeSystem mainTime"),
-            byoyomi = json.getInt("byoyomi") ?: ApiHandler.badRequest("missing timeSystem byoyomi"),
-            stones = json.getInt("stones") ?: ApiHandler.badRequest("missing timeSystem stones")
+            mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
+            byoyomi = json.getInt("byoyomi") ?: badRequest("missing timeSystem byoyomi"),
+            stones = json.getInt("stones") ?: badRequest("missing timeSystem stones")
         )
         "STANDARD" -> StandardByoyomi(
-            mainTime = json.getInt("mainTime") ?: ApiHandler.badRequest("missing timeSystem mainTime"),
-            byoyomi = json.getInt("byoyomi") ?: ApiHandler.badRequest("missing timeSystem byoyomi"),
-            periods = json.getInt("periods") ?: ApiHandler.badRequest("missing timeSystem periods")
+            mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
+            byoyomi = json.getInt("byoyomi") ?: badRequest("missing timeSystem byoyomi"),
+            periods = json.getInt("periods") ?: badRequest("missing timeSystem periods")
         )
-        "FISHER" -> FisherTime(
-            mainTime = json.getInt("mainTime") ?: ApiHandler.badRequest("missing timeSystem mainTime"),
-            increment = json.getInt("increment") ?: ApiHandler.badRequest("missing timeSystem increment"),
-            maxTime = json.getInt("increment") ?: Integer.MAX_VALUE
+        "FISCHER" -> FischerTime(
+            mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
+            increment = json.getInt("increment") ?: badRequest("missing timeSystem increment"),
+            maxTime = json.getInt("maxTime") ?: Integer.MAX_VALUE
         )
         "SUDDEN_DEATH" -> SuddenDeath(
-            mainTime = json.getInt("mainTime") ?: ApiHandler.badRequest("missing timeSystem mainTime"),
+            mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
         )
-        else -> ApiHandler.badRequest("invalid or missing timeSystem type")
+        else -> badRequest("invalid or missing timeSystem type")
     }
 
 fun TimeSystem.toJson() = when (type) {
-    TimeSystem.TimeSystemType.CANADIAN -> Json.Object("mainTime" to mainTime, "byoyomi" to byoyomi, "stones" to stones)
-    TimeSystem.TimeSystemType.STANDARD -> Json.Object("mainTime" to mainTime, "byoyomi" to byoyomi, "periods" to periods)
-    TimeSystem.TimeSystemType.FISHER -> Json.Object("mainTime" to mainTime, "increment" to increment, "maxTime" to maxTime)
-    TimeSystem.TimeSystemType.SUDDEN_DEATH -> Json.Object("mainTime" to mainTime)
+    TimeSystem.TimeSystemType.CANADIAN -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "stones" to stones)
+    TimeSystem.TimeSystemType.STANDARD -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "periods" to periods)
+    TimeSystem.TimeSystemType.FISCHER ->
+        if (maxTime == Int.MAX_VALUE) Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment)
+        else Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment, "maxTime" to maxTime)
+    TimeSystem.TimeSystemType.SUDDEN_DEATH -> Json.Object("type" to type.name, "mainTime" to mainTime)
 }
-

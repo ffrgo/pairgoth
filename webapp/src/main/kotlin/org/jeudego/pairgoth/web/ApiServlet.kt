@@ -12,6 +12,8 @@ import org.jeudego.pairgoth.util.toString
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.locks.ReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -34,7 +36,18 @@ class ApiServlet : HttpServlet() {
         doRequest(request, response)
     }
 
+    private val lock: ReadWriteLock = ReentrantReadWriteLock()
     private fun doRequest(request: HttpServletRequest, response: HttpServletResponse) {
+        val requestLock = if (request.method == "GET") lock.readLock() else lock.writeLock()
+        try {
+            requestLock.lock()
+            doProtectedRequest(request, response)
+        } finally {
+            requestLock.unlock()
+        }
+    }
+
+    private fun doProtectedRequest(request: HttpServletRequest, response: HttpServletResponse) {
         val uri = request.requestURI
         logger.logRequest(request, !uri.contains(".") && uri.length > 1)
 
