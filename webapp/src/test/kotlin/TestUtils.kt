@@ -40,9 +40,9 @@ object TestAPI {
             on { setAttribute(eq(ApiHandler.SELECTOR_KEY), selector.capture()) } doAnswer {}
             on { setAttribute(eq(ApiHandler.SUBSELECTOR_KEY), subSelector.capture()) } doAnswer {}
             on { setAttribute(eq(ApiHandler.PAYLOAD_KEY), reqPayload.capture()) } doAnswer {}
-            on { getAttribute(ApiHandler.SELECTOR_KEY) } doAnswer { selector.lastValue }
-            on { getAttribute(ApiHandler.SUBSELECTOR_KEY) } doAnswer { subSelector.lastValue }
-            on { getAttribute(ApiHandler.PAYLOAD_KEY) } doAnswer { reqPayload.lastValue }
+            on { getAttribute(ApiHandler.SELECTOR_KEY) } doAnswer { selector.allValues.lastOrNull() }
+            on { getAttribute(ApiHandler.SUBSELECTOR_KEY) } doAnswer { subSelector.allValues.lastOrNull() }
+            on { getAttribute(ApiHandler.PAYLOAD_KEY) } doAnswer { reqPayload.allValues.lastOrNull() }
             on { reader } doReturn myReader
             on { scheme } doReturn "http"
             on { localName } doReturn "pairgoth"

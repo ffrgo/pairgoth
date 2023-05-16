@@ -114,9 +114,9 @@ class ApiServlet : HttpServlet() {
             builder.append(response.status).append(' ')
                 .append(reason)
             if (response.status == HttpServletResponse.SC_INTERNAL_SERVER_ERROR) {
-                logger.info(red(">> {}"), builder.toString())
+                logger.trace(red(">> {}"), builder.toString())
             } else {
-                logger.info(green(">> {}"), builder.toString())
+                logger.trace(green(">> {}"), builder.toString())
             }
 
             // CB TODO - should be bufferized and asynchronously written in synchronous chunks

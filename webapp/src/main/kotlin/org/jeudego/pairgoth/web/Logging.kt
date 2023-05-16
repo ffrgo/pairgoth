@@ -25,7 +25,7 @@ fun Logger.logRequest(req: HttpServletRequest, logHeaders: Boolean = false) {
     }
     // builder.append(' ').append(req.getProtocol());
     info(blue("<< {}"), builder.toString())
-    if (logHeaders) {
+    if (isTraceEnabled && logHeaders) {
         // CB TODO - should be bufferized and asynchronously written in synchronous chunks
         // so that header lines from parallel requests are not mixed up in the logs ;
         // synchronizing the whole request log is not desirable
@@ -33,7 +33,7 @@ fun Logger.logRequest(req: HttpServletRequest, logHeaders: Boolean = false) {
         while (headerNames.hasMoreElements()) {
             val name = headerNames.nextElement()
             val value = req.getHeader(name)
-            info(blue("<<     {}: {}"), name, value)
+            trace(blue("<<     {}: {}"), name, value)
         }
     }
 }
