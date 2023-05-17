@@ -28,6 +28,7 @@ object TournamentHandler: PairgothApiHandler {
     }
 
     override fun put(request: HttpServletRequest): Json {
+        // BC TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request) ?: badRequest("missing or invalid tournament id")
         val payload = getObjectPayload(request)
         // disallow changing type

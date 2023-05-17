@@ -24,7 +24,7 @@ class Swiss(
     var method: Method,
     var firstRoundMethod: Method = method
 ): Pairing(SWISS) {
-    enum class Method { FOLD, RANDOM, SLIP }
+    enum class Method { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
     override fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game> {
         val actualMethod = if (round == 1) firstRoundMethod else method
         val history =
@@ -66,7 +66,9 @@ fun Pairing.Companion.fromJson(json: Json.Object) = when (json.getString("type")
 }
 
 fun Pairing.toJson() = when (this) {
-    is Swiss -> Json.Object("type" to type.name, "method" to method.name, "firstRoundMethod" to firstRoundMethod.name)
+    is Swiss ->
+        if (method == firstRoundMethod) Json.Object("type" to type.name, "method" to method.name)
+        else Json.Object("type" to type.name, "method" to method.name, "firstRoundMethod" to firstRoundMethod.name)
     is MacMahon -> Json.Object("type" to type.name, "bar" to bar, "minLevel" to minLevel)
     is RoundRobin -> Json.Object("type" to type.name)
 }

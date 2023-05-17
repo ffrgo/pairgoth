@@ -16,6 +16,7 @@ data class Tournament(
     val location: String,
     val online: Boolean,
     val timeSystem: TimeSystem,
+    val rounds: Int,
     val pairing: Pairing,
     val rules: Rules = Rules.FRENCH,
     val gobanSize: Int = 19,
@@ -45,6 +46,7 @@ data class Tournament(
         // Minimal check on round number.
         // CB TODO - the complete check should verify, for each player, that he was either non pairable or implied in the previous round
         if (round > games.size + 1) badRequest("previous round not paired")
+        if (round > rounds) badRequest("too many rounds")
         val evenPairables =
             if (pairables.size % 2 == 0) pairables
             else pairables.toMutableList()?.also { it.add(ByePlayer) }
@@ -78,6 +80,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament? = null
     rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: Rules.FRENCH,
     gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
     timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
+    rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
     pairing = json.getObject("pairing")?.let { Pairing.fromJson(it) } ?: default?.pairing ?: badRequest("missing pairing")
 )
 
@@ -95,5 +98,6 @@ fun Tournament.toJson() = Json.Object(
     "rules" to rules.name,
     "gobanSize" to gobanSize,
     "timeSystem" to timeSystem.toJson(),
+    "rounds" to rounds,
     "pairing" to pairing.toJson()
 )

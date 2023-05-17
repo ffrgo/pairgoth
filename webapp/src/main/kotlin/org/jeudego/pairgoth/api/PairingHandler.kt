@@ -19,7 +19,8 @@ object PairingHandler: ApiHandler {
     override fun get(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        return tournament.pairables.values.filter { !it.skip.contains(round) }.map { it.toJson() }.toJsonArray()
+        val games = tournament.games.getOrNull(round)?.values ?: emptyList()
+        return games.map { it.toJson() }.toJsonArray()
     }
 
     override fun post(request: HttpServletRequest): Json {
@@ -38,7 +39,7 @@ object PairingHandler: ApiHandler {
                     if (it.skip.contains(round)) badRequest("pairable #$id does not play round $round")
                 } ?: badRequest("invalid pairable id: #$id")
             }
-        // check players are not already implied in games
+        // check players are not already implied in games in this round
         val pairablesIDs = pairables.map { it.id }.toSet()
         tournament.games.getOrNull(round)?.let { games ->
             games.values.mapNotNull { game ->

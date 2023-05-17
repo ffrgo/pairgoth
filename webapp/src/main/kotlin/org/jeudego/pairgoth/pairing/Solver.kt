@@ -32,6 +32,7 @@ sealed class Solver(private val history: List<Game>) {
         val solution = matching.matching
 
         val result = solution.map {
+            // CB TODO - choice of colors should be here
             Game(Store.nextGameId, graph.getEdgeSource(it).id , graph.getEdgeTarget(it).id)
         }
         return result

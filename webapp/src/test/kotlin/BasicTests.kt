@@ -27,8 +27,10 @@ class BasicTests: TestBase() {
             "mainTime" to 1200,
             "increment" to 10
         ),
+        "rounds" to 2,
         "pairing" to Json.Object(
-            "type" to "ROUNDROBIN"
+            "type" to "SWISS",
+            "method" to "SPLIT_AND_SLIP"
         )
     )
 
@@ -79,19 +81,21 @@ class BasicTests: TestBase() {
 
     @Test
     fun `004 modify user`() {
-        val resp = TestAPI.put("/api/tour/1/part/1", Json.Object("skip" to Json.Array(1))) as Json.Object
+        // remove player #1 from round #2
+        val resp = TestAPI.put("/api/tour/1/part/1", Json.Object("skip" to Json.Array(2))) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val player = TestAPI.get("/api/tour/1/part/1") as Json.Object
-        assertEquals("[1]", player.getArray("skip").toString(), "First player should have id #1")
+        assertEquals("[2]", player.getArray("skip").toString(), "First player should have id #1")
     }
 
     @Test
     fun `005 pair`() {
         val resp = TestAPI.post("/api/tour/1/part", anotherPlayer) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val pairable = TestAPI.get("/api/tour/1/pair/1")
-        logger.info(pairable.toString())
+        val games = TestAPI.post("/api/tour/1/pair/1", Json.Array("all"))
+        val possibleResults = setOf(
+            "[{\"id\":1,\"w\":1,\"b\":2,\"r\":\"?\"}]",
+            "[{\"id\":1,\"w\":2,\"b\":1,\"r\":\"?\"}]")
+        assertTrue(possibleResults.contains(games.toString()), "pairing differs")
     }
-
-
 }
