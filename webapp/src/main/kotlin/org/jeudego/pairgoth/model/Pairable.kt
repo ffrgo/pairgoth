@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
@@ -11,6 +12,12 @@ import kotlin.math.roundToInt
 sealed class Pairable(val id: Int, val name: String, open val rating: Int, open val rank: Int) {
     abstract fun toJson(): Json.Object
     val skip = mutableSetOf<Int>() // skipped rounds
+}
+
+object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
+    override fun toJson(): Json.Object {
+        throw Error("bye player should never be serialized")
+    }
 }
 
 fun Pairable.displayRank(): String = when {
@@ -86,7 +93,7 @@ class Team(id: Int, name: String): Pairable(id, name, 0, 0) {
     override fun toJson() = Json.Object(
         "id" to id,
         "name" to name,
-        "players" to Json.Array(players.map { it.toJson() })
+        "players" to players.map { it.toJson() }.toJsonArray()
     )
 }
 

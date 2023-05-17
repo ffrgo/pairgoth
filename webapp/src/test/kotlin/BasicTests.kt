@@ -41,6 +41,15 @@ class BasicTests: TestBase() {
         "club" to "13Ma"
     )
 
+    val anotherPlayer = Json.Object(
+        "name" to "Poirot",
+        "firstname" to "Hercule",
+        "rating" to 1700,
+        "rank" to -1,
+        "country" to "FR",
+        "club" to "75Op"
+    )
+
     @Test
     fun `001 create tournament`() {
         val resp = TestAPI.post("/api/tour", aTournament) as Json.Object
@@ -75,4 +84,14 @@ class BasicTests: TestBase() {
         val player = TestAPI.get("/api/tour/1/part/1") as Json.Object
         assertEquals("[1]", player.getArray("skip").toString(), "First player should have id #1")
     }
+
+    @Test
+    fun `005 pair`() {
+        val resp = TestAPI.post("/api/tour/1/part", anotherPlayer) as Json.Object
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        val pairable = TestAPI.get("/api/tour/1/pair/1")
+        logger.info(pairable.toString())
+    }
+
+
 }

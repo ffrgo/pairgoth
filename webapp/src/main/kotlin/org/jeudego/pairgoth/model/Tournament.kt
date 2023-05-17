@@ -2,7 +2,6 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import kotlinx.datetime.LocalDate
-import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
 
@@ -38,10 +37,21 @@ data class Tournament(
         NBW, MMS, SOS, SOSOS, SODOS
     }
 
-    // pairables
+    // pairables per id
     val pairables = mutableMapOf<Int, Pairable>()
 
-    // games per round
+    // pairing
+    fun pair(round: Int, pairables: List<Pairable>): List<Game> {
+        // Minimal check on round number.
+        // CB TODO - the complete check should verify, for each player, that he was either non pairable or implied in the previous round
+        if (round > games.size + 1) badRequest("previous round not paired")
+        val evenPairables =
+            if (pairables.size % 2 == 0) pairables
+            else pairables.toMutableList()?.also { it.add(ByePlayer) }
+        return pairing.pair(this, round, evenPairables)
+    }
+
+    // games per id for each round
     val games = mutableListOf<MutableMap<Int, Game>>()
 
     // standings criteria

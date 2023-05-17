@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.fromJson
@@ -11,7 +12,7 @@ object PlayerHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest): Json {
         val tournament = getTournament(request) ?: badRequest("invalid tournament")
         return when (val pid = getSubSelector(request)?.toIntOrNull()) {
-            null -> Json.Array(tournament.pairables.values.map { it.toJson() })
+            null -> tournament.pairables.values.map { it.toJson() }.toJsonArray()
             else -> tournament.pairables[pid]?.toJson() ?: badRequest("no player with id #${pid}")
         }
     }
