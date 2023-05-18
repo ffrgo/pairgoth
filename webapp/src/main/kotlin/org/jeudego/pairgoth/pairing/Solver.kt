@@ -9,19 +9,23 @@ import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
+import java.util.*
 
-sealed class Solver(private val history: List<Game>) {
+sealed class Solver(protected val history: List<Game>, protected val pairables: List<Pairable>) {
+
+    companion object {
+        val rand = Random(/* seed from properties - TODO */)
+    }
 
     open fun sort(p: Pairable, q: Pairable): Int = 0 // no sort by default
     abstract fun weight(p: Pairable, q: Pairable): Double
 
-    fun pair(pairables: List<Pairable>): List<Game> {
+    fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
-        val sorted = pairables.sortedWith(::sort)
         val builder = GraphBuilder(SimpleWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
-        for (i in sorted.indices) {
-            for (j in i + 1 until sorted.size) {
+        for (i in sortedPairables.indices) {
+            for (j in i + 1 until n) {
                 val p = pairables[i]
                 val q = pairables[j]
                 builder.addEdge(p, q, weight(p, q))
@@ -36,6 +40,35 @@ sealed class Solver(private val history: List<Game>) {
             Game(Store.nextGameId, graph.getEdgeSource(it).id , graph.getEdgeTarget(it).id)
         }
         return result
+    }
+
+    // Calculation parameters
+
+    val n = pairables.size
+
+    // pairables sorted using overloadable sort function
+    private val sortedPairables by lazy {
+        pairables.sortedWith(::sort)
+    }
+
+    // place (among sorted pairables)
+    val Pairable.place: Int get() = _place[id]!!
+    private val _place by lazy {
+        sortedPairables.mapIndexed { index, pairable ->
+            Pair(pairable.id, index)
+        }.toMap()
+    }
+
+    // placeInGroup (of same score) : Pair(place, groupSize)
+    val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
+    private val _placeInGroup by lazy {
+        sortedPairables.groupBy {
+            it.score
+        }.values.flatMap { group ->
+            group.mapIndexed { index, pairable ->
+                Pair(pairable.id, Pair(index, group.size))
+            }
+        }.toMap()
     }
 
     // already paired players map

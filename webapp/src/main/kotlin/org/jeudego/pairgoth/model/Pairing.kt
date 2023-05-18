@@ -12,9 +12,7 @@ import java.util.Random
 // TODO - this is only an early draft
 
 sealed class Pairing(val type: PairingType) {
-    companion object {
-        val rand = Random(/* seed from properties - TODO */)
-    }
+    companion object {}
     enum class PairingType { SWISS, MACMAHON, ROUNDROBIN }
 
     abstract fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game>
@@ -30,7 +28,7 @@ class Swiss(
         val history =
             if (tournament.games.isEmpty()) emptyList()
             else tournament.games.slice(0 until round).flatMap { it.values }
-        return SwissSolver(history, actualMethod).pair(pairables)
+        return SwissSolver(history, pairables, actualMethod).pair()
     }
 }
 
