@@ -1,11 +1,14 @@
 package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.ext.OpenGotha
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
+import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
 
 object TournamentHandler: PairgothApiHandler {
@@ -18,10 +21,11 @@ object TournamentHandler: PairgothApiHandler {
     }
 
     override fun post(request: HttpServletRequest): Json {
-        val payload = getObjectPayload(request)
-
-        // tournament parsing
-        val tournament = Tournament.fromJson(payload)
+        val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
+            is Json.Object -> Tournament.fromJson(getObjectPayload(request))
+            is Element -> OpenGotha.import(payload)
+            else -> badRequest("missing or invalid payload")
+        }
 
         Store.addTournament(tournament)
         return Json.Object("success" to true, "id" to tournament.id)

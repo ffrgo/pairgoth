@@ -6,17 +6,25 @@ import org.jeudego.pairgoth.web.ApiServlet
 import org.jeudego.pairgoth.web.WebappManager
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import java.io.BufferedReader
+import java.io.File
+import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringReader
 import java.io.StringWriter
 import java.util.*
+import java.util.regex.Pattern
+import java.util.zip.ZipEntry
+import java.util.zip.ZipException
+import java.util.zip.ZipFile
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+
+
+// J2EE server basic mocking
 
 object TestAPI {
 
@@ -24,7 +32,7 @@ object TestAPI {
 
     private val apiServlet = ApiServlet()
 
-    private fun testRequest(reqMethod: String, uri: String, payload: Json? = null): Json {
+    private fun <T> testRequest(reqMethod: String, uri: String, payload: T? = null): Json {
 
         WebappManager.properties["webapp.env"] = "test"
 
@@ -48,7 +56,11 @@ object TestAPI {
             on { localName } doReturn "pairgoth"
             on { localPort } doReturn 80
             on { contextPath } doReturn ""
-            on { contentType } doReturn if (reqMethod == "GET") null else "application/json; charset=UTF-8"
+            on { contentType } doReturn if (reqMethod == "GET") null else when (payload) {
+                is Json -> "application/json; charset=UTF-8"
+                is String -> "application/xml; charset=UTF-8"
+                else -> throw Error("unhandled case")
+            }
             on { headerNames } doReturn Collections.enumeration(myHeaderNames)
             on { getHeader(eq("Accept")) } doReturn "application/json"
         }
@@ -72,12 +84,12 @@ object TestAPI {
         return Json.parse(buffer.toString()) ?: throw Error("no response payload")
     }
 
-    fun get(uri: String) = testRequest("GET", uri)
-    fun post(uri: String, payload: Json) = testRequest("POST", uri, payload)
-    fun put(uri: String, payload: Json) = testRequest("PUT", uri, payload)
-    fun delete(uri: String, payload: Json) = testRequest("DELETE", uri, payload)
+    fun get(uri: String) = testRequest<Void>("GET", uri)
+    fun <T> post(uri: String, payload: T) = testRequest("POST", uri, payload)
+    fun <T> put(uri: String, payload: T) = testRequest("PUT", uri, payload)
+    fun <T> delete(uri: String, payload: T) = testRequest("DELETE", uri, payload)
 }
 
-fun expectSuccess() {
+// Get a list of resources
 
-}
+fun getTestResources(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path").listFiles()

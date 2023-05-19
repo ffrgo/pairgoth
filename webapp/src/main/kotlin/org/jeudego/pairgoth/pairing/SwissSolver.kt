@@ -30,7 +30,7 @@ class SwissSolver(history: List<Game>, pairables: List<Pairable>, val method: Sw
             SPLIT_AND_FOLD ->
                 if (p.placeInGroup.first > q.placeInGroup.first) abs(p.placeInGroup.first - (q.placeInGroup.second - q.placeInGroup.first)) * PLACE_WEIGHT
                 else abs(q.placeInGroup.first - (p.placeInGroup.second - p.placeInGroup.first)) * PLACE_WEIGHT
-            SPLIT_AND_RANDOM -> rand.nextDouble(p.placeInGroup.second.toDouble()) * PLACE_WEIGHT
+            SPLIT_AND_RANDOM -> rand.nextDouble() * p.placeInGroup.second * PLACE_WEIGHT
             SPLIT_AND_SLIP -> abs(abs(p.placeInGroup.first - q.placeInGroup.first) - p.placeInGroup.second) * PLACE_WEIGHT
             else -> throw Error("unhandled case")
         }

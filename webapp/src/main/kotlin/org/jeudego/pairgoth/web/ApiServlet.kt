@@ -5,11 +5,14 @@ import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.TournamentHandler
+import org.jeudego.pairgoth.util.Colorizer.blue
 import org.jeudego.pairgoth.util.Colorizer.green
 import org.jeudego.pairgoth.util.Colorizer.red
+import org.jeudego.pairgoth.util.XmlUtils
 import org.jeudego.pairgoth.util.parse
 import org.jeudego.pairgoth.util.toString
 import org.slf4j.LoggerFactory
+import org.w3c.dom.Element
 import java.io.IOException
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
@@ -60,8 +63,8 @@ class ApiServlet : HttpServlet() {
             if ("dev" == WebappManager.getProperty("webapp.env")) {
                 response.addHeader("Access-Control-Allow-Origin", "*")
             }
-            validateContentType(request)
             validateAccept(request);
+            validateContentType(request)
 
             // parse request URI
 
@@ -169,22 +172,36 @@ class ApiServlet : HttpServlet() {
         )
 
         // check content type
-        if (!isJson(mimeType)) throw ApiException(
+        if (isJson(mimeType)) {
+            // put Json body as request attribute
+            try {
+                Json.parse(request.reader)?.let { payload: Json ->
+                    request.setAttribute(ApiHandler.PAYLOAD_KEY, payload)
+                    if (logger.isInfoEnabled) {
+                        logger.logPayload("<<     ", payload, true)
+                    }
+                }
+            } catch (ioe: IOException) {
+                throw ApiException(HttpServletResponse.SC_BAD_REQUEST, ioe)
+            }
+        } else if (isXml(mimeType)) {
+            // some API calls like opengotha import accept xml docs as body
+            // CB TODO - limit to those calls
+            try {
+                XmlUtils.parse(request.reader)?.let { payload: Element ->
+                    request.setAttribute(ApiHandler.PAYLOAD_KEY, payload)
+                    logger.info(blue("<<     (xml document)"))
+
+                }
+            } catch(ioe: IOException) {
+                throw ApiException(HttpServletResponse.SC_BAD_REQUEST, ioe)
+            }
+        }
+        else throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
             "JSON content expected"
         )
 
-        // put Json body as request attribute
-        try {
-            Json.parse(request.reader)?.let { payload: Json ->
-                request.setAttribute(ApiHandler.PAYLOAD_KEY, payload)
-                if (logger.isInfoEnabled) {
-                    logger.logPayload("<<     ", payload, true)
-                }
-            }
-        } catch (ioe: IOException) {
-            throw ApiException(HttpServletResponse.SC_BAD_REQUEST, ioe)
-        }
     }
 
     @Throws(ApiException::class)
@@ -241,9 +258,7 @@ class ApiServlet : HttpServlet() {
         private const val EXPECTED_CHARSET = "utf8"
         const val AUTH_HEADER = "Authorization"
         const val AUTH_PREFIX = "Bearer"
-        private fun isJson(mimeType: String): Boolean {
-            return "text/json" == mimeType || "application/json" == mimeType ||
-                    mimeType.endsWith("+json")
-        }
+        private fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
+        private fun isXml(mimeType: String) = "text/xml" == mimeType || "application/xml" == mimeType || mimeType.endsWith("+xml")
     }
 }

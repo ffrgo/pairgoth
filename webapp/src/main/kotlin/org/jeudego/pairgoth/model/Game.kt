@@ -10,7 +10,7 @@ data class Game(
     val handicap: Int = 0,
     var result: Result = UNKNOWN
 ) {
-    enum class Result(val symbol: Char) { UNKNOWN('?'), BLACK('b'), WHITE('w'), JIGO('='), CANCELLED('x') }
+    enum class Result(val symbol: Char) { UNKNOWN('?'), BLACK('b'), WHITE('w'), JIGO('='), CANCELLED('x'), BOTHWIN('+'), BOTHLOOSE('-') }
 }
 
 // serialization

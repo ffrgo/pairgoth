@@ -10,6 +10,7 @@ import kotlin.math.roundToInt
 // Pairable
 
 sealed class Pairable(val id: Int, val name: String, open val rating: Int, open val rank: Int) {
+    companion object {}
     abstract fun toJson(): Json.Object
     val skip = mutableSetOf<Int>() // skipped rounds
 }
@@ -29,10 +30,10 @@ fun Pairable.displayRank(): String = when {
 
 private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
 
-fun Pairable.setRank(rankStr: String): Int {
+fun Pairable.Companion.parseRank(rankStr: String): Int {
     val (level, letter) = rankRegex.matchEntire(rankStr)?.destructured ?: throw Error("invalid rank: $rankStr")
     val num = level.toInt()
-    if (num < 0 || num > 9) throw Error("invalid rank: $rankStr")
+    if (num < 0 || letter != "k" && letter != "K" && num > 9) throw Error("invalid rank: $rankStr")
     return when (letter.lowercase()) {
         "k" -> -num
         "d" -> num - 1
