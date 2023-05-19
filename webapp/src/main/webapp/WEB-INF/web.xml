@@ -33,7 +33,7 @@
   </servlet>
   <servlet>
     <servlet-name>sse</servlet-name>
-    <servlet-class>org.jeudego.pairgoth.web.sse.SSEServlet</servlet-class>
+    <servlet-class>org.jeudego.pairgoth.web.SSEServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>

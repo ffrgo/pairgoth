@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.test
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.web.ApiServlet
+import org.jeudego.pairgoth.web.SSEServlet
 import org.jeudego.pairgoth.web.WebappManager
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.doAnswer
@@ -31,6 +32,7 @@ object TestAPI {
     fun Any?.toUnit() = Unit
 
     private val apiServlet = ApiServlet()
+    private val sseServlet = SSEServlet()
 
     private fun <T> testRequest(reqMethod: String, uri: String, payload: T? = null): Json {
 

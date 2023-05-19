@@ -8,6 +8,8 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.web.Event
+import org.jeudego.pairgoth.web.Event.*
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
 
@@ -26,8 +28,8 @@ object TournamentHandler: PairgothApiHandler {
             is Element -> OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
-
         Store.addTournament(tournament)
+        Event.dispatch(tournamentAdded, tournament.toJson())
         return Json.Object("success" to true, "id" to tournament.id)
     }
 
@@ -42,12 +44,14 @@ object TournamentHandler: PairgothApiHandler {
         updated.games.addAll(tournament.games)
         updated.criteria.addAll(tournament.criteria)
         Store.replaceTournament(updated)
+        Event.dispatch(tournamentUpdated, tournament.toJson())
         return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {
         val tournament = getTournament(request) ?: badRequest("missing or invalid tournament id")
         Store.deleteTournament(tournament)
+        Event.dispatch(tournamentDeleted, tournament.id)
         return Json.Object("success" to true)
     }
 }

@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.web.Event
 import javax.servlet.http.HttpServletRequest
 
 object ResultsHandler: PairgothApiHandler {
@@ -18,30 +19,13 @@ object ResultsHandler: PairgothApiHandler {
         return games.map { it.toJson() }.toJsonArray()
     }
 
-    override fun post(request: HttpServletRequest): Json {
-        val tournament = getTournament(request)
-        val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        val payload = getObjectPayload(request)
-        val game = tournament.games[round][payload.getInt("id")] ?: badRequest("invalid game id")
-        game.result = Game.Result.valueOf(payload.getString("result") ?: badRequest("missing result"))
-        return Json.Object("success" to true)
-    }
-
     override fun put(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val payload = getObjectPayload(request)
         val game = tournament.games[round][payload.getInt("id")] ?: badRequest("invalid game id")
         game.result = Game.Result.valueOf(payload.getString("result") ?: badRequest("missing result"))
-        return Json.Object("success" to true)
-    }
-
-    override fun delete(request: HttpServletRequest): Json {
-        val tournament = getTournament(request)
-        val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        val payload = getObjectPayload(request)
-        val game = tournament.games[round][payload.getInt("id")] ?: badRequest("invalid game id")
-        tournament.games[round].remove(payload.getInt("id") ?: badRequest("invalid game id"))  ?: badRequest("invalid game id")
+        Event.dispatch(Event.resultUpdated, Json.Object("tournament" to tournament.id, "round" to round, "data" to game))
         return Json.Object("success" to true)
     }
 }

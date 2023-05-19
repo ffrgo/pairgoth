@@ -5,6 +5,8 @@ import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.fromJson
+import org.jeudego.pairgoth.web.Event
+import org.jeudego.pairgoth.web.Event.*
 import javax.servlet.http.HttpServletRequest
 
 object PlayerHandler: PairgothApiHandler {
@@ -23,7 +25,7 @@ object PlayerHandler: PairgothApiHandler {
         // player parsing (CB TODO - team handling, based on tournament type)
         val player = Player.fromJson(payload)
         tournament.pairables[player.id] = player
-        // CB TODO - handle event broadcasting
+        Event.dispatch(playerAdded, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
         return Json.Object("success" to true, "id" to player.id)
     }
 
@@ -34,10 +36,16 @@ object PlayerHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val updated = Player.fromJson(payload, player as Player)
         tournament.pairables[updated.id] = updated
+        Event.dispatch(playerUpdated, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
         return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {
-        return super.delete(request)
+        val tournament = getTournament(request) ?: badRequest("invalid tournament")
+        val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
+        val player = tournament.pairables[id] ?: badRequest("invalid player id")
+        tournament.pairables.remove(id)
+        Event.dispatch(playerDeleted, Json.Object("tournament" to tournament.id, "data" to id))
+        return Json.Object("success" to true)
     }
 }
