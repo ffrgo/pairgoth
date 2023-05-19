@@ -2,6 +2,7 @@
 
 ## Sources structure
 
+```
 .
 ├── pairgoth.properties.example ............... Executable property file to instanciate
 ├── debug.sh .................................. Executable debug script, linux
@@ -23,9 +24,25 @@
         │       └── WEB-INF ................... Engine API webapp configuration
         └── test
             └── kotlin ........................ Engine webapp API unit tests
+```
 
-## Building
+## Webapp sources structure
 
+```
+webapp/src/main/kotlin/org/jeudego/pairgoth
+├── api .................................... API handlers
+├── ext .................................... External: import/export features
+├── model .................................. Domain logic model
+├── pairing ................................ Pairing solvers
+├── store .................................. Persistence handlers
+├── util ................................... Various utilities
+└── web .................................... Web interface
+    └── sse ................................ Server Sent Events interface
+```
+
+Tests are located in `webapp/src/test/kotlin`
+
+## Building and running
 
 ### Executable
 
@@ -34,6 +51,8 @@ You need maven installed.
 Copy and adapt `pairgoth.properties.example` towards `pairgoth.properties`.
 
 Just running `./run.sh` or `./run.bat` shoud build and run the engine .
+
+Run `/test.sh` to test the engine.
 
 ### Docker
 
