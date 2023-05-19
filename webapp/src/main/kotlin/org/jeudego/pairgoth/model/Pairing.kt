@@ -11,9 +11,15 @@ import java.util.Random
 
 // TODO - this is only an early draft
 
-sealed class Pairing(val type: PairingType) {
+sealed class Pairing(val type: PairingType, val weights: Weights = Weights()) {
     companion object {}
     enum class PairingType { SWISS, MACMAHON, ROUNDROBIN }
+    data class Weights(
+        val played: Double = 1_000_000.0, // weight if players already met
+        val score: Double =     10_000.0, // per difference of score or MMS
+        val place: Double =      1_000.0, // per difference of expected position for Swiss
+        val color: Double =        100.0  // per color unbalancing
+    )
 
     abstract fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game>
 }
@@ -28,7 +34,7 @@ class Swiss(
         val history =
             if (tournament.games.isEmpty()) emptyList()
             else tournament.games.slice(0 until round).flatMap { it.values }
-        return SwissSolver(history, pairables, actualMethod).pair()
+        return SwissSolver(history, pairables, weights, actualMethod).pair()
     }
 }
 

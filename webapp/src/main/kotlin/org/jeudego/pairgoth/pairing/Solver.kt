@@ -3,15 +3,17 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.Game.Result.*
 import org.jeudego.pairgoth.model.Pairable
+import org.jeudego.pairgoth.model.Pairing
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
+import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.SimpleWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 import java.util.*
 
-sealed class Solver(protected val history: List<Game>, protected val pairables: List<Pairable>) {
+sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val weights: Pairing.Weights) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -23,12 +25,13 @@ sealed class Solver(protected val history: List<Game>, protected val pairables: 
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
-        val builder = GraphBuilder(SimpleWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
+        val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
         for (i in sortedPairables.indices) {
             for (j in i + 1 until n) {
                 val p = pairables[i]
                 val q = pairables[j]
                 builder.addEdge(p, q, weight(p, q))
+                builder.addEdge(q, p, weight(q, p))
             }
         }
         val graph = builder.build()
@@ -36,7 +39,6 @@ sealed class Solver(protected val history: List<Game>, protected val pairables: 
         val solution = matching.matching
 
         val result = solution.map {
-            // CB TODO - choice of colors should be here
             Game(Store.nextGameId, graph.getEdgeSource(it).id , graph.getEdgeTarget(it).id)
         }
         return result
@@ -79,6 +81,16 @@ sealed class Solver(protected val history: List<Game>, protected val pairables: 
         } + history.map { game ->
             Pair(game.white, game.black)
         }).toSet()
+    }
+
+    // color balance (nw - nb)
+    val Pairable.colorBalance: Int get() = _colorBalance[id] ?: 0
+    private val _colorBalance: Map<Int, Int> by lazy {
+        history.flatMap { game ->
+            listOf(Pair(game.white, +1), Pair(game.black, -1))
+        }.groupingBy { it.first }.fold(0) { acc, next ->
+            acc + next.second
+        }
     }
 
     // score (number of wins)
