@@ -13,8 +13,14 @@ class ImportTests: TestBase() {
             val resource = file.readText(StandardCharsets.UTF_8)
             val resp = TestAPI.post("/api/tour", resource)
             val id = resp.asObject().getInt("id")
-            val tournament = TestAPI.get("/api/tour/$id")
+            val tournament = TestAPI.get("/api/tour/$id").asObject()
             logger.info(tournament.toString())
+            val players = TestAPI.get("/api/tour/$id/part").asArray()
+            logger.info(players.toString())
+            for (round in 1..tournament.getInt("rounds")!!) {
+                val games = TestAPI.get("/api/tour/$id/res/1").asArray()
+                logger.info("games for round $round: {}", games.toString())
+            }
         }
     }
 }

@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
+import org.jeudego.pairgoth.api.ResultsHandler
 import org.jeudego.pairgoth.api.TournamentHandler
 import org.jeudego.pairgoth.util.Colorizer.blue
 import org.jeudego.pairgoth.util.Colorizer.green
@@ -84,6 +85,7 @@ class ApiServlet : HttpServlet() {
                         null -> TournamentHandler
                         "part" -> PlayerHandler
                         "pair" -> PairingHandler
+                        "res" -> ResultsHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
                 "player" -> PlayerHandler
