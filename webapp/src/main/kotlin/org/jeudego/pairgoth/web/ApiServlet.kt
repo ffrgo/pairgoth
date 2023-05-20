@@ -213,7 +213,7 @@ class ApiServlet : HttpServlet() {
                 HttpServletResponse.SC_BAD_REQUEST,
                 "Missing 'Accept' header"
             )
-        if (!isJson(accept)) throw ApiException(
+        if (!isJson(accept) && (!isXml(accept) || !request.requestURI.matches(Regex("/api/tour/\\d+")))) throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
             "Invalid 'Accept' header"
         )
@@ -260,7 +260,7 @@ class ApiServlet : HttpServlet() {
         private const val EXPECTED_CHARSET = "utf8"
         const val AUTH_HEADER = "Authorization"
         const val AUTH_PREFIX = "Bearer"
-        private fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
-        private fun isXml(mimeType: String) = "text/xml" == mimeType || "application/xml" == mimeType || mimeType.endsWith("+xml")
+        fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
+        fun isXml(mimeType: String) = "text/xml" == mimeType || "application/xml" == mimeType || mimeType.endsWith("+xml")
     }
 }

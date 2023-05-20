@@ -9,15 +9,16 @@ import javax.servlet.http.HttpServletResponse
 interface ApiHandler {
 
     fun route(request: HttpServletRequest, response: HttpServletResponse) =
+        // for now, only get() needed the response object ; other methods shall be reengineered as well if needed
         when (request.method) {
-            "GET" -> get(request)
+            "GET" -> get(request, response)
             "POST" -> post(request)
             "PUT" -> put(request)
             "DELETE" -> delete(request)
             else -> notImplemented()
         }
 
-    fun get(request: HttpServletRequest): Json {
+    fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         notImplemented()
     }
 

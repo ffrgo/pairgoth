@@ -8,10 +8,11 @@ import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.web.Event
 import org.jeudego.pairgoth.web.Event.*
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object PairingHandler: PairgothApiHandler {
 
-    override fun get(request: HttpServletRequest): Json {
+    override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val playing = (tournament.games.getOrNull(round)?.values ?: emptyList()).flatMap {

@@ -8,10 +8,11 @@ import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.web.Event
 import org.jeudego.pairgoth.web.Event.*
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object PlayerHandler: PairgothApiHandler {
 
-    override fun get(request: HttpServletRequest): Json {
+    override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request) ?: badRequest("invalid tournament")
         return when (val pid = getSubSelector(request)?.toIntOrNull()) {
             null -> tournament.pairables.values.map { it.toJson() }.toJsonArray()

@@ -4,15 +4,14 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.web.Event
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object ResultsHandler: PairgothApiHandler {
 
-    override fun get(request: HttpServletRequest): Json {
+    override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val games = tournament.games.getOrNull(round)?.values ?: emptyList()

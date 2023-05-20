@@ -8,17 +8,30 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.web.ApiServlet
 import org.jeudego.pairgoth.web.Event
 import org.jeudego.pairgoth.web.Event.*
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 object TournamentHandler: PairgothApiHandler {
 
-    override fun get(request: HttpServletRequest): Json {
+    override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
+        val accept = request.getHeader("Accept")
         return when (val id = getSelector(request)?.toIntOrNull()) {
             null -> Json.Array(Store.getTournamentsIDs())
-            else -> Store.getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")
+            else ->
+                when {
+                    ApiServlet.isJson(accept) -> Store.getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")
+                    ApiServlet.isXml(accept) -> {
+                        val export = Store.getTournament(id)?.let { OpenGotha.export(it) } ?: badRequest("no tournament with id #${id}")
+                        response.contentType = "application/xml; charset=UTF-8"
+                        response.writer.write(export)
+                        null // return null to indicate that we handled the response ourself
+                    }
+                    else -> badRequest("unhandled Accept header: $accept")
+                }
         }
     }
 

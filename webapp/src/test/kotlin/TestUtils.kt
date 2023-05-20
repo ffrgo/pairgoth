@@ -34,7 +34,7 @@ object TestAPI {
     private val apiServlet = ApiServlet()
     private val sseServlet = SSEServlet()
 
-    private fun <T> testRequest(reqMethod: String, uri: String, payload: T? = null): Json {
+    private fun <T> testRequest(reqMethod: String, uri: String, accept: String = "application/json", payload: T? = null): String {
 
         WebappManager.properties["webapp.env"] = "test"
 
@@ -64,7 +64,7 @@ object TestAPI {
                 else -> throw Error("unhandled case")
             }
             on { headerNames } doReturn Collections.enumeration(myHeaderNames)
-            on { getHeader(eq("Accept")) } doReturn "application/json"
+            on { getHeader(eq("Accept")) } doReturn accept
         }
 
         // mock response
@@ -83,13 +83,14 @@ object TestAPI {
             "DELETE" -> apiServlet.doDelete(req, resp)
         }
 
-        return Json.parse(buffer.toString()) ?: throw Error("no response payload")
+        return buffer.toString() ?: throw Error("no response payload")
     }
 
-    fun get(uri: String) = testRequest<Void>("GET", uri)
-    fun <T> post(uri: String, payload: T) = testRequest("POST", uri, payload)
-    fun <T> put(uri: String, payload: T) = testRequest("PUT", uri, payload)
-    fun <T> delete(uri: String, payload: T) = testRequest("DELETE", uri, payload)
+    fun get(uri: String): Json = Json.parse(testRequest<Void>("GET", uri)) ?: throw Error("no payload")
+    fun getXml(uri: String): String = testRequest<Void>("GET", uri, "application/xml")
+    fun <T> post(uri: String, payload: T) = Json.parse(testRequest("POST", uri, payload = payload)) ?: throw Error("no payload")
+    fun <T> put(uri: String, payload: T) = Json.parse(testRequest("PUT", uri, payload = payload)) ?: throw Error("no payload")
+    fun <T> delete(uri: String, payload: T) = Json.parse(testRequest("DELETE", uri, payload = payload)) ?: throw Error("no payload")
 }
 
 // Get a list of resources
