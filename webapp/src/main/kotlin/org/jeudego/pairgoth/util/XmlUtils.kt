@@ -287,11 +287,9 @@ object XmlUtils {
      */
     @Throws(XPathExpressionException::class)
     fun search(xpath: String?, context: Node?): NodeList {
-        var ret: NodeList? = null
         val xp = XPathFactory.newInstance().newXPath()
         val exp = xp.compile(xpath)
-        ret = exp.evaluate(context, XPathConstants.NODESET) as NodeList
-        return ret
+        return exp.evaluate(context, XPathConstants.NODESET) as NodeList
     }
 
     /**
@@ -305,7 +303,7 @@ object XmlUtils {
     fun getNodes(xpath: String?, context: Node?): List<Node> {
         val ret: MutableList<Node> = ArrayList()
         val lst = search(xpath, context)
-        for (i in 0 until lst!!.length) {
+        for (i in 0 until lst.length) {
             ret.add(lst.item(i))
         }
         return ret
@@ -322,7 +320,7 @@ object XmlUtils {
     fun getElements(xpath: String?, context: Node?): List<Element> {
         val ret: MutableList<Element> = ArrayList()
         val lst = search(xpath, context)
-        for (i in 0 until lst!!.length) {
+        for (i in 0 until lst.length) {
             // will throw a ClassCastExpression if Node is not an Element,
             // that's what we want
             ret.add(lst.item(i) as Element)
@@ -340,7 +338,7 @@ object XmlUtils {
     fun nodePath(n: Node): String {
 
         // declarations
-        var parent: Node? = null
+        var parent: Node?
         val hierarchy = Stack<Node>()
         val buffer = StringBuffer("/")
 
@@ -528,7 +526,7 @@ fun Node.trimTextNodes() {
     val children: NodeList = getChildNodes()
     for (i in 0 until children.length) {
         val child = children.item(i)
-        if (child.nodeType === Node.TEXT_NODE) {
+        if (child.nodeType == Node.TEXT_NODE) {
             child.textContent = child.textContent.trim()
         }
         else child.trimTextNodes()

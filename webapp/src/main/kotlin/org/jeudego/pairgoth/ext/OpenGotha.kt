@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.StandardByoyomi
+import org.jeudego.pairgoth.model.StandardTournament
 import org.jeudego.pairgoth.model.SuddenDeath
 import org.jeudego.pairgoth.model.Swiss
 import org.jeudego.pairgoth.model.TimeSystem
@@ -96,12 +97,12 @@ class OpenGothaFormat(xml: Element): XmlFormat(xml) {
 }
 
 object OpenGotha {
-    fun import(element: Element): Tournament {
+    fun import(element: Element): Tournament<*> {
         val imported = OpenGothaFormat(element)
         val genParams = imported.TournamentParameterSet.GeneralParameterSet
         val handParams = imported.TournamentParameterSet.HandicapParameterSet
         val pairingParams = imported.TournamentParameterSet.PairingParameterSet
-        val tournament = Tournament(
+        val tournament = StandardTournament(
             id = Store.nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
             name = genParams.name,
@@ -150,7 +151,7 @@ object OpenGotha {
             ).also {
                 canonicMap.put("${player.name}${player.firstName}".uppercase(Locale.ENGLISH), it.id)
             }
-        }.associateByTo(tournament.pairables) { it.id }
+        }.associateByTo(tournament.players) { it.id }
         val gamesPerRound = imported.Games.groupBy {
             it.roundNumber
         }.values.map {
@@ -177,7 +178,7 @@ object OpenGotha {
     }
 
     // TODO - bye player(s)
-    fun export(tournament: Tournament): String {
+    fun export(tournament: Tournament<*>): String {
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <Tournament dataVersion="201" externalIPAddress="88.122.144.219" fullVersionNumber="3.51" runningMode="SAL" saveDT="20210111180800">
@@ -225,7 +226,6 @@ object OpenGotha {
                             Game.Result.JIGO -> "RESULT_EQUAL"
                             Game.Result.BOTHWIN -> "RESULT_BOTHWIN"
                             Game.Result.BOTHLOOSE -> "RESULT_BOTHLOOSE"
-                            else -> throw Error("unhandled game result")
                         }
                     }" roundNumber="${
                         round + 1

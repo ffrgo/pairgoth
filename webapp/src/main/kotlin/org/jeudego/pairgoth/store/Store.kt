@@ -13,9 +13,9 @@ object Store {
     val nextPlayerId get() = _nextPlayerId.incrementAndGet()
     val nextGameId get() = _nextGameId.incrementAndGet()
 
-    private val tournaments = mutableMapOf<Int, Tournament>()
+    private val tournaments = mutableMapOf<Int, Tournament<*>>()
 
-    fun addTournament(tournament: Tournament) {
+    fun addTournament(tournament: Tournament<*>) {
         if (tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} already exists")
         tournaments[tournament.id] = tournament
     }
@@ -24,12 +24,12 @@ object Store {
 
     fun getTournamentsIDs(): Set<Int> = tournaments.keys
 
-    fun replaceTournament(tournament: Tournament) {
+    fun replaceTournament(tournament: Tournament<*>) {
         if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")
         tournaments[tournament.id] = tournament
     }
 
-    fun deleteTournament(tournament: Tournament) {
+    fun deleteTournament(tournament: Tournament<*>) {
         if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")
         tournaments.remove(tournament.id)
 

@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse
 object PlayerHandler: PairgothApiHandler {
 
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
-        val tournament = getTournament(request) ?: badRequest("invalid tournament")
+        val tournament = getTournament(request)
         return when (val pid = getSubSelector(request)?.toIntOrNull()) {
             null -> tournament.pairables.values.map { it.toJson() }.toJsonArray()
             else -> tournament.pairables[pid]?.toJson() ?: badRequest("no player with id #${pid}")
@@ -21,31 +21,30 @@ object PlayerHandler: PairgothApiHandler {
     }
 
     override fun post(request: HttpServletRequest): Json {
-        val tournament = getTournament(request) ?: badRequest("invalid tournament")
+        val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         // player parsing (CB TODO - team handling, based on tournament type)
         val player = Player.fromJson(payload)
-        tournament.pairables[player.id] = player
+        tournament.players[player.id] = player
         Event.dispatch(playerAdded, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
         return Json.Object("success" to true, "id" to player.id)
     }
 
     override fun put(request: HttpServletRequest): Json {
-        val tournament = getTournament(request) ?: badRequest("invalid tournament")
+        val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
         val player = tournament.pairables[id] ?: badRequest("invalid player id")
         val payload = getObjectPayload(request)
         val updated = Player.fromJson(payload, player as Player)
-        tournament.pairables[updated.id] = updated
+        tournament.players[updated.id] = updated
         Event.dispatch(playerUpdated, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
         return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {
-        val tournament = getTournament(request) ?: badRequest("invalid tournament")
+        val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
-        val player = tournament.pairables[id] ?: badRequest("invalid player id")
-        tournament.pairables.remove(id)
+        tournament.players.remove(id) ?: badRequest("invalid player id")
         Event.dispatch(playerDeleted, Json.Object("tournament" to tournament.id, "data" to id))
         return Json.Object("success" to true)
     }
