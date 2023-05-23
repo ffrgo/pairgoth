@@ -132,8 +132,8 @@ class TeamTournament(
         name = json.getString("name") ?: default?.name ?: badRequest("missing name")
     ).apply {
         json.getArray("players")?.let { arr ->
-            arr.map {
-                if (it != null && it is Json.Object) Player.fromJson(it)
+            arr.mapTo(playerIds) {
+                if (it != null && it is Number) it.toInt().also { id -> players.containsKey(id) }
                 else badRequest("invalid players array")
             }
         } ?: badRequest("missing players")

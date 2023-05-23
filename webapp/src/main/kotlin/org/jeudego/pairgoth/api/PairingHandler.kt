@@ -18,7 +18,7 @@ object PairingHandler: PairgothApiHandler {
         val playing = (tournament.games.getOrNull(round)?.values ?: emptyList()).flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        return tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.toJsonArray()
+        return tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.map { it.id }.toJsonArray()
     }
 
     override fun post(request: HttpServletRequest): Json {
