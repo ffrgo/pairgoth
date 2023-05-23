@@ -29,7 +29,6 @@ class SwissSolver(history: List<Game>, pairables: List<Pairable>, weights: Pairi
                 else abs(q.placeInGroup.first - (p.placeInGroup.second - p.placeInGroup.first)) * weights.place
             SPLIT_AND_RANDOM -> rand.nextDouble() * p.placeInGroup.second * weights.place
             SPLIT_AND_SLIP -> abs(abs(p.placeInGroup.first - q.placeInGroup.first) - p.placeInGroup.second) * weights.place
-            else -> throw Error("unhandled case")
         }
     } + (abs(p.colorBalance + 1) + abs(q.colorBalance - 1)) * weights.color
 }

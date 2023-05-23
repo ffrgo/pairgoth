@@ -66,7 +66,7 @@ open class OptionalStringXmlDelegate(val xml: Element) {
 
 open class StringXmlDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): String = xml.childOrNull(property.name)?.value() ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) { value?.let { xml.child(property.name).textContent = value } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) { value.let { xml.child(property.name).textContent = value } }
 }
 
 open class OptionalBooleanXmlDelegate(val xml: Element) {
@@ -76,7 +76,7 @@ open class OptionalBooleanXmlDelegate(val xml: Element) {
 
 open class BooleanXmlDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = Json.TypeUtils.toBoolean(xml.childOrNull(property.name)?.value()) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 open class OptionalIntXmlDelegate(val xml: Element) {
@@ -86,7 +86,7 @@ open class OptionalIntXmlDelegate(val xml: Element) {
 
 open class IntXmlDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Int = Json.TypeUtils.toInt(xml.childOrNull(property.name)?.value()) ?: error(property.name)
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 open class OptionalLongXmlDelegate(val xml: Element) {
@@ -96,7 +96,7 @@ open class OptionalLongXmlDelegate(val xml: Element) {
 
 open class LongXmlDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Long = Json.TypeUtils.toLong(xml.childOrNull(property.name)?.value()) ?: error(property.name)
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 open class OptionalDoubleXmlDelegate(val xml: Element) {
@@ -106,7 +106,7 @@ open class OptionalDoubleXmlDelegate(val xml: Element) {
 
 open class DoubleXmlDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Double = Json.TypeUtils.toDouble(xml.childOrNull(property.name)?.value()) ?: error(property.name)
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 open class OptionalEnumXmlDelegate<E: Enum<*>> (val xml: Element, private val kclass: KClass<E>) {
@@ -115,7 +115,7 @@ open class OptionalEnumXmlDelegate<E: Enum<*>> (val xml: Element, private val kc
         val xmlValue = xml.childOrNull(property.name)?.textContent
         return enumValues.firstOrNull() { it.name == xmlValue }
     }
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: E?) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: E?) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 open class EnumXmlDelegate<E: Enum<*>> (val xml: Element, private val kclass: KClass<E>) {
@@ -124,7 +124,7 @@ open class EnumXmlDelegate<E: Enum<*>> (val xml: Element, private val kclass: KC
         val xmlValue = xml.childOrNull(property.name)?.textContent
         return enumValues.firstOrNull() { it.name == xmlValue } ?: error(property.name)
     }
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: E) { value?.let { xml.child(property.name).textContent = value.toString() } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: E) { value.let { xml.child(property.name).textContent = value.toString() } }
 }
 
 const val ISO_LOCAL_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss"
@@ -153,13 +153,13 @@ internal fun dateTimeFormat(format: String): DateTimeFormatter {
 open class OptionalDateXmlDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATE_FORMAT) {
     private val format = dateTimeFormat(formatString)
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): LocalDate? = xml.childOrNull(property.name)?.value()?.let { LocalDate.parse(it /*, format */) }
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate?) { value?.let { xml.child(property.name).textContent = value?.let { /* format.format(value)*/ value.toString() } } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate?) { value?.let { xml.child(property.name).textContent = value.let { /* format.format(value)*/ value.toString() } } }
 }
 
 open class DateXmlDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATE_FORMAT) {
     private val format = dateTimeFormat(formatString)
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): LocalDate = xml.childOrNull(property.name)?.value()?.let { LocalDate.parse(it /*, format */) } ?: error(property.name)
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate) { value?.let { xml.child(property.name).textContent = value?.let { /* format.format(value)*/ value.toString() } } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate) { value.let { xml.child(property.name).textContent = value.let { /* format.format(value)*/ value.toString() } } }
 }
 
 open class OptionalDateTimeXmlDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATETIME_FORMAT) {
@@ -172,7 +172,7 @@ open class OptionalDateTimeXmlDelegate(val xml: Element, formatString: String = 
         return inputString?.let { LocalDateTime.parse(it /*, format*/) } // CB TODO format handling
     }
     //**
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDateTime?) { value?.let { xml.child(property.name).textContent = value?.let { value.toString() /* format.format(value)*/  } } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDateTime?) { value?.let { xml.child(property.name).textContent = value.let { value.toString() /* format.format(value)*/  } } }
 }
 
 open class DateTimeXmlDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATETIME_FORMAT) {
@@ -185,7 +185,7 @@ open class DateTimeXmlDelegate(val xml: Element, formatString: String = ISO_LOCA
         return inputString?.let { LocalDateTime.parse(it /*, format*/) } ?: error(property.name) // CB TODO format handling
     }
     //**
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDateTime) { value?.let { xml.child(property.name).textContent = value?.let { value.toString() /* format.format(value)*/  } } }
+    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDateTime) { value.let { xml.child(property.name).textContent = value.let { value.toString() /* format.format(value)*/  } } }
 }
 
 fun <F: XmlFormat, T: Any> KClass<F>.instantiate(content: T): F = constructors.first().call(content)
@@ -207,7 +207,7 @@ open class OptionalStringXmlAttrDelegate(val xml: Element) {
 
 open class StringXmlAttrDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): String = xml.attr(property.name) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) { value?.let { xml.setAttr(property.name, value) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: String) { value.let { xml.setAttr(property.name, value) } }
 }
 
 open class OptionalBooleanXmlAttrDelegate(val xml: Element) {
@@ -217,7 +217,7 @@ open class OptionalBooleanXmlAttrDelegate(val xml: Element) {
 
 open class BooleanXmlAttrDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Boolean = xml.boolAttr(property.name) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { value?.let { xml.setAttr(property.name, value) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Boolean) { value.let { xml.setAttr(property.name, value) } }
 }
 
 open class OptionalIntXmlAttrDelegate(val xml: Element) {
@@ -227,7 +227,7 @@ open class OptionalIntXmlAttrDelegate(val xml: Element) {
 
 open class IntXmlAttrDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Int = xml.intAttr(property.name) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) { value?.let { xml.setAttr(property.name, value) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) { value.let { xml.setAttr(property.name, value) } }
 }
 
 open class OptionalLongXmlAttrDelegate(val xml: Element) {
@@ -237,7 +237,7 @@ open class OptionalLongXmlAttrDelegate(val xml: Element) {
 
 open class LongXmlAttrDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Long = xml.longAttr(property.name) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) { value?.let { xml.setAttr(property.name, value) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Long) { value.let { xml.setAttr(property.name, value) } }
 }
 
 open class OptionalDoubleXmlAttrDelegate(val xml: Element) {
@@ -247,7 +247,7 @@ open class OptionalDoubleXmlAttrDelegate(val xml: Element) {
 
 open class DoubleXmlAttrDelegate(val xml: Element) {
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): Double = xml.doubleAttr(property.name) ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) { value?.let { xml.setAttr(property.name, value) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Double) { value.let { xml.setAttr(property.name, value) } }
 }
 
 open class OptionalDateXmlAttrDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATE_FORMAT) {
@@ -259,7 +259,7 @@ open class OptionalDateXmlAttrDelegate(val xml: Element, formatString: String = 
 open class DateXmlAttrDelegate(val xml: Element, formatString: String = ISO_LOCAL_DATE_FORMAT) {
     private val format = dateTimeFormat(formatString)
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): LocalDate = xml.attr(property.name)?.let { LocalDate.parse(it/*, format*/) } ?: error(property.name)
-    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate) { value?.let { xml.setAttr(property.name, value.toString() /* format.format(value) */) } }
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: LocalDate) { value.let { xml.setAttr(property.name, value.toString() /* format.format(value) */) } }
 }
 
 // containers delegates

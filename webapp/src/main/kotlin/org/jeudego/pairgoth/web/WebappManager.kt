@@ -104,9 +104,6 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun contextDestroyed(sce: ServletContextEvent) {
         logger.info("---------- Stopping Web Application ----------")
 
-        // overcome a Jetty's bug (v9.4.10.v20180503) whereas if a @WebListener is also listed in the descriptor
-        // it will be instanciated twice...
-        if (context == null) return
         val context = sce.servletContext
         for (service in webServices.keys) stopService(service, true)
         // ??? DriverManager.deregisterDriver(com.mysql.cj.jdbc.Driver ...);

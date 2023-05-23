@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.ext.OpenGotha
+import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
@@ -48,12 +49,15 @@ object TournamentHandler: PairgothApiHandler {
 
     override fun put(request: HttpServletRequest): Json {
         // BC TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
-        val tournament = getTournament(request) ?: badRequest("missing or invalid tournament id")
+        val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
         val updated = Tournament.fromJson(payload, tournament)
-        updated.pairables.putAll(tournament.pairables)
+        updated.players.putAll(tournament.players)
+        if (tournament is TeamTournament && updated is TeamTournament) {
+            updated.teams.putAll(tournament.teams)
+        }
         updated.games.addAll(tournament.games)
         updated.criteria.addAll(tournament.criteria)
         Store.replaceTournament(updated)
@@ -62,7 +66,7 @@ object TournamentHandler: PairgothApiHandler {
     }
 
     override fun delete(request: HttpServletRequest): Json {
-        val tournament = getTournament(request) ?: badRequest("missing or invalid tournament id")
+        val tournament = getTournament(request)
         Store.deleteTournament(tournament)
         Event.dispatch(tournamentDeleted, tournament.id)
         return Json.Object("success" to true)

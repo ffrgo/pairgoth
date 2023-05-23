@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
+import org.jeudego.pairgoth.api.TeamHandler
 import org.jeudego.pairgoth.api.TournamentHandler
 import org.jeudego.pairgoth.util.Colorizer.blue
 import org.jeudego.pairgoth.util.Colorizer.green
@@ -86,6 +87,7 @@ class ApiServlet : HttpServlet() {
                         "part" -> PlayerHandler
                         "pair" -> PairingHandler
                         "res" -> ResultsHandler
+                        "team" -> TeamHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
                 "player" -> PlayerHandler
@@ -103,7 +105,7 @@ class ApiServlet : HttpServlet() {
 
         } catch (apiException: ApiException) {
             reason = apiException.message ?: "unknown API error"
-            if (reason == null) error(response, apiException.code) else error(
+            error(
                 request,
                 response,
                 apiException.code,
@@ -190,7 +192,7 @@ class ApiServlet : HttpServlet() {
             // some API calls like opengotha import accept xml docs as body
             // CB TODO - limit to those calls
             try {
-                XmlUtils.parse(request.reader)?.let { payload: Element ->
+                XmlUtils.parse(request.reader).let { payload: Element ->
                     request.setAttribute(ApiHandler.PAYLOAD_KEY, payload)
                     logger.info(blue("<<     (xml document)"))
 

@@ -21,20 +21,21 @@ sealed class Pairing(val type: PairingType, val weights: Weights = Weights()) {
         val color: Double =        100.0  // per color unbalancing
     )
 
-    abstract fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game>
+    abstract fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game>
 }
+
+fun Tournament<*>.historyBefore(round: Int) =
+    if (games.isEmpty()) emptyList()
+    else games.slice(0 until round).flatMap { it.values }
 
 class Swiss(
     var method: Method,
     var firstRoundMethod: Method = method
 ): Pairing(SWISS) {
     enum class Method { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
-    override fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game> {
+    override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         val actualMethod = if (round == 1) firstRoundMethod else method
-        val history =
-            if (tournament.games.isEmpty()) emptyList()
-            else tournament.games.slice(0 until round).flatMap { it.values }
-        return SwissSolver(history, pairables, weights, actualMethod).pair()
+        return SwissSolver(tournament.historyBefore(round), pairables, weights, actualMethod).pair()
     }
 }
 
@@ -44,13 +45,13 @@ class MacMahon(
 ): Pairing(MACMAHON) {
     val groups = mutableListOf<Int>()
 
-    override fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game> {
+    override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         TODO()
     }
 }
 
 class RoundRobin: Pairing(ROUNDROBIN) {
-    override fun pair(tournament: Tournament, round: Int, pairables: List<Pairable>): List<Game> {
+    override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         TODO()
     }
 }
