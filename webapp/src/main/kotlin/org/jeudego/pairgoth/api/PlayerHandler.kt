@@ -23,7 +23,6 @@ object PlayerHandler: PairgothApiHandler {
     override fun post(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
-        // player parsing (CB TODO - team handling, based on tournament type)
         val player = Player.fromJson(payload)
         tournament.players[player.id] = player
         Event.dispatch(playerAdded, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
@@ -33,9 +32,9 @@ object PlayerHandler: PairgothApiHandler {
     override fun put(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
-        val player = tournament.pairables[id] ?: badRequest("invalid player id")
+        val player = tournament.players[id] ?: badRequest("invalid player id")
         val payload = getObjectPayload(request)
-        val updated = Player.fromJson(payload, player as Player)
+        val updated = Player.fromJson(payload, player)
         tournament.players[updated.id] = updated
         Event.dispatch(playerUpdated, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
         return Json.Object("success" to true)

@@ -83,29 +83,3 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
     }
 }
-
-// Team
-
-class Team(id: Int, name: String): Pairable(id, name, 0, 0) {
-    companion object {}
-    val players = mutableSetOf<Player>()
-    override val rating: Int get() = if (players.isEmpty()) super.rating else (players.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
-    override val rank: Int get() = if (players.isEmpty()) super.rank else (players.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
-    override fun toJson() = Json.Object(
-        "id" to id,
-        "name" to name,
-        "players" to players.map { it.toJson() }.toJsonArray()
-    )
-}
-
-fun Team.Companion.fromJson(json: Json.Object) = Team(
-    id = json.getInt("id") ?: Store.nextPlayerId,
-    name = json.getString("name") ?: badRequest("missing name")
-).apply {
-    json.getArray("players")?.let { arr ->
-        arr.map {
-            if (it != null && it is Json.Object) Player.fromJson(it)
-            else badRequest("invalid players array")
-        }
-    } ?: badRequest("missing players")
-}

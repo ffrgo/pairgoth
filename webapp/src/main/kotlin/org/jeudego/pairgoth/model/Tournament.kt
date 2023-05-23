@@ -1,9 +1,11 @@
 package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonArray
 import kotlinx.datetime.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
+import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
     val id: Int,
@@ -106,9 +108,37 @@ class TeamTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5
-): Tournament<Team>(id, type, name, shortName, startDate, endDate, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+    companion object {}
     override val players = mutableMapOf<Int, Player>()
     val teams: MutableMap<Int, Team> = _pairables
+
+    inner class Team(id: Int, name: String): Pairable(id, name, 0, 0) {
+        val playerIds = mutableSetOf<Int>()
+        val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
+        override val rating: Int get() = if (players.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
+        override val rank: Int get() = if (players.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
+        val club: String? get() = players.map { club }.distinct().let { if (it.size == 1) it[0] else null }
+        val country: String? get() = players.map { country }.distinct().let { if (it.size == 1) it[0] else null }
+        override fun toJson() = Json.Object(
+            "id" to id,
+            "name" to name,
+            "players" to playerIds.toList().toJsonArray()
+        )
+    }
+
+    fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(
+        id = json.getInt("id") ?: default?.id ?: Store.nextPlayerId,
+        name = json.getString("name") ?: default?.name ?: badRequest("missing name")
+    ).apply {
+        json.getArray("players")?.let { arr ->
+            arr.map {
+                if (it != null && it is Json.Object) Player.fromJson(it)
+                else badRequest("invalid players array")
+            }
+        } ?: badRequest("missing players")
+    }
+
 }
 
 // Serialization
