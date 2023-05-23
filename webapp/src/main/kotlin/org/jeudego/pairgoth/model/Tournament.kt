@@ -8,7 +8,7 @@ import org.jeudego.pairgoth.store.Store
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
-    val id: Int,
+    val id: ID,
     val type: Type,
     val name: String,
     val shortName: String,
@@ -41,11 +41,11 @@ sealed class Tournament <P: Pairable>(
     }
 
     // players per id
-    abstract val players: MutableMap<Int, Player>
+    abstract val players: MutableMap<ID, Player>
 
     // pairables per id
-    protected val _pairables = mutableMapOf<Int, P>()
-    val pairables: Map<Int, Pairable> get() = _pairables
+    protected val _pairables = mutableMapOf<ID, P>()
+    val pairables: Map<ID, Pairable> get() = _pairables
 
     // pairing
     fun pair(round: Int, pairables: List<Pairable>): List<Game> {
@@ -63,7 +63,7 @@ sealed class Tournament <P: Pairable>(
     }
 
     // games per id for each round
-    private val games = mutableListOf<MutableMap<Int, Game>>()
+    private val games = mutableListOf<MutableMap<ID, Game>>()
 
     fun games(round: Int) = games.getOrNull(round - 1) ?: mutableMapOf()
     fun lastRound() = games.size
@@ -78,7 +78,7 @@ sealed class Tournament <P: Pairable>(
 
 // standard tournament of individuals
 class StandardTournament(
-    id: Int,
+    id: ID,
     type: Tournament.Type,
     name: String,
     shortName: String,
@@ -99,7 +99,7 @@ class StandardTournament(
 
 // team tournament
 class TeamTournament(
-    id: Int,
+    id: ID,
     type: Tournament.Type,
     name: String,
     shortName: String,
@@ -116,11 +116,11 @@ class TeamTournament(
     komi: Double = 7.5
 ): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
     companion object {}
-    override val players = mutableMapOf<Int, Player>()
-    val teams: MutableMap<Int, Team> = _pairables
+    override val players = mutableMapOf<ID, Player>()
+    val teams: MutableMap<ID, Team> = _pairables
 
-    inner class Team(id: Int, name: String): Pairable(id, name, 0, 0) {
-        val playerIds = mutableSetOf<Int>()
+    inner class Team(id: ID, name: String): Pairable(id, name, 0, 0) {
+        val playerIds = mutableSetOf<ID>()
         val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
         override val rating: Int get() = if (teamPlayers.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
         override val rank: Int get() = if (teamPlayers.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()

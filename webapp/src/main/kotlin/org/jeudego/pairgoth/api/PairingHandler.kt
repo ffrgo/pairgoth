@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Pairing
+import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.web.Event
 import org.jeudego.pairgoth.web.Event.*
@@ -35,7 +36,7 @@ object PairingHandler: PairgothApiHandler {
                 tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }
             else payload.map {
                 // CB - because of the '["all"]' map, conversion to int lands here... Better API syntax for 'all players'?
-                if (it is Number) it.toInt() else badRequest("invalid pairable id: #$it")
+                if (it is Number) it.toID() else badRequest("invalid pairable id: #$it")
             }.map { id ->
                 tournament.pairables[id]?.also {
                     if (it.skip.contains(round)) badRequest("pairable #$id does not play round $round")

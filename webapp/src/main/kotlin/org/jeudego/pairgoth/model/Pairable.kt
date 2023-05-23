@@ -9,7 +9,7 @@ import kotlin.math.roundToInt
 
 // Pairable
 
-sealed class Pairable(val id: Int, val name: String, open val rating: Int, open val rank: Int) {
+sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int) {
     companion object {}
     abstract fun toJson(): Json.Object
     abstract val club: String?
@@ -49,7 +49,7 @@ fun Pairable.Companion.parseRank(rankStr: String): Int {
 // Player
 
 class Player(
-    id: Int,
+    id: ID,
     name: String,
     var firstname: String,
     rating: Int,

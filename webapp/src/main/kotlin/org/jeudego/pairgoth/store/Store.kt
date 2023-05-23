@@ -1,5 +1,6 @@
 package org.jeudego.pairgoth.store
 
+import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.Tournament
 import java.util.concurrent.atomic.AtomicInteger
@@ -13,16 +14,16 @@ object Store {
     val nextPlayerId get() = _nextPlayerId.incrementAndGet()
     val nextGameId get() = _nextGameId.incrementAndGet()
 
-    private val tournaments = mutableMapOf<Int, Tournament<*>>()
+    private val tournaments = mutableMapOf<ID, Tournament<*>>()
 
     fun addTournament(tournament: Tournament<*>) {
         if (tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} already exists")
         tournaments[tournament.id] = tournament
     }
 
-    fun getTournament(id: Int) = tournaments[id]
+    fun getTournament(id: ID) = tournaments[id]
 
-    fun getTournamentsIDs(): Set<Int> = tournaments.keys
+    fun getTournamentsIDs(): Set<ID> = tournaments.keys
 
     fun replaceTournament(tournament: Tournament<*>) {
         if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")

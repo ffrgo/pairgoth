@@ -5,9 +5,9 @@ import org.jeudego.pairgoth.model.Game.Result.*
 import java.util.*
 
 data class Game(
-    val id: Int,
-    val white: Int,
-    val black: Int,
+    val id: ID,
+    val white: ID,
+    val black: ID,
     val handicap: Int = 0,
     var result: Result = UNKNOWN
 ) {
