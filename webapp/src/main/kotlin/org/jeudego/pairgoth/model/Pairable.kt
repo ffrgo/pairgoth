@@ -12,6 +12,8 @@ import kotlin.math.roundToInt
 sealed class Pairable(val id: Int, val name: String, open val rating: Int, open val rank: Int) {
     companion object {}
     abstract fun toJson(): Json.Object
+    abstract val club: String?
+    abstract val country: String?
     val skip = mutableSetOf<Int>() // skipped rounds
 }
 
@@ -19,13 +21,15 @@ object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
     override fun toJson(): Json.Object {
         throw Error("bye player should never be serialized")
     }
+
+    override val club = "none"
+    override val country = "none"
 }
 
 fun Pairable.displayRank(): String = when {
     rank < 0 -> "${-rank}k"
-    rank >= 0 && rank < 10 -> "${rank + 1}d"
-    rank >= 10 -> "${rank - 9}p"
-    else -> throw Error("impossible")
+    rank < 10 -> "${rank + 1}d"
+    else -> "${rank - 9}p"
 }
 
 private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
@@ -50,8 +54,8 @@ class Player(
     var firstname: String,
     rating: Int,
     rank: Int,
-    var country: String,
-    var club: String
+    override var country: String,
+    override var club: String
 ): Pairable(id, name, rating, rank) {
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)

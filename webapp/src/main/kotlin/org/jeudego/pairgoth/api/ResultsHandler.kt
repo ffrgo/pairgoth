@@ -14,7 +14,7 @@ object ResultsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        val games = tournament.games.getOrNull(round)?.values ?: emptyList()
+        val games = tournament.games(round).values
         return games.map { it.toJson() }.toJsonArray()
     }
 
@@ -22,8 +22,8 @@ object ResultsHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val payload = getObjectPayload(request)
-        val game = tournament.games[round][payload.getInt("id")] ?: badRequest("invalid game id")
-        game.result = Game.Result.valueOf(payload.getString("result") ?: badRequest("missing result"))
+        val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
+        game.result = Game.Result.fromSymbol(payload.getChar("result") ?: badRequest("missing result"))
         Event.dispatch(Event.resultUpdated, Json.Object("tournament" to tournament.id, "round" to round, "data" to game))
         return Json.Object("success" to true)
     }

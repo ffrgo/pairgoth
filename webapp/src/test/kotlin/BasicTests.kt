@@ -1,16 +1,15 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
-import org.junit.jupiter.api.MethodOrderer.Alphanumeric
+import org.junit.jupiter.api.MethodOrderer.MethodName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
-import java.util.Objects
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 
-@TestMethodOrder(Alphanumeric::class)
+@TestMethodOrder(MethodName::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BasicTests: TestBase() {
 
@@ -51,8 +50,7 @@ class BasicTests: TestBase() {
         ),
         "rounds" to 2,
         "pairing" to Json.Object(
-            "type" to "SWISS",
-            "method" to "SPLIT_AND_RANDOM"
+            "type" to "MACMAHON"
         )
     )
 
@@ -60,7 +58,7 @@ class BasicTests: TestBase() {
         "name" to "Burma",
         "firstname" to "Nestor",
         "rating" to 1600,
-        "rank" to -2,
+        "rank" to -5,
         "country" to "FR",
         "club" to "13Ma"
     )
@@ -114,33 +112,59 @@ class BasicTests: TestBase() {
     fun `005 pair`() {
         val resp = TestAPI.post("/api/tour/1/part", anotherPlayer) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val games = TestAPI.post("/api/tour/1/pair/1", Json.Array("all"))
+        var games = TestAPI.post("/api/tour/1/pair/1", Json.Array("all"))
         val possibleResults = setOf(
-            "[{\"id\":1,\"w\":1,\"b\":2,\"r\":\"?\"}]",
-            "[{\"id\":1,\"w\":2,\"b\":1,\"r\":\"?\"}]")
+            """[{"id":1,"w":1,"b":2,"h":0,"r":"?"}]""",
+            """[{"id":1,"w":2,"b":1,"h":0,"r":"?"}]"""
+        )
         assertTrue(possibleResults.contains(games.toString()), "pairing differs")
+        games = TestAPI.get("/api/tour/1/res/1") as Json.Array
+        assertTrue(possibleResults.contains(games.toString()), "results differs")
+        val empty = TestAPI.get("/api/tour/1/pair/1") as Json.Array
+        assertEquals("[]", empty.toString(), "no more pairables for round 1")
     }
 
     @Test
-    fun `006 team tournament`() {
+    fun `006 result`() {
+        val resp = TestAPI.put("/api/tour/1/res/1", Json.parse("""{"id":1,"result":"b"}""")) as Json.Object
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        val games = TestAPI.get("/api/tour/1/res/1")
+        val possibleResults = setOf(
+            """[{"id":1,"w":1,"b":2,"h":0,"r":"b"}]""",
+            """[{"id":1,"w":2,"b":1,"h":0,"r":"b"}]"""
+        )
+        assertTrue(possibleResults.contains(games.toString()), "results differ")
+    }
+
+    @Test
+    fun `007 team tournament, MacMahon`() {
         var resp = TestAPI.post("/api/tour", aTeamTournament) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         assertEquals(2, resp.getInt("id"), "expecting id #2 for new tournament")
-        resp = TestAPI.post("api/tour/2/part", aPlayer) as Json.Object
+        resp = TestAPI.post("/api/tour/2/part", aPlayer) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         assertEquals(3, resp.getInt("id"), "expecting id #3 for new player")
-        resp = TestAPI.post("api/tour/2/part", anotherPlayer) as Json.Object
+        resp = TestAPI.post("/api/tour/2/part", anotherPlayer) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         assertEquals(4, resp.getInt("id"), "expecting id #{ for new player")
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         var arr = TestAPI.get("/api/tour/2/pair/1") as Json.Array
         assertEquals("[]", arr.toString(), "expecting an empty array")
-        resp = TestAPI.post("api/tour/2/team", Json.parse("""{ "name":"The Buffallos", "players":[3, 4] }""") as Json.Object) as Json.Object
+        resp = TestAPI.post("/api/tour/2/team", Json.parse("""{ "name":"The Buffallos", "players":[3, 4] }""") as Json.Object) as Json.Object
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         assertEquals(5, resp.getInt("id"), "expecting team id #5")
-        resp = TestAPI.get("api/tour/2/team/5") as Json.Object
+        resp = TestAPI.get("/api/tour/2/team/5") as Json.Object
         assertEquals("""{"id":5,"name":"The Buffallos","players":[3,4]}""", resp.toString(), "expecting team description")
         arr = TestAPI.get("/api/tour/2/pair/1") as Json.Array
         assertEquals("[5]", arr.toString(), "expecting a singleton array")
+        // nothing stops us in reusing players in different teams, at least for now...
+        resp = TestAPI.post("/api/tour/2/team", Json.parse("""{ "name":"The Billies", "players":[3, 4] }""") as Json.Object) as Json.Object
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        assertEquals(6, resp.getInt("id"), "expecting team id #6")
+        arr = TestAPI.get("/api/tour/2/pair/1") as Json.Array
+        assertEquals("[5,6]", arr.toString(), "expecting two pairables")
+        arr = TestAPI.post("/api/tour/2/pair/1", Json.parse("""["all"]""")) as Json.Array
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        val expected = """"["id":1,"w":5,"b":6,"h":3,"r":"?"]"""
     }
 }

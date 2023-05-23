@@ -173,7 +173,9 @@ object OpenGotha {
                 )
             }.associateBy { it.id }.toMutableMap()
         }
-        tournament.games.addAll(gamesPerRound)
+        gamesPerRound.forEachIndexed { index, games ->
+            tournament.games(index).putAll(games)
+        }
         return tournament
     }
 
@@ -209,9 +211,9 @@ object OpenGotha {
             }
             </Players>
             <Games>
-            ${tournament.games.flatMapIndexed { round, games ->
+            ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
                     games.values.mapIndexed { table, game ->
-                        Triple(round, table , game)
+                        Triple(index + 1, table , game)
                     }
                 }.joinToString("\n") { (round, table, game) ->
                     """<Game blackPlayer="${
@@ -228,7 +230,7 @@ object OpenGotha {
                             Game.Result.BOTHLOOSE -> "RESULT_BOTHLOOSE"
                         }
                     }" roundNumber="${
-                        round + 1
+                        round
                     }" tableNumber="${
                         table + 1
                     }" whitePlayer="${

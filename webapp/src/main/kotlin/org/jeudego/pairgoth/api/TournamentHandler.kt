@@ -54,11 +54,15 @@ object TournamentHandler: PairgothApiHandler {
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
         val updated = Tournament.fromJson(payload, tournament)
+        // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
         updated.players.putAll(tournament.players)
         if (tournament is TeamTournament && updated is TeamTournament) {
             updated.teams.putAll(tournament.teams)
         }
-        updated.games.addAll(tournament.games)
+        for (round in 1..tournament.lastRound()) updated.games(round).apply {
+            clear()
+            putAll(tournament.games(round))
+        }
         updated.criteria.addAll(tournament.criteria)
         Store.replaceTournament(updated)
         Event.dispatch(tournamentUpdated, tournament.toJson())

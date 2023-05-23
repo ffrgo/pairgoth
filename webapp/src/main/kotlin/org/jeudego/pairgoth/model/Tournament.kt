@@ -56,11 +56,17 @@ sealed class Tournament <P: Pairable>(
         val evenPairables =
             if (pairables.size % 2 == 0) pairables
             else pairables.toMutableList().also { it.add(ByePlayer) }
-        return pairing.pair(this, round, evenPairables)
+        return pairing.pair(this, round, evenPairables).also { newGames ->
+            if (games.size < round) games.add(mutableMapOf())
+            games[round - 1].putAll( newGames.associateBy { it.id } )
+        }
     }
 
     // games per id for each round
-    val games = mutableListOf<MutableMap<Int, Game>>()
+    private val games = mutableListOf<MutableMap<Int, Game>>()
+
+    fun games(round: Int) = games.getOrNull(round - 1) ?: mutableMapOf()
+    fun lastRound() = games.size
 
     // standings criteria
     val criteria = mutableListOf<Criterion>(
@@ -116,10 +122,10 @@ class TeamTournament(
     inner class Team(id: Int, name: String): Pairable(id, name, 0, 0) {
         val playerIds = mutableSetOf<Int>()
         val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
-        override val rating: Int get() = if (players.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
-        override val rank: Int get() = if (players.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
-        val club: String? get() = players.map { club }.distinct().let { if (it.size == 1) it[0] else null }
-        val country: String? get() = players.map { country }.distinct().let { if (it.size == 1) it[0] else null }
+        override val rating: Int get() = if (teamPlayers.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
+        override val rank: Int get() = if (teamPlayers.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
+        override val club: String? get() = teamPlayers.map { club }.distinct().let { if (it.size == 1) it[0] else null }
+        override val country: String? get() = teamPlayers.map { country }.distinct().let { if (it.size == 1) it[0] else null }
         override fun toJson() = Json.Object(
             "id" to id,
             "name" to name,

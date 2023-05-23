@@ -20,7 +20,12 @@ sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val 
     }
 
     open fun sort(p: Pairable, q: Pairable): Int = 0 // no sort by default
-    abstract fun weight(p: Pairable, q: Pairable): Double
+    abstract fun weight(black: Pairable, white: Pairable): Double
+    open fun handicap(black: Pairable, white: Pairable) = 0
+    open fun games(black: Pairable, white: Pairable): List<Game> {
+        // CB TODO team of individuals pairing
+        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = handicap(black, white)))
+    }
 
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
@@ -30,16 +35,16 @@ sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val 
             for (j in i + 1 until n) {
                 val p = pairables[i]
                 val q = pairables[j]
-                builder.addEdge(p, q, weight(p, q))
-                builder.addEdge(q, p, weight(q, p))
+                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
+                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
             }
         }
         val graph = builder.build()
         val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MINIMIZE)
         val solution = matching.matching
 
-        val result = solution.map {
-            Game(Store.nextGameId, graph.getEdgeSource(it).id , graph.getEdgeTarget(it).id)
+        val result = solution.flatMap {
+            games(black = graph.getEdgeSource(it) , white = graph.getEdgeTarget(it))
         }
         return result
     }
@@ -94,49 +99,55 @@ sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val 
     }
 
     // score (number of wins)
-    val Pairable.score: Int get() = _score[id] ?: 0
-    private val _score: Map<Int, Int> by lazy {
-        history.mapNotNull { game ->
-            when (game.result) {
-                BLACK -> game.black
-                WHITE -> game.white
-                else -> null
+    val Pairable.score: Double get() = _score[id] ?: 0.0
+    private val _score: Map<Int, Double> by lazy {
+        mutableMapOf<Int, Double>().apply {
+            history.forEach { game ->
+                when (game.result) {
+                    BLACK -> put(game.black, getOrDefault(game.black, 0.0) + 1.0)
+                    WHITE -> put(game.white, getOrDefault(game.white, 0.0) + 1.0)
+                    BOTHWIN -> {
+                        put(game.black, getOrDefault(game.black, 0.0) + 0.5)
+                        put(game.white, getOrDefault(game.white, 0.0) + 0.5)
+                    }
+                    else -> {}
+                }
             }
-        }.groupingBy { it }.eachCount()
+        }
     }
 
     // sos
-    val Pairable.sos: Int get() = _sos[id] ?: 0
+    val Pairable.sos: Double get() = _sos[id] ?: 0.0
     private val _sos by lazy {
         (history.map { game ->
-            Pair(game.black, _score[game.white] ?: 0)
+            Pair(game.black, _score[game.white] ?: 0.0)
         } + history.map { game ->
-            Pair(game.white, _score[game.black] ?: 0)
-        }).groupingBy { it.first }.fold(0) { acc, next ->
+            Pair(game.white, _score[game.black] ?: 0.0)
+        }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
     }
 
     // sosos
-    val Pairable.sosos: Int get() = _sosos[id] ?: 0
+    val Pairable.sosos: Double get() = _sosos[id] ?: 0.0
     private val _sosos by lazy {
         (history.map { game ->
-            Pair(game.black, _sos[game.white] ?: 0)
+            Pair(game.black, _sos[game.white] ?: 0.0)
         } + history.map { game ->
-            Pair(game.white, _sos[game.black] ?: 0)
-        }).groupingBy { it.first }.fold(0) { acc, next ->
+            Pair(game.white, _sos[game.black] ?: 0.0)
+        }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
     }
 
     // sodos
-    val Pairable.sodos: Int get() = _sodos[id] ?: 0
+    val Pairable.sodos: Double get() = _sodos[id] ?: 0.0
     private val _sodos by lazy {
         (history.map { game ->
-            Pair(game.black, if (game.result == BLACK) _score[game.white] ?: 0 else 0)
+            Pair(game.black, if (game.result == BLACK) _score[game.white] ?: 0.0 else 0.0)
         } + history.map { game ->
-            Pair(game.white, if (game.result == WHITE) _score[game.black] ?: 0 else 0)
-        }).groupingBy { it.first }.fold(0) { acc, next ->
+            Pair(game.white, if (game.result == WHITE) _score[game.black] ?: 0.0 else 0.0)
+        }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
     }

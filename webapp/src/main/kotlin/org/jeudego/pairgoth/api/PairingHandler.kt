@@ -15,7 +15,7 @@ object PairingHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        val playing = (tournament.games.getOrNull(round)?.values ?: emptyList()).flatMap {
+        val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
         return tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.map { it.id }.toJsonArray()
@@ -27,7 +27,7 @@ object PairingHandler: PairgothApiHandler {
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
         if (!allPlayers && tournament.pairing.type == Pairing.PairingType.SWISS) badRequest("Swiss pairing requires all pairable players")
-        val playing = (tournament.games.getOrNull(round)?.values ?: emptyList()).flatMap {
+        val playing = (tournament.games(round).values).flatMap {
             listOf(it.black, it.white)
         }.toSet()
         val pairables =
@@ -52,15 +52,15 @@ object PairingHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
-        if (round != tournament.games.size) badRequest("cannot delete games in other rounds but the last")
+        if (round != tournament.lastRound()) badRequest("cannot delete games in other rounds but the last")
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
         if (allPlayers) {
-            tournament.games.removeLast()
+            tournament.games(round).clear()
         } else {
             payload.forEach {
                 val id = (it as Number).toInt()
-                tournament.games[round].remove(id)
+                tournament.games(round).remove(id)
             }
         }
         Event.dispatch(gamesDeleted, Json.Object("tournament" to tournament.id, "round" to round, "data" to payload))

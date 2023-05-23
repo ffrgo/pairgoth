@@ -6,32 +6,39 @@ import org.jeudego.pairgoth.model.Pairing.PairingType.*
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.RoundRobin
 import org.jeudego.pairgoth.model.Swiss
+import org.jeudego.pairgoth.pairing.MacMahonSolver
 import org.jeudego.pairgoth.pairing.SwissSolver
 import java.util.Random
-
-// TODO - this is only an early draft
 
 sealed class Pairing(val type: PairingType, val weights: Weights = Weights()) {
     companion object {}
     enum class PairingType { SWISS, MACMAHON, ROUNDROBIN }
     data class Weights(
-        val played: Double = 1_000_000.0, // weight if players already met
-        val score: Double =     10_000.0, // per difference of score or MMS
-        val place: Double =      1_000.0, // per difference of expected position for Swiss
-        val color: Double =        100.0  // per color unbalancing
+        val played: Double =    1_000_000.0, // players already met
+        val group: Double =       100_000.0, // different group
+        val handicap: Double =     50_000.0, // for each handicap stone
+        val score: Double =        10_000.0, // per difference of score or MMS
+        val place: Double =         1_000.0, // per difference of expected position for Swiss
+        val color: Double =           500.0, // per color unbalancing
+        val club: Double =            100.0, // same club weight
+        val country: Double =          50.0  // same country
     )
 
     abstract fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game>
 }
 
 fun Tournament<*>.historyBefore(round: Int) =
-    if (games.isEmpty()) emptyList()
-    else games.slice(0 until round).flatMap { it.values }
+    if (lastRound() == 0) emptyList()
+    else (0 until round).flatMap { games(round).values }
 
 class Swiss(
     var method: Method,
-    var firstRoundMethod: Method = method
-): Pairing(SWISS) {
+    var firstRoundMethod: Method = method,
+): Pairing(SWISS, Weights(
+    handicap = 0.0, // no handicap games anyway
+    club = 0.0,
+    country = 0.0
+)) {
     enum class Method { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         val actualMethod = if (round == 1) firstRoundMethod else method
@@ -41,12 +48,13 @@ class Swiss(
 
 class MacMahon(
     var bar: Int = 0,
-    var minLevel: Int = -30
+    var minLevel: Int = -30,
+    var reducer: Int = 1
 ): Pairing(MACMAHON) {
     val groups = mutableListOf<Int>()
 
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        TODO()
+        return MacMahonSolver(tournament.historyBefore(round), pairables, weights, mmBase = minLevel, mmBar = bar, reducer = reducer).pair()
     }
 }
 
@@ -65,7 +73,8 @@ fun Pairing.Companion.fromJson(json: Json.Object) = when (json.getString("type")
     )
     MACMAHON -> MacMahon(
         bar = json.getInt("bar") ?: 0,
-        minLevel = json.getInt("minLevel") ?: -30
+        minLevel = json.getInt("minLevel") ?: -30,
+        reducer = json.getInt("reducer") ?: 1
     )
     ROUNDROBIN -> RoundRobin()
 }
@@ -74,7 +83,7 @@ fun Pairing.toJson() = when (this) {
     is Swiss ->
         if (method == firstRoundMethod) Json.Object("type" to type.name, "method" to method.name)
         else Json.Object("type" to type.name, "method" to method.name, "firstRoundMethod" to firstRoundMethod.name)
-    is MacMahon -> Json.Object("type" to type.name, "bar" to bar, "minLevel" to minLevel)
+    is MacMahon -> Json.Object("type" to type.name, "bar" to bar, "minLevel" to minLevel, "reducer" to reducer)
     is RoundRobin -> Json.Object("type" to type.name)
 }
 

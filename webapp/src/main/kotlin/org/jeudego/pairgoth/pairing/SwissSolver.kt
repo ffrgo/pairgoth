@@ -11,24 +11,29 @@ class SwissSolver(history: List<Game>, pairables: List<Pairable>, weights: Pairi
 
     override fun sort(p: Pairable, q: Pairable): Int =
         when (p.score) {
-            q.score -> p.rating - q.rating
-            else -> p.score - q.score
+            q.score -> q.rating - p.rating
+            else -> ((q.score - p.score) * 1000).toInt()
         }
 
-    override fun weight(p: Pairable, q: Pairable) = when {
-        p.played(q) -> weights.played
-        p.score != q.score -> {
+    override fun weight(black: Pairable, white: Pairable): Double {
+        var weight = 0.0
+        if (black.played(white)) weight += weights.played
+        if (black.score != white.score) {
             val placeWeight =
-                if (p.score > q.score) (p.placeInGroup.second + q.placeInGroup.first) * weights.place
-                else (q.placeInGroup.second + p.placeInGroup.first) * weights.place
-            abs(p.score - q.score) * weights.score + placeWeight
+                if (black.score > white.score) (black.placeInGroup.second + white.placeInGroup.first) * weights.place
+                else (white.placeInGroup.second + black.placeInGroup.first) * weights.place
+            weight += abs(black.score - white.score) * weights.score + placeWeight
+        } else {
+            weight += when (method) {
+                SPLIT_AND_FOLD ->
+                    if (black.placeInGroup.first > white.placeInGroup.first) abs(black.placeInGroup.first - (white.placeInGroup.second - white.placeInGroup.first)) * weights.place
+                    else abs(white.placeInGroup.first - (black.placeInGroup.second - black.placeInGroup.first)) * weights.place
+
+                SPLIT_AND_RANDOM -> rand.nextDouble() * black.placeInGroup.second * weights.place
+                SPLIT_AND_SLIP -> abs(abs(black.placeInGroup.first - white.placeInGroup.first) - black.placeInGroup.second) * weights.place
+            }
         }
-        else -> when (method) {
-            SPLIT_AND_FOLD ->
-                if (p.placeInGroup.first > q.placeInGroup.first) abs(p.placeInGroup.first - (q.placeInGroup.second - q.placeInGroup.first)) * weights.place
-                else abs(q.placeInGroup.first - (p.placeInGroup.second - p.placeInGroup.first)) * weights.place
-            SPLIT_AND_RANDOM -> rand.nextDouble() * p.placeInGroup.second * weights.place
-            SPLIT_AND_SLIP -> abs(abs(p.placeInGroup.first - q.placeInGroup.first) - p.placeInGroup.second) * weights.place
-        }
-    } + (abs(p.colorBalance + 1) + abs(q.colorBalance - 1)) * weights.color
+        weight += (abs(black.colorBalance + 1) + abs(white.colorBalance - 1)) * weights.color
+        return weight
+    }
 }
