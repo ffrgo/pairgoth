@@ -53,17 +53,4 @@
     <param-name>webapp-slf4j-logger.format</param-name>
     <param-value>%logger [%level] [%ip] %message @%file:%line:%column</param-value>
   </context-param>
-  <context-param>
-    <param-name>webapp-slf4j-logger.level</param-name>
-    <param-value>trace</param-value>
-    <!-- CB TODO parametrize from webapp properties file
-    <param-value>${logger.level}</param-value>
-    -->
-  </context-param>
-  <!--
-  <context-param>
-    <param-name>webapp-slf4j-logger.notification</param-name>
-    <param-value>${logger.notification}</param-value>
-  </context-param>
-  -->
 </web-app>

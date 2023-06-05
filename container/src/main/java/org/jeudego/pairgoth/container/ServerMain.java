@@ -20,10 +20,14 @@ package org.jeudego.pairgoth.container;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Enumeration;
+import java.util.Map;
+import java.util.Properties;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.util.resource.PathResource;
@@ -53,8 +57,8 @@ public class ServerMain
 
     private void run() throws Throwable
     {
+        // create server and web context
         Server server = new Server(8080);
-
         WebAppContext context = new WebAppContext() {
             @Override
             public boolean isServerResource(String name, URL url)
@@ -63,6 +67,22 @@ public class ServerMain
             }
         };
         context.setContextPath("/");
+
+        // pairgoth runtime properties
+        File properties = new File("./pairgoth.properties");
+        if (properties.exists()) {
+            Properties props = new Properties();
+            props.load(new FileReader(properties));
+            for (Map.Entry<Object, Object> entry: props.entrySet()) {
+                String property = (String)entry.getKey();
+                String value = (String)entry.getValue();
+                if (property.startsWith("logger.")) {
+                    context.setInitParameter("webapp-slf4j-logger." + property.substring(7), value);
+                } else {
+                    System.setProperty("pairgoth." + property, value);
+                }
+            }
+        }
 
         switch (getOperationalMode())
         {

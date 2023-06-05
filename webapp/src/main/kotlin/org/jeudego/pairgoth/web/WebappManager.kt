@@ -55,32 +55,14 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
         context.setAttribute("manager", this)
         webappRoot = context.getRealPath("/")
         try {
-            properties.load(context.getResourceAsStream("/WEB-INF/pairgoth.properties"))
-            val submaps: MutableMap<String, MutableMap<String, String>> = HashMap()
-            for (prop in properties.stringPropertyNames()) {
-                val value = properties.getProperty(prop)
-
-                // filter out missing values and passwords
-                if (value.startsWith("\${") || prop.contains("password")) continue
-                context.setAttribute(prop, value)
-
-                // also support one level of submaps (TODO - more)
-                val dot = prop.indexOf('.')
-                if (dot != -1) {
-                    val topKey = prop.substring(0, dot)
-                    val subKey = prop.substring(dot + 1)
-                    if ("password" == subKey) continue
-                    var submap = submaps[topKey]
-                    if (submap == null) {
-                        submap = HashMap()
-                        submaps[topKey] = submap
-                    }
-                    submap[subKey] = value
-                }
+            // load default properties
+            properties.load(context.getResourceAsStream("/WEB-INF/pairgoth.default.properties"))
+            // override with system properties after stripping off the 'pairgoth.' prefix
+            System.getProperties().filter { (key, value) -> key is String && key.startsWith(PAIRGOTH_PROPERTIES_PREFIX)
+            }.forEach { (key, value) ->
+                properties[(key as String).removePrefix(PAIRGOTH_PROPERTIES_PREFIX)] = value
             }
-            for ((key, value) in submaps) {
-                context.setAttribute(key, value)
-            }
+
             logger.info("Using profile {}", properties.getProperty("webapp.env"))
 
             // set system user agent string to empty string
@@ -119,6 +101,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun sessionDestroyed(se: HttpSessionEvent) {}
 
     companion object {
+        const val PAIRGOTH_PROPERTIES_PREFIX = "pairgoth."
         lateinit var webappRoot: String
         lateinit var context: ServletContext
         private val webServices: MutableMap<String?, Pair<Runnable, Thread?>> = TreeMap()
