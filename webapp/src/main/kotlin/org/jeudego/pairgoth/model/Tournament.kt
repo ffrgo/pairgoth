@@ -25,11 +25,11 @@ sealed class Tournament <P: Pairable>(
     val komi: Double = 7.5
 ) {
     companion object {}
-    enum class Type(val playersNumber: Int) {
+    enum class Type(val playersNumber: Int, val individual: Boolean = true) {
         INDIVIDUAL(1),
-        PAIRGO(2),
-        RENGO2(2),
-        RENGO3(3),
+        PAIRGO(2, false),
+        RENGO2(2, false),
+        RENGO3(3, false),
         TEAM2(2),
         TEAM3(3),
         TEAM4(4),
@@ -131,6 +131,7 @@ class TeamTournament(
             "name" to name,
             "players" to playerIds.toList().toJsonArray()
         )
+        val teamOfIndividuals: Boolean get() = type.individual
     }
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(

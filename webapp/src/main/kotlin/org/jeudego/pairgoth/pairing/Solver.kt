@@ -4,6 +4,7 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.Game.Result.*
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.Pairing
+import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -13,7 +14,15 @@ import org.jgrapht.graph.SimpleWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 import java.util.*
 
-sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val weights: Pairing.Weights) {
+interface HistoryDigester {
+    val colorBalance: Map<Int, Int>
+    val score: Map<Int, Double>
+    val sos: Map<Int, Double>
+    val sosos: Map<Int, Double>
+    val sodos: Map<Int, Double>
+}
+
+sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val weights: Pairing.Weights) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -53,6 +62,10 @@ sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val 
 
     val n = pairables.size
 
+    private val historyHelper =
+        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history)
+        else HistoryHelper(history)
+
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
         pairables.sortedWith(::sort)
@@ -79,77 +92,20 @@ sealed class Solver(val history: List<Game>, val pairables: List<Pairable>, val 
     }
 
     // already paired players map
-    fun Pairable.played(other: Pairable) = _paired.contains(Pair(id, other.id))
-    private val _paired: Set<Pair<Int, Int>> by lazy {
-        (history.map { game ->
-            Pair(game.black, game.white)
-        } + history.map { game ->
-            Pair(game.white, game.black)
-        }).toSet()
-    }
+    fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
 
     // color balance (nw - nb)
-    val Pairable.colorBalance: Int get() = _colorBalance[id] ?: 0
-    private val _colorBalance: Map<Int, Int> by lazy {
-        history.flatMap { game ->
-            listOf(Pair(game.white, +1), Pair(game.black, -1))
-        }.groupingBy { it.first }.fold(0) { acc, next ->
-            acc + next.second
-        }
-    }
+    val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
 
     // score (number of wins)
-    val Pairable.score: Double get() = _score[id] ?: 0.0
-    private val _score: Map<Int, Double> by lazy {
-        mutableMapOf<Int, Double>().apply {
-            history.forEach { game ->
-                when (game.result) {
-                    BLACK -> put(game.black, getOrDefault(game.black, 0.0) + 1.0)
-                    WHITE -> put(game.white, getOrDefault(game.white, 0.0) + 1.0)
-                    BOTHWIN -> {
-                        put(game.black, getOrDefault(game.black, 0.0) + 0.5)
-                        put(game.white, getOrDefault(game.white, 0.0) + 0.5)
-                    }
-                    else -> {}
-                }
-            }
-        }
-    }
+    val Pairable.score: Double get() = historyHelper.score(this) ?: 0.0
 
     // sos
-    val Pairable.sos: Double get() = _sos[id] ?: 0.0
-    private val _sos by lazy {
-        (history.map { game ->
-            Pair(game.black, _score[game.white] ?: 0.0)
-        } + history.map { game ->
-            Pair(game.white, _score[game.black] ?: 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
-            acc + next.second
-        }
-    }
+    val Pairable.sos: Double get() = historyHelper.sos(this) ?: 0.0
 
     // sosos
-    val Pairable.sosos: Double get() = _sosos[id] ?: 0.0
-    private val _sosos by lazy {
-        (history.map { game ->
-            Pair(game.black, _sos[game.white] ?: 0.0)
-        } + history.map { game ->
-            Pair(game.white, _sos[game.black] ?: 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
-            acc + next.second
-        }
-    }
+    val Pairable.sosos: Double get() = historyHelper.sosos(this) ?: 0.0
 
     // sodos
-    val Pairable.sodos: Double get() = _sodos[id] ?: 0.0
-    private val _sodos by lazy {
-        (history.map { game ->
-            Pair(game.black, if (game.result == BLACK) _score[game.white] ?: 0.0 else 0.0)
-        } + history.map { game ->
-            Pair(game.white, if (game.result == WHITE) _score[game.black] ?: 0.0 else 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
-            acc + next.second
-        }
-    }
-
+    val Pairable.sodos: Double get() = historyHelper.sodos(this) ?: 0.0
 }
