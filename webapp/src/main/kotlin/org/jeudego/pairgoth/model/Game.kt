@@ -6,9 +6,9 @@ import java.util.*
 
 data class Game(
     val id: ID,
-    val white: ID,
-    val black: ID,
-    val handicap: Int = 0,
+    var white: ID,
+    var black: ID,
+    var handicap: Int = 0,
     var result: Result = UNKNOWN
 ) {
     enum class Result(val symbol: Char) {

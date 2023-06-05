@@ -15,6 +15,7 @@ enum class Event {
     teamDeleted,
     gamesAdded,
     gamesDeleted,
+    gameUpdated,
     resultUpdated,
     ;
 

@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Pairing
+import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.web.Event
@@ -47,6 +48,20 @@ object PairingHandler: PairgothApiHandler {
         val ret = games.map { it.toJson() }.toJsonArray()
         Event.dispatch(gamesAdded, Json.Object("tournament" to tournament.id, "round" to round, "data" to ret))
         return ret
+    }
+
+    override fun put(request: HttpServletRequest): Json {
+        val tournament = getTournament(request)
+        val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
+        // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
+        if (round != tournament.lastRound()) badRequest("cannot edit pairings in other rounds but the last")
+        val payload = getObjectPayload(request)
+        val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
+        game.black = payload.getID("b") ?: badRequest("missing black player id")
+        game.white = payload.getID("w") ?: badRequest("missing white player id")
+        if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
+        Event.dispatch(gameUpdated, Json.Object("tournament" to tournament.id, "round" to round, "data" to game.toJson()))
+        return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {
