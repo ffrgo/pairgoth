@@ -65,7 +65,9 @@ sealed class Tournament <P: Pairable>(
     // games per id for each round
     private val games = mutableListOf<MutableMap<ID, Game>>()
 
-    fun games(round: Int) = games.getOrNull(round - 1) ?: mutableMapOf()
+    fun games(round: Int) = games.getOrNull(round - 1) ?:
+        if (round > games.size) throw Error("invalid round")
+        else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = games.size
 
     // standings criteria
@@ -153,7 +155,7 @@ class TeamTournament(
 fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = null): Tournament<*> {
     val type = json.getString("type")?.uppercase()?.let { Tournament.Type.valueOf(it) } ?: default?.type ?:  badRequest("missing type")
     // No clean way to avoid this redundancy
-    return if (type.playersNumber == 1)
+    val tournament = if (type.playersNumber == 1)
             StandardTournament(
                 id = json.getInt("id") ?: default?.id ?: Store.nextTournamentId,
                 type = type,
@@ -189,6 +191,10 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it) } ?: default?.pairing ?: badRequest("missing pairing")
             )
+    json["pairables"]?.let { pairables ->
+
+    }
+    return tournament
 }
 
 fun Tournament<*>.toJson() = Json.Object(

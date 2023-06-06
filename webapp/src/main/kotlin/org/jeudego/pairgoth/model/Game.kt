@@ -11,6 +11,7 @@ data class Game(
     var handicap: Int = 0,
     var result: Result = UNKNOWN
 ) {
+    companion object {}
     enum class Result(val symbol: Char) {
         UNKNOWN('?'),
         BLACK('b'),
@@ -35,4 +36,12 @@ fun Game.toJson() = Json.Object(
     "b" to black,
     "h" to handicap,
     "r" to "${result.symbol}"
+)
+
+fun Game.Companion.fromJson(json: Json.Object) = Game(
+    id = json.getID("id") ?: throw Error("missing game id"),
+    white = json.getID("white") ?: throw Error("missing white player"),
+    black = json.getID("black") ?: throw Error("missing black player"),
+    handicap = json.getInt("handicap") ?: 0,
+    result = json.getChar("result")?.let { Game.Result.fromSymbol(it) } ?: UNKNOWN
 )
