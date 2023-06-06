@@ -1,6 +1,7 @@
 target
-docker/data
-.idea
-docker/.env
-pairgoth.properties
+/docker/data
+/.idea
+/docker/.env
+/pairgoth.properties
 *.err
+/tournamentfiles

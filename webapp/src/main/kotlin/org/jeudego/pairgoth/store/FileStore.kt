@@ -32,6 +32,10 @@ class FileStore(pathStr: String): StoreImplementation {
         if (!file.mkdirs() && !file.isDirectory) throw Error("Property pairgoth.store.file.path must be a directory")
     }
 
+    init {
+        _nextTournamentId.set(getTournamentsIDs().maxOrNull() ?: 0.toID())
+    }
+
     override fun getTournamentsIDs(): Set<ID> {
         return path.useDirectoryEntries("*.tour") { entries ->
             entries.mapNotNull { entry ->
@@ -59,8 +63,8 @@ class FileStore(pathStr: String): StoreImplementation {
         val file = path.useDirectoryEntries("${id.toString().padStart(LEFT_PAD, '0')}-*.tour") { entries ->
             entries.map { entry ->
                 entry.fileName.toString()
-            }
-        }.firstOrNull() ?: throw Error("no such tournament")
+            }.firstOrNull() ?: throw Error("no such tournament")
+        }
         val json = Json.parse(path.resolve(file).readText())?.asObject() ?: throw Error("could not read tournament")
         val tournament = Tournament.fromJson(json)
         val players = json["players"] as Json.Array? ?: Json.Array()

@@ -16,9 +16,9 @@ abstract class OAuthHelper {
     abstract val name: String
     abstract fun getLoginURL(sessionId: String?): String
     protected val clientId: String
-        protected get() = WebappManager.getProperty("oauth." + name + ".client_id")
+        protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".client_id")
     protected val secret: String
-        protected get() = WebappManager.getProperty("oauth." + name + ".secret")
+        protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".secret")
     protected val redirectURI: String?
         protected get() = try {
             val uri: String = WebappManager.Companion.getProperty("webapp.url") + "/oauth.html"

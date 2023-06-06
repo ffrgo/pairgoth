@@ -107,8 +107,11 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
         private val webServices: MutableMap<String?, Pair<Runnable, Thread?>> = TreeMap()
         var logger = LoggerFactory.getLogger(WebappManager::class.java)
         val properties = Properties()
-        fun getProperty(prop: String?): String {
+        fun getProperty(prop: String): String? {
             return properties.getProperty(prop)
+        }
+        fun getMandatoryProperty(prop: String): String {
+            return properties.getProperty(prop) ?: throw Error("missing property: ${prop}")
         }
 
         val webappURL by lazy { getProperty("webapp.url") }

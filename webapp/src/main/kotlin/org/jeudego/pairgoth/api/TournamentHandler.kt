@@ -43,7 +43,7 @@ object TournamentHandler: PairgothApiHandler {
             else -> badRequest("missing or invalid payload")
         }
         Store.addTournament(tournament)
-        Event.dispatch(tournamentAdded, tournament.toJson())
+        tournament.dispatchEvent(tournamentAdded, tournament.toJson())
         return Json.Object("success" to true, "id" to tournament.id)
     }
 
@@ -65,14 +65,14 @@ object TournamentHandler: PairgothApiHandler {
         }
         updated.criteria.addAll(tournament.criteria)
         Store.replaceTournament(updated)
-        Event.dispatch(tournamentUpdated, tournament.toJson())
+        tournament.dispatchEvent(tournamentUpdated, tournament.toJson())
         return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         Store.deleteTournament(tournament)
-        Event.dispatch(tournamentDeleted, tournament.id)
+        tournament.dispatchEvent(tournamentDeleted, Json.Object("id" to tournament.id))
         return Json.Object("success" to true)
     }
 }

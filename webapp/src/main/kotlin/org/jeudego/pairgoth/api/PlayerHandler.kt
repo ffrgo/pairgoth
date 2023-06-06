@@ -25,7 +25,7 @@ object PlayerHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val player = Player.fromJson(payload)
         tournament.players[player.id] = player
-        Event.dispatch(playerAdded, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
+        tournament.dispatchEvent(playerAdded, player.toJson())
         return Json.Object("success" to true, "id" to player.id)
     }
 
@@ -36,7 +36,7 @@ object PlayerHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val updated = Player.fromJson(payload, player)
         tournament.players[updated.id] = updated
-        Event.dispatch(playerUpdated, Json.Object("tournament" to tournament.id, "data" to player.toJson()))
+        tournament.dispatchEvent(playerUpdated, player.toJson())
         return Json.Object("success" to true)
     }
 
@@ -44,7 +44,7 @@ object PlayerHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
         tournament.players.remove(id) ?: badRequest("invalid player id")
-        Event.dispatch(playerDeleted, Json.Object("tournament" to tournament.id, "data" to id))
+        tournament.dispatchEvent(playerDeleted, Json.Object("id" to id))
         return Json.Object("success" to true)
     }
 }

@@ -24,7 +24,7 @@ object ResultsHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
         game.result = Game.Result.fromSymbol(payload.getChar("result") ?: badRequest("missing result"))
-        Event.dispatch(Event.resultUpdated, Json.Object("tournament" to tournament.id, "round" to round, "data" to game))
+        tournament.dispatchEvent(Event.resultUpdated, Json.Object("round" to round, "data" to game))
         return Json.Object("success" to true)
     }
 }

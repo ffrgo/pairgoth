@@ -4,9 +4,9 @@ import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Tournament
 import java.util.concurrent.atomic.AtomicInteger
 
-private val _nextTournamentId = AtomicInteger()
-private val _nextPlayerId = AtomicInteger()
-private val _nextGameId = AtomicInteger()
+internal val _nextTournamentId = AtomicInteger()
+internal val _nextPlayerId = AtomicInteger()
+internal val _nextGameId = AtomicInteger()
 
 interface StoreImplementation {
 

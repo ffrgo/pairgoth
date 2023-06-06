@@ -46,7 +46,7 @@ object PairingHandler: PairgothApiHandler {
             }
         val games = tournament.pair(round, pairables)
         val ret = games.map { it.toJson() }.toJsonArray()
-        Event.dispatch(gamesAdded, Json.Object("tournament" to tournament.id, "round" to round, "data" to ret))
+        tournament.dispatchEvent(gamesAdded, Json.Object("round" to round, "games" to ret))
         return ret
     }
 
@@ -60,7 +60,7 @@ object PairingHandler: PairgothApiHandler {
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
-        Event.dispatch(gameUpdated, Json.Object("tournament" to tournament.id, "round" to round, "data" to game.toJson()))
+        tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
         return Json.Object("success" to true)
     }
 
@@ -79,7 +79,7 @@ object PairingHandler: PairgothApiHandler {
                 tournament.games(round).remove(id)
             }
         }
-        Event.dispatch(gamesDeleted, Json.Object("tournament" to tournament.id, "round" to round, "data" to payload))
+        tournament.dispatchEvent(gamesDeleted, Json.Object("round" to round, "games" to payload))
         return Json.Object("success" to true)
     }
 }
