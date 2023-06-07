@@ -5,3 +5,4 @@ target
 /pairgoth.properties
 *.err
 /tournamentfiles
+*.iml

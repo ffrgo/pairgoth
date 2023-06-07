@@ -16,7 +16,7 @@
 ├── docker .................................... Docker packaging
 │   ├── pairgoth.properties.example ........... Docker property file to instanciate
 │   └── run.sh ................................ Docker launch script
-└── webapp .................................... Engine web application
+└── api-webapp ................................ Engine web application
     └── src
         ├── main
         │   ├── kotlin ........................ Engine kotlin sources (the real meat is here!)
@@ -26,10 +26,10 @@
             └── kotlin ........................ Engine webapp API unit tests
 ```
 
-## Webapp sources structure
+## API Webapp sources structure
 
 ```
-webapp/src/main/kotlin/org/jeudego/pairgoth
+api-webapp/src/main/kotlin/org/jeudego/pairgoth
 ├── api .................................... API handlers
 ├── ext .................................... External: import/export features
 ├── model .................................. Domain logic model

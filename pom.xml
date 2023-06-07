@@ -59,7 +59,8 @@
   </properties>
 
   <modules>
-    <module>webapp</module>
+    <module>api-webapp</module>
+    <!-- <module>view-webapp</module> in progress -->
     <module>container</module>
     <module>bootstrap</module>
     <module>application</module>

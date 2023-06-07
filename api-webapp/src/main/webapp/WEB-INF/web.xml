@@ -41,7 +41,7 @@
   <!-- servlet mappings -->
   <servlet-mapping>
     <servlet-name>api</servlet-name>
-    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>sse</servlet-name>
