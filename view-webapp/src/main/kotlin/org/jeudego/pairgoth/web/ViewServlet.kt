@@ -41,7 +41,7 @@ class ViewServlet : VelocityViewServlet() {
     override fun fillContext(context: Context, request: HttpServletRequest) {
         super.fillContext(context, request)
         var uri = decodeURI(request)
-        context.put("page", uri)
+        context.put("page", "$uri.html")
         val base = uri.replaceFirst(".html$".toRegex(), "")
         val suffixes = Arrays.asList("js", "css")
         for (suffix in suffixes) {
