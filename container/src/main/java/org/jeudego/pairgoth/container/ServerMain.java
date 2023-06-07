@@ -25,11 +25,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.Properties;
 
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.resource.PathResource;
 import org.eclipse.jetty.webapp.WebAppContext;
 
@@ -41,7 +41,8 @@ public class ServerMain
         PROD
     }
 
-    private Path basePath;
+    private Path apiBasePath = null;
+    private Path viewBasePath = null;
 
     public static void main(String[] args)
     {
@@ -59,15 +60,25 @@ public class ServerMain
     {
         // create server and web context
         Server server = new Server(8080);
-        WebAppContext context = new WebAppContext() {
+
+        WebAppContext apiContext = new WebAppContext() {
             @Override
             public boolean isServerResource(String name, URL url)
             {
                 return super.isServerResource(name, url) || url.getFile().contains("/WEB-INF/jetty-server/");
             }
         };
-        context.setContextPath("/");
+        apiContext.setContextPath("/api");
 
+        WebAppContext viewContext = new WebAppContext() {
+            @Override
+            public boolean isServerResource(String name, URL url)
+            {
+                return super.isServerResource(name, url) || url.getFile().contains("/WEB-INF/jetty-server/");
+            }
+        };
+        viewContext.setContextPath("/");
+        
         // pairgoth runtime properties
         File properties = new File("./pairgoth.properties");
         if (properties.exists()) {
@@ -77,7 +88,7 @@ public class ServerMain
                 String property = (String)entry.getKey();
                 String value = (String)entry.getValue();
                 if (property.startsWith("logger.")) {
-                    context.setInitParameter("webapp-slf4j-logger." + property.substring(7), value);
+                    apiContext.setInitParameter("webapp-slf4j-logger." + property.substring(7), value);
                 } else {
                     System.setProperty("pairgoth." + property, value);
                 }
@@ -88,21 +99,29 @@ public class ServerMain
         {
             case PROD:
                 // Configure as WAR
-                context.setWar(basePath.toString());
+                apiContext.setWar(apiBasePath.toString());
+                viewContext.setWar(viewBasePath.toString());
                 break;
             case DEV:
                 // Configuring from Development Base
-                context.setBaseResource(new PathResource(basePath.resolve("src/main/webapp")));
+
+                apiContext.setBaseResource(new PathResource(apiBasePath.resolve("src/main/webapp")));
                 // Add webapp compiled classes & resources (copied into place from src/main/resources)
-                Path classesPath = basePath.resolve("target/webapp/WEB-INF/classes");
-                context.setExtraClasspath(classesPath.toAbsolutePath().toString());
+                Path apiClassesPath = apiBasePath.resolve("target/webapp/WEB-INF/classes");
+                apiContext.setExtraClasspath(apiClassesPath.toAbsolutePath().toString());
+
+                viewContext.setBaseResource(new PathResource(viewBasePath.resolve("src/main/webapp")));
+                // Add webapp compiled classes & resources (copied into place from src/main/resources)
+                Path viewClassesPath = viewBasePath.resolve("target/webapp/WEB-INF/classes");
+                viewContext.setExtraClasspath(viewClassesPath.toAbsolutePath().toString());
+                
                 server.setDumpAfterStart(true);
                 break;
             default:
                 throw new FileNotFoundException("Unable to configure WebAppContext base resource undefined");
         }
-
-        server.setHandler(context);
+        
+        server.setHandler(new ContextHandlerCollection(apiContext, viewContext));
 
         server.start();
         server.join();
@@ -117,16 +136,19 @@ public class ServerMain
             Path warPath = new File(warLocation).toPath().toRealPath();
             if (Files.exists(warPath) && Files.isRegularFile(warPath))
             {
-                this.basePath = warPath;
+                this.apiBasePath = warPath;
+                this.viewBasePath = warPath;
                 return OperationalMode.PROD;
             }
         }
 
         // We are in development mode, likely building and testing from an IDE.
-        Path devPath = new File("../webapp").toPath().toRealPath();
-        if (Files.exists(devPath) && Files.isDirectory(devPath))
+        Path apiDevPath = new File("../api-webapp").toPath().toRealPath();
+        Path viewDevPath = new File("../view-webapp").toPath().toRealPath();
+        if (Files.exists(apiDevPath) && Files.isDirectory(apiDevPath) && Files.exists(viewDevPath) && Files.isDirectory(viewDevPath))
         {
-            this.basePath = devPath;
+            this.apiBasePath = apiDevPath;
+            this.viewBasePath = viewDevPath;
             return OperationalMode.DEV;
         }
 

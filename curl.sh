@@ -21,4 +21,4 @@ curl -s --header "Accept: application/json" http://localhost:8080/api/tour/1/par
 echo
 echo
 
-curl -s --header "Last-Event-Id: 0" http://localhost:8080/events
+curl -s --header "Last-Event-Id: 0" http://localhost:8080/api/events

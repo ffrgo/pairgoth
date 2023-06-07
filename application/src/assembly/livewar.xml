@@ -20,7 +20,7 @@
       <unpack>true</unpack>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
-        <include>${project.groupId}:webapp</include>
+        <include>${project.groupId}:api-webapp</include>
         <include>${project.groupId}:bootstrap</include>
       </includes>
     </dependencySet>
