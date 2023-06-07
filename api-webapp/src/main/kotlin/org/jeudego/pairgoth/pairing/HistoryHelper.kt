@@ -21,9 +21,14 @@ open class HistoryHelper(protected val history: List<Game>) {
         }).toSet()
     }
 
+    // Returns the number of games played as white
+    // Only count games without handicap
     private val colorBalance: Map<Int, Int> by lazy {
-        history.flatMap { game ->
+        history.flatMap { game -> if (game.handicap == 0) {
             listOf(Pair(game.white, +1), Pair(game.black, -1))
+        } else {
+            listOf(Pair(game.white, 0), Pair(game.black, 0))
+        }
         }.groupingBy { it.first }.fold(0) { acc, next ->
             acc + next.second
         }

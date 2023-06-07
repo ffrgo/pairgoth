@@ -72,7 +72,7 @@ sealed class Tournament <P: Pairable>(
 
     // standings criteria
     val criteria = mutableListOf<Criterion>(
-        if (pairing.type == Pairing.PairingType.MACMAHON) Criterion.MMS else Criterion.NBW,
+        if (pairing.type == Pairing.PairingType.MAC_MAHON) Criterion.MMS else Criterion.NBW,
         Criterion.SOS,
         Criterion.SOSOS
     )

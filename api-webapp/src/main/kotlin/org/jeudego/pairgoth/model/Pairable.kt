@@ -10,10 +10,15 @@ import kotlin.math.roundToInt
 // Pairable
 
 sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int) {
-    companion object {}
+    companion object {
+        val MIN_RANK: Int = -30 // 30k
+    }
     abstract fun toJson(): Json.Object
     abstract val club: String?
     abstract val country: String?
+    open fun nameSeed(): String {
+        return name
+    }
     val skip = mutableSetOf<Int>() // skipped rounds
 }
 
@@ -70,6 +75,9 @@ class Player(
         "club" to club
     ).also {
         if (skip.isNotEmpty()) it["skip"] = Json.Array(skip)
+    }
+    override fun nameSeed(): String {
+        return name + firstname
     }
 }
 
