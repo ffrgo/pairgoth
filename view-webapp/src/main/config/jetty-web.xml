@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://www.eclipse.org/jetty/configure.dtd">
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+  <!-- https://www.eclipse.org/jetty/documentation/jetty-9/index.html#file-alias-serving -->
+  <Call name="addAliasCheck">
+    <Arg>
+      <New class="org.eclipse.jetty.server.handler.AllowSymLinkAliasChecker" />
+    </Arg>
+  </Call>
+</Configure>

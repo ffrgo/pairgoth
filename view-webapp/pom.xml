@@ -9,7 +9,7 @@
         <artifactId>engine-parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>api-webapp</artifactId>
+    <artifactId>view-webapp</artifactId>
 
     <packaging>war</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
@@ -207,23 +207,22 @@
             <version>3.8.0</version>
         </dependency>
          -->
-        <!-- pdf -->
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>2.0.28</version>
-        </dependency>
         <!-- server-side events -->
         <dependency>
             <groupId>com.republicate</groupId>
             <artifactId>jeasse-servlet3</artifactId>
             <version>1.2</version>
         </dependency>
-        <!-- graph solver -->
+        <!-- templating -->
         <dependency>
-            <groupId>org.jgrapht</groupId>
-            <artifactId>jgrapht-core</artifactId>
-            <version>1.5.2</version>
+            <groupId>org.apache.velocity.tools</groupId>
+            <artifactId>velocity-tools-view</artifactId>
+            <version>3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-engine-core</artifactId>
+            <version>2.4-SNAPSHOT</version>
         </dependency>
         <!-- tests -->
         <dependency>
