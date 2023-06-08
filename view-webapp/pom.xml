@@ -16,10 +16,6 @@
     <description>PairGoth pairing system</description>
     <url>TODO</url>
     <properties>
-        <kotlin.version>1.8.21</kotlin.version>
-        <kotlin.code.style>official</kotlin.code.style>
-        <kotlin.compiler.jvmTarget>10</kotlin.compiler.jvmTarget>
-        <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <pac4j.version>5.7.1</pac4j.version>
     </properties>
     <build>
@@ -30,7 +26,6 @@
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-maven-plugin</artifactId>
-                <version>${kotlin.version}</version>
                 <executions>
                     <execution>
                         <id>compile</id>

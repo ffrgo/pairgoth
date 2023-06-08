@@ -11,8 +11,7 @@
 ├── run.bat ................................... Executable run script, windows
 ├── test.sh ................................... Executable test script, linux
 ├── application ............................... Executable final packaging
-├── bootstrap ................................. Executable entry point
-├── container ................................. Web container
+├── webserver ................................. Web container
 ├── docker .................................... Docker packaging
 │   ├── pairgoth.properties.example ........... Docker property file to instanciate
 │   └── run.sh ................................ Docker launch script
@@ -24,6 +23,7 @@
         │       └── WEB-INF ................... Engine API webapp configuration
         └── test
             └── kotlin ........................ Engine webapp API unit tests
+└── view-webapp ............................... Web interface
 ```
 
 ## API Webapp sources structure
@@ -37,7 +37,6 @@ api-webapp/src/main/kotlin/org/jeudego/pairgoth
 ├── store .................................. Persistence handlers
 ├── util ................................... Various utilities
 └── web .................................... Web interface
-    └── sse ................................ Server Sent Events interface
 ```
 
 Tests are located in `webapp/src/test/kotlin`
@@ -48,11 +47,9 @@ Tests are located in `webapp/src/test/kotlin`
 
 You need maven installed.
 
-Copy and adapt `pairgoth.properties.example` towards `pairgoth.properties`.
+Copy and adapt `pairgoth.properties.example` towards `pairgoth.properties`, if needed. Otherwise pairgoth will use default properties (TODO - list them)
 
 Just running `./run.sh` or `./run.bat` shoud build and run the engine .
-
-Run `/test.sh` to test the engine.
 
 ### Docker
 

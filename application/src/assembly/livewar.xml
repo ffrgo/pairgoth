@@ -4,24 +4,23 @@
   <id>live-war</id>
   <baseDirectory>/</baseDirectory>
   <formats>
-    <format>war</format>
+    <format>jar</format>
   </formats>
   <dependencySets>
-    <dependencySet>
-      <outputDirectory>/WEB-INF/jetty-server/</outputDirectory>
-      <unpack>true</unpack>
-      <useTransitiveDependencies>false</useTransitiveDependencies>
-      <includes>
-        <include>${project.groupId}:container</include>
-      </includes>
-    </dependencySet>
     <dependencySet>
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>
       <useTransitiveDependencies>false</useTransitiveDependencies>
       <includes>
-        <include>${project.groupId}:api-webapp</include>
-        <include>${project.groupId}:bootstrap</include>
+        <include>${project.groupId}:webserver</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>/META-INF/webapps/</outputDirectory>
+      <unpack>false</unpack>
+      <useTransitiveDependencies>false</useTransitiveDependencies>
+      <includes>
+        <include>*:war</include>
       </includes>
     </dependencySet>
   </dependencySets>
