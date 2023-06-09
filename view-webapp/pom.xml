@@ -73,6 +73,28 @@
                     </classpathDependencyExcludes>
                 </configuration>
             </plugin>
+            <!-- sass to css -->
+            <plugin>
+                <groupId>com.gitlab.haynes</groupId>
+                <artifactId>libsass-maven-plugin</artifactId>
+                <version>0.2.29</version>
+                <executions>
+                    <execution>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <inputPath>${basedir}/src/main/sass/</inputPath>
+                    <inputSyntax>scss</inputSyntax>
+                    <outputPath>${project.build.directory}/${project.build.finalName}/css</outputPath>
+                    <generateSourceMap>true</generateSourceMap>
+                    <sourceMapOutputPath>${project.build.directory}/${project.build.finalName}/css</sourceMapOutputPath>
+                    <!-- <includePath>${basedir}/src/main/sass/plugins/</includePath> -->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencyManagement>

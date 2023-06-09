@@ -31,7 +31,9 @@ class DispatchingFilter : Filter {
         val uri = req.requestURI
         when {
             uri.endsWith('/') -> response.sendRedirect("${uri}index")
-            uri.contains('.') -> defaultRequestDispatcher.forward(request, response)
+            uri.contains('.') ->
+                if (uri.endsWith(".html")) resp.sendError(404)
+                else defaultRequestDispatcher.forward(request, response)
             else -> chain.doFilter(request, response)
         }
     }
