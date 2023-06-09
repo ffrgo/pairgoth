@@ -108,7 +108,7 @@ private fun launchServer() {
     }
 
     // create server
-    val server = Server(8080) // CB TODO port is to be calculated from webapp.url
+    val server = Server()
 
     // register webapps
     server.handler = ContextHandlerCollection(apiContext, viewContext)
