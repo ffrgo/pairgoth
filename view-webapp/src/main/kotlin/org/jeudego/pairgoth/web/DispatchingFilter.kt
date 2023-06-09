@@ -1,4 +1,4 @@
-package org.jeudego.egc2024.web
+package org.jeudego.pairgoth.web
 
 import org.slf4j.LoggerFactory
 import javax.servlet.Filter

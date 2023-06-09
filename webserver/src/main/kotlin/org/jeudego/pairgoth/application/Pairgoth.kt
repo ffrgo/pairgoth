@@ -49,9 +49,7 @@ private fun extractWarFiles() {
 private fun launchServer() {
 
     // create server
-    val server = Server(8080)
-    server.start()
-    server.join()
+    val server = Server(8080) // CB TODO port is to be calculated from webapp.url
 
     // create webapps contexts
     val apiContext = createContext("api", "/api");

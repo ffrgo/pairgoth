@@ -17,10 +17,32 @@
     <filter-class>com.republicate.slf4j.impl.IPTagFilter</filter-class>
     <async-supported>true</async-supported>
   </filter>
+  <filter>
+    <filter-name>dispatching-filter</filter-name>
+    <filter-class>org.jeudego.pairgoth.web.DispatchingFilter</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
+  <filter>
+    <filter-name>language-filter</filter-name>
+    <filter-class>org.jeudego.pairgoth.web.LanguageFilter</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
 
   <!-- filters mapping -->
   <filter-mapping>
     <filter-name>webapp-slf4j-logger-ip-tag-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>dispatching-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>language-filter</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>

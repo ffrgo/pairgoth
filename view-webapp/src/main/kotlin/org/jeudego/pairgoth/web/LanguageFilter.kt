@@ -2,9 +2,8 @@ package org.jeudego.pairgoth.web
 
 import org.jeudego.pairgoth.util.Translator
 import org.jeudego.pairgoth.util.Translator.Companion.defaultLanguage
-import org.jeudego.pairgoth.util.Translator.Companion.getTranslator
 import org.jeudego.pairgoth.util.Translator.Companion.providedLanguages
-import org.jeudego.pairgoth.view.TranslationTool
+import org.jeudego.pairgoth.view.IntlTool
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.FilterConfig
@@ -24,22 +23,27 @@ class LanguageFilter : Filter {
         val request = req as HttpServletRequest
         val response = resp as HttpServletResponse
 
-        val uri = request.requestURI
-        val match = langPattern.matchEntire(uri)
-        val lang = match?.groupValues?.get(1)
-        val target = match?.groupValues?.get(2) ?: uri
-
-        if (lang != null && providedLanguages.contains(lang)) {
-            // the target URI contains a language we provide
-            request.setAttribute("lang", lang)
-            request.setAttribute("target", target)
-            TranslationTool.translator.set(Translator.getTranslator(lang))
+        val reqLang = request.getAttribute("lang") as String?
+        if (reqLang != null) {
+            IntlTool.translator.set(Translator.getTranslator(reqLang))
             chain.doFilter(request, response)
         } else {
-            // the request must be redirected
-            val preferredLanguage = getPreferredLanguage(request)
-            val destination = if (lang != null) target else uri
-            response.sendRedirect("${preferredLanguage}${destination}")
+            val uri = request.requestURI
+            val match = langPattern.matchEntire(uri)
+            val lang = match?.groupValues?.get(1)
+            val target = match?.groupValues?.get(2) ?: uri
+
+            if (lang != null && providedLanguages.contains(lang)) {
+                // the target URI contains a language we provide
+                request.setAttribute("lang", lang)
+                request.setAttribute("target", target)
+                filterConfig!!.servletContext.getRequestDispatcher(target).forward(request, response)
+            } else {
+                // the request must be redirected
+                val preferredLanguage = getPreferredLanguage(request)
+                val destination = if (lang != null) target else uri
+                response.sendRedirect("${preferredLanguage}${destination}")
+            }
         }
     }
 

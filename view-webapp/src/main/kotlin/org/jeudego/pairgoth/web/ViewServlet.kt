@@ -1,23 +1,14 @@
 package org.jeudego.pairgoth.web
 
-import org.apache.commons.lang3.tuple.Pair
 import org.apache.velocity.Template
 import org.apache.velocity.context.Context
+import org.apache.velocity.exception.ResourceNotFoundException
 import org.apache.velocity.tools.view.ServletUtils
 import org.apache.velocity.tools.view.VelocityViewServlet
-import org.jeudego.pairgoth.util.Translator
-import org.jeudego.pairgoth.web.WebappManager
 import java.io.File
-import java.io.IOException
-import java.io.InputStreamReader
-import java.io.Serializable
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
-import java.nio.charset.StandardCharsets
-import java.text.DateFormat
 import java.util.*
-import java.util.function.Function
-import java.util.stream.Collectors
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -85,6 +76,23 @@ class ViewServlet : VelocityViewServlet() {
             log.error(msg, e2)
             throw RuntimeException(msg, e)
         }
+    }
+
+    override fun manageResourceNotFound(
+        request: HttpServletRequest?,
+        response: HttpServletResponse?,
+        e: ResourceNotFoundException?
+    ) {
+        val path = ServletUtils.getPath(request)
+        log.debug("Resource not found for path '{}'", path, e)
+        val message = e!!.message
+        if (!response!!.isCommitted && message != null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, path)
+        } else {
+            error(request, response, e)
+            throw e
+        }
+
     }
 
     companion object {
