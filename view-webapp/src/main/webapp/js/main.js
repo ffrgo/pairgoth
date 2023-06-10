@@ -11,38 +11,23 @@ function randomString(length) {
 }
 
 // serializeObject tweak to allow '.' to nest keys, and '-' in keys
+/*
 $.extend(FormSerializer.patterns, {
   fixed:    /^\d+$/,
   validate: /^[a-z][a-z0-9_-]*(?:\.[a-z0-9_-]+|\[[0-9]+\])*(?:\[\])?$/i,
   key:      /[a-z0-9_-]+|(?=\[\])/gi,
   named:    /^[a-z0-9_-]+$/i
 });
+ */
 
 // deserializeObject
+/*
 jQuery.fn.populate = function (data) {
   if (!this.is('form')) throw "Error: ${this} is not a form";
   populate(this[0], data);
   return this;
 };
-
-// Toasts
-
-function clearNotif() {
-  let infoBox = $('#information');
-  infoBox.removeClass('alert-info alert-success alert-warning alert-danger show');
-  infoBox.addClass('hide');
-  infoBox.find('.toast-text').text('');
-  store.remove('notif');
-}
-
-function notif(type, msg) {
-  console.log(type)
-  let infoBox = $('#information');
-  clearNotif();
-  infoBox.removeClass('hide');
-  infoBox.addClass(`alert-${type} show`);
-  infoBox.find('.toast-text').text(msg);
-}
+ */
 
 // crypto
 
@@ -68,9 +53,11 @@ function setDecimals() {
   $('input[data-digits="4"]').inputmask({ alias: 'currency', placeholder: '0', groupSeparator: ' ', digits: 4, digitsOptional: false });
 }
 
+/*
 $(() => {
   setDecimals();
 });
+ */
 
 function populateSelect(select, list, empty = false) {
   select.empty();

@@ -1,0 +1,5 @@
+User-agent: *
+User-Agent: AdsBot-Google
+Disallow: /*
+
+Sitemap: https://${webapp.url}/site.xml
