@@ -84,6 +84,35 @@ private fun launchServer() {
     val viewContext = createContext("view", "/")
 
     // handle properties
+    readProperties(apiContext, viewContext)
+
+    val webappUrl = serverProps.getProperty("webapp.url")?.let { URL(it) } ?: throw Error("missing property webapp.url")
+    val secure = webappUrl.protocol == "https"
+
+    // create server
+    val server =
+        if (secure) Server()
+        else Server(webappUrl.port)
+
+    server.apply {
+        // register webapps
+        handler = ContextHandlerCollection(apiContext, viewContext)
+        if (secure) {
+            val connector = buildSecureConnector(server, webappUrl.port)
+            addConnector(connector)
+        }
+        // launch server
+        start()
+        join()
+    }
+}
+
+private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
+    context.war = "$tmp/pairgoth/webapps/$webapp-webapp-$version.war"
+    context.contextPath = contextPath
+}
+
+private fun readProperties(vararg contexts: WebAppContext) {
     val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
     defaultProps.openStream().use {
         serverProps.load(InputStreamReader(it, StandardCharsets.UTF_8))
@@ -97,8 +126,9 @@ private fun launchServer() {
             if (property.startsWith("logger.")) {
                 // special handling for logger properties
                 val webappLoggerPropKey = "webapp-slf4j-logger.${property.substring(7)}"
-                apiContext.setInitParameter(webappLoggerPropKey, value)
-                viewContext.setInitParameter(webappLoggerPropKey, value)
+                contexts.forEach { context ->
+                    context.setInitParameter(webappLoggerPropKey, value)
+                }
             } else if (property.startsWith("webapp.ssl.")) {
                 // do not propagate ssl properties further
             } else {
@@ -106,13 +136,9 @@ private fun launchServer() {
             }
         }
     }
+}
 
-    // create server
-    val server = Server()
-
-    // register webapps
-    server.handler = ContextHandlerCollection(apiContext, viewContext)
-
+private fun buildSecureConnector(server: Server, port: Int): ServerConnector {
     // set up http/2
     val httpConfig = HttpConfiguration().apply {
         addCustomizer(SecureRequestCustomizer())
@@ -124,7 +150,8 @@ private fun launchServer() {
     }
     val cert = getResourceProperty("webapp.ssl.cert").readBytes()
     val key = getResourceProperty("webapp.ssl.key").readText().let {
-        val encodedKey = Pattern.compile("(?m)(?s)^---*BEGIN.*---*$(.*)^---*END.*---*$.*").matcher(it).replaceFirst("$1")
+        val encodedKey =
+            Pattern.compile("(?m)(?s)^---*BEGIN.*---*$(.*)^---*END.*---*$.*").matcher(it).replaceFirst("$1")
         Base64.getDecoder().decode(encodedKey.replace("\n", ""))
     }
     val pass = serverProps.getProperty("webapp.ssl.pass") ?: "foobar"
@@ -136,27 +163,25 @@ private fun launchServer() {
     val certificateFactory = CertificateFactory.getInstance("X.509")
     val store = KeyStore.getInstance("JKS").apply {
         load(null)
-        setCertificateEntry("certificate", certificateFactory.generateCertificate(ByteArrayInputStream(cert)) as X509Certificate)
-        setKeyEntry("key", privKey, pass.toCharArray(), arrayOf(certificateFactory.generateCertificate(ByteArrayInputStream(cert))))
+        setCertificateEntry(
+            "certificate",
+            certificateFactory.generateCertificate(ByteArrayInputStream(cert)) as X509Certificate
+        )
+        setKeyEntry(
+            "key",
+            privKey,
+            pass.toCharArray(),
+            arrayOf(certificateFactory.generateCertificate(ByteArrayInputStream(cert)))
+        )
     }
     val sslContextFactory = SslContextFactory.Server().apply {
         keyStoreType = "JKS"
         keyStore = store
         keyStorePassword = pass
-        // if (pass.isNotEmpty()) keyManagerPassword = pass
     }
 
     val tls = SslConnectionFactory(sslContextFactory, alpn.protocol)
     val connector = ServerConnector(server, tls, alpn, h2, http11)
-    connector.port = 8443
-    server.addConnector(connector)
-
-    // launch server
-    server.start()
-    server.join()
-}
-
-private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
-    context.war = "$tmp/pairgoth/webapps/$webapp-webapp-$version.war"
-    context.contextPath = contextPath
+    connector.port = port
+    return connector
 }
