@@ -17,7 +17,8 @@
     </toolbox>
 
     <toolbox scope="request">
-        <tool key="intl" class="org.jeudego.pairgoth.view.IntlTool"/>
+        <tool key="translate" class="org.jeudego.pairgoth.view.TranslationTool"/>
+        <tool key="api" class="org.jeudego.pairgoth.view.ApiTool"/>
     </toolbox>
 
 </tools>

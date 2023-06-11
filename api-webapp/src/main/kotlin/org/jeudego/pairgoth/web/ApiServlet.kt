@@ -170,7 +170,7 @@ class ApiServlet : HttpServlet() {
         }
 
         // check charset
-        if (charset != null && EXPECTED_CHARSET != charset) throw ApiException(
+        if (charset != null && EXPECTED_CHARSET != charset.lowercase(Locale.ROOT).replace("-", "")) throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
             "UTF-8 content expected"
         )
@@ -215,6 +215,8 @@ class ApiServlet : HttpServlet() {
                 HttpServletResponse.SC_BAD_REQUEST,
                 "Missing 'Accept' header"
             )
+        // CB TODO 1) a reference to a specific API call at this point is a code smell.
+        //         2) there will e other content types: .tou, .h9, .html
         if (!isJson(accept) && (!isXml(accept) || !request.requestURI.matches(Regex("/api/tour/\\d+")))) throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
             "Invalid 'Accept' header"

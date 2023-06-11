@@ -1,19 +1,38 @@
 body {
-  font-size : clamp(2rem, 10vw, 5rem);
+  font-size : clamp(1rem, 3vw, 3rem);
   width: 100vw;
   height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.flex {
   display: flex;
-  flex-flow: column nowrap;
-  justify-items: stretch;
-  align-items: stretch;
+  &.horz {
+    flex-flow: row nowrap;
+    align-items: center;
+  }
+  &.vert {
+    flex-flow: column nowrap;
+    align-items: stretch;
+  }
 }
 
 #header {
-  height: 1.5em;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-items: center;
-  align-items: stretch;
+  height: 2em;
+  width: 100%;
+  position: relative;
+  justify-content: space-between;
+  #left-header, #right-header {
+    height: 100%;
+  }
+  #logo {
+    height: 100%;
+    img {
+      display: inline-block;
+      max-height: 100%;
+    }
+  }
 }
 
 #center {
@@ -24,5 +43,9 @@ body {
 }
 
 #footer {
-  height: 1.5em;
+  flex: 0;
+  height: 2em;
+  margin: 0 2em;
+  font-size: 0.8em;
+  justify-content: space-between;
 }

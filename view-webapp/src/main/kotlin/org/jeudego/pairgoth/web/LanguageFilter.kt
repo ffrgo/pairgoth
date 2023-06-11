@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.web
 import org.jeudego.pairgoth.util.Translator
 import org.jeudego.pairgoth.util.Translator.Companion.defaultLanguage
 import org.jeudego.pairgoth.util.Translator.Companion.providedLanguages
-import org.jeudego.pairgoth.view.IntlTool
+import org.jeudego.pairgoth.view.TranslationTool
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.FilterConfig
@@ -25,7 +25,7 @@ class LanguageFilter : Filter {
 
         val reqLang = request.getAttribute("lang") as String?
         if (reqLang != null) {
-            IntlTool.translator.set(Translator.getTranslator(reqLang))
+            TranslationTool.translator.set(Translator.getTranslator(reqLang))
             chain.doFilter(request, response)
         } else {
             val uri = request.requestURI

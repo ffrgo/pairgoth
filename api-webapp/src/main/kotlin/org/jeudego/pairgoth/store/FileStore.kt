@@ -40,7 +40,7 @@ class FileStore(pathStr: String): StoreImplementation {
         return path.useDirectoryEntries("*.tour") { entries ->
             entries.mapNotNull { entry ->
                 filenameRegex.matchEntire(entry.fileName.toString())?.groupValues?.get(1)?.toID()
-            }.toSet()
+            }.toSortedSet()
         }
     }
 
