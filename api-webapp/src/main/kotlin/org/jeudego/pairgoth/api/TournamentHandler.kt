@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.ext.OpenGotha
@@ -21,7 +22,7 @@ object TournamentHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val accept = request.getHeader("Accept")
         return when (val id = getSelector(request)?.toIntOrNull()) {
-            null -> Json.Array(Store.getTournamentsIDs())
+            null -> Store.getTournaments().toJsonObject()
             else ->
                 when {
                     ApiServlet.isJson(accept) -> Store.getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")

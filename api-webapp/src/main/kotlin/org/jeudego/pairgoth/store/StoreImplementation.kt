@@ -14,7 +14,7 @@ interface StoreImplementation {
     val nextPlayerId get() = _nextPlayerId.incrementAndGet()
     val nextGameId get() = _nextGameId.incrementAndGet()
 
-    fun getTournamentsIDs(): Set<ID>
+    fun getTournaments(): Map<ID, String>
     fun addTournament(tournament: Tournament<*>)
     fun getTournament(id: ID): Tournament<*>?
     fun replaceTournament(tournament: Tournament<*>)
