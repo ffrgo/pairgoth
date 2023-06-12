@@ -10,7 +10,7 @@ import okhttp3.internal.EMPTY_REQUEST
 class ApiTool {
     companion object {
         const val JSON = "application/json"
-        val apiRoot = System.getProperty("pairgoth.webapp.url").let { base ->
+        val apiRoot = System.getProperty("pairgoth.api.url").let { base ->
             if (base.endsWith('/')) "${base}api/"
             else "${base}/api/"
         }

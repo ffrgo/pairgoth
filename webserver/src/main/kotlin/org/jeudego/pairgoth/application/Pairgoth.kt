@@ -79,12 +79,25 @@ private fun getResourceProperty(key: String) = serverProps.getProperty(key)?.let
 
 private fun launchServer() {
 
-    // create webapps contexts
-    val apiContext = createContext("api", "/api")
-    val viewContext = createContext("view", "/")
+    // read default properties and provided ones, if any
+    readProperties()
 
-    // handle properties
-    readProperties(apiContext, viewContext)
+    // create webapps contexts
+    val webAppContexts = mutableListOf<WebAppContext>()
+    val mode = serverProps["mode"] ?: throw Error("missing property: mode")
+    if (mode == "server" || mode == "standalone") webAppContexts.add(createContext("api", "/api"))
+    if (mode == "client" || mode == "standalone") webAppContexts.add(createContext("view", "/"))
+
+    // special handling for logger properties
+    serverProps.stringPropertyNames().asSequence().filter { propName ->
+        propName.startsWith("logger.")
+    }.forEach { propName ->
+        val key = "webapp-slf4j-logger.${propName.substring(7)}"
+        val value = serverProps.getProperty(propName)
+        webAppContexts.forEach { context ->
+            context.setInitParameter(key, value)
+        }
+    }
 
     val webappUrl = serverProps.getProperty("webapp.url")?.let { URL(it) } ?: throw Error("missing property webapp.url")
     val secure = webappUrl.protocol == "https"
@@ -96,7 +109,7 @@ private fun launchServer() {
 
     server.apply {
         // register webapps
-        handler = ContextHandlerCollection(apiContext, viewContext)
+        handler = ContextHandlerCollection(*webAppContexts.toTypedArray())
         if (secure) {
             val connector = buildSecureConnector(server, webappUrl.port)
             addConnector(connector)
@@ -112,7 +125,7 @@ private fun createContext(webapp: String, contextPath: String) = WebAppContext()
     context.contextPath = contextPath
 }
 
-private fun readProperties(vararg contexts: WebAppContext) {
+private fun readProperties() {
     val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
     defaultProps.openStream().use {
         serverProps.load(InputStreamReader(it, StandardCharsets.UTF_8))
@@ -123,13 +136,7 @@ private fun readProperties(vararg contexts: WebAppContext) {
         serverProps.entries.forEach { entry ->
             val property = entry.key as String
             val value = entry.value as String
-            if (property.startsWith("logger.")) {
-                // special handling for logger properties
-                val webappLoggerPropKey = "webapp-slf4j-logger.${property.substring(7)}"
-                contexts.forEach { context ->
-                    context.setInitParameter(webappLoggerPropKey, value)
-                }
-            } else if (property.startsWith("webapp.ssl.")) {
+            if (!property.startsWith("webapp.ssl.")) {
                 // do not propagate ssl properties further
             } else {
                 System.setProperty("pairgoth.$property", value)

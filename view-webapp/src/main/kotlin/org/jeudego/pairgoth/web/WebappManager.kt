@@ -51,7 +51,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
         context = sce.servletContext
-        logger.info("---------- Starting Web Application ----------")
+        logger.info("---------- Starting Pairgoth Web Client ----------")
         context.setAttribute("manager", this)
         webappRoot = context.getRealPath("/")
         try {

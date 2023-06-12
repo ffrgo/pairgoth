@@ -42,7 +42,7 @@ class LanguageFilter : Filter {
                 // the request must be redirected
                 val preferredLanguage = getPreferredLanguage(request)
                 val destination = if (lang != null) target else uri
-                response.sendRedirect("${preferredLanguage}${destination}")
+                response.sendRedirect("/${preferredLanguage}${destination}")
             }
         }
     }

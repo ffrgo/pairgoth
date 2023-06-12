@@ -95,6 +95,20 @@
                     <!-- <includePath>${basedir}/src/main/sass/plugins/</includePath> -->
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>${jetty.version}</version>
+                <configuration>
+                    <scan>0</scan>
+                    <systemProperties>
+                        <systemProperty>
+                            <name>pairgoth.webapp.url</name>
+                            <value>http://localhost:8080</value>
+                        </systemProperty>
+                    </systemProperties>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencyManagement>
