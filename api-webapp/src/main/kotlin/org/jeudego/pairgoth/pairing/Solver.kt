@@ -119,6 +119,39 @@ sealed class Solver(
         return result
     }
 
+    open fun applyBaseCriteria(p1: Pairable, p2: Pairable): Long {
+        var score = 0L
+
+        // Base Criterion 1 : Avoid Duplicating Game
+        // Did p1 and p2 already play ?
+        score += avoidDuplicatingGames(p1, p2)
+        // Base Criterion 2 : Random
+        score += applyRandom(p1, p2)
+        // Base Criterion 3 : Balance W and B
+        score += applyBalanceBW(p1, p2)
+
+        return score
+    }
+
+    // Main criteria
+    open fun applyMainCriteria(p1: Pairable, p2: Pairable): Long {
+        var score = 0L;
+
+        // Main criterion 1 avoid mixing category is moved to Swiss with category
+        // TODO
+
+        // Main criterion 2 minimize score difference
+        score += minimizeScoreDifference(p1, p2)
+
+        // Main criterion 3 If different groups, make a directed Draw-up/Draw-down
+        // TODO
+
+        // Main criterion 4 seeding
+        score += applySeeding(p1, p2)
+
+        return score
+    }
+
     // Weight score computation details
     // Base criteria
     open fun avoidDuplicatingGames(p1: Pairable, p2: Pairable): Long {
@@ -154,39 +187,6 @@ sealed class Solver(
             }
         }
         return 0
-    }
-
-    open fun applyBaseCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
-
-        // Base Criterion 1 : Avoid Duplicating Game
-        // Did p1 and p2 already play ?
-        score += avoidDuplicatingGames(p1, p2)
-        // Base Criterion 2 : Random
-        score += applyRandom(p1, p2)
-        // Base Criterion 3 : Balance W and B
-        score += applyBalanceBW(p1, p2)
-
-        return score
-    }
-
-    // Main criteria
-    open fun applyMainCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L;
-
-        // Main criterion 1 avoid mixing category is moved to Swiss with category
-        // TODO
-
-        // Main criterion 2 minimize score difference
-        score += minimizeScoreDifference(p1, p2)
-
-        // Main criterion 3 If different groups, make a directed Draw-up/Draw-down
-        // TODO
-
-        // Main criterion 4 seeding
-        score += applySeeding(p1, p2)
-
-        return score
     }
 
     open fun minimizeScoreDifference(p1: Pairable, p2: Pairable): Long {

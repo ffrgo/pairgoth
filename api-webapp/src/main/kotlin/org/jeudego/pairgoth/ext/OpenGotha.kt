@@ -1,19 +1,6 @@
 package org.jeudego.pairgoth.ext
 
-import org.jeudego.pairgoth.model.CanadianByoyomi
-import org.jeudego.pairgoth.model.FischerTime
-import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.MacMahon
-import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.model.Player
-import org.jeudego.pairgoth.model.StandardByoyomi
-import org.jeudego.pairgoth.model.StandardTournament
-import org.jeudego.pairgoth.model.SuddenDeath
-import org.jeudego.pairgoth.model.Swiss
-import org.jeudego.pairgoth.model.TimeSystem
-import org.jeudego.pairgoth.model.Tournament
-import org.jeudego.pairgoth.model.displayRank
-import org.jeudego.pairgoth.model.parseRank
+import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.util.XmlFormat
 import org.jeudego.pairgoth.util.booleanAttr
@@ -120,20 +107,21 @@ object OpenGotha {
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
-                0 -> Swiss(
-                    when (pairingParams.paiMaSeedSystem1) {
-                        "SPLITANDFOLD" -> Swiss.Method.SPLIT_AND_FOLD
-                        "SPLITANDRANDOM" -> Swiss.Method.SPLIT_AND_RANDOM
-                        "SPLITANDSLIP" -> Swiss.Method.SPLIT_AND_SLIP
-                        else -> throw Error("unknown swiss pairing method")
-                    },
-                    when (pairingParams.paiMaSeedSystem2) {
-                        "SPLITANDFOLD" -> Swiss.Method.SPLIT_AND_FOLD
-                        "SPLITANDRANDOM" -> Swiss.Method.SPLIT_AND_RANDOM
-                        "SPLITANDSLIP" -> Swiss.Method.SPLIT_AND_SLIP
-                        else -> throw Error("unknown swiss pairing method")
-                    }
-                )
+                /*
+                when (pairingParams.paiMaSeedSystem1) {
+                    "SPLITANDFOLD" -> SeedMethod.SPLIT_AND_FOLD
+                    "SPLITANDRANDOM" -> SeedMethod.SPLIT_AND_RANDOM
+                    "SPLITANDSLIP" -> SeedMethod.SPLIT_AND_SLIP
+                    else -> throw Error("unknown swiss pairing method")
+                },
+                when (pairingParams.paiMaSeedSystem2) {
+                    "SPLITANDFOLD" -> SeedMethod.SPLIT_AND_FOLD
+                    "SPLITANDRANDOM" -> SeedMethod.SPLIT_AND_RANDOM
+                    "SPLITANDSLIP" -> SeedMethod.SPLIT_AND_SLIP
+                    else -> throw Error("unknown swiss pairing method")
+                }
+                */
+                0 -> Swiss() // TODO
                 else -> MacMahon() // TODO
             },
             rounds = genParams.numberOfRounds
