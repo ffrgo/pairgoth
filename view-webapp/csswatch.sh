@@ -1,3 +1,3 @@
 #!/bin/bash
 
-mvn com.gitlab.haynes:libsass-maven-plugin:0.2.29:watch
+mvn io.github.cleydyr:dart-sass-maven-plugin:1.1.0:watch-sass

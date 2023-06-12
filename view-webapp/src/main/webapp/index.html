@@ -1,4 +1,14 @@
-
-Known tournaments:
-
-$api.get('tour')
+<div class="section">
+  <button id="new" class="ui blue icon floating button">
+    <i class="fa fa-plus-square-o"></i>
+    New tournament
+  </button>
+</div>
+#foreach($tour in $api.get('tour').entrySet())
+<div class="section">
+  <button data-tour-id="$tour.key" class="ui open basic secondary white icon floating button">
+    <i class="fa fa-folder-open-o"></i>
+    Open $tour.value
+  </button>
+</div>
+#end

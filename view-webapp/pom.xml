@@ -45,27 +45,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/src/main/config</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <configuration>
                     <classpathDependencyExcludes>
@@ -74,6 +53,24 @@
                 </configuration>
             </plugin>
             <!-- sass to css -->
+            <plugin>
+                <groupId>io.github.cleydyr</groupId>
+                <artifactId>dart-sass-maven-plugin</artifactId>
+                <version>1.1.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-css-using-sass</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>compile-sass</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputFolder>${project.build.directory}/generated-resources/css</outputFolder>
+                </configuration>
+            </plugin>
+            <!--
             <plugin>
                 <groupId>com.gitlab.haynes</groupId>
                 <artifactId>libsass-maven-plugin</artifactId>
@@ -92,21 +89,39 @@
                     <outputPath>${project.build.directory}/${project.build.finalName}/css</outputPath>
                     <generateSourceMap>true</generateSourceMap>
                     <sourceMapOutputPath>${project.build.directory}/${project.build.finalName}/css</sourceMapOutputPath>
-                    <!-- <includePath>${basedir}/src/main/sass/plugins/</includePath> -->
                 </configuration>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <configuration>
-                    <scan>0</scan>
+                    <scan>1</scan>
                     <httpConnector>
                         <port>8080</port>
                     </httpConnector>
                     <systemProperties>
                         <pairgoth.api.url>http://localhost:8085/api/</pairgoth.api.url>
                     </systemProperties>
+                    <webApp>
+                        <resourceBases>${project.basedir}/src/main/webapp,${project.build.directory}/generated-resources/</resourceBases>
+                    </webApp>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.build.directory}/generated-resources/css</directory>
+                            <targetPath>css</targetPath>
+                            <includes>
+                                <include>main.css</include>
+                            </includes>
+                        </resource>
+                    </webResources>
                 </configuration>
             </plugin>
         </plugins>
