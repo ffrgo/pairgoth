@@ -35,7 +35,7 @@ private const val MA_MAX_MAXIMIZE_SEEDING: Double = MA_MAX_MINIMIZE_SCORE_DIFFER
 
 enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
 
-sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = PairingParams()) {
+sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = PairingParams(), val placementParams: PlacementParams) {
     companion object {}
     enum class PairingType { SWISS, MAC_MAHON, ROUND_ROBIN }
     data class PairingParams(
@@ -61,9 +61,8 @@ sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = P
             val maLastRoundForSeedSystem1: Int = 1,
             val maSeedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,
             val maSeedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
-            // TODO get these parameters from Placement parameters
-            //val maAdditionalPlacementCritSystem1: Int = PlacementParameterSet.PLA_CRIT_RATING,
-            //val maAdditionalPlacementCritSystem2: Int = PlacementParameterSet.PLA_CRIT_NUL,
+            val maAdditionalPlacementCritSystem1: PlacementCriterion = PlacementCriterion.RATING,
+            val maAdditionalPlacementCritSystem2: PlacementCriterion = PlacementCriterion.NULL,
 
             // Secondary criteria
             val seBarThresholdActive: Boolean = true, // Do not apply secondary criteria for players above bar
@@ -127,9 +126,9 @@ class Swiss(): Pairing(SWISS, PairingParams(
 
         geo = GeographicalParams.disabled(),
         hd = HandicapParams.disabled(),
-)) {
+), PlacementParams(PlacementCriterion.NBW, PlacementCriterion.SOSW, PlacementCriterion.SOSOSW)) {
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return SwissSolver(tournament.historyBefore(round), pairables, pairingParams).pair()
+        return SwissSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams).pair()
     }
 }
 
@@ -137,15 +136,16 @@ class MacMahon(
     var bar: Int = 0,
     var minLevel: Int = -30,
     var reducer: Int = 1
-): Pairing(MAC_MAHON, PairingParams(seDefSecCrit = MA_MAX_MINIMIZE_SCORE_DIFFERENCE)) {
+): Pairing(MAC_MAHON, PairingParams(seDefSecCrit = MA_MAX_MINIMIZE_SCORE_DIFFERENCE),
+        PlacementParams(PlacementCriterion.MMS, PlacementCriterion.SOSM, PlacementCriterion.SOSOSM)) {
     val groups = mutableListOf<Int>()
 
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return MacMahonSolver(tournament.historyBefore(round), pairables, pairingParams, mmBase = minLevel, mmBar = bar, reducer = reducer).pair()
+        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, mmBase = minLevel, mmBar = bar, reducer = reducer).pair()
     }
 }
 
-class RoundRobin: Pairing(ROUND_ROBIN) {
+class RoundRobin: Pairing(ROUND_ROBIN, PairingParams(), PlacementParams(PlacementCriterion.NBW, PlacementCriterion.RATING)) {
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         TODO()
     }

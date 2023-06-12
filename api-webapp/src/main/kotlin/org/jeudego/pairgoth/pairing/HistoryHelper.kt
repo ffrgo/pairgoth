@@ -1,17 +1,30 @@
 package org.jeudego.pairgoth.pairing
 
-import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.model.TeamTournament
+import org.jeudego.pairgoth.model.*
 
-open class HistoryHelper(protected val history: List<Game>) {
+open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Double>) {
 
+    fun getCriterionValue(p: Pairable, crit: PlacementCriterion): Int {
+        // Returns generic criterion
+        // Specific criterion are computed by solvers directly
+        return when (crit) {
+            PlacementCriterion.NULL -> 0
+            PlacementCriterion.CATEGORY -> TODO()
+            PlacementCriterion.RANK -> p.rank
+            PlacementCriterion.RATING -> p.rating
+
+            PlacementCriterion.EXT -> TODO()
+            PlacementCriterion.EXR -> TODO()
+            PlacementCriterion.SDC -> TODO()
+            PlacementCriterion.DC -> TODO()
+            else -> -1
+        }
+    }
+    // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
-    open fun score(p: Pairable) = score[p.id]
-    open fun sos(p: Pairable) = sos[p.id]
-    open fun sosos(p: Pairable) = sosos[p.id]
-    open fun sodos(p: Pairable) = sodos[p.id]
+    open fun nbW(p: Pairable) = numberWins[p.id]
+
 
     protected val paired: Set<Pair<Int, Int>> by lazy {
         (history.map { game ->
@@ -34,7 +47,7 @@ open class HistoryHelper(protected val history: List<Game>) {
         }
     }
 
-    private val score: Map<Int, Double> by lazy {
+    val numberWins: Map<Int, Double> by lazy {
         mutableMapOf<Int, Double>().apply {
             history.forEach { game ->
                 when (game.result) {
@@ -50,7 +63,8 @@ open class HistoryHelper(protected val history: List<Game>) {
         }
     }
 
-    private val sos by lazy {
+    // SOS related functions given a score function
+    val sos by lazy {
         (history.map { game ->
             Pair(game.black, score[game.white] ?: 0.0)
         } + history.map { game ->
@@ -60,17 +74,18 @@ open class HistoryHelper(protected val history: List<Game>) {
         }
     }
 
-    private val sosos by lazy {
-        (history.map { game ->
-            Pair(game.black, sos[game.white] ?: 0.0)
-        } + history.map { game ->
-            Pair(game.white, sos[game.black] ?: 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
-            acc + next.second
-        }
+    // sos-1
+    val sosm1: Map<ID, Double> by lazy {
+        TODO()
     }
 
-    private val sodos by lazy {
+    // sos-2
+    val sosm2: Map<ID, Double> by lazy {
+        TODO()
+    }
+
+    // sodos
+    val sodos by lazy {
         (history.map { game ->
             Pair(game.black, if (game.result == Game.Result.BLACK) score[game.white] ?: 0.0 else 0.0)
         } + history.map { game ->
@@ -80,12 +95,27 @@ open class HistoryHelper(protected val history: List<Game>) {
         }
     }
 
+    // sosos
+    val sosos by lazy {
+        (history.map { game ->
+            Pair(game.black, sos[game.white] ?: 0.0)
+        } + history.map { game ->
+            Pair(game.white, sos[game.black] ?: 0.0)
+        }).groupingBy { it.first }.fold(0.0) { acc, next ->
+            acc + next.second
+        }
+    }
 
+    // cumulative score
+    val cumscore: Map<ID, Double> by lazy {
+        TODO()
+    }
 }
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
 
-class TeamOfIndividualsHistoryHelper(history: List<Game>): HistoryHelper(history) {
+class TeamOfIndividualsHistoryHelper(history: List<Game>, score: Map<ID, Double>):
+        HistoryHelper(history, score) {
 
     private fun Pairable.asTeam() = this as TeamTournament.Team
 
@@ -93,8 +123,8 @@ class TeamOfIndividualsHistoryHelper(history: List<Game>): HistoryHelper(history
         (p2.asTeam()).playerIds.map {Pair(it, id) }
     }.toSet()).isNotEmpty()
 
-    override fun score(p: Pairable) = p.asTeam().teamPlayers.map { super.score(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    override fun sos(p:Pairable) = p.asTeam().teamPlayers.map { super.sos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    override fun sosos(p:Pairable) = p.asTeam().teamPlayers.map { super.sosos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    override fun sodos(p:Pairable) = p.asTeam().teamPlayers.map { super.sodos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
+    override fun nbW(p: Pairable) = p.asTeam().teamPlayers.map { super.nbW(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
+    //override fun sos(p:Pairable) = p.asTeam().teamPlayers.map { super.sos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
+    //override fun sosos(p:Pairable) = p.asTeam().teamPlayers.map { super.sosos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
+    //override fun sodos(p:Pairable) = p.asTeam().teamPlayers.map { super.sodos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
 }

@@ -1,9 +1,6 @@
 package org.jeudego.pairgoth.pairing
 
-import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.model.Pairing
-import org.jeudego.pairgoth.model.TeamTournament
+import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -47,30 +44,88 @@ private fun nonDetRandom(max: Long): Long {
     return r.toLong()
 }
 
-sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pairingParams: Pairing.PairingParams) {
+sealed class Solver(
+        val round: Int,
+        history: List<Game>,
+        val pairables: List<Pairable>,
+        val pairingParams: Pairing.PairingParams,
+        val placementParams: PlacementParams) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
     }
 
-    open fun sort(p: Pairable, q: Pairable): Int = 0 // no sort by default
+    open fun sort(p: Pairable, q: Pairable): Int {
+        for (criterion in placementParams.criteria) {
+            val criterionP = getCriterionValue(p, criterion)
+            val criterionQ = getCriterionValue(q, criterion)
+            if (criterionP != criterionQ) {
+                return criterionP - criterionQ
+            }
+        }
+        return 0
+    }
     open fun weight(p1: Pairable, p2: Pairable): Double {
         var score = 1L // 1 is minimum value because 0 means "no matching allowed"
 
         score += applyBaseCriteria(p1, p2)
+
+        score += applyMainCriteria(p1, p2)
 
         return score as Double
     }
     // The main criterion that will be used to define the groups should be defined by subclasses
     abstract fun mainCriterion(p1: Pairable): Int
     abstract fun mainCriterionMinMax(): Pair<Int, Int>
+    // SOS and variants will be computed based on this score
+    abstract fun computeStandingScore(): Map<ID, Double>
+    // This function needs to be overridden for criterion specific to the current pairing mode
+    open fun getSpecificCriterionValue(p1: Pairable, criterion: PlacementCriterion): Int {
+        return -1
+    }
 
+    private fun getCriterionValue(p1: Pairable, criterion: PlacementCriterion): Int {
+        val genericCritVal = historyHelper.getCriterionValue(p1, criterion)
+        // If the value from the history helper is > 0 it means that it is a generic criterion
+        // Just returns the value
+        if (genericCritVal != -1) {
+            return genericCritVal
+        }
+        // Otherwise we have to delegate it to the solver
+        val critVal = getSpecificCriterionValue(p1, criterion)
+        if (critVal == -1) throw Error("Couldn't compute criterion value")
+        return critVal
+    }
+
+    fun pair(): List<Game> {
+        // check that at this stage, we have an even number of pairables
+        if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
+        val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
+        for (i in sortedPairables.indices) {
+            for (j in i + 1 until pairables.size) {
+                val p = pairables[i]
+                val q = pairables[j]
+                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
+                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
+            }
+        }
+        val graph = builder.build()
+        val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MINIMIZE)
+        val solution = matching.matching
+
+        val result = solution.flatMap {
+            games(black = graph.getEdgeSource(it) , white = graph.getEdgeTarget(it))
+        }
+        return result
+    }
+
+    // Weight score computation details
     // Base criteria
     open fun avoidDuplicatingGames(p1: Pairable, p2: Pairable): Long {
-        if (historyHelper.playedTogether(p1, p2)) {
-            return pairingParams.baseAvoidDuplGame
+        if (p1.played(p2)) {
+            return 0 // We get no score if pairables already played together
         } else {
-            return 0
+            return pairingParams.baseAvoidDuplGame
         }
     }
 
@@ -129,17 +184,18 @@ sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pair
     }
 
     open fun minimizeScoreDifference(p1: Pairable, p2: Pairable): Long {
-        var scoCost: Long = 0
-        val scoRange: Int = numberGroups
+        var score: Long = 0
+        val scoreRange: Int = numberGroups
         // TODO check category equality if category are used in SwissCat
-        val x = abs(groups[p1.id]!! - groups[p2.id]!!) as Double / scoRange.toDouble()
+        val x = abs(p1.group - p2.group) as Double / scoreRange.toDouble()
         val k: Double = pairingParams.standardNX1Factor
-        scoCost = (pairingParams.mainMinimizeScoreDifference * (1.0 - x) * (1.0 + k * x)) as Long
+        score = (pairingParams.mainMinimizeScoreDifference * (1.0 - x) * (1.0 + k * x)) as Long
 
-        return scoCost
+        return score
     }
 
     // Handicap functions
+    // Has to be overridden if handicap is not based on rank
     open fun handicap(p1: Pairable, p2: Pairable): Int {
         var hd = 0
         var pseudoRank1: Int = p1.rank
@@ -152,8 +208,8 @@ sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pair
         return clampHandicap(hd)
     }
 
-    open fun clampHandicap(input_hd: Int): Int {
-        var hd = input_hd
+    open fun clampHandicap(inputHd: Int): Int {
+        var hd = inputHd
         if (hd > 0) {
             hd -= pairingParams.hd.correction
             hd = min(hd, 0)
@@ -174,47 +230,25 @@ sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pair
         return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = handicap(black, white)))
     }
 
-    fun pair(): List<Game> {
-        // check that at this stage, we have an even number of pairables
-        if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
-        val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
-        for (i in sortedPairables.indices) {
-            for (j in i + 1 until n) {
-                val p = pairables[i]
-                val q = pairables[j]
-                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
-                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
-            }
-        }
-        val graph = builder.build()
-        val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MINIMIZE)
-        val solution = matching.matching
+    // Generic parameters calculation
+    private val standingScore = computeStandingScore()
+    val historyHelper =
+            if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, standingScore)
+            else HistoryHelper(history, standingScore)
 
-        val result = solution.flatMap {
-            games(black = graph.getEdgeSource(it) , white = graph.getEdgeTarget(it))
-        }
-        return result
-    }
 
-    private fun computeGroups(): Pair<Map<Int, Int>, Int> {
+    // Decide each pairable group based on the main criterion
+    private fun computeGroups(): Pair<Map<ID, Int>, Int> {
         val (mainScoreMin, mainScoreMax) = mainCriterionMinMax()
 
         // TODO categories
-        val groups: Map<Int, Int> = pairables.associate { pairable -> Pair(pairable.id, mainCriterion(pairable)) }
+        val groups: Map<ID, Int> = pairables.associate { pairable -> Pair(pairable.id, mainCriterion(pairable)) }
 
         return Pair(groups, mainScoreMax - mainScoreMin)
     }
 
-    // Calculation parameters
-
-    val n = pairables.size
-
-    private val historyHelper =
-        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history)
-        else HistoryHelper(history)
-
     private val groupsResult = computeGroups()
-    private val groups = groupsResult.first
+    private val _groups = groupsResult.first
     private val numberGroups = groupsResult.second
 
     // pairables sorted using overloadable sort function
@@ -234,7 +268,7 @@ sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pair
     val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
     private val _placeInGroup by lazy {
         sortedPairables.groupBy {
-            it.score
+            it.group
         }.values.flatMap { group ->
             group.mapIndexed { index, pairable ->
                 Pair(pairable.id, Pair(index, group.size))
@@ -243,20 +277,25 @@ sealed class Solver(history: List<Game>, val pairables: List<Pairable>, val pair
     }
 
     // already paired players map
-    fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
+    private fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
 
     // color balance (nw - nb)
-    val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
+    private val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
+
+    private val Pairable.group: Int get() = _groups[id]!!
 
     // score (number of wins)
-    val Pairable.score: Double get() = historyHelper.score(this) ?: 0.0
+    val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
 
-    // sos
-    val Pairable.sos: Double get() = historyHelper.sos(this) ?: 0.0
+    val Pairable.sos: Double get() = historyHelper.sos[id]!!
 
-    // sosos
-    val Pairable.sosos: Double get() = historyHelper.sosos(this) ?: 0.0
+    val Pairable.sosm1: Double get() = historyHelper.sosm1[id]!!
+    val Pairable.sosm2: Double get() = historyHelper.sosm2[id]!!
+    val Pairable.sosos: Double get() = historyHelper.sosos[id]!!
+    val Pairable.sodos: Double get() = historyHelper.sodos[id]!!
+    val Pairable.cums: Double get() = historyHelper.cumscore[id]!!
 
-    // sodos
-    val Pairable.sodos: Double get() = historyHelper.sodos(this) ?: 0.0
+
+
+
 }
