@@ -78,11 +78,15 @@
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <configuration>
+                    <scan>0</scan>
+                    <httpConnector>
+                        <port>8085</port>
+                    </httpConnector>
                     <webApp>
                         <contextPath>/api/</contextPath>
                     </webApp>
                 </configuration>
-            </plugin>            
+            </plugin>
         </plugins>
     </build>
     <dependencyManagement>

@@ -101,11 +101,11 @@
                 <version>${jetty.version}</version>
                 <configuration>
                     <scan>0</scan>
+                    <httpConnector>
+                        <port>8080</port>
+                    </httpConnector>
                     <systemProperties>
-                        <systemProperty>
-                            <name>pairgoth.webapp.url</name>
-                            <value>http://localhost:8080</value>
-                        </systemProperty>
+                        <pairgoth.api.url>http://localhost:8085/api/</pairgoth.api.url>
                     </systemProperties>
                 </configuration>
             </plugin>

@@ -11,11 +11,9 @@ class ApiTool {
     companion object {
         const val JSON = "application/json"
         val apiRoot =
-            (System.getProperty("pairgoth.api.url") ?: System.getProperty("pairgoth.webapp.url"))
-            .let { base ->
-                if (base.endsWith('/')) "${base}api/"
-                else "${base}/api/"
-            }
+            System.getProperty("pairgoth.api.url")?.let { "${it.removeSuffix("/")}/" }
+            ?: System.getProperty("pairgoth.webapp.url")?.let { "${it.removeSuffix("/")}/api/" }
+            ?: throw Error("no configured API url")
     }
     private val client = OkHttpClient()
     private fun prepare(url: String) = Request.Builder().url("$apiRoot$url").header("Accept", JSON)
