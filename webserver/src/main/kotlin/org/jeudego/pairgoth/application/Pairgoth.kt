@@ -35,6 +35,11 @@ import java.util.regex.Pattern
 
 fun main(vararg args: String) {
     try {
+        // register a shutdown hook for any global necessary cleanup
+        Runtime.getRuntime().addShutdownHook(object: Thread() {
+            override fun run() { cleanup() }
+        })
+
         // read default properties and provided ones, if any
         readProperties()
         // extract war files from main archive
@@ -47,7 +52,12 @@ fun main(vararg args: String) {
 }
 
 private val tmp = System.getProperty("java.io.tmpdir")
+private val webapps = Path.of("${tmp}/pairgoth/webapps")
 private val version = "1.0-SNAPSHOT" // TODO CB
+
+private fun cleanup() {
+    FileUtils.deleteDirectory(webapps.toFile())
+}
 
 private fun readProperties() {
     val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
@@ -76,9 +86,8 @@ private fun readProperties() {
 private fun extractWarFiles() {
     // val jarLocation = object{}::class.java.protectionDomain.codeSource.location
     // prepare output directory
-    val targetPath = Path.of("${tmp}/pairgoth/webapps")
-    FileUtils.deleteDirectory(targetPath.toFile())
-    Files.createDirectories(targetPath)
+    FileUtils.deleteDirectory(webapps.toFile())
+    Files.createDirectories(webapps)
 
     // extract wars
     val webappsFolderURL = getResource("/META-INF/webapps") ?: throw Error("webapps not found")
@@ -89,7 +98,7 @@ private fun extractWarFiles() {
     }.forEach { entry ->
         if (!entry.isDirectory) {
             jarFile.getInputStream(entry).use { entryInputStream ->
-                Files.copy(entryInputStream, targetPath.resolve(entry.name.removePrefix("META-INF/webapps/")))
+                Files.copy(entryInputStream, webapps.resolve(entry.name.removePrefix("META-INF/webapps/")))
             }
         }
     }

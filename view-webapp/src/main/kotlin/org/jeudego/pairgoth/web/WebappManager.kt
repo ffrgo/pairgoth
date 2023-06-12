@@ -72,12 +72,6 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
             // fail to correctly implement SSL...
             disableSSLCertificateChecks()
 
-            // start smtp loop
-            if (properties.containsKey("smtp.host")) {
-                registerService("smtp", SmtpLoop(properties))
-                startService("smtp")
-            }
-
         } catch (ioe: IOException) {
             logger.error("webapp initialization error", ioe)
         }
