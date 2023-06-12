@@ -180,17 +180,61 @@ sealed class Solver(
         // Main criterion 2 minimize score difference
         score += minimizeScoreDifference(p1, p2)
 
+        // Main criterion 3 If different groups, make a directed Draw-up/Draw-down
+        // TODO
+
+        // Main criterion 4 seeding
+        score += applySeeding(p1, p2)
+
         return score
     }
 
     open fun minimizeScoreDifference(p1: Pairable, p2: Pairable): Long {
-        var score: Long = 0
+        var score = 0L
         val scoreRange: Int = numberGroups
         // TODO check category equality if category are used in SwissCat
         val x = abs(p1.group - p2.group) as Double / scoreRange.toDouble()
         val k: Double = pairingParams.standardNX1Factor
         score = (pairingParams.mainMinimizeScoreDifference * (1.0 - x) * (1.0 + k * x)) as Long
 
+        return score
+    }
+
+    fun applySeeding(p1: Pairable, p2: Pairable): Long {
+        var score = 0L
+        // Apply seeding for players in the same group
+        if (p1.group == p2.group) {
+            val (cla1, groupSize) = p1.placeInGroup
+            val cla2 = p2.placeInGroup.first
+            val maxSeedingWeight = pairingParams.maMaximizeSeeding
+
+            val currentSeedSystem: SeedMethod = if (round <= pairingParams.maLastRoundForSeedSystem1)
+                pairingParams.maSeedSystem1 else pairingParams.maSeedSystem2
+
+            score += when(currentSeedSystem) {
+                // The best is to get 2 * |Cla1 - Cla2| - groupSize    close to 0
+                SeedMethod.SPLIT_AND_SLIP -> {
+                    val x = 2 * abs(cla1 - cla2) - groupSize
+                    maxSeedingWeight - maxSeedingWeight * x / groupSize * x / groupSize
+                }
+
+                // The best is to get cla1 + cla2 - (groupSize - 1) close to 0
+                SeedMethod.SPLIT_AND_FOLD -> {
+                    val x = cla1 + cla2 - (groupSize - 1)
+                    maxSeedingWeight - maxSeedingWeight * x / (groupSize - 1) * x / (groupSize - 1)
+                }
+
+                SeedMethod.SPLIT_AND_RANDOM -> {
+                    if ((2 * cla1 < groupSize && 2 * cla2 >= groupSize) || (2 * cla1 >= groupSize && 2 * cla2 < groupSize)) {
+                        val randRange = (maxSeedingWeight * 0.2).toLong()
+                        val rand = detRandom(randRange, p1, p2)
+                        maxSeedingWeight - rand
+                    } else {
+                        0L
+                    }
+                }
+            }
+        }
         return score
     }
 
@@ -237,19 +281,13 @@ sealed class Solver(
             else HistoryHelper(history, standingScore)
 
 
+
     // Decide each pairable group based on the main criterion
-    private fun computeGroups(): Pair<Map<ID, Int>, Int> {
+    private val numberGroups by lazy {
         val (mainScoreMin, mainScoreMax) = mainCriterionMinMax()
-
-        // TODO categories
-        val groups: Map<ID, Int> = pairables.associate { pairable -> Pair(pairable.id, mainCriterion(pairable)) }
-
-        return Pair(groups, mainScoreMax - mainScoreMin)
+        mainScoreMax - mainScoreMin
     }
-
-    private val groupsResult = computeGroups()
-    private val _groups = groupsResult.first
-    private val numberGroups = groupsResult.second
+    private val _groups = pairables.associate { pairable -> Pair(pairable.id, mainCriterion(pairable)) }
 
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
@@ -265,7 +303,7 @@ sealed class Solver(
     }
 
     // placeInGroup (of same score) : Pair(place, groupSize)
-    val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
+    private val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
     private val _placeInGroup by lazy {
         sortedPairables.groupBy {
             it.group

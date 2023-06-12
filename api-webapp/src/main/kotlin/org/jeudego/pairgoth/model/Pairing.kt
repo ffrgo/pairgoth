@@ -25,13 +25,13 @@ private const val BA_MAX_AVOIDDUPLGAME: Long = 500000000000000L // 5e14
 private const val BA_MAX_RANDOM: Long = 1000000000L // 2e9
 private const val BA_MAX_BALANCEWB: Long = 1000000L // 1e6
 
-private const val MA_MAX_AVOID_MIXING_CATEGORIES: Double = 2e13
+private const val MA_MAX_AVOID_MIXING_CATEGORIES: Long = 20000000000000L // 2e13
 // Ratio between MA_MAX_MINIMIZE_SCORE_DIFFERENCE and MA_MAX_AVOID_MIXING_CATEGORIES should stay below 1/ nbcat^2
-private const val MA_MAX_MINIMIZE_SCORE_DIFFERENCE: Double = 1e11
-private const val MA_MAX_DUDD_WEIGHT: Double = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 1000;  // Draw-ups Draw-downs
+private const val MA_MAX_MINIMIZE_SCORE_DIFFERENCE: Long = 100000000000L // 1e11
+private const val MA_MAX_DUDD_WEIGHT: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 1000;  // Draw-ups Draw-downs
 enum class MA_DUDD {TOP, MID, BOT}
 
-private const val MA_MAX_MAXIMIZE_SEEDING: Double = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 20000;
+private const val MA_MAX_MAXIMIZE_SEEDING: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 20000;
 
 enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
 
@@ -50,14 +50,14 @@ sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = P
             // Main criteria
             // TODO move avoidmixingcategories to swiss with category
             //val maAvoidMixingCategories: Double = MA_MAX_AVOID_MIXING_CATEGORIES,
-            val mainMinimizeScoreDifference: Double = MA_MAX_MINIMIZE_SCORE_DIFFERENCE,
+            val mainMinimizeScoreDifference: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE,
 
-            val maDUDDWeight: Double = MA_MAX_DUDD_WEIGHT,
+            val maDUDDWeight: Long = MA_MAX_DUDD_WEIGHT,
             val maCompensateDUDD: Boolean = true,
             val maDUDDUpperMode: MA_DUDD = MA_DUDD.MID,
             val maDUDDLowerMode: MA_DUDD = MA_DUDD.MID,
 
-            val maMaximizeSeeding: Double = MA_MAX_MAXIMIZE_SEEDING, // 5 *10^6
+            val maMaximizeSeeding: Long = MA_MAX_MAXIMIZE_SEEDING, // 5 *10^6
             val maLastRoundForSeedSystem1: Int = 1,
             val maSeedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,
             val maSeedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
@@ -68,7 +68,7 @@ sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = P
             val seBarThresholdActive: Boolean = true, // Do not apply secondary criteria for players above bar
             val seRankThreshold: Int = 0, // Do not apply secondary criteria above 1D rank
             val seNbWinsThresholdActive: Boolean = true, // Do not apply secondary criteria when nbWins >= nbRounds / 2
-            val seDefSecCrit: Double = MA_MAX_AVOID_MIXING_CATEGORIES, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
+            val seDefSecCrit: Long = MA_MAX_AVOID_MIXING_CATEGORIES, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
 
             // Geographical params
             val geo: GeographicalParams = GeographicalParams(avoidSameGeo = seDefSecCrit),
@@ -82,19 +82,19 @@ sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = P
 }
 
 data class GeographicalParams(
-        val avoidSameGeo: Double, // Should be SeDefSecCrit for SwCat and MM, 0 for Swiss
+        val avoidSameGeo: Long, // Should be SeDefSecCrit for SwCat and MM, 0 for Swiss
         val preferMMSDiffRatherThanSameCountry: Int = 1,    // Typically = 1
         val preferMMSDiffRatherThanSameClubsGroup: Int = 2, // Typically = 2
         val preferMMSDiffRatherThanSameClub: Int = 3,       // Typically = 3
 ) {
     companion object {
-        fun disabled() = GeographicalParams(avoidSameGeo = 0.0)
+        fun disabled() = GeographicalParams(avoidSameGeo = 0L)
     }
 }
 
 data class HandicapParams(
         // minimizeHandicap is a secondary criteria but moved here
-        val minimizeHandicap: Double, // Should be paiSeDefSecCrit for SwCat, 0 for others
+        val minimizeHandicap: Long, // Should be paiSeDefSecCrit for SwCat, 0 for others
         val basedOnMMS: Boolean = true, // if hdBasedOnMMS is false, hd will be based on rank
         // When one player in the game has a rank of at least hdNoHdRankThreshold,
         // then the game will be without handicap
@@ -104,7 +104,7 @@ data class HandicapParams(
 ) {
     companion object {
         fun disabled() = HandicapParams(
-                minimizeHandicap = 0.0,
+                minimizeHandicap = 0L,
                 basedOnMMS = false,
                 noHdRankThreshold=-30, // 30k
                 ceiling=0)
@@ -161,7 +161,7 @@ fun HandicapParams.toJson() = Json.Object(
     "ceiling" to ceiling, )
 
 fun HandicapParams.fromJson(json: Json.Object) = HandicapParams(
-        minimizeHandicap=json.getDouble("minimize_hd")!!,
+        minimizeHandicap=json.getLong("minimize_hd")!!,
         basedOnMMS=json.getBoolean("mms_based")!!,
         noHdRankThreshold=json.getInt("no_hd_thresh")!!,
         correction=json.getInt("correction")!!,
@@ -175,7 +175,7 @@ fun GeographicalParams.toJson() = Json.Object(
         "club" to preferMMSDiffRatherThanSameClub,)
 
 fun GeographicalParams.fromJson(json: Json.Object) = GeographicalParams(
-        avoidSameGeo=json.getDouble("avoid_same_geo")!!,
+        avoidSameGeo=json.getLong("avoid_same_geo")!!,
         preferMMSDiffRatherThanSameCountry=json.getInt("country")!!,
         preferMMSDiffRatherThanSameClubsGroup=json.getInt("club_group")!!,
         preferMMSDiffRatherThanSameClub=json.getInt("club")!!,
