@@ -2,6 +2,7 @@
 <tools xmlns:xi="http://www.w3.org/2001/XInclude">
 
     <toolbox scope="application">
+        <tool key="translate" class="org.jeudego.pairgoth.view.TranslationTool"/>
         <!--
         <tool key="number" format="#0.00"/>
         <tool key="date" locale="fr_FR" format="yyyy-MM-dd"/>
@@ -17,7 +18,6 @@
     </toolbox>
 
     <toolbox scope="request">
-        <tool key="translate" class="org.jeudego.pairgoth.view.TranslationTool"/>
         <tool key="api" class="org.jeudego.pairgoth.view.ApiTool"/>
     </toolbox>
 
