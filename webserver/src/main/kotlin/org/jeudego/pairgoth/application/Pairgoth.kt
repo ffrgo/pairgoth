@@ -35,7 +35,11 @@ import java.util.regex.Pattern
 
 fun main(vararg args: String) {
     try {
+        // read default properties and provided ones, if any
+        readProperties()
+        // extract war files from main archive
         extractWarFiles()
+        // launch web server
         launchServer()
     } catch (t: Throwable) {
         t.printStackTrace(System.err)
@@ -44,6 +48,30 @@ fun main(vararg args: String) {
 
 private val tmp = System.getProperty("java.io.tmpdir")
 private val version = "1.0-SNAPSHOT" // TODO CB
+
+private fun readProperties() {
+    val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
+    defaultProps.openStream().use {
+        serverProps.load(InputStreamReader(it, StandardCharsets.UTF_8))
+    }
+    val properties = File("./pairgoth.properties")
+    if (properties.exists()) {
+        serverProps.load(FileReader(properties))
+        serverProps.entries.forEach { entry ->
+            val property = entry.key as String
+            val value = entry.value as String
+            if (!property.startsWith("webapp.ssl.")) {
+                // do not propagate ssl properties further
+                System.setProperty("pairgoth.$property", value)
+            }
+        }
+    }
+    // we want colorized output on linux
+    if (System.getProperty("os.name") == "Linux")
+    {
+        System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", "false");
+    }
+}
 
 private fun extractWarFiles() {
     // val jarLocation = object{}::class.java.protectionDomain.codeSource.location
@@ -66,11 +94,11 @@ private fun extractWarFiles() {
         }
     }
 }
-
 private val mainClass = object{}::class.java.enclosingClass
 private val jarPath = mainClass.protectionDomain.codeSource.location.path.let { URLDecoder.decode(it, "UTF-8") }
 private val serverProps = Properties()
 private fun getResource(resource: String) = mainClass.getResource(resource)
+
 private fun getResourceProperty(key: String) = serverProps.getProperty(key)?.let { property ->
     val url = property.replace("\$jar", jarPath)
     if (!Resource.newResource(url).exists()) throw Error("resource not found: $url")
@@ -78,10 +106,6 @@ private fun getResourceProperty(key: String) = serverProps.getProperty(key)?.let
 } ?: throw Error("missing property: $key")
 
 private fun launchServer() {
-
-    // read default properties and provided ones, if any
-    readProperties()
-
     // create webapps contexts
     val webAppContexts = mutableListOf<WebAppContext>()
     val mode = serverProps["mode"] ?: throw Error("missing property: mode")
@@ -123,26 +147,6 @@ private fun launchServer() {
 private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
     context.war = "$tmp/pairgoth/webapps/$webapp-webapp-$version.war"
     context.contextPath = contextPath
-}
-
-private fun readProperties() {
-    val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
-    defaultProps.openStream().use {
-        serverProps.load(InputStreamReader(it, StandardCharsets.UTF_8))
-    }
-    val properties = File("./pairgoth.properties")
-    if (properties.exists()) {
-        serverProps.load(FileReader(properties))
-        serverProps.entries.forEach { entry ->
-            val property = entry.key as String
-            val value = entry.value as String
-            if (!property.startsWith("webapp.ssl.")) {
-                // do not propagate ssl properties further
-            } else {
-                System.setProperty("pairgoth.$property", value)
-            }
-        }
-    }
 }
 
 private fun buildSecureConnector(server: Server, port: Int): ServerConnector {
