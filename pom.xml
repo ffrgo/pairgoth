@@ -23,7 +23,7 @@
       <id>republicate.com</id>
       <url>https://republicate.com/maven2</url>
       <releases>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </releases>
       <snapshots>
       <enabled>true</enabled>
@@ -56,13 +56,18 @@
     <servlet.api.version>4.0.4</servlet.api.version>
     <jetty.version>10.0.15</jetty.version>
     <slf4j.version>2.0.7</slf4j.version>
+
+    <!-- kotlin -->
+    <kotlin.version>1.8.21</kotlin.version>
+    <kotlin.code.style>official</kotlin.code.style>
+    <kotlin.compiler.jvmTarget>10</kotlin.compiler.jvmTarget>
+    <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
   </properties>
 
   <modules>
     <module>api-webapp</module>
-    <!-- <module>view-webapp</module> in progress -->
-    <module>container</module>
-    <module>bootstrap</module>
+    <module>view-webapp</module>
+    <module>webserver</module>
     <module>application</module>
   </modules>
 
@@ -143,6 +148,11 @@
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>${license.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.jetbrains.kotlin</groupId>
+          <artifactId>kotlin-maven-plugin</artifactId>
+          <version>${kotlin.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>

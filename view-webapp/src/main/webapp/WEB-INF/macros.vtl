@@ -1,0 +1,44 @@
+#macro(forward $url)
+##    $log.debug("forwarding towards $url")
+    $request.session.servletContext.getRequestDispatcher($url).forward($request,$response)
+#end
+
+#macro(redirect $url)
+    $log.debug("redirecting towards $url")
+    $response.sendRedirect($url)
+#end
+
+#macro(seterror $msg)##
+$log.error($msg)##
+$session.setAttribute('error',$msg)##
+#end
+
+#macro(clearerror)##
+$session.removeAttribute('error')##
+#end
+
+#macro(setmessage $msg)##
+$log.info($msg)##
+#if($message)##
+$session.setAttribute('message',"$message<br/>$msg")##
+#else##
+$session.setAttribute('message',$msg)##
+#end##
+#end
+
+#macro(clearmessage)##
+    $session.removeAttribute('message')##
+#end
+
+#macro(api_error $message)
+  $api.exception($message)
+#end
+
+#macro(euro $amount)
+$number.format('#0.00 €', $amount)##
+#end
+
+#macro(ttc $amount)
+#set($ttc = $amount * 1.2)##
+$number.format('#0.00 €', $ttc)##
+#end

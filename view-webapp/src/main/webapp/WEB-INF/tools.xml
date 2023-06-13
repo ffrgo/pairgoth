@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<tools xmlns:xi="http://www.w3.org/2001/XInclude">
+
+    <toolbox scope="application">
+        <tool key="translate" class="org.jeudego.pairgoth.view.TranslationTool"/>
+        <!--
+        <tool key="number" format="#0.00"/>
+        <tool key="date" locale="fr_FR" format="yyyy-MM-dd"/>
+        <tool key="inflector" class="org.atteo.evo.inflector.English"/>
+        <tool key="strings" class="org.apache.commons.lang3.StringUtils"/>
+        -->
+    </toolbox>
+
+    <toolbox scope="session">
+        <!--
+        <tool key="oauth" class="org.jeudego.egc2024.tool.OAuthTool"/>
+        -->
+    </toolbox>
+
+    <toolbox scope="request">
+        <tool key="api" class="org.jeudego.pairgoth.view.ApiTool"/>
+    </toolbox>
+
+</tools>

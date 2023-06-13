@@ -1,0 +1,117 @@
+@import "/lib/fomantic-ui-2.8.7/semantic.css" layer(semantic);
+
+@layer pairgoth {
+  
+  /* general styles */
+  body {
+    font-size: clamp(12px, .8rem + .25vw, 20px);
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .flex {
+    display: flex;
+    &.horz {
+      flex-flow: row nowrap;
+      align-items: center;
+    }
+    &.vert {
+      flex-flow: column nowrap;
+      align-items: stretch;
+    }
+  }
+
+  /* header, center, footer */
+  
+  #header {
+    height: 3em;
+    width: 100%;
+    position: relative;
+    justify-content: space-between;
+    #logo {
+      height: 100%;
+      img {
+        display: inline-block;
+        max-height: 100%;
+      }
+    }
+  }
+
+  #center {
+    max-width: clamp(800px, 80vw, 100vw);
+    flex: 1;
+    overflow: auto;
+    #inner {
+      display: flex;
+      flex-flow: column nowrap;
+      align-items: center;
+    }
+  }
+
+  #footer {
+    flex: 0;
+    height: 2em;
+    margin: 0 0.5em;
+    font-size: 0.8em;
+    justify-content: space-between;
+  }
+
+  .section {
+    padding: 0.5em;
+  }
+
+  /* buttons */
+  
+  button {
+    font-size: inherit;
+  }
+
+  button.floating {
+    box-shadow: 0px 8px 8px -5px rgba(0,0,0,35%);
+    transition: all 0.3s;
+    &.white  {
+      border: solid 1px black;
+      background-color: white;
+    }
+    &:hover {
+      box-shadow: 0px 10px 10px -5px rgba(0,0,0,35%);
+      transform: scale(1.05);
+    }
+    &:active {
+      transition: all 0.1s;
+      box-shadow: none;
+      transform: translate(0px, 5px);
+    }
+  }
+
+  /* languages */
+  #lang {
+    position: relative;
+    #lang-list {
+      position: absolute;
+      display: none;
+      top:100%;
+      left: -200%;
+      flex-flow: column nowrap;
+      padding: 0.5em;
+      gap: 0.5em;
+      background-color: #dddddd;
+      align-items: flex-start;
+      z-index: 50;
+      &.shown {
+        display: flex;
+      }
+      a {
+        display: inline-block;
+        text-align: center;
+        i {
+          vertical-align: middle;
+        }
+      }
+    }
+  }
+
+}

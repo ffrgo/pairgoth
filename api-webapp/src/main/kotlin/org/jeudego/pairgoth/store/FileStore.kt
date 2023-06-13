@@ -22,7 +22,7 @@ private fun Tournament<*>.filename() = "${id.toString().padStart(LEFT_PAD, '0')}
 
 class FileStore(pathStr: String): StoreImplementation {
     companion object {
-        private val filenameRegex = Regex("^(\\d+)-.*\\.tour$")
+        private val filenameRegex = Regex("^(\\d+)-(.*)\\.tour$")
         private val timestampFormat: DateFormat = SimpleDateFormat("yyyyMMddHHmmss")
         private val timestamp: String get() = timestampFormat.format(Date())
     }
@@ -33,14 +33,15 @@ class FileStore(pathStr: String): StoreImplementation {
     }
 
     init {
-        _nextTournamentId.set(getTournamentsIDs().maxOrNull() ?: 0.toID())
+        _nextTournamentId.set(getTournaments().keys.maxOrNull() ?: 0.toID())
     }
 
-    override fun getTournamentsIDs(): Set<ID> {
+    override fun getTournaments(): Map<ID, String> {
         return path.useDirectoryEntries("*.tour") { entries ->
             entries.mapNotNull { entry ->
-                filenameRegex.matchEntire(entry.fileName.toString())?.groupValues?.get(1)?.toID()
-            }.toSet()
+                val match = filenameRegex.matchEntire(entry.fileName.toString())
+                match?.let { Pair(it.groupValues[1].toID(), it.groupValues[2]) }
+            }.sortedBy { it.first }.toMap()
         }
     }
 

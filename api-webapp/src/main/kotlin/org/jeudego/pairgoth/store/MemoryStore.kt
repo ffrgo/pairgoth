@@ -6,7 +6,7 @@ import org.jeudego.pairgoth.model.Tournament
 class MemoryStore: StoreImplementation {
     private val tournaments = mutableMapOf<ID, Tournament<*>>()
 
-    override fun getTournamentsIDs(): Set<ID> = tournaments.keys
+    override fun getTournaments(): Map<ID, String> = tournaments.mapValues { it.value.shortName }
 
     override fun addTournament(tournament: Tournament<*>) {
         if (tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} already exists")
