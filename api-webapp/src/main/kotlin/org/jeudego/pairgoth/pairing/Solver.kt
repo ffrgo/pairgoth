@@ -72,6 +72,8 @@ sealed class Solver(
 
         score += applyMainCriteria(p1, p2)
 
+        score += applySecondaryCriteria(p1, p2)
+
         return score as Double
     }
     // The main criterion that will be used to define the groups should be defined by subclasses
@@ -135,7 +137,7 @@ sealed class Solver(
 
     // Main criteria
     open fun applyMainCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L;
+        var score = 0L
 
         // Main criterion 1 avoid mixing category is moved to Swiss with category
         // TODO
@@ -148,6 +150,18 @@ sealed class Solver(
 
         // Main criterion 4 seeding
         score += applySeeding(p1, p2)
+
+        return score
+    }
+
+    open fun applySecondaryCriteria(p1: Pairable, p2: Pairable): Long {
+        var score = 0L
+        // See Swiss with category for minimizing handicap criterion
+
+        // TODO understand where opengotha test if need to be applied
+
+        // Geographical criterion
+        score += avoidSameGeo(p1, p2)
 
         return score
     }
@@ -235,6 +249,70 @@ sealed class Solver(
                 }
             }
         }
+        return score
+    }
+
+    open fun doNeedToApplySecondaryCriteria(p1: Pairable, p2: Pairable) {
+        // secCase = 0 : No player is above thresholds
+        // secCase = 1 : One player is above thresholds
+        // secCase = 2 : Both players are above thresholds
+        // TODO understand where it is used
+    }
+
+    fun avoidSameGeo(p1: Pairable, p2: Pairable): Long {
+        val placementScoreRange = numberGroups
+
+        val geoMaxCost = pairingParams.geo.avoidSameGeo
+
+        val countryFactor = pairingParams.geo.preferMMSDiffRatherThanSameCountry
+        val clubFactor: Int = pairingParams.geo.preferMMSDiffRatherThanSameClub
+        //val groupFactor: Int = pairingParams.geo.preferMMSDiffRatherThanSameClubsGroup
+
+        // Same country
+        val countryRatio = if (p1.country != p2.country && countryFactor != 0) {
+            min(countryFactor.toDouble() / placementScoreRange as Double, 1.0) // clamp to 1
+        } else {
+            0.0
+        }
+
+        // Same club and club group (TODO club group)
+        var clubRatio = 0.0
+        val commonClub = p1.club == p2.club
+        val commonGroup = false // TODO
+
+        if (commonGroup && !commonClub) {
+            clubRatio = if (clubFactor == 0) {
+                0.0
+            } else {
+                clubFactor.toDouble() / 2.0 / placementScoreRange as Double
+            }
+
+        } else if (!commonGroup && !commonClub) {
+            clubRatio = if (clubFactor == 0) {
+                0.0
+            } else {
+                clubFactor.toDouble() * 1.2 / placementScoreRange as Double
+            }
+        }
+        clubRatio = min(clubRatio, 1.0)
+
+        // TODO Same family
+
+        // compute geoRatio
+
+        val mainPart = max(countryRatio, clubRatio)
+        val secPart = min(countryRatio, clubRatio)
+
+        var geoRatio = mainPart + secPart / 2.0
+        if (geoRatio > 0.0) {
+            geoRatio += 0.5 / placementScoreRange as Double
+        }
+
+        // The concavity function is applied to geoRatio to get geoCost
+        val dbGeoCost: Double = geoMaxCost.toDouble() * (1.0 - geoRatio) * (1.0 + pairingParams.standardNX1Factor * geoRatio)
+        var score: Long = pairingParams.mainMinimizeScoreDifference - dbGeoCost.toLong()
+        score = min(score, geoMaxCost)
+
         return score
     }
 
