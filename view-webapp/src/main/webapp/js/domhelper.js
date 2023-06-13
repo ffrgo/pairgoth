@@ -27,6 +27,9 @@ NodeList.prototype.toggleClass = function(className) {
     elem.classList.toggle(className);
   });
 }
+NodeList.prototype.hasClass = function(className) {
+  return this.item(0).classList.contains(className);
+}
 Node.prototype.offset = function() {
   let _x = 0;
   let _y = 0;
@@ -47,3 +50,20 @@ Element.prototype.attr = function (key) {
 NodeList.prototype.attr = function(key) {
   this.item(0).attr(key) // CB TODO review
 }
+Element.prototype.data = function (key) {
+  return this.attributes[`data-${key}`].value
+}
+NodeList.prototype.data = function(key) {
+  this.item(0).data(key) // CB TODO review
+}
+
+
+let initFunctions = [];
+function onLoad(fct) {
+  if (typeof(fct) == "function") initFunctions.push(fct);
+}
+document.on("DOMContentLoaded", () => {
+  initFunctions.forEach(fct => {
+    fct();
+  });
+});

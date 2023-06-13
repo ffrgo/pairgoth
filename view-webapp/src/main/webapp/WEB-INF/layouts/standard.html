@@ -11,13 +11,20 @@
 </head>
 <body class="vert flex">
   <div id="header" class="horz flex">
-    <div id="left-header" class="horz flex">
-      <div id="logo" class="vert flex">
-        <img src="/img/logo.svg"/>
-      </div>
+    <div id="logo">
+      <img src="/img/logo.svg"/>
     </div>
-    <div id="right-header">
+    <div id="title">
+    </div>
+    <div id="lang">
       <i class="$translate.flags[$request.lang] flag"></i>
+      <div id="lang-list">
+#foreach($lang in $translate.flags.entrySet())
+  #if($lang != $request.lang)
+        <a class="lang" data-lang="$lang.key" href="#"><i class="$lang.value flag"></i>&nbsp;$lang.key</a>
+  #end
+#end
+      </div>
     </div>
   </div>
   <div id="center">
@@ -31,8 +38,28 @@
   </div>
   <script type="text/javascript" src="/js/store2-2.14.2.min.js"></script>
   <script type="text/javascript" src="/js/tablesort-5.4.0.min.js"></script>
+  <script type="text/javascript" src="/js/domhelper.js"></script>
   <script type="text/javascript" src="/js/formproxy.js"></script>
   <script type="text/javascript" src="/js/api.js"></script>
   <script type="text/javascript" src="/js/main.js"></script>
+  <script type="text/javascript">
+    // #[[
+    onLoad(() => {
+      $('#lang').on('click', e => {
+        $('#lang-list').toggleClass('shown');
+      });
+      $('.lang').on('click', e => {
+        let lang = e.target.closest('.lang').data('lang');
+        document.location.href = document.location.href.replace(/\/[a-z]{2}\//, `/${lang}/`);
+        return false;
+      });
+      document.on('click', e => {
+        if ($('#lang-list').hasClass('shown') && !e.target.closest('.lang,#lang')) {
+          $('#lang-list').removeClass('shown');
+        }
+      });
+    });
+    // ]]#
+  </script>
 </body>
 </html>

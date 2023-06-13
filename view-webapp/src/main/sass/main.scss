@@ -1,8 +1,10 @@
 @import "/lib/fomantic-ui-2.8.7/semantic.css" layer(semantic);
 
 @layer pairgoth {
+  
+  /* general styles */
   body {
-    font-size : clamp(1rem, 2vw, 3rem);
+    font-size: clamp(12px, .8rem + .25vw, 20px);
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -22,19 +24,13 @@
     }
   }
 
+  /* header, center, footer */
+  
   #header {
     height: 3em;
     width: 100%;
     position: relative;
     justify-content: space-between;
-    #left-header {
-      height: 100%;
-    }
-    #right-header {
-      height: 100%;
-      margin-top: 0.5em;
-      margin-right: 0.5em;
-    }
     #logo {
       height: 100%;
       img {
@@ -67,6 +63,8 @@
     padding: 0.5em;
   }
 
+  /* buttons */
+  
   button {
     font-size: inherit;
   }
@@ -88,4 +86,31 @@
       transform: translate(0px, 5px);
     }
   }
+
+  /* languages */
+  #lang {
+    position: relative;
+    #lang-list {
+      position: absolute;
+      display: none;
+      top:100%;
+      left: -200%;
+      right: 0.2em;
+      flex-flow: column nowrap;
+      padding: 0.2em;
+      gap: 0.5em;
+      background-color: #d44935;
+      align-items: center;
+      z-index: 50;
+      &.shown {
+        display: flex;
+      }
+      a {
+        display: inline-block;
+        text-align: center;
+
+      }
+    }
+  }
+
 }
