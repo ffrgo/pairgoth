@@ -2,7 +2,7 @@ package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
 
-open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Double>) {
+open class HistoryHelper(protected val history: List<Game>, computeScore: () -> Map<ID, Double>) {
 
     fun getCriterionValue(p: Pairable, crit: PlacementCriterion): Int {
         // Returns generic criterion
@@ -26,7 +26,7 @@ open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Doubl
     open fun nbW(p: Pairable) = numberWins[p.id]
 
 
-    protected val paired: Set<Pair<Int, Int>> by lazy {
+    protected val paired: Set<Pair<ID, ID>> by lazy {
         (history.map { game ->
             Pair(game.black, game.white)
         } + history.map { game ->
@@ -36,7 +36,7 @@ open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Doubl
 
     // Returns the number of games played as white
     // Only count games without handicap
-    private val colorBalance: Map<Int, Int> by lazy {
+    private val colorBalance: Map<ID, Int> by lazy {
         history.flatMap { game -> if (game.handicap == 0) {
             listOf(Pair(game.white, +1), Pair(game.black, -1))
         } else {
@@ -47,8 +47,8 @@ open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Doubl
         }
     }
 
-    val numberWins: Map<Int, Double> by lazy {
-        mutableMapOf<Int, Double>().apply {
+    val numberWins: Map<ID, Double> by lazy {
+        mutableMapOf<ID, Double>().apply {
             history.forEach { game ->
                 when (game.result) {
                     Game.Result.BLACK -> put(game.black, getOrDefault(game.black, 0.0) + 1.0)
@@ -61,6 +61,11 @@ open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Doubl
                 }
             }
         }
+    }
+
+    // Has to be set after construction
+    private val score by lazy {
+        computeScore()
     }
 
     // SOS related functions given a score function
@@ -114,8 +119,8 @@ open class HistoryHelper(protected val history: List<Game>, score: Map<ID, Doubl
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
 
-class TeamOfIndividualsHistoryHelper(history: List<Game>, score: Map<ID, Double>):
-        HistoryHelper(history, score) {
+class TeamOfIndividualsHistoryHelper(history: List<Game>, computeScore: () -> Map<ID, Double>):
+        HistoryHelper(history, computeScore) {
 
     private fun Pairable.asTeam() = this as TeamTournament.Team
 

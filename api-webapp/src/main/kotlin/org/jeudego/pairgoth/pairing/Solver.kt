@@ -12,6 +12,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+val DEBUG_EXPORT_WEIGHT = true
 
 private fun detRandom(max: Long, p1: Pairable, p2: Pairable): Long {
     var nR: Long = 0
@@ -353,10 +354,10 @@ sealed class Solver(
     }
 
     // Generic parameters calculation
-    private val standingScore = computeStandingScore()
-    val historyHelper =
-            if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, standingScore)
-            else HistoryHelper(history, standingScore)
+    //private val standingScore by lazy { computeStandingScore() }
+
+    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, ::computeStandingScore)
+    else HistoryHelper(history, ::computeStandingScore)
 
 
 
@@ -404,7 +405,6 @@ sealed class Solver(
     val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
 
     val Pairable.sos: Double get() = historyHelper.sos[id]!!
-
     val Pairable.sosm1: Double get() = historyHelper.sosm1[id]!!
     val Pairable.sosm2: Double get() = historyHelper.sosm2[id]!!
     val Pairable.sosos: Double get() = historyHelper.sosos[id]!!
