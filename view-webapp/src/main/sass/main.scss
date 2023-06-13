@@ -95,12 +95,11 @@
       display: none;
       top:100%;
       left: -200%;
-      right: 0.2em;
       flex-flow: column nowrap;
-      padding: 0.2em;
+      padding: 0.5em;
       gap: 0.5em;
-      background-color: #d44935;
-      align-items: center;
+      background-color: #dddddd;
+      align-items: flex-start;
       z-index: 50;
       &.shown {
         display: flex;
@@ -108,7 +107,9 @@
       a {
         display: inline-block;
         text-align: center;
-
+        i {
+          vertical-align: middle;
+        }
       }
     }
   }
