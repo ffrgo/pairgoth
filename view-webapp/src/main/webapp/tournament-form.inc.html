@@ -1,0 +1,70 @@
+<form id="new-tournament-form" class="ui form">
+  <div class="ui infos tab segment">
+    <div class="field">
+      <label>Tournament name</label>
+      <input type="text" name="name" placeholder="Tournament name"/>
+    </div>
+    <div class="field">
+      <label>Tournament short name</label>
+      <input type="text" name="shortname" placeholder="short_name"/>
+    </div>
+    <div class="field">
+      <label>Tournament dates</label>
+      <span id="date-range">from <input type="text" name="start" class="date" placeholder="start date"/> to <input type="text" name="end" class="date" placeholder="end date"/></span>
+    </div>
+    <div class="field">
+      <label>Number of rounds</label>
+      <span><input type="number" name="rounds" min="1"/> rounds</span>
+    </div>
+  </div>
+  <div class="ui type tab segment">
+    <div class="grouped unstackable fields">
+      <label>Tournament type</label>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="standard"/>
+            Standard tournament of individual players
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="partners"/>
+            <span>Partner teams tournament of <input type="number" min="2" name="partners"/> players</span> (pairgo / rengo)
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="teams"/>
+            <span>Teams tournament of <input type="number" min="2" name="partners"/> players</span> (teams of individual players)
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui pairing tab segment">
+    <div class="grouped unstackable fields">
+      <label>Tournament pairing</label>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="pairing" value="macmahon"/>
+            MacMahon
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="pairing" value="swiss"/>
+            Swiss
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>

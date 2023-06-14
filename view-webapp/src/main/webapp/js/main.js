@@ -83,3 +83,39 @@ function exportCSV(filename, content) {
   link.click();
   document.body.removeChild(link);
 }
+
+/* modals */
+
+NodeList.prototype.modal = function(show) {
+  this.item(0).modal(show);
+  return this;
+}
+Element.prototype.modal = function(show) {
+  if (show) {
+    document.body.addClass('dimmed');
+    this.addClass('active');
+  }
+  else {
+    this.removeClass('active');
+    document.body.removeClass('dimmed');
+  }
+  return this;
+}
+
+
+onLoad(() => {
+  /*
+  document.on('click', e => {
+    if (!e.target.closest('.modal')) $('.modal').hide();
+  })
+   */
+  $('i.close.icon').on('click', e => {
+    let modal = e.target.closest('.modal');
+    if (modal) modal.modal(false);
+  });
+  $('.modal .actions .cancel').on('click', e => {
+    e.target.closest('.modal').modal(false);
+  });
+  $('#dimmer').on('click', e => $('.modal').modal(false));
+});
+
