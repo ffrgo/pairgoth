@@ -23,17 +23,17 @@ class SwissSolver(round: Int,
         return historyHelper.numberWins
     }
 
-    override fun getSpecificCriterionValue(p: Pairable, criterion: PlacementCriterion): Int {
+    override fun getSpecificCriterionValue(p: Pairable, criterion: PlacementCriterion): Double {
         // TODO solve this double/int conflict
         return when (criterion) {
-            PlacementCriterion.NBW -> p.nbW.toInt()
-            PlacementCriterion.SOSW -> p.sos.toInt()
-            PlacementCriterion.SOSWM1 -> p.sosm1.toInt()
-            PlacementCriterion.SOSWM2 -> p.sosm2.toInt()
-            PlacementCriterion.SODOSW -> p.sodos.toInt()
-            PlacementCriterion.SOSOSW -> p.sosos.toInt()
-            PlacementCriterion.CUSSW -> p.cums.toInt()
-            else -> -1
+            PlacementCriterion.NBW -> p.nbW
+            PlacementCriterion.SOSW -> p.sos
+            PlacementCriterion.SOSWM1 -> p.sosm1
+            PlacementCriterion.SOSWM2 -> p.sosm2
+            PlacementCriterion.SODOSW -> p.sodos
+            PlacementCriterion.SOSOSW -> p.sosos
+            PlacementCriterion.CUSSW -> p.cums
+            else -> -1.0
         }
     }
 }

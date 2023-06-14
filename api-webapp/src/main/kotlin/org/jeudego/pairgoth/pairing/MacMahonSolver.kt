@@ -23,17 +23,17 @@ class MacMahonSolver(round: Int, history: List<Game>, pairables: List<Pairable>,
         TODO("Not yet implemented")
     }
 
-    override fun getSpecificCriterionValue(p: Pairable, criterion: PlacementCriterion): Int {
+    override fun getSpecificCriterionValue(p: Pairable, criterion: PlacementCriterion): Double {
         // TODO solve this double/int conflict
         return when (criterion) {
             PlacementCriterion.MMS -> TODO()
-            PlacementCriterion.SOSM -> p.sos.toInt()
-            PlacementCriterion.SOSMM1 -> p.sosm1.toInt()
-            PlacementCriterion.SOSMM2 -> p.sosm2.toInt()
-            PlacementCriterion.SODOSM -> p.sodos.toInt()
-            PlacementCriterion.SOSOSM -> p.sosos.toInt()
-            PlacementCriterion.CUSSM -> p.cums.toInt()
-            else -> -1
+            PlacementCriterion.SOSM -> p.sos
+            PlacementCriterion.SOSMM1 -> p.sosm1
+            PlacementCriterion.SOSMM2 -> p.sosm2
+            PlacementCriterion.SODOSM -> p.sodos
+            PlacementCriterion.SOSOSM -> p.sosos
+            PlacementCriterion.CUSSM -> p.cums
+            else -> -1.0
         }
     }
 

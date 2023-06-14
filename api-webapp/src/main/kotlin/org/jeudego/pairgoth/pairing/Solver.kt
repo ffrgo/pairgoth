@@ -61,7 +61,7 @@ sealed class Solver(
             val criterionP = getCriterionValue(p, criterion)
             val criterionQ = getCriterionValue(q, criterion)
             if (criterionP != criterionQ) {
-                return criterionP - criterionQ
+                return (criterionP - criterionQ).toInt()
             }
         }
         return 0
@@ -83,20 +83,20 @@ sealed class Solver(
     // SOS and variants will be computed based on this score
     abstract fun computeStandingScore(): Map<ID, Double>
     // This function needs to be overridden for criterion specific to the current pairing mode
-    open fun getSpecificCriterionValue(p1: Pairable, criterion: PlacementCriterion): Int {
-        return -1
+    open fun getSpecificCriterionValue(p1: Pairable, criterion: PlacementCriterion): Double {
+        return -1.0
     }
 
-    private fun getCriterionValue(p1: Pairable, criterion: PlacementCriterion): Int {
+    private fun getCriterionValue(p1: Pairable, criterion: PlacementCriterion): Double {
         val genericCritVal = historyHelper.getCriterionValue(p1, criterion)
         // If the value from the history helper is > 0 it means that it is a generic criterion
         // Just returns the value
-        if (genericCritVal != -1) {
+        if (genericCritVal < 0) {
             return genericCritVal
         }
         // Otherwise we have to delegate it to the solver
         val critVal = getSpecificCriterionValue(p1, criterion)
-        if (critVal == -1) throw Error("Couldn't compute criterion value")
+        if (critVal < 0) throw Error("Couldn't compute criterion value")
         return critVal
     }
 

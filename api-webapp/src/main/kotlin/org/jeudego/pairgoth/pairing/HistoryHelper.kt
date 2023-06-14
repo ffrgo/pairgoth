@@ -4,20 +4,20 @@ import org.jeudego.pairgoth.model.*
 
 open class HistoryHelper(protected val history: List<Game>, computeScore: () -> Map<ID, Double>) {
 
-    fun getCriterionValue(p: Pairable, crit: PlacementCriterion): Int {
+    fun getCriterionValue(p: Pairable, crit: PlacementCriterion): Double {
         // Returns generic criterion
         // Specific criterion are computed by solvers directly
         return when (crit) {
-            PlacementCriterion.NULL -> 0
+            PlacementCriterion.NULL -> 0.0
             PlacementCriterion.CATEGORY -> TODO()
-            PlacementCriterion.RANK -> p.rank
-            PlacementCriterion.RATING -> p.rating
+            PlacementCriterion.RANK -> p.rank.toDouble()
+            PlacementCriterion.RATING -> p.rating.toDouble()
 
             PlacementCriterion.EXT -> TODO()
             PlacementCriterion.EXR -> TODO()
             PlacementCriterion.SDC -> TODO()
             PlacementCriterion.DC -> TODO()
-            else -> -1
+            else -> -1.0
         }
     }
     // Generic helper functions
