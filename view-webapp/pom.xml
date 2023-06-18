@@ -103,6 +103,7 @@
                     </httpConnector>
                     <systemProperties>
                         <pairgoth.api.url>http://localhost:8085/api/</pairgoth.api.url>
+                        <pairgoth.env>dev</pairgoth.env>
                     </systemProperties>
                     <webApp>
                         <resourceBases>${project.basedir}/src/main/webapp,${project.build.directory}/generated-resources/</resourceBases>

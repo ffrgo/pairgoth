@@ -7,12 +7,14 @@ import org.apache.velocity.runtime.parser.node.ASTText
 import org.apache.velocity.runtime.parser.node.SimpleNode
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.nio.charset.StandardCharsets
 import java.nio.file.Path
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentSkipListSet
 import java.util.regex.Pattern
 import kotlin.io.path.readLines
 import kotlin.io.path.useDirectoryEntries
@@ -79,7 +81,7 @@ class Translator private constructor(private val iso: String) {
                 if (groupStart > start) output.print(text.substring(start, groupStart))
                 val capture = matcher.group(group)
                 var token: String = StringEscapeUtils.unescapeHtml4(capture)
-                if (StringUtils.containsOnly(token, "\r\n\t -;:.\"/<>\u00A00123456789€!")) output.print(capture) else {
+                if (StringUtils.containsOnly(token, "\r\n\t -;:.'\"/<>\u00A00123456789€[]!")) output.print(capture) else {
                     token = normalize(token)
                     token = translate(token)
                     output.print(StringEscapeUtils.escapeHtml4(token))
@@ -104,17 +106,15 @@ class Translator private constructor(private val iso: String) {
         map[0] = (ignoring != null)
         while (pos < text.length) {
             if (ignoring == null) {
-                val nextIgnore = ignoredTags.map { tag ->
-                    Pair(tag, text.indexOf("<$tag(?:>\\s)"))
-                }.filter {
-                    it.second != -1
-                }.sortedBy {
-                    it.second
-                }.firstOrNull()
+                val nextIgnore = ignoredTags.mapNotNull { tag ->
+                    Regex("<($tag)(?:>|\\s)").find(text)
+                }.minByOrNull {
+                    it.range.first
+                }
                 if (nextIgnore == null) pos = text.length
                 else {
-                    ignoring = nextIgnore.first
-                    pos += nextIgnore.first.length + 2
+                    ignoring = nextIgnore.groupValues[1]
+                    pos += ignoring.length + 2
                 }
             } else {
                 val closingTag = text.indexOf("</$ignoring>")
@@ -132,9 +132,12 @@ class Translator private constructor(private val iso: String) {
         get() = textAccessor[this] as String
         set(value: String) { textAccessor[this] = value }
 
+    private val saveMissingTranslations = System.getProperty("pairgoth.env") == "dev"
+    private val missingTranslations: MutableSet<String> = ConcurrentSkipListSet()
+
     private fun reportMissingTranslation(enText: String) {
         logger.warn("missing translation towards {}: {}", iso, enText)
-        // CB TODO - create file
+        if (saveMissingTranslations) missingTranslations.add(enText)
     }
 
     companion object {
@@ -165,5 +168,18 @@ class Translator private constructor(private val iso: String) {
 
         val providedLanguages = setOf("en", "fr")
         const val defaultLanguage = "en"
+
+        internal fun notifyExiting() {
+            translators.values.filter {
+                it.saveMissingTranslations && it.missingTranslations.isNotEmpty()
+            }.forEach {
+                val missing = File("${it.iso}.missing")
+                logger.info("Saving missing translations for ${it.iso} to ${missing.canonicalPath}")
+                missing.printWriter().use { out ->
+
+                    out.println(it.missingTranslations.map { "${it}\t" }.joinToString("\n"))
+                }
+            }
+        }
     }
 }
