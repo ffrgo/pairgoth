@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -14,8 +15,7 @@ import kotlin.math.min
 
 val DEBUG_EXPORT_WEIGHT = true
 
-private fun detRandom(max: Long, p1: Pairable, p2: Pairable): Long {
-    var nR: Long = 0
+private fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
     var inverse = false
 
     val seed1 = p1.nameSeed()
@@ -28,28 +28,25 @@ private fun detRandom(max: Long, p1: Pairable, p2: Pairable): Long {
         inverse = true
     }
     val s = name1 + name2
+    var nR = 0.0
     for (i in s.indices) {
         val c = s[i]
-        nR += (c.code * (i + 1)).toLong()
+        nR += (c.code * (i + 1)).toDouble()
     }
     nR = nR * 1234567 % (max + 1)
     if (inverse) nR = max - nR
     return nR
 }
 
-private fun nonDetRandom(max: Long): Long {
-    if (max == 0L) {
-        return 0
-    }
-    val r = Math.random() * (max + 1)
-    return r.toLong()
-}
+private fun nonDetRandom(max: Double) =
+    if (max == 0.0) 0.0
+    else Math.random() * (max + 1.0)
 
 sealed class Solver(
         val round: Int,
         history: List<Game>,
         val pairables: List<Pairable>,
-        val pairingParams: Pairing.PairingParams,
+        val pairingParams: PairingParams,
         val placementParams: PlacementParams) {
 
     companion object {
@@ -66,28 +63,23 @@ sealed class Solver(
         }
         return 0
     }
-    open fun weight(p1: Pairable, p2: Pairable): Double {
-        var score = 1L // 1 is minimum value because 0 means "no matching allowed"
+    open fun weight(p1: Pairable, p2: Pairable) =
+        1.0 + // 1 is minimum value because 0 means "no matching allowed"
+        applyBaseCriteria(p1, p2) +
+        applyMainCriteria(p1, p2) +
+        applySecondaryCriteria(p1, p2)
 
-        score += applyBaseCriteria(p1, p2)
-
-        score += applyMainCriteria(p1, p2)
-
-        score += applySecondaryCriteria(p1, p2)
-
-        return score as Double
-    }
     // The main criterion that will be used to define the groups should be defined by subclasses
     abstract fun mainCriterion(p1: Pairable): Int
     abstract fun mainCriterionMinMax(): Pair<Int, Int>
     // SOS and variants will be computed based on this score
     abstract fun computeStandingScore(): Map<ID, Double>
     // This function needs to be overridden for criterion specific to the current pairing mode
-    open fun getSpecificCriterionValue(p1: Pairable, criterion: PlacementCriterion): Double {
+    open fun getSpecificCriterionValue(p1: Pairable, criterion: Criterion): Double {
         return -1.0
     }
 
-    private fun getCriterionValue(p1: Pairable, criterion: PlacementCriterion): Double {
+    private fun getCriterionValue(p1: Pairable, criterion: Criterion): Double {
         val genericCritVal = historyHelper.getCriterionValue(p1, criterion)
         // If the value from the history helper is > 0 it means that it is a generic criterion
         // Just returns the value
@@ -122,8 +114,8 @@ sealed class Solver(
         return result
     }
 
-    open fun applyBaseCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
+    open fun applyBaseCriteria(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
 
         // Base Criterion 1 : Avoid Duplicating Game
         // Did p1 and p2 already play ?
@@ -137,8 +129,8 @@ sealed class Solver(
     }
 
     // Main criteria
-    open fun applyMainCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
+    open fun applyMainCriteria(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
 
         // Main criterion 1 avoid mixing category is moved to Swiss with category
         // TODO
@@ -155,8 +147,8 @@ sealed class Solver(
         return score
     }
 
-    open fun applySecondaryCriteria(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
+    open fun applySecondaryCriteria(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
         // See Swiss with category for minimizing handicap criterion
 
         // TODO understand where opengotha test if need to be applied
@@ -169,23 +161,23 @@ sealed class Solver(
 
     // Weight score computation details
     // Base criteria
-    open fun avoidDuplicatingGames(p1: Pairable, p2: Pairable): Long {
+    open fun avoidDuplicatingGames(p1: Pairable, p2: Pairable): Double {
         if (p1.played(p2)) {
-            return 0 // We get no score if pairables already played together
+            return 0.0 // We get no score if pairables already played together
         } else {
-            return pairingParams.baseAvoidDuplGame
+            return pairingParams.base.dupWeight
         }
     }
 
-    open fun applyRandom(p1: Pairable, p2: Pairable): Long {
-        if (pairingParams.baseDeterministic) {
-            return detRandom(pairingParams.baseRandom, p1, p2)
+    open fun applyRandom(p1: Pairable, p2: Pairable): Double {
+        if (pairingParams.base.deterministic) {
+            return detRandom(pairingParams.base.random, p1, p2)
         } else {
-            return nonDetRandom(pairingParams.baseRandom)
+            return nonDetRandom(pairingParams.base.random)
         }
     }
 
-    open fun applyBalanceBW(p1: Pairable, p2: Pairable): Long {
+    open fun applyBalanceBW(p1: Pairable, p2: Pairable): Double {
         // This cost is never applied if potential Handicap != 0
         // It is fully applied if wbBalance(sP1) and wbBalance(sP2) are strictly of different signs
         // It is half applied if one of wbBalance is 0 and the other is >=2
@@ -194,58 +186,58 @@ sealed class Solver(
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
             if (wb1 * wb2 < 0) {
-                return pairingParams.baseBalanceWB
+                return pairingParams.base.colorBalance
             } else if (wb1 == 0 && abs(wb2) >= 2) {
-                return pairingParams.baseBalanceWB / 2
+                return pairingParams.base.colorBalance / 2
             } else if (wb2 == 0 && abs(wb1) >= 2) {
-                return pairingParams.baseBalanceWB / 2
+                return pairingParams.base.colorBalance / 2
             }
         }
-        return 0
+        return 0.0
     }
 
-    open fun minimizeScoreDifference(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
+    open fun minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
         val scoreRange: Int = numberGroups
         // TODO check category equality if category are used in SwissCat
         val x = abs(p1.group - p2.group) as Double / scoreRange.toDouble()
-        val k: Double = pairingParams.standardNX1Factor
-        score = (pairingParams.mainMinimizeScoreDifference * (1.0 - x) * (1.0 + k * x)) as Long
+        val k: Double = pairingParams.base.nx1
+        score = pairingParams.main.scoreWeight * (1.0 - x) * (1.0 + k * x)
 
         return score
     }
 
-    fun applySeeding(p1: Pairable, p2: Pairable): Long {
-        var score = 0L
+    fun applySeeding(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
         // Apply seeding for players in the same group
         if (p1.group == p2.group) {
             val (cla1, groupSize) = p1.placeInGroup
             val cla2 = p2.placeInGroup.first
-            val maxSeedingWeight = pairingParams.maMaximizeSeeding
+            val maxSeedingWeight = pairingParams.main.seedingWeight
 
-            val currentSeedSystem: SeedMethod = if (round <= pairingParams.maLastRoundForSeedSystem1)
-                pairingParams.maSeedSystem1 else pairingParams.maSeedSystem2
+            val currentSeedSystem: MainCritParams.SeedMethod = if (round <= pairingParams.main.lastRoundForSeedSystem1)
+                pairingParams.main.seedSystem1 else pairingParams.main.seedSystem2
 
             score += when(currentSeedSystem) {
                 // The best is to get 2 * |Cla1 - Cla2| - groupSize    close to 0
-                SeedMethod.SPLIT_AND_SLIP -> {
-                    val x = 2 * abs(cla1 - cla2) - groupSize
+                SPLIT_AND_SLIP -> {
+                    val x = 2.0 * abs(cla1 - cla2) - groupSize
                     maxSeedingWeight - maxSeedingWeight * x / groupSize * x / groupSize
                 }
 
                 // The best is to get cla1 + cla2 - (groupSize - 1) close to 0
-                SeedMethod.SPLIT_AND_FOLD -> {
+                SPLIT_AND_FOLD -> {
                     val x = cla1 + cla2 - (groupSize - 1)
                     maxSeedingWeight - maxSeedingWeight * x / (groupSize - 1) * x / (groupSize - 1)
                 }
 
-                SeedMethod.SPLIT_AND_RANDOM -> {
+                SPLIT_AND_RANDOM -> {
                     if ((2 * cla1 < groupSize && 2 * cla2 >= groupSize) || (2 * cla1 >= groupSize && 2 * cla2 < groupSize)) {
-                        val randRange = (maxSeedingWeight * 0.2).toLong()
+                        val randRange = maxSeedingWeight * 0.2
                         val rand = detRandom(randRange, p1, p2)
                         maxSeedingWeight - rand
                     } else {
-                        0L
+                        0.0
                     }
                 }
             }
@@ -260,7 +252,7 @@ sealed class Solver(
         // TODO understand where it is used
     }
 
-    fun avoidSameGeo(p1: Pairable, p2: Pairable): Long {
+    fun avoidSameGeo(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = numberGroups
 
         val geoMaxCost = pairingParams.geo.avoidSameGeo
@@ -310,8 +302,8 @@ sealed class Solver(
         }
 
         // The concavity function is applied to geoRatio to get geoCost
-        val dbGeoCost: Double = geoMaxCost.toDouble() * (1.0 - geoRatio) * (1.0 + pairingParams.standardNX1Factor * geoRatio)
-        var score: Long = pairingParams.mainMinimizeScoreDifference - dbGeoCost.toLong()
+        val dbGeoCost: Double = geoMaxCost.toDouble() * (1.0 - geoRatio) * (1.0 + pairingParams.base.nx1 * geoRatio)
+        var score = pairingParams.main.scoreWeight - dbGeoCost
         score = min(score, geoMaxCost)
 
         return score
@@ -324,8 +316,8 @@ sealed class Solver(
         var pseudoRank1: Int = p1.rank
         var pseudoRank2: Int = p2.rank
 
-        pseudoRank1 = min(pseudoRank1, pairingParams.hd.noHdRankThreshold)
-        pseudoRank2 = min(pseudoRank2, pairingParams.hd.noHdRankThreshold)
+        pseudoRank1 = min(pseudoRank1, pairingParams.handicap.rankThreshold)
+        pseudoRank2 = min(pseudoRank2, pairingParams.handicap.rankThreshold)
         hd = pseudoRank1 - pseudoRank2
 
         return clampHandicap(hd)
@@ -334,16 +326,16 @@ sealed class Solver(
     open fun clampHandicap(inputHd: Int): Int {
         var hd = inputHd
         if (hd > 0) {
-            hd -= pairingParams.hd.correction
+            hd -= pairingParams.handicap.correction
             hd = min(hd, 0)
         }
         if (hd < 0) {
-            hd += pairingParams.hd.correction
+            hd += pairingParams.handicap.correction
             hd = max(hd, 0)
         }
         // Clamp handicap with ceiling
-        hd = min(hd, pairingParams.hd.ceiling)
-        hd = max(hd, -pairingParams.hd.ceiling)
+        hd = min(hd, pairingParams.handicap.ceiling)
+        hd = max(hd, -pairingParams.handicap.ceiling)
 
         return hd
     }

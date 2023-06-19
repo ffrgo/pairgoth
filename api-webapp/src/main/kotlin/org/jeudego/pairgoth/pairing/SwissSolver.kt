@@ -1,12 +1,11 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
-import kotlin.math.abs
 
 class SwissSolver(round: Int,
                   history: List<Game>,
                   pairables: List<Pairable>,
-                  pairingParams: Pairing.PairingParams,
+                  pairingParams: PairingParams,
                   placementParams: PlacementParams):
         Solver(round, history, pairables, pairingParams, placementParams) {
 
@@ -23,16 +22,16 @@ class SwissSolver(round: Int,
         return historyHelper.numberWins
     }
 
-    override fun getSpecificCriterionValue(p: Pairable, criterion: PlacementCriterion): Double {
+    override fun getSpecificCriterionValue(p: Pairable, criterion: Criterion): Double {
         // TODO solve this double/int conflict
         return when (criterion) {
-            PlacementCriterion.NBW -> p.nbW
-            PlacementCriterion.SOSW -> p.sos
-            PlacementCriterion.SOSWM1 -> p.sosm1
-            PlacementCriterion.SOSWM2 -> p.sosm2
-            PlacementCriterion.SODOSW -> p.sodos
-            PlacementCriterion.SOSOSW -> p.sosos
-            PlacementCriterion.CUSSW -> p.cums
+            Criterion.NBW -> p.nbW
+            Criterion.SOSW -> p.sos
+            Criterion.SOSWM1 -> p.sosm1
+            Criterion.SOSWM2 -> p.sosm2
+            Criterion.SODOSW -> p.sodos
+            Criterion.SOSOSW -> p.sosos
+            Criterion.CUSSW -> p.cums
             else -> -1.0
         }
     }

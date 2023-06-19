@@ -2,200 +2,305 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.ext.OpenGothaFormat
-import org.jeudego.pairgoth.model.Pairing.PairingType.*
+import org.jeudego.pairgoth.model.PairingType.*
+import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.pairing.MacMahonSolver
 import org.jeudego.pairgoth.pairing.SwissSolver
 
-// Below are some constants imported from opengotha
-/**
- * Max value for BaAvoidDuplGame.
- * In order to be compatible with max value of long (8 * 10^18),
- * with max number of games (8000),
- * with relative weight of this parameter (1/2)
- *BA_MAX_AVOIDDUPLGAME should be strictly limited to 5 * 10^14
- */
-private const val BA_MAX_AVOIDDUPLGAME: Long = 500000000000000L // 5e14
+// base pairing parameters
+data class BasePairingParams(
+    // standard NX1 factor for concavity curves
+    val nx1: Double = 0.5,
+    val dupWeight: Double = MAX_AVOIDDUPGAME,
+    val random: Double = 0.0,
+    val deterministic: Boolean = true,
+    val colorBalance: Double = MAX_COLOR_BALANCE
+) {
+    init {
+        if (nx1 < 0.0 || nx1 > 1.0) throw Error("invalid standardNX1Factor")
+        if (dupWeight < 0.0 || dupWeight > MAX_AVOIDDUPGAME) throw Error("invalid avoidDuplGame value")
+        if (random < 0.0 || random > MAX_RANDOM) throw Error("invalid random")
+        if (colorBalance > 0.0 || colorBalance > MAX_COLOR_BALANCE) throw Error("invalid balanceWB")
+    }
 
-/**
- * Max value for BaRandom.
- * Due to internal coding,
- * BA_MAX_RANDOM should be strictly limited to 2 * 10^9
- */
-private const val BA_MAX_RANDOM: Long = 1000000000L // 2e9
-private const val BA_MAX_BALANCEWB: Long = 1000000L // 1e6
+    companion object {
+        const val MAX_AVOIDDUPGAME = 500000000000000.0 // 5e14
+        const val MAX_RANDOM = 1000000000.0 // 1e9
+        const val MAX_COLOR_BALANCE = 1000000.0 // 1e6
+        val default = BasePairingParams()
+    }
+}
 
-private const val MA_MAX_AVOID_MIXING_CATEGORIES: Long = 20000000000000L // 2e13
-// Ratio between MA_MAX_MINIMIZE_SCORE_DIFFERENCE and MA_MAX_AVOID_MIXING_CATEGORIES should stay below 1/ nbcat^2
-private const val MA_MAX_MINIMIZE_SCORE_DIFFERENCE: Long = 100000000000L // 1e11
-private const val MA_MAX_DUDD_WEIGHT: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 1000;  // Draw-ups Draw-downs
-enum class MA_DUDD {TOP, MID, BOT}
+// main criterium parameters
+data class MainCritParams(
+    // TB - TODO move avoidmixingcategories to swiss with category?
+    val categoriesWeight: Double = MAX_CATEGORIES_WEIGHT, // opengotha avoidMixingCategories
+    val scoreWeight: Double = MAX_SCORE_WEIGHT, // opengotha minimizeScoreDifference
+    val drawUpDownWeight: Double = MAX_DRAW_UP_DOWN_WEIGHT, // opengotha DUDDWeight
+    val compensateDrawUpDown: Boolean = true,
+    val drawUpDownUpperMode: DrawUpDown = DrawUpDown.MIDDLE,
+    val drawUpDownLowerMode: DrawUpDown = DrawUpDown.MIDDLE,
+    val seedingWeight: Double = MAX_SEEDING_WEIGHT, // 5 *10^6, opengotha maximizeSeeding
+    val lastRoundForSeedSystem1: Int = 1,
+    val seedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,
+    val seedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
+    val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
+    val additionalPlacementCritSystem2: Criterion = Criterion.NONE,
+) {
+    enum class DrawUpDown {TOP, MIDDLE, BOTTOM}
+    enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
+    companion object {
+        const val MAX_CATEGORIES_WEIGHT = 20000000000000.0 // 2e13
+        // Ratio between MAX_SCORE_WEIGHT and MAX_CATEGORIES_WEIGHT should stay below 1/ nbcat^2
+        const val MAX_SCORE_WEIGHT = 100000000000.0 // 1e11
+        const val MAX_DRAW_UP_DOWN_WEIGHT = MAX_SCORE_WEIGHT / 1000.0;  // Draw-ups Draw-downs
+        const val MAX_SEEDING_WEIGHT = MAX_SCORE_WEIGHT / 20000.0;
+        val default = MainCritParams()
+    }
+}
 
-private const val MA_MAX_MAXIMIZE_SEEDING: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE / 20000;
+// secondary criterium parameters
+data class SecondaryCritParams(
+    val barThresholdActive: Boolean = true, // Do not apply secondary criteria for players above bar
+    val rankThreshold: Int = 0, // Do not apply secondary criteria above 1D rank
+    val nbWinsThresholdActive: Boolean = true, // Do not apply secondary criteria when nbWins >= nbRounds / 2
+    val defSecCrit: Double = MainCritParams.MAX_CATEGORIES_WEIGHT, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
+) {
+    companion object {
+        val default = SecondaryCritParams()
+    }
+}
 
-enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
+// geographical pairing params
+data class GeographicalParams(
+    val avoidSameGeo: Double = 0.0, // Should be SecondaryCritParams.defSecCrit for SwCat and MM, 0 for Swiss
+    val preferMMSDiffRatherThanSameCountry: Int = 1,    // Typically = 1
+    val preferMMSDiffRatherThanSameClubsGroup: Int = 2, // Typically = 2
+    val preferMMSDiffRatherThanSameClub: Int = 3,       // Typically = 3
+) {
+    companion object {
+        val disabled = GeographicalParams(avoidSameGeo = 0.0)
+    }
+}
 
-sealed class Pairing(val type: PairingType, val pairingParams: PairingParams = PairingParams(), val placementParams: PlacementParams) {
+// handicap params
+data class HandicapParams(
+    // minimizeHandicap is a secondary criteria but moved here
+    val weight: Double = 0.0, // Should be paiSeDefSecCrit for SwCat, 0 for others
+    val useMMS: Boolean = true, // if useMMS is false, hd will be based on rank
+    // When one player in the game has a rank of at least hdNoHdRankThreshold,
+    // then the game will be without handicap
+    val rankThreshold: Int = 0, // 0 is 1d
+    val correction: Int = 1, // Handicap will be decreased by hdCorrection
+    val ceiling: Int = 9, // Possible values are between 0 and 9
+) {
+    companion object {
+        val default = HandicapParams(
+            weight = 0.0, // default disables handicap
+            useMMS = false,
+            rankThreshold = -30, // 30k
+            ceiling = 0)
+    }
+}
+
+enum class PairingType { SWISS, MAC_MAHON, ROUND_ROBIN }
+
+data class PairingParams(
+    val base: BasePairingParams = BasePairingParams(),
+    val main: MainCritParams = MainCritParams(),
+    val secondary: SecondaryCritParams = SecondaryCritParams(),
+    val geo: GeographicalParams = GeographicalParams(),
+    val handicap: HandicapParams = HandicapParams()
+)
+
+sealed class Pairing(
+    val type: PairingType,
+    val pairingParams: PairingParams,
+    val placementParams: PlacementParams) {
     companion object {}
-    enum class PairingType { SWISS, MAC_MAHON, ROUND_ROBIN }
-    data class PairingParams(
-            // Standard NX1 factor ( = Rather N X 1 than 1 X N)
-            val standardNX1Factor: Double = 0.5,
-            // Base criteria
-            val baseAvoidDuplGame: Long = BA_MAX_AVOIDDUPLGAME,
-            val baseRandom: Long = 0,
-            val baseDeterministic: Boolean = true,
-            val baseBalanceWB: Long = BA_MAX_BALANCEWB,
-
-            // Main criteria
-            // TODO move avoidmixingcategories to swiss with category
-            //val maAvoidMixingCategories: Double = MA_MAX_AVOID_MIXING_CATEGORIES,
-            val mainMinimizeScoreDifference: Long = MA_MAX_MINIMIZE_SCORE_DIFFERENCE,
-
-            val maDUDDWeight: Long = MA_MAX_DUDD_WEIGHT,
-            val maCompensateDUDD: Boolean = true,
-            val maDUDDUpperMode: MA_DUDD = MA_DUDD.MID,
-            val maDUDDLowerMode: MA_DUDD = MA_DUDD.MID,
-
-            val maMaximizeSeeding: Long = MA_MAX_MAXIMIZE_SEEDING, // 5 *10^6
-            val maLastRoundForSeedSystem1: Int = 1,
-            val maSeedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,
-            val maSeedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
-            val maAdditionalPlacementCritSystem1: PlacementCriterion = PlacementCriterion.RATING,
-            val maAdditionalPlacementCritSystem2: PlacementCriterion = PlacementCriterion.NULL,
-
-            // Secondary criteria
-            val seBarThresholdActive: Boolean = true, // Do not apply secondary criteria for players above bar
-            val seRankThreshold: Int = 0, // Do not apply secondary criteria above 1D rank
-            val seNbWinsThresholdActive: Boolean = true, // Do not apply secondary criteria when nbWins >= nbRounds / 2
-            val seDefSecCrit: Long = MA_MAX_AVOID_MIXING_CATEGORIES, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
-
-            // Geographical params
-            val geo: GeographicalParams = GeographicalParams(avoidSameGeo = seDefSecCrit),
-
-            // Handicap related settings
-            val hd: HandicapParams = HandicapParams(minimizeHandicap = seDefSecCrit),
-    )
-
-
     abstract fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game>
 }
 
-data class GeographicalParams(
-        val avoidSameGeo: Long, // Should be SeDefSecCrit for SwCat and MM, 0 for Swiss
-        val preferMMSDiffRatherThanSameCountry: Int = 1,    // Typically = 1
-        val preferMMSDiffRatherThanSameClubsGroup: Int = 2, // Typically = 2
-        val preferMMSDiffRatherThanSameClub: Int = 3,       // Typically = 3
-) {
-    companion object {
-        fun disabled() = GeographicalParams(avoidSameGeo = 0L)
-    }
-}
-
-data class HandicapParams(
-        // minimizeHandicap is a secondary criteria but moved here
-        val minimizeHandicap: Long, // Should be paiSeDefSecCrit for SwCat, 0 for others
-        val basedOnMMS: Boolean = true, // if hdBasedOnMMS is false, hd will be based on rank
-        // When one player in the game has a rank of at least hdNoHdRankThreshold,
-        // then the game will be without handicap
-        val noHdRankThreshold: Int = 0, // 0 is 1d
-        val correction: Int = 1, // Handicap will be decreased by hdCorrection
-        val ceiling: Int = 9, // Possible values are between 0 and 9
-) {
-    companion object {
-        fun disabled() = HandicapParams(
-                minimizeHandicap = 0L,
-                basedOnMMS = false,
-                noHdRankThreshold=-30, // 30k
-                ceiling=0)
-    }
-}
-
-fun Tournament<*>.historyBefore(round: Int) =
+private fun Tournament<*>.historyBefore(round: Int) =
     if (lastRound() == 0) emptyList()
     else (0 until round).flatMap { games(round).values }
 
-class Swiss(): Pairing(SWISS, PairingParams(
-        maSeedSystem1 = SeedMethod.SPLIT_AND_SLIP,
-        maSeedSystem2 = SeedMethod.SPLIT_AND_SLIP,
-
-        seBarThresholdActive = true, // not relevant
-        seRankThreshold = -30,
-        seNbWinsThresholdActive = true, // not relevant
-        seDefSecCrit = MA_MAX_AVOID_MIXING_CATEGORIES,
-
-        geo = GeographicalParams.disabled(),
-        hd = HandicapParams.disabled(),
-), PlacementParams(PlacementCriterion.NBW, PlacementCriterion.SOSW, PlacementCriterion.SOSOSW)) {
+class Swiss(
+    pairingParams: PairingParams = PairingParams(
+        base = BasePairingParams(),
+        main = MainCritParams(
+            seedSystem1 = SPLIT_AND_SLIP,
+            seedSystem2 = SPLIT_AND_SLIP
+        ),
+        secondary = SecondaryCritParams(
+            barThresholdActive = true,
+            rankThreshold = -30,
+            nbWinsThresholdActive = true,
+            defSecCrit = MainCritParams.MAX_CATEGORIES_WEIGHT
+        ),
+        geo = GeographicalParams.disabled,
+        handicap = HandicapParams.default
+    ),
+    placementParams: PlacementParams = PlacementParams(
+        Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
+    )
+): Pairing(SWISS, pairingParams, placementParams) {
+    companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         return SwissSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams).pair()
     }
 }
 
 class MacMahon(
-    var bar: Int = 0,
-    var minLevel: Int = -30,
-    var reducer: Int = 1
-): Pairing(MAC_MAHON, PairingParams(seDefSecCrit = MA_MAX_MINIMIZE_SCORE_DIFFERENCE),
-        PlacementParams(PlacementCriterion.MMS, PlacementCriterion.SOSM, PlacementCriterion.SOSOSM)) {
-    val groups = mutableListOf<Int>()
-
+    pairingParams: PairingParams = PairingParams(
+        base = BasePairingParams(),
+        main = MainCritParams(),
+        secondary = SecondaryCritParams(
+            defSecCrit = MainCritParams.MAX_SCORE_WEIGHT
+        ),
+        geo = GeographicalParams(
+            avoidSameGeo = MainCritParams.MAX_SCORE_WEIGHT
+        ),
+        handicap = HandicapParams()
+    ),
+    placementParams: PlacementParams = PlacementParams(
+        Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
+    )
+): Pairing(MAC_MAHON, pairingParams, placementParams) {
+    companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, mmBase = minLevel, mmBar = bar, reducer = reducer).pair()
+        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams).pair()
     }
 }
 
-class RoundRobin: Pairing(ROUND_ROBIN, PairingParams(), PlacementParams(PlacementCriterion.NBW, PlacementCriterion.RATING)) {
+class RoundRobin(
+    pairingParams: PairingParams = PairingParams(),
+    placementParams: PlacementParams = PlacementParams(Criterion.NBW, Criterion.RATING)
+): Pairing(ROUND_ROBIN, pairingParams, placementParams) {
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         TODO()
     }
 }
 
 // Serialization
-// TODO failing on serialization
-fun HandicapParams.toJson() = Json.Object(
-    "minimize_hd" to minimizeHandicap,
-    "mms_based" to basedOnMMS,
-    "no_hd_thresh" to noHdRankThreshold,
-    "correction" to correction,
-    "ceiling" to ceiling, )
 
-fun HandicapParams.fromJson(json: Json.Object) = HandicapParams(
-        minimizeHandicap=json.getLong("minimize_hd")!!,
-        basedOnMMS=json.getBoolean("mms_based")!!,
-        noHdRankThreshold=json.getInt("no_hd_thresh")!!,
-        correction=json.getInt("correction")!!,
-        ceiling=json.getInt("ceiling")!!,
+fun BasePairingParams.Companion.fromJson(json: Json.Object) = BasePairingParams(
+    nx1 = json.getDouble("nx1") ?: default.nx1,
+    dupWeight = json.getDouble("dupWeight") ?: default.dupWeight,
+    random = json.getDouble("random") ?: default.random,
+    deterministic = json.getBoolean("deterministic") ?: default.deterministic,
+    colorBalance = json.getDouble("colorBalanceWeight") ?: default.colorBalance
+)
+
+fun BasePairingParams.toJson() = Json.Object(
+    "nx1" to nx1,
+    "dupWeight" to dupWeight,
+    "random" to random,
+    "colorBalanceWeight" to colorBalance
+)
+
+fun MainCritParams.Companion.fromJson(json: Json.Object) = MainCritParams(
+    categoriesWeight = json.getDouble("catWeight") ?: default.categoriesWeight,
+    scoreWeight = json.getDouble("scoreWeight") ?: default.scoreWeight,
+    drawUpDownWeight = json.getDouble("upDownWeight") ?: default.drawUpDownWeight,
+    compensateDrawUpDown = json.getBoolean("upDownCompensate") ?: default.compensateDrawUpDown,
+    drawUpDownLowerMode = json.getString("upDownLowerMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: default.drawUpDownLowerMode,
+    drawUpDownUpperMode = json.getString("upDownUpperMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: default.drawUpDownUpperMode,
+    seedingWeight = json.getDouble("maximizeSeeding") ?: default.seedingWeight,
+    lastRoundForSeedSystem1 = json.getInt("firstSeedLastRound") ?: default.lastRoundForSeedSystem1,
+    seedSystem1 = json.getString("firstSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: default.seedSystem1,
+    seedSystem2 = json.getString("secondSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: default.seedSystem2,
+    additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem1,
+    additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem2
+)
+
+fun MainCritParams.toJson() = Json.Object(
+    "catWeight" to categoriesWeight,
+    "scoreWeight" to scoreWeight,
+    "upDownWeight" to drawUpDownWeight,
+    "upDownCompensate" to compensateDrawUpDown,
+    "upDownLowerMode" to drawUpDownLowerMode,
+    "upDownUpperMode" to drawUpDownUpperMode,
+    "maximizeSeeding" to seedingWeight,
+    "firstSeedLastRound" to lastRoundForSeedSystem1,
+    "firstSeed" to seedSystem1,
+    "secondSeed" to seedSystem2,
+    "firstSeedAddCrit" to additionalPlacementCritSystem1,
+    "secondSeedAddCrit" to additionalPlacementCritSystem2
+)
+
+fun SecondaryCritParams.Companion.fromJson(json: Json.Object) = SecondaryCritParams(
+    barThresholdActive = json.getBoolean("barTreshold") ?: default.barThresholdActive,
+    rankThreshold = json.getInt("rankTreshold") ?: default.rankThreshold,
+    nbWinsThresholdActive = json.getBoolean("winsTreshold") ?: default.nbWinsThresholdActive,
+    defSecCrit = json.getDouble("secWeight") ?: default.defSecCrit
+)
+
+fun SecondaryCritParams.toJson() = Json.Object(
+    "barTreshold" to barThresholdActive,
+    "rankTreshold" to rankThreshold,
+    "winsTreshold" to nbWinsThresholdActive,
+    "secWeight" to defSecCrit
+)
+
+fun GeographicalParams.Companion.fromJson(json: Json.Object) = GeographicalParams(
+    avoidSameGeo = json.getDouble("weight") ?: disabled.avoidSameGeo,
+    preferMMSDiffRatherThanSameCountry = json.getInt("mmsDiffCountry") ?: disabled.preferMMSDiffRatherThanSameCountry,
+    preferMMSDiffRatherThanSameClubsGroup = json.getInt("mmsDiffClubGroup") ?: disabled.preferMMSDiffRatherThanSameClubsGroup,
+    preferMMSDiffRatherThanSameClub = json.getInt("mmsDiffClub") ?: disabled.preferMMSDiffRatherThanSameClub
 )
 
 fun GeographicalParams.toJson() = Json.Object(
-        "avoid_same_geo" to avoidSameGeo,
-        "country" to preferMMSDiffRatherThanSameCountry,
-        "club_group" to preferMMSDiffRatherThanSameClubsGroup,
-        "club" to preferMMSDiffRatherThanSameClub,)
-
-fun GeographicalParams.fromJson(json: Json.Object) = GeographicalParams(
-        avoidSameGeo=json.getLong("avoid_same_geo")!!,
-        preferMMSDiffRatherThanSameCountry=json.getInt("country")!!,
-        preferMMSDiffRatherThanSameClubsGroup=json.getInt("club_group")!!,
-        preferMMSDiffRatherThanSameClub=json.getInt("club")!!,
+    "weight" to avoidSameGeo,
+    "mmsDiffCountry" to preferMMSDiffRatherThanSameCountry,
+    "mmsDiffClubGroup" to preferMMSDiffRatherThanSameClubsGroup,
+    "mmsDiffClub" to preferMMSDiffRatherThanSameClub
 )
 
+fun HandicapParams.Companion.fromJson(json: Json.Object) = HandicapParams(
+    weight = json.getDouble("weight") ?: default.weight,
+    useMMS = json.getBoolean("useMMS") ?: default.useMMS,
+    rankThreshold = json.getInt("treshold") ?: default.rankThreshold,
+    correction = json.getInt("correction") ?: default.correction,
+    ceiling = json.getInt("ceiling") ?: default.ceiling
+)
 
-fun Pairing.Companion.fromJson(json: Json.Object) = when (json.getString("type")?.let { Pairing.PairingType.valueOf(it) } ?: badRequest("missing pairing type")) {
-    SWISS -> Swiss()
-    MAC_MAHON -> MacMahon(
-        bar = json.getInt("bar") ?: 0,
-        minLevel = json.getInt("minLevel") ?: -30,
-        reducer = json.getInt("reducer") ?: 1
-    )
-    ROUND_ROBIN -> RoundRobin()
+fun HandicapParams.toJson() = Json.Object(
+    "weight" to weight,
+    "useMMS" to useMMS,
+    "treshold" to rankThreshold,
+    "correction" to correction,
+    "ceiling" to ceiling
+)
+
+fun Pairing.Companion.fromJson(json: Json.Object): Pairing {
+    // get default values for each type
+    val type = json.getString("type")?.let { PairingType.valueOf(it) } ?: badRequest("missing pairing type")
+    val defaultParams = when (type) {
+        SWISS -> Swiss()
+        MAC_MAHON -> MacMahon()
+        ROUND_ROBIN -> RoundRobin()
+    }
+    val base = json.getObject("base")?.let { BasePairingParams.fromJson(it) } ?: defaultParams.pairingParams.base
+    val main = json.getObject("main")?.let { MainCritParams.fromJson(it) } ?: defaultParams.pairingParams.main
+    val secondary = json.getObject("secondary")?.let { SecondaryCritParams.fromJson(it) } ?: defaultParams.pairingParams.secondary
+    val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it) } ?: defaultParams.pairingParams.geo
+    val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it) } ?: defaultParams.pairingParams.handicap
+    val pairingParams = PairingParams(base, main, secondary, geo, hd)
+    val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: defaultParams.placementParams
+    return when (type) {
+        SWISS -> Swiss(pairingParams, placementParams)
+        MAC_MAHON -> MacMahon(pairingParams, placementParams)
+        ROUND_ROBIN -> RoundRobin(pairingParams, placementParams)
+    }
 }
 
-fun Pairing.toJson() = when (this) {
-    is Swiss ->
-        Json.Object("type" to type.name, "geo" to pairingParams.geo.toJson(), "hd" to pairingParams.hd.toJson())
-    is MacMahon -> Json.Object("type" to type.name, "bar" to bar, "minLevel" to minLevel, "reducer" to reducer)
-    is RoundRobin -> Json.Object("type" to type.name)
-}
-
+fun Pairing.toJson() = Json.Object(
+    "type" to type.name,
+    "base" to pairingParams.base.toJson(),
+    "main" to pairingParams.main.toJson(),
+    "secondary" to pairingParams.main.toJson(),
+    "geo" to pairingParams.geo.toJson(),
+    "handicap" to pairingParams.handicap.toJson(),
+    "placement" to placementParams.toJson()
+)

@@ -36,10 +36,6 @@ sealed class Tournament <P: Pairable>(
         TEAM5(5);
     }
 
-    enum class Criterion {
-        NBW, MMS, SOS, SOSOS, SODOS
-    }
-
     // players per id
     abstract val players: MutableMap<ID, Player>
 
@@ -69,13 +65,6 @@ sealed class Tournament <P: Pairable>(
         if (round > games.size + 1) throw Error("invalid round")
         else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = games.size
-
-    // standings criteria
-    val criteria = mutableListOf<Criterion>(
-        if (pairing.type == Pairing.PairingType.MAC_MAHON) Criterion.MMS else Criterion.NBW,
-        Criterion.SOS,
-        Criterion.SOSOS
-    )
 }
 
 // standard tournament of individuals

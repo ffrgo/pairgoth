@@ -1,7 +1,9 @@
 package org.jeudego.pairgoth.model
 
-enum class PlacementCriterion {
-    NULL, // No ranking/tie-break
+import com.republicate.kson.Json
+
+enum class Criterion {
+    NONE, // No ranking / tie-break
 
     CATEGORY,
     RANK,
@@ -35,24 +37,23 @@ enum class PlacementCriterion {
     DC, // Direct confrontation
 }
 
-class PlacementParams(vararg criteria: PlacementCriterion) {
-    companion object {
-        const val MAX_NUMBER_OF_CRITERIA: Int = 6
+class PlacementParams(vararg crit: Criterion) {
+    companion object {}
+
+    val criteria = crit.toList().also {
+        check()
     }
 
-    private fun addNullCriteria(criteria: Array<out PlacementCriterion>): ArrayList<PlacementCriterion> {
-        var criteria = arrayListOf(*criteria)
-        while (criteria.size < MAX_NUMBER_OF_CRITERIA) {
-            criteria.add(PlacementCriterion.NULL)
-        }
-        return criteria
-    }
-
-    val criteria = addNullCriteria(criteria)
-
-    open fun checkWarnings(): String {
-        // Returns a warning message if criteria are incoherent
-        // TODO
-        return ""
+    private fun check() {
+        // throws an exception if criteria are incoherent
+        // TODO - if (not coherent) throw Error("...")
     }
 }
+
+fun PlacementParams.Companion.fromJson(json: Json.Array) = PlacementParams(*json.map {
+    Criterion.valueOf(it!! as String)
+}.toTypedArray())
+
+fun PlacementParams.toJson() = Json.Array(*criteria.map {
+    it.name
+}.toTypedArray())
