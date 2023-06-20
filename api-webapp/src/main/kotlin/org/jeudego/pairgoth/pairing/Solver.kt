@@ -52,8 +52,8 @@ sealed class Solver(
 
     open fun sort(p: Pairable, q: Pairable): Int {
         for (criterion in placement.criteria) {
-            val criterionP = evalCriterion(p, criterion)
-            val criterionQ = evalCriterion(q, criterion)
+            val criterionP = p.eval(criterion)
+            val criterionQ = q.eval(criterion)
             if (criterionP != criterionQ) {
                 return (criterionP * 100 - criterionQ * 100).toInt()
             }
@@ -357,6 +357,7 @@ sealed class Solver(
     val Pairable.sodos: Double get() = historyHelper.sodos[id]!!
     val Pairable.cums: Double get() = historyHelper.cumScore[id]!!
 
+    fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
     open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         NONE -> 0.0
         CATEGORY -> TODO()
