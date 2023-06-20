@@ -28,13 +28,9 @@ object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
     override val country = "none"
 }
 
-fun Pairable.displayRank(): String = when {
-    rank < 0 -> "${-rank}k"
-    rank < 10 -> "${rank + 1}d"
-    else -> "${rank - 9}p"
-}
+fun Pairable.displayRank() = if (rank < 0) "${-rank}k" else "${rank + 1}d"
 
-private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
+private val rankRegex = Regex("(\\d+)([kd])", RegexOption.IGNORE_CASE)
 
 fun Pairable.Companion.parseRank(rankStr: String): Int {
     val (level, letter) = rankRegex.matchEntire(rankStr)?.destructured ?: throw Error("invalid rank: $rankStr")
@@ -43,7 +39,6 @@ fun Pairable.Companion.parseRank(rankStr: String): Int {
     return when (letter.lowercase()) {
         "k" -> -num
         "d" -> num - 1
-        "p" -> num + 9
         else -> throw Error("impossible")
     }
 }

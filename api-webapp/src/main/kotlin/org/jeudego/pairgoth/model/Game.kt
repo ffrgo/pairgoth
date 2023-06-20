@@ -26,6 +26,11 @@ data class Game(
             fun fromSymbol(c: Char) = byChar[c] ?: throw Error("unknown result symbol: $c")
         }
     }
+    // pairing needs to know if there has been a draw-up or a draw-down
+    internal var blackDrawnUp = false
+    internal var blackDrawnDown = false
+    internal var whiteDrawnUp = false
+    internal var whiteDrawnDown = false
 }
 
 // serialization
