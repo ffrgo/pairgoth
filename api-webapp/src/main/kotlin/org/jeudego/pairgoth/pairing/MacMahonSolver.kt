@@ -2,7 +2,12 @@ package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
 
-class MacMahonSolver(round: Int, history: List<Game>, pairables: List<Pairable>, pairingParams: PairingParams, placementParams: PlacementParams): Solver(round, history, pairables, pairingParams, placementParams) {
+class MacMahonSolver(round: Int,
+                     history: List<List<Game>>,
+                     pairables: List<Pairable>,
+                     pairingParams: PairingParams,
+                     placementParams: PlacementParams):
+    Solver(round, history, pairables, pairingParams, placementParams) {
 
 //    val Pairable.mms get() = mmBase + nbW // TODO real calculation
 
@@ -32,5 +37,4 @@ class MacMahonSolver(round: Int, history: List<Game>, pairables: List<Pairable>,
             else -> -1.0
         }
     }
-
 }

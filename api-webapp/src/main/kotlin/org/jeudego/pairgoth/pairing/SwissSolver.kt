@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 
 class SwissSolver(round: Int,
-                  history: List<Game>,
+                  history: List<List<Game>>,
                   pairables: List<Pairable>,
                   pairingParams: PairingParams,
                   placementParams: PlacementParams):
@@ -19,7 +19,7 @@ class SwissSolver(round: Int,
     }
 
     override fun computeStandingScore(): Map<ID, Double> {
-        return historyHelper.numberWins
+        return historyHelper.wins
     }
 
     override fun getSpecificCriterionValue(p: Pairable, criterion: Criterion): Double {

@@ -8,7 +8,7 @@ import org.jeudego.pairgoth.pairing.MacMahonSolver
 import org.jeudego.pairgoth.pairing.SwissSolver
 
 // base pairing parameters
-data class BasePairingParams(
+data class BaseCritParams(
     // standard NX1 factor for concavity curves
     val nx1: Double = 0.5,
     val dupWeight: Double = MAX_AVOIDDUPGAME,
@@ -27,7 +27,7 @@ data class BasePairingParams(
         const val MAX_AVOIDDUPGAME = 500000000000000.0 // 5e14
         const val MAX_RANDOM = 1000000000.0 // 1e9
         const val MAX_COLOR_BALANCE = 1000000.0 // 1e6
-        val default = BasePairingParams()
+        val default = BaseCritParams()
     }
 }
 
@@ -106,7 +106,7 @@ data class HandicapParams(
 enum class PairingType { SWISS, MAC_MAHON, ROUND_ROBIN }
 
 data class PairingParams(
-    val base: BasePairingParams = BasePairingParams(),
+    val base: BaseCritParams = BaseCritParams(),
     val main: MainCritParams = MainCritParams(),
     val secondary: SecondaryCritParams = SecondaryCritParams(),
     val geo: GeographicalParams = GeographicalParams(),
@@ -123,11 +123,11 @@ sealed class Pairing(
 
 private fun Tournament<*>.historyBefore(round: Int) =
     if (lastRound() == 0) emptyList()
-    else (0 until round).flatMap { games(round).values }
+    else (0 until round).map { games(round).values.toList() }
 
 class Swiss(
     pairingParams: PairingParams = PairingParams(
-        base = BasePairingParams(),
+        base = BaseCritParams(),
         main = MainCritParams(
             seedSystem1 = SPLIT_AND_SLIP,
             seedSystem2 = SPLIT_AND_SLIP
@@ -153,7 +153,7 @@ class Swiss(
 
 class MacMahon(
     pairingParams: PairingParams = PairingParams(
-        base = BasePairingParams(),
+        base = BaseCritParams(),
         main = MainCritParams(),
         secondary = SecondaryCritParams(
             defSecCrit = MainCritParams.MAX_SCORE_WEIGHT
@@ -184,7 +184,7 @@ class RoundRobin(
 
 // Serialization
 
-fun BasePairingParams.Companion.fromJson(json: Json.Object) = BasePairingParams(
+fun BaseCritParams.Companion.fromJson(json: Json.Object) = BaseCritParams(
     nx1 = json.getDouble("nx1") ?: default.nx1,
     dupWeight = json.getDouble("dupWeight") ?: default.dupWeight,
     random = json.getDouble("random") ?: default.random,
@@ -192,7 +192,7 @@ fun BasePairingParams.Companion.fromJson(json: Json.Object) = BasePairingParams(
     colorBalance = json.getDouble("colorBalanceWeight") ?: default.colorBalance
 )
 
-fun BasePairingParams.toJson() = Json.Object(
+fun BaseCritParams.toJson() = Json.Object(
     "nx1" to nx1,
     "dupWeight" to dupWeight,
     "random" to random,
@@ -281,7 +281,7 @@ fun Pairing.Companion.fromJson(json: Json.Object): Pairing {
         MAC_MAHON -> MacMahon()
         ROUND_ROBIN -> RoundRobin()
     }
-    val base = json.getObject("base")?.let { BasePairingParams.fromJson(it) } ?: defaultParams.pairingParams.base
+    val base = json.getObject("base")?.let { BaseCritParams.fromJson(it) } ?: defaultParams.pairingParams.base
     val main = json.getObject("main")?.let { MainCritParams.fromJson(it) } ?: defaultParams.pairingParams.main
     val secondary = json.getObject("secondary")?.let { SecondaryCritParams.fromJson(it) } ?: defaultParams.pairingParams.secondary
     val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it) } ?: defaultParams.pairingParams.geo
