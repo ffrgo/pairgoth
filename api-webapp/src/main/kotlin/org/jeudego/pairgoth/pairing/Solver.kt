@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.model.Criterion.*
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
@@ -51,10 +52,10 @@ sealed class Solver(
 
     open fun sort(p: Pairable, q: Pairable): Int {
         for (criterion in placement.criteria) {
-            val criterionP = getCriterionValue(p, criterion)
-            val criterionQ = getCriterionValue(q, criterion)
+            val criterionP = evalCriterion(p, criterion)
+            val criterionQ = evalCriterion(q, criterion)
             if (criterionP != criterionQ) {
-                return (criterionP - criterionQ).toInt()
+                return (criterionP * 100 - criterionQ * 100).toInt()
             }
         }
         return 0
@@ -67,27 +68,10 @@ sealed class Solver(
         pairing.geo.apply(p1, p2)
 
     // The main criterion that will be used to define the groups should be defined by subclasses
-    abstract fun mainCriterion(p1: Pairable): Int
-    abstract fun mainCriterionMinMax(): Pair<Int, Int>
+    abstract val Pairable.main: Double
+    abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
     abstract fun computeStandingScore(): Map<ID, Double>
-    // This function needs to be overridden for criterion specific to the current pairing mode
-    open fun getSpecificCriterionValue(p1: Pairable, criterion: Criterion): Double {
-        return -1.0
-    }
-
-    private fun getCriterionValue(p1: Pairable, criterion: Criterion): Double {
-        val genericCritVal = historyHelper.getCriterionValue(p1, criterion)
-        // If the value from the history helper is > 0 it means that it is a generic criterion
-        // Just returns the value
-        if (genericCritVal < 0) {
-            return genericCritVal
-        }
-        // Otherwise we have to delegate it to the solver
-        val critVal = getSpecificCriterionValue(p1, criterion)
-        if (critVal < 0) throw Error("Couldn't compute criterion value")
-        return critVal
-    }
 
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
@@ -172,7 +156,7 @@ sealed class Solver(
 
     open fun MainCritParams.minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
-        val scoreRange: Int = numberGroups
+        val scoreRange: Int = groupsCount
         // TODO check category equality if category are used in SwissCat
         val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
         val k: Double = pairing.base.nx1
@@ -235,7 +219,7 @@ sealed class Solver(
     }
 
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
-        val placementScoreRange = numberGroups
+        val placementScoreRange = groupsCount
 
         val geoMaxCost = avoidSameGeo
 
@@ -325,11 +309,10 @@ sealed class Solver(
     //private val standingScore by lazy { computeStandingScore() }
 
     // Decide each pairable group based on the main criterion
-    private val numberGroups by lazy {
-        val (mainScoreMin, mainScoreMax) = mainCriterionMinMax()
-        mainScoreMax - mainScoreMin
+    private val groupsCount get() = (mainLimits.second - mainLimits.first).toInt()
+    private val _groups by lazy {
+        pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
     }
-    private val _groups = pairables.associate { pairable -> Pair(pairable.id, mainCriterion(pairable)) }
 
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
@@ -373,4 +356,18 @@ sealed class Solver(
     val Pairable.sosos: Double get() = historyHelper.sosos[id]!!
     val Pairable.sodos: Double get() = historyHelper.sodos[id]!!
     val Pairable.cums: Double get() = historyHelper.cumScore[id]!!
+
+    open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
+        NONE -> 0.0
+        CATEGORY -> TODO()
+        RANK -> pairable.rank.toDouble()
+        RATING -> pairable.rating.toDouble()
+        NBW -> pairable.nbW
+        SOSW -> pairable.sos
+        SOSWM1 -> pairable.sosm1
+        SOSWM2 -> pairable.sosm2
+        SODOSW -> pairable.sodos
+        CUSSW -> pairable.cums
+        else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
+    }
 }

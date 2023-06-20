@@ -15,22 +15,6 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
         else -> 0.0
     }
 
-    fun getCriterionValue(p: Pairable, crit: Criterion): Double {
-        // Returns generic criterion
-        // Specific criterion are computed by solvers directly
-        return when (crit) {
-            Criterion.NONE -> 0.0
-            Criterion.CATEGORY -> TODO()
-            Criterion.RANK -> p.rank.toDouble()
-            Criterion.RATING -> p.rating.toDouble()
-
-            Criterion.EXT -> TODO()
-            Criterion.EXR -> TODO()
-            Criterion.SDC -> TODO()
-            Criterion.DC -> TODO()
-            else -> -1.0
-        }
-    }
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
     open fun colorBalance(p: Pairable) = colorBalance[p.id]

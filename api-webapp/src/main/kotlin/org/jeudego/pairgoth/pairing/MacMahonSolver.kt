@@ -9,32 +9,19 @@ class MacMahonSolver(round: Int,
                      placementParams: PlacementParams):
     Solver(round, history, pairables, pairingParams, placementParams) {
 
-//    val Pairable.mms get() = mmBase + nbW // TODO real calculation
+    val Pairable.mmBase: Double get() = rank + 30.0 // TODO use params
+    val Pairable.mms: Double get() = mmBase + nbW // TODO real calculation
 
     // CB TODO - configurable criteria
-    override fun mainCriterion(p1: Pairable): Int {
-        TODO("Not yet implemented")
-    }
-
-    override fun mainCriterionMinMax(): Pair<Int, Int> {
-        TODO("Not yet implemented")
-    }
-
+    override val Pairable.main get() = mms
+    override val mainLimits get() = TODO()
     override fun computeStandingScore(): Map<ID, Double> {
         TODO("Not yet implemented")
     }
 
-    override fun getSpecificCriterionValue(p: Pairable, criterion: Criterion): Double {
-        // TODO solve this double/int conflict
-        return when (criterion) {
-            Criterion.MMS -> TODO()
-            Criterion.SOSM -> p.sos
-            Criterion.SOSMM1 -> p.sosm1
-            Criterion.SOSMM2 -> p.sosm2
-            Criterion.SODOSM -> p.sodos
-            Criterion.SOSOSM -> p.sosos
-            Criterion.CUSSM -> p.cums
-            else -> -1.0
-        }
+    override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
+        Criterion.MMS -> pairable.mms
+        else -> super.evalCriterion(pairable, criterion)
     }
+
 }
