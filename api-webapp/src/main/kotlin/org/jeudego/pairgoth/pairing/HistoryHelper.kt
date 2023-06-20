@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
 
-open class HistoryHelper(protected val history: List<List<Game>>, computeScore: () -> Map<ID, Double>) {
+open class HistoryHelper(protected val history: List<List<Game>>, private val scores: Map<ID, Double>) {
 
     private val Game.blackScore get() = when (result) {
         BLACK, BOTHWIN -> 1.0
@@ -58,17 +58,12 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
         }
     }
 
-    // Has to be set after construction
-    private val score by lazy {
-        computeScore()
-    }
-
     // SOS related functions given a score function
     val sos by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, score[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white] ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, score[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black] ?: 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
@@ -77,9 +72,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
     // sos-1
     val sosm1 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, score[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white] ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, score[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black] ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues {
@@ -91,9 +86,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
     // sos-2
     val sosm2 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, score[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white] ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, score[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black] ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues {
@@ -105,9 +100,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
     // sodos
     val sodos by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, if (game.result == Game.Result.BLACK) score[game.white] ?: 0.0 else 0.0)
+            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white] ?: 0.0 else 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, if (game.result == Game.Result.WHITE) score[game.black] ?: 0.0 else 0.0)
+            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black] ?: 0.0 else 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
@@ -134,17 +129,16 @@ open class HistoryHelper(protected val history: List<List<Game>>, computeScore: 
                 acc + next.whiteScore
             })
         }.reduce { acc, map ->
-            (acc.keys + map.keys).associate<ID, ID, Double> { id ->
-                Pair(id, acc.getOrDefault(id, 0.0) + acc.getOrDefault(id, 0.0) + map.getOrDefault(id, 0.0))
-            }.toMap()
+            (acc.keys + map.keys).associateWith { id -> acc.getOrDefault(id, 0.0) + acc.getOrDefault(id, 0.0) + map.getOrDefault(id, 0.0) }
+                .toMap()
         }
     }
 }
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
 
-class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, computeScore: () -> Map<ID, Double>):
-        HistoryHelper(history, computeScore) {
+class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scores: Map<ID, Double>):
+        HistoryHelper(history, scores) {
 
     private fun Pairable.asTeam() = this as TeamTournament.Team
 
@@ -156,4 +150,7 @@ class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, computeScore: ()
     //override fun sos(p:Pairable) = p.asTeam().teamPlayers.map { super.sos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
     //override fun sosos(p:Pairable) = p.asTeam().teamPlayers.map { super.sosos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
     //override fun sodos(p:Pairable) = p.asTeam().teamPlayers.map { super.sodos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
+
+    // TODO CB - now that we've got the rounds in history helper, calculate virtual scores
+    // also - try to factorize a bit calculations
 }

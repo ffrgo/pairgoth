@@ -9,16 +9,18 @@ class MacMahonSolver(round: Int,
                      placementParams: PlacementParams):
     Solver(round, history, pairables, pairingParams, placementParams) {
 
-    val Pairable.mmBase: Double get() = rank + 30.0 // TODO use params
-    val Pairable.mms: Double get() = mmBase + nbW // TODO real calculation
+    override val scores: Map<ID, Double> by lazy {
+        historyHelper.wins.mapValues {
+            pairablesMap[it.key]!!.let { pairable ->
+                pairable.mmBase + pairable.nbW
+            }
+        }
+    }
+    val Pairable.mmBase: Double get() = rank + 30.0    // TODO use params
+    val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria
-    override val Pairable.main get() = mms
     override val mainLimits get() = TODO()
-    override fun computeStandingScore(): Map<ID, Double> {
-        TODO("Not yet implemented")
-    }
-
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
         else -> super.evalCriterion(pairable, criterion)

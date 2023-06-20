@@ -47,8 +47,18 @@ sealed class Solver(
         val rand = Random(/* seed from properties - TODO */)
     }
 
-    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, ::computeStandingScore)
-    else HistoryHelper(history, ::computeStandingScore)
+    abstract val scores: Map<ID, Double>
+    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, scores)
+    else HistoryHelper(history, scores)
+
+    // pairables sorted using overloadable sort function
+    private val sortedPairables by lazy {
+        pairables.sortedWith(::sort)
+    }
+
+    protected val pairablesMap by lazy {
+        pairables.associateBy { it.id }
+    }
 
     open fun sort(p: Pairable, q: Pairable): Int {
         for (criterion in placement.criteria) {
@@ -68,11 +78,9 @@ sealed class Solver(
         pairing.geo.apply(p1, p2)
 
     // The main criterion that will be used to define the groups should be defined by subclasses
-    abstract val Pairable.main: Double
+    val Pairable.main: Double get() = scores[id] ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
-    abstract fun computeStandingScore(): Map<ID, Double>
-
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
@@ -312,11 +320,6 @@ sealed class Solver(
     private val groupsCount get() = (mainLimits.second - mainLimits.first).toInt()
     private val _groups by lazy {
         pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
-    }
-
-    // pairables sorted using overloadable sort function
-    private val sortedPairables by lazy {
-        pairables.sortedWith(::sort)
     }
 
     // place (among sorted pairables)
