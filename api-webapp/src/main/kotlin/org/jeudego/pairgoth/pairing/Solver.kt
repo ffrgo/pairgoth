@@ -48,8 +48,10 @@ sealed class Solver(
     }
 
     abstract val scores: Map<ID, Double>
-    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, scores)
-    else HistoryHelper(history, scores)
+    val historyHelper by lazy {
+        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, scores)
+        else HistoryHelper(history, scores)
+    }
 
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
