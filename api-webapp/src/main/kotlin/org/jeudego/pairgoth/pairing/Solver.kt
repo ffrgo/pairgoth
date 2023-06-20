@@ -176,7 +176,7 @@ sealed class Solver(
             val currentSeedSystem= if (round <= lastRoundForSeedSystem1) seedSystem1 else seedSystem2
 
             score += when(currentSeedSystem) {
-                // The best is to get 2 * |Cla1 - Cla2| - groupSize    close to 0
+                // The best is to get 2 * |Cla1 - Cla2| - groupSize close to 0
                 SPLIT_AND_SLIP -> {
                     val x = 2.0 * abs(cla1 - cla2) - groupSize
                     maxSeedingWeight - maxSeedingWeight * x / groupSize * x / groupSize
@@ -350,12 +350,12 @@ sealed class Solver(
     // score (number of wins)
     val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
 
-    val Pairable.sos: Double get() = historyHelper.sos[id]!!
-    val Pairable.sosm1: Double get() = historyHelper.sosm1[id]!!
-    val Pairable.sosm2: Double get() = historyHelper.sosm2[id]!!
-    val Pairable.sosos: Double get() = historyHelper.sosos[id]!!
-    val Pairable.sodos: Double get() = historyHelper.sodos[id]!!
-    val Pairable.cums: Double get() = historyHelper.cumScore[id]!!
+    val Pairable.sos: Double get() = historyHelper.sos[id] ?: 0.0
+    val Pairable.sosm1: Double get() = historyHelper.sosm1[id] ?: 0.0
+    val Pairable.sosm2: Double get() = historyHelper.sosm2[id] ?: 0.0
+    val Pairable.sosos: Double get() = historyHelper.sosos[id] ?: 0.0
+    val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
+    val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
 
     fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
     open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
@@ -367,6 +367,7 @@ sealed class Solver(
         SOSW -> pairable.sos
         SOSWM1 -> pairable.sosm1
         SOSWM2 -> pairable.sosm2
+        SOSOSW -> pairable.sosos
         SODOSW -> pairable.sodos
         CUSSW -> pairable.cums
         else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
