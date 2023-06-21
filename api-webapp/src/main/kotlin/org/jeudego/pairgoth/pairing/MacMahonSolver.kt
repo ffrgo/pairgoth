@@ -20,7 +20,7 @@ class MacMahonSolver(round: Int,
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria
-    override val mainLimits get() = TODO()
+    override val mainLimits get() = Pair(0.0, 100.0) // TODO
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
         else -> super.evalCriterion(pairable, criterion)

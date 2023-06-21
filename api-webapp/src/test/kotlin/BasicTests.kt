@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonObject
 import org.jeudego.pairgoth.model.ID
 import org.junit.jupiter.api.MethodOrderer.MethodName
 import org.junit.jupiter.api.Test
@@ -53,7 +54,7 @@ class BasicTests: TestBase() {
         ),
         "rounds" to 2,
         "pairing" to Json.Object(
-            "type" to "MACMAHON"
+            "type" to "MAC_MAHON"
         )
     )
 
@@ -94,8 +95,10 @@ class BasicTests: TestBase() {
         val resp = TestAPI.get("/api/tour/$aTournamentID").asObject()
         assertEquals(aTournamentID, resp.getInt("id"), "First tournament should have id #$aTournamentID")
         // filter out "id", and also "komi", "rules" and "gobanSize" which were provided by default
-        val cmp = Json.Object(*resp.entries.filter { it.key !in listOf("id", "komi", "rules", "gobanSize") }.map { Pair(it.key, it.value) }.toTypedArray())
-        assertEquals(aTournament.toString(), cmp.toString(), "tournament differs")
+        // also filter out "pairing", which is filled by all default values
+        val cmp = Json.Object(*resp.entries.filter { it.key !in listOf("id", "komi", "rules", "gobanSize", "pairing") }.map { Pair(it.key, it.value) }.toTypedArray())
+        val expected = aTournament.entries.filter { it.key != "pairing" }.map { Pair(it.key, it.value) }.toMap().toJsonObject()
+        assertEquals(expected.toString(), cmp.toString(), "tournament differs")
     }
 
     @Test

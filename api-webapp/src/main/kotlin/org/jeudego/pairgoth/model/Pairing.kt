@@ -14,13 +14,13 @@ data class BaseCritParams(
     val dupWeight: Double = MAX_AVOIDDUPGAME,
     val random: Double = 0.0,
     val deterministic: Boolean = true,
-    val colorBalance: Double = MAX_COLOR_BALANCE
+    val colorBalanceWeight: Double = MAX_COLOR_BALANCE
 ) {
     init {
         if (nx1 < 0.0 || nx1 > 1.0) throw Error("invalid standardNX1Factor")
         if (dupWeight < 0.0 || dupWeight > MAX_AVOIDDUPGAME) throw Error("invalid avoidDuplGame value")
         if (random < 0.0 || random > MAX_RANDOM) throw Error("invalid random")
-        if (colorBalance > 0.0 || colorBalance > MAX_COLOR_BALANCE) throw Error("invalid balanceWB")
+        if (colorBalanceWeight < 0.0 || colorBalanceWeight > MAX_COLOR_BALANCE) throw Error("invalid ColorBalanceWeight")
     }
 
     companion object {
@@ -189,14 +189,14 @@ fun BaseCritParams.Companion.fromJson(json: Json.Object) = BaseCritParams(
     dupWeight = json.getDouble("dupWeight") ?: default.dupWeight,
     random = json.getDouble("random") ?: default.random,
     deterministic = json.getBoolean("deterministic") ?: default.deterministic,
-    colorBalance = json.getDouble("colorBalanceWeight") ?: default.colorBalance
+    colorBalanceWeight = json.getDouble("colorBalanceWeight") ?: default.colorBalanceWeight
 )
 
 fun BaseCritParams.toJson() = Json.Object(
     "nx1" to nx1,
     "dupWeight" to dupWeight,
     "random" to random,
-    "colorBalanceWeight" to colorBalance
+    "colorBalanceWeight" to colorBalanceWeight
 )
 
 fun MainCritParams.Companion.fromJson(json: Json.Object) = MainCritParams(

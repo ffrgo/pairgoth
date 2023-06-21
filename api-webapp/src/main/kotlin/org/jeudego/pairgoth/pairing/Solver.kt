@@ -48,10 +48,8 @@ sealed class Solver(
     }
 
     abstract val scores: Map<ID, Double>
-    val historyHelper by lazy {
-        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history, scores)
-        else HistoryHelper(history, scores)
-    }
+    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
+        else HistoryHelper(history) { scores }
 
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
@@ -139,8 +137,8 @@ sealed class Solver(
         if (potentialHd == 0) {
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
-            if (wb1 * wb2 < 0) return colorBalance
-            else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) return colorBalance / 2
+            if (wb1 * wb2 < 0) return colorBalanceWeight
+            else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) return colorBalanceWeight / 2
         }
         return 0.0
     }
@@ -239,7 +237,7 @@ sealed class Solver(
 
         // Same country
         val countryRatio = if (p1.country != p2.country && countryFactor != 0) {
-            min(countryFactor.toDouble() / placementScoreRange as Double, 1.0) // clamp to 1
+            min(countryFactor.toDouble() / placementScoreRange.toDouble(), 1.0) // clamp to 1
         } else {
             0.0
         }
@@ -253,14 +251,14 @@ sealed class Solver(
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
-                clubFactor.toDouble() / 2.0 / placementScoreRange as Double
+                clubFactor.toDouble() / 2.0 / placementScoreRange.toDouble()
             }
 
         } else if (!commonGroup && !commonClub) {
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
-                clubFactor.toDouble() * 1.2 / placementScoreRange as Double
+                clubFactor.toDouble() * 1.2 / placementScoreRange.toDouble()
             }
         }
         clubRatio = min(clubRatio, 1.0)

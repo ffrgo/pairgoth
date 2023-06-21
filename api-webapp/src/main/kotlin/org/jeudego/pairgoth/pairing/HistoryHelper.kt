@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
 
-open class HistoryHelper(protected val history: List<List<Game>>, private val scores: Map<ID, Double>) {
+open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: ()-> Map<ID, Double>) {
 
     private val Game.blackScore get() = when (result) {
         BLACK, BOTHWIN -> 1.0
@@ -14,6 +14,8 @@ open class HistoryHelper(protected val history: List<List<Game>>, private val sc
         WHITE, BOTHWIN -> 1.0
         else -> 0.0
     }
+
+    private val scores by lazy(scoresGetter)
 
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
@@ -137,8 +139,8 @@ open class HistoryHelper(protected val history: List<List<Game>>, private val sc
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
 
-class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scores: Map<ID, Double>):
-        HistoryHelper(history, scores) {
+class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scoresGetter: () -> Map<ID, Double>):
+        HistoryHelper(history, scoresGetter) {
 
     private fun Pairable.asTeam() = this as TeamTournament.Team
 
