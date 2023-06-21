@@ -7,7 +7,7 @@
     <version>1.0-SNAPSHOT</version>
   </parent>
   <artifactId>application</artifactId>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <serverManifestDirectory>${project.build.directory}/servermanifest</serverManifestDirectory>
