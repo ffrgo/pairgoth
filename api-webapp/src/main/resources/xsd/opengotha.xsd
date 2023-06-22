@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Tournament" type="TournamentType"/>
+  <xs:complexType name="PlayerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="agaExpirationDate" use="optional"/>
+        <xs:attribute type="xs:string" name="agaId" use="optional"/>
+        <xs:attribute type="xs:string" name="club" use="optional"/>
+        <xs:attribute type="xs:string" name="country" use="optional"/>
+        <xs:attribute type="xs:string" name="egfPin" use="optional"/>
+        <xs:attribute type="xs:int" name="ffgLicence" use="optional"/>
+        <xs:attribute type="xs:string" name="ffgLicenceStatus" use="optional"/>
+        <xs:attribute type="xs:string" name="firstName"/>
+        <xs:attribute type="xs:string" name="grade" use="optional"/>
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:integer" name="participating"/>
+        <xs:attribute type="xs:string" name="rank" use="optional"/>
+        <xs:attribute type="xs:int" name="rating" use="optional"/>
+        <xs:attribute type="xs:string" name="ratingOrigin" use="optional"/>
+        <xs:attribute type="xs:string" name="registeringStatus" use="optional"/>
+        <xs:attribute type="xs:int" name="smmsCorrection" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="PlayersType">
+    <xs:sequence>
+      <xs:element type="PlayerType" name="Player" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GameType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="blackPlayer"/>
+        <xs:attribute type="xs:int" name="handicap"/>
+        <xs:attribute type="xs:string" name="knownColor" use="optional"/>
+        <xs:attribute type="xs:string" name="result" use="optional"/>
+        <xs:attribute type="xs:int" name="roundNumber"/>
+        <xs:attribute type="xs:int" name="tableNumber"/>
+        <xs:attribute type="xs:string" name="whitePlayer"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="GamesType">
+    <xs:sequence>
+      <xs:element type="GameType" name="Game" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ByePlayerType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="player"/>
+        <xs:attribute type="xs:int" name="roundNumber"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="ByePlayersType">
+    <xs:sequence>
+      <xs:element type="ByePlayerType" name="ByePlayer"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="GeneralParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:boolean" name="bInternet" use="optional"/>
+        <xs:attribute type="xs:int" name="basicTime"/>
+        <xs:attribute type="xs:date" name="beginDate"/>
+        <xs:attribute type="xs:int" name="canByoYomiTime"/>
+        <xs:attribute type="xs:string" name="complementaryTimeSystem"/>
+        <xs:attribute type="xs:string" name="director"/>
+        <xs:attribute type="xs:date" name="endDate"/>
+        <xs:attribute type="xs:int" name="fischerTime"/>
+        <xs:attribute type="xs:string" name="genCountNotPlayedGamesAsHalfPoint"/>
+        <xs:attribute type="xs:string" name="genMMBar"/>
+        <xs:attribute type="xs:string" name="genMMFloor"/>
+        <xs:attribute type="xs:int" name="genMMS2ValueAbsent"/>
+        <xs:attribute type="xs:int" name="genMMS2ValueBye"/>
+        <xs:attribute type="xs:string" name="genMMZero"/>
+        <xs:attribute type="xs:int" name="genNBW2ValueAbsent"/>
+        <xs:attribute type="xs:int" name="genNBW2ValueBye"/>
+        <xs:attribute type="xs:string" name="genRoundDownNBWMMS"/>
+        <xs:attribute type="xs:float" name="komi"/>
+        <xs:attribute type="xs:string" name="location"/>
+        <xs:attribute type="xs:string" name="name"/>
+        <xs:attribute type="xs:int" name="nbMovesCanTime"/>
+        <xs:attribute type="xs:int" name="numberOfCategories"/>
+        <xs:attribute type="xs:int" name="numberOfRounds"/>
+        <xs:attribute type="xs:string" name="shortName"/>
+        <xs:attribute type="xs:int" name="size"/>
+        <xs:attribute type="xs:int" name="stdByoYomiTime"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="HandicapParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="hdBasedOnMMS"/>
+        <xs:attribute type="xs:int" name="hdCeiling"/>
+        <xs:attribute type="xs:int" name="hdCorrection"/>
+        <xs:attribute type="xs:string" name="hdNoHdRankThreshold"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="PlacementCriterionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="name" use="optional"/>
+        <xs:attribute type="xs:int" name="number" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="PlacementCriteriaType">
+    <xs:sequence>
+      <xs:element type="PlacementCriterionType" name="PlacementCriterion" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PlacementParameterSetType">
+    <xs:sequence>
+      <xs:element type="PlacementCriteriaType" name="PlacementCriteria"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PairingParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:long" name="paiBaAvoidDuplGame"/>
+        <xs:attribute type="xs:int" name="paiBaBalanceWB"/>
+        <xs:attribute type="xs:string" name="paiBaDeterministic"/>
+        <xs:attribute type="xs:int" name="paiBaRandom"/>
+        <xs:attribute type="xs:string" name="paiMaAdditionalPlacementCritSystem1"/>
+        <xs:attribute type="xs:string" name="paiMaAdditionalPlacementCritSystem2"/>
+        <xs:attribute type="xs:int" name="paiMaAvoidMixingCategories"/>
+        <xs:attribute type="xs:string" name="paiMaCompensateDUDD"/>
+        <xs:attribute type="xs:string" name="paiMaDUDDLowerMode"/>
+        <xs:attribute type="xs:string" name="paiMaDUDDUpperMode"/>
+        <xs:attribute type="xs:int" name="paiMaDUDDWeight"/>
+        <xs:attribute type="xs:int" name="paiMaLastRoundForSeedSystem1"/>
+        <xs:attribute type="xs:int" name="paiMaMaximizeSeeding"/>
+        <xs:attribute type="xs:long" name="paiMaMinimizeScoreDifference"/>
+        <xs:attribute type="xs:string" name="paiMaSeedSystem1"/>
+        <xs:attribute type="xs:string" name="paiMaSeedSystem2"/>
+        <xs:attribute type="xs:int" name="paiSeAvoidSameGeo"/>
+        <xs:attribute type="xs:string" name="paiSeBarThresholdActive"/>
+        <xs:attribute type="xs:long" name="paiSeDefSecCrit"/>
+        <xs:attribute type="xs:int" name="paiSeMinimizeHandicap"/>
+        <xs:attribute type="xs:string" name="paiSeNbWinsThresholdActive"/>
+        <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameClub"/>
+        <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameCountry"/>
+        <xs:attribute type="xs:string" name="paiSeRankThreshold"/>
+        <xs:attribute type="xs:float" name="paiStandardNX1Factor"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="DPParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="displayClCol"/>
+        <xs:attribute type="xs:string" name="displayCoCol"/>
+        <xs:attribute type="xs:string" name="displayIndGamesInMatches"/>
+        <xs:attribute type="xs:string" name="displayNPPlayers"/>
+        <xs:attribute type="xs:string" name="displayNumCol"/>
+        <xs:attribute type="xs:string" name="displayPlCol"/>
+        <xs:attribute type="xs:string" name="gameFormat"/>
+        <xs:attribute type="xs:string" name="playerSortType"/>
+        <xs:attribute type="xs:string" name="showByePlayer"/>
+        <xs:attribute type="xs:string" name="showNotFinallyRegisteredPlayers"/>
+        <xs:attribute type="xs:string" name="showNotPairedPlayers"/>
+        <xs:attribute type="xs:string" name="showNotParticipatingPlayers"/>
+        <xs:attribute type="xs:string" name="showPlayerClub"/>
+        <xs:attribute type="xs:string" name="showPlayerCountry"/>
+        <xs:attribute type="xs:string" name="showPlayerGrade"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="PublishParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:string" name="exportToLocalFile"/>
+        <xs:attribute type="xs:string" name="htmlAutoScroll"/>
+        <xs:attribute type="xs:string" name="print"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TournamentParameterSetType">
+    <xs:sequence>
+      <xs:element type="GeneralParameterSetType" name="GeneralParameterSet"/>
+      <xs:element type="HandicapParameterSetType" name="HandicapParameterSet"/>
+      <xs:element type="PlacementParameterSetType" name="PlacementParameterSet"/>
+      <xs:element type="PairingParameterSetType" name="PairingParameterSet"/>
+      <xs:element type="DPParameterSetType" name="DPParameterSet"/>
+      <xs:element type="PublishParameterSetType" name="PublishParameterSet"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TeamGeneralParameterSetType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:int" name="teamSize"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TeamPlacementParameterSetType">
+    <xs:sequence>
+      <xs:element type="PlacementCriteriaType" name="PlacementCriteria"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TeamTournamentParameterSetType">
+    <xs:sequence>
+      <xs:element type="TeamGeneralParameterSetType" name="TeamGeneralParameterSet"/>
+      <xs:element type="TeamPlacementParameterSetType" name="TeamPlacementParameterSet"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TournamentType">
+    <xs:sequence>
+      <xs:element type="PlayersType" name="Players"/>
+      <xs:element type="GamesType" name="Games"/>
+      <xs:element type="ByePlayersType" name="ByePlayers"/>
+      <xs:element type="TournamentParameterSetType" name="TournamentParameterSet"/>
+      <xs:element type="TeamTournamentParameterSetType" name="TeamTournamentParameterSet"/>
+    </xs:sequence>
+    <xs:attribute type="xs:int" name="dataVersion"/>
+    <xs:attribute type="xs:string" name="externalIPAddress"/>
+    <xs:attribute type="xs:float" name="fullVersionNumber"/>
+    <xs:attribute type="xs:string" name="runningMode"/>
+    <xs:attribute type="xs:long" name="saveDT"/>
+  </xs:complexType>
+</xs:schema>

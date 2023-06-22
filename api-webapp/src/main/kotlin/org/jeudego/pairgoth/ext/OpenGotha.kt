@@ -1,116 +1,55 @@
 package org.jeudego.pairgoth.ext
 
+import jakarta.xml.bind.JAXBContext
+import jakarta.xml.bind.JAXBElement
+import kotlinx.datetime.LocalDate
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.opengotha.TournamentType
+import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.Store
-import org.jeudego.pairgoth.util.XmlFormat
-import org.jeudego.pairgoth.util.booleanAttr
-import org.jeudego.pairgoth.util.arrayOf
-import org.jeudego.pairgoth.util.dateAttr
-import org.jeudego.pairgoth.util.doubleAttr
-import org.jeudego.pairgoth.util.intAttr
-import org.jeudego.pairgoth.util.mutableArrayOf
-import org.jeudego.pairgoth.util.objectOf
-import org.jeudego.pairgoth.util.optBoolean
-import org.jeudego.pairgoth.util.stringAttr
 import org.w3c.dom.Element
 import java.util.*
+import javax.xml.XMLConstants
+import javax.xml.datatype.XMLGregorianCalendar
+import javax.xml.validation.SchemaFactory
 
-class OpenGothaFormat(xml: Element): XmlFormat(xml) {
-
-    val Players by mutableArrayOf<Player>()
-    val Games by mutableArrayOf<Game>()
-    val TournamentParameterSet by objectOf<Params>()
-
-    class Player(xml: Element): XmlFormat(xml) {
-        val agaId by stringAttr()
-        val club by stringAttr()
-        val country by stringAttr()
-        val egfPin by stringAttr()
-        val ffgLicence by stringAttr()
-        val firstName by stringAttr()
-        val name by stringAttr()
-        val participating by stringAttr()
-        val rank by stringAttr()
-        val rating by intAttr()
-    }
-
-    class Game(xml: Element): XmlFormat(xml) {
-        val blackPlayer by stringAttr()
-        val whitePlayer by stringAttr()
-        val handicap by intAttr()
-        val knownColor by booleanAttr()
-        val result by stringAttr()
-        val roundNumber by intAttr()
-    }
-
-    class Params(xml: Element): XmlFormat(xml) {
-        val GeneralParameterSet by objectOf<GenParams>()
-        val HandicapParameterSet by objectOf<HandicapParams>()
-        val PairingParameterSet by objectOf<PairingParams>()
-        val PlacementParameterSet by objectOf<Criteria>()
-
-        class GenParams(xml: Element): XmlFormat(xml) {
-            val bInternet by optBoolean()
-            val basicTime by intAttr()
-            val beginDate by dateAttr()
-            val canByoYomiTime by intAttr()
-            val complementaryTimeSystem by stringAttr()
-            val endDate by dateAttr()
-            val fisherTime by intAttr()
-            val genCountNotPlayedGamesAsHalfPoint by booleanAttr()
-            val genMMBar by stringAttr()
-            val genMMFloor by stringAttr()
-            val komi by doubleAttr()
-            val location by stringAttr()
-            val name by stringAttr()
-            val nbMovesCanTime by intAttr()
-            val numberOfCategories by intAttr()
-            val numberOfRounds by intAttr()
-            val shortName by stringAttr()
-            val size by intAttr()
-            val stdByoYomiTime by intAttr()
-        }
-        class HandicapParams(xml: Element): XmlFormat(xml) {
-            val hdBasedOnMMS by booleanAttr()
-            val hdCeiling by intAttr()
-            val hdCorrection by intAttr()
-            val hdNoHdRankThreshold by stringAttr()
-        }
-        class PairingParams(xml: Element): XmlFormat(xml) {
-            val paiMaSeedSystem1 by stringAttr()
-            val paiMaSeedSystem2 by stringAttr()
-        }
-        class Criteria(xml: Element): XmlFormat(xml) {
-            val PlacementCriterion by arrayOf<Criterion>()
-        }
-        class Criterion(xml: Element): XmlFormat(xml) {
-            val name by stringAttr()
-        }
-    }
-}
+private const val MILLISECONDS_PER_DAY = 86400000
+fun XMLGregorianCalendar.toLocalDate() = LocalDate.fromEpochDays((toGregorianCalendar().time.time / MILLISECONDS_PER_DAY).toInt())
 
 object OpenGotha {
     fun import(element: Element): Tournament<*> {
-        val imported = OpenGothaFormat(element)
-        val genParams = imported.TournamentParameterSet.GeneralParameterSet
-        val handParams = imported.TournamentParameterSet.HandicapParameterSet
-        val pairingParams = imported.TournamentParameterSet.PairingParameterSet
-        val placementParams = imported.TournamentParameterSet.PlacementParameterSet
+
+        val context = JAXBContext.newInstance(ObjectFactory::class.java)
+        val parsed = context.createUnmarshaller()/*.also { unmarshaller ->
+            val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+            val schemaURL = OpenGotha::class.java.getResource("/xsd/opengotha.xsd") ?: throw Error("opengotha.xsd not found")
+            val schema = schemaFactory.newSchema(schemaURL)
+            unmarshaller.schema = schema
+
+        }*/.unmarshal(element) as JAXBElement<TournamentType>
+
+        val ogt = parsed.value
+        // import tournament parameters
+
+        val genParams = ogt.tournamentParameterSet.generalParameterSet
+        val handParams = ogt.tournamentParameterSet.handicapParameterSet
+        val placmtParams = ogt.tournamentParameterSet.placementParameterSet
+        val pairParams = ogt.tournamentParameterSet.pairingParameterSet
         val tournament = StandardTournament(
             id = Store.nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
             name = genParams.name,
             shortName = genParams.shortName,
-            startDate = genParams.beginDate,
-            endDate = genParams.endDate,
+            startDate = genParams.beginDate.toLocalDate(),
+            endDate = genParams.endDate.toLocalDate(),
             country = "FR", // no country in opengotha format
             location = genParams.location,
-            online = genParams.bInternet ?: false,
+            online = genParams.isBInternet ?: false,
             timeSystem = when (genParams.complementaryTimeSystem) {
                 "SUDDENDEATH" -> SuddenDeath(genParams.basicTime)
                 "STDBYOYOMI" -> StandardByoyomi(genParams.basicTime, genParams.stdByoYomiTime, 1) // no periods?
                 "CANBYOYOMI" -> CanadianByoyomi(genParams.basicTime, genParams.canByoYomiTime, genParams.nbMovesCanTime)
-                "FISCHER" -> FischerTime(genParams.basicTime, genParams.fisherTime)
+                "FISCHER" -> FischerTime(genParams.basicTime, genParams.fischerTime)
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
@@ -119,7 +58,11 @@ object OpenGotha {
 
                     ),
                     placementParams = PlacementParams(
-                        crit = placementParams.PlacementCriterion.map { Criterion.valueOf(it.name) }.toTypedArray()
+                        crit = placmtParams.placementCriteria.placementCriterion.filter {
+                            it.name != "NULL"
+                        }.map {
+                            Criterion.valueOf(it.name)
+                        }.toTypedArray()
                     )
                 ) // TODO
                 else -> MacMahon(
@@ -133,8 +76,10 @@ object OpenGotha {
             },
             rounds = genParams.numberOfRounds
         )
+
         val canonicMap = mutableMapOf<String, Int>()
-        imported.Players.map { player ->
+        // import players
+        ogt.players.player.map { player ->
             Player(
                 id = Store.nextPlayerId,
                 name = player.name,
@@ -147,7 +92,7 @@ object OpenGotha {
                 canonicMap.put("${player.name}${player.firstName}".uppercase(Locale.ENGLISH), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
-        val gamesPerRound = imported.Games.groupBy {
+        val gamesPerRound = ogt.games.game.groupBy {
             it.roundNumber
         }.values.map {
             it.map { game ->
@@ -169,7 +114,7 @@ object OpenGotha {
             }.associateBy { it.id }.toMutableMap()
         }
         gamesPerRound.forEachIndexed { index, games ->
-            tournament.games(index).putAll(games)
+            tournament.games(index + 1).putAll(games)
         }
         return tournament
     }
@@ -178,8 +123,9 @@ object OpenGotha {
     fun export(tournament: Tournament<*>): String {
         // two methods here
         // method 1 (advised because it's more error-proof but more complex to set up) is to assign one by one
-        // the fields of an OpenGothaFormat instance, then call toPrettyString() on it
-        // opengotha = OpenGothaFormat()
+        // the fields of an OGTournamentType instance, then call toPrettyString() on it
+        // val ogt = OGTournamentType()
+        // ...
         //
         // method 2 (quick and dirty) is to rely on templating:
         val xml = """
@@ -281,6 +227,7 @@ object OpenGotha {
             </Tournament>
             
         """.trimIndent()
+
         return xml
     }
 }

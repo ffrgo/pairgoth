@@ -66,6 +66,26 @@
                     </webApp>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>gen-schema</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <packageName>org.jeudego.pairgoth.opengotha</packageName>
+                    <sourceType>XmlSchema</sourceType>                    
+                    <sources>
+                        <source>src/main/resources/xsd</source>
+                    </sources>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <dependencyManagement>
@@ -212,6 +232,17 @@
             <groupId>org.jgrapht</groupId>
             <artifactId>jgrapht-core</artifactId>
             <version>1.5.2</version>
+        </dependency>
+        <!-- xml class generation -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>4.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>4.0.3</version>
         </dependency>
         <!-- tests -->
         <dependency>
