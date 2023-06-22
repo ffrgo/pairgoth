@@ -28,7 +28,8 @@ object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
     override val country = "none"
 }
 
-fun Pairable.displayRank() = if (rank < 0) "${-rank}k" else "${rank + 1}d"
+fun displayRank(rank: Int) = if (rank < 0) "${-rank}k" else "${rank + 1}d"
+fun Pairable.displayRank() = displayRank(rank)
 
 private val rankRegex = Regex("(\\d+)([kd])", RegexOption.IGNORE_CASE)
 

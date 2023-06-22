@@ -4,12 +4,11 @@ import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.util.XmlFormat
 import org.jeudego.pairgoth.util.booleanAttr
-import org.jeudego.pairgoth.util.childrenArrayOf
+import org.jeudego.pairgoth.util.arrayOf
 import org.jeudego.pairgoth.util.dateAttr
 import org.jeudego.pairgoth.util.doubleAttr
-import org.jeudego.pairgoth.util.find
-import org.jeudego.pairgoth.util.get
 import org.jeudego.pairgoth.util.intAttr
+import org.jeudego.pairgoth.util.mutableArrayOf
 import org.jeudego.pairgoth.util.objectOf
 import org.jeudego.pairgoth.util.optBoolean
 import org.jeudego.pairgoth.util.stringAttr
@@ -18,8 +17,8 @@ import java.util.*
 
 class OpenGothaFormat(xml: Element): XmlFormat(xml) {
 
-    val Players by childrenArrayOf<Player>()
-    val Games by childrenArrayOf<Game>()
+    val Players by mutableArrayOf<Player>()
+    val Games by mutableArrayOf<Game>()
     val TournamentParameterSet by objectOf<Params>()
 
     class Player(xml: Element): XmlFormat(xml) {
@@ -48,6 +47,7 @@ class OpenGothaFormat(xml: Element): XmlFormat(xml) {
         val GeneralParameterSet by objectOf<GenParams>()
         val HandicapParameterSet by objectOf<HandicapParams>()
         val PairingParameterSet by objectOf<PairingParams>()
+        val PlacementParameterSet by objectOf<Criteria>()
 
         class GenParams(xml: Element): XmlFormat(xml) {
             val bInternet by optBoolean()
@@ -80,6 +80,12 @@ class OpenGothaFormat(xml: Element): XmlFormat(xml) {
             val paiMaSeedSystem1 by stringAttr()
             val paiMaSeedSystem2 by stringAttr()
         }
+        class Criteria(xml: Element): XmlFormat(xml) {
+            val PlacementCriterion by arrayOf<Criterion>()
+        }
+        class Criterion(xml: Element): XmlFormat(xml) {
+            val name by stringAttr()
+        }
     }
 }
 
@@ -89,6 +95,7 @@ object OpenGotha {
         val genParams = imported.TournamentParameterSet.GeneralParameterSet
         val handParams = imported.TournamentParameterSet.HandicapParameterSet
         val pairingParams = imported.TournamentParameterSet.PairingParameterSet
+        val placementParams = imported.TournamentParameterSet.PlacementParameterSet
         val tournament = StandardTournament(
             id = Store.nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
@@ -107,22 +114,22 @@ object OpenGotha {
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
-                /*
-                when (pairingParams.paiMaSeedSystem1) {
-                    "SPLITANDFOLD" -> SeedMethod.SPLIT_AND_FOLD
-                    "SPLITANDRANDOM" -> SeedMethod.SPLIT_AND_RANDOM
-                    "SPLITANDSLIP" -> SeedMethod.SPLIT_AND_SLIP
-                    else -> throw Error("unknown swiss pairing method")
-                },
-                when (pairingParams.paiMaSeedSystem2) {
-                    "SPLITANDFOLD" -> SeedMethod.SPLIT_AND_FOLD
-                    "SPLITANDRANDOM" -> SeedMethod.SPLIT_AND_RANDOM
-                    "SPLITANDSLIP" -> SeedMethod.SPLIT_AND_SLIP
-                    else -> throw Error("unknown swiss pairing method")
-                }
-                */
-                0 -> Swiss() // TODO
-                else -> MacMahon() // TODO
+                0 -> Swiss(
+                    pairingParams = PairingParams(
+
+                    ),
+                    placementParams = PlacementParams(
+                        crit = placementParams.PlacementCriterion.map { Criterion.valueOf(it.name) }.toTypedArray()
+                    )
+                ) // TODO
+                else -> MacMahon(
+                    pairingParams = PairingParams(
+
+                    ),
+                    placementParams = PlacementParams(
+
+                    )
+                ) // TODO
             },
             rounds = genParams.numberOfRounds
         )
@@ -169,6 +176,12 @@ object OpenGotha {
 
     // TODO - bye player(s)
     fun export(tournament: Tournament<*>): String {
+        // two methods here
+        // method 1 (advised because it's more error-proof but more complex to set up) is to assign one by one
+        // the fields of an OpenGothaFormat instance, then call toPrettyString() on it
+        // opengotha = OpenGothaFormat()
+        //
+        // method 2 (quick and dirty) is to rely on templating:
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <Tournament dataVersion="201" externalIPAddress="88.122.144.219" fullVersionNumber="3.51" runningMode="SAL" saveDT="20210111180800">
@@ -238,18 +251,17 @@ object OpenGotha {
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
             } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
-            <HandicapParameterSet hdBasedOnMMS="false" hdCeiling="0" hdCorrection="0" hdNoHdRankThreshold="30K"/>
+            <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
             <PlacementParameterSet>
             <PlacementCriteria>
-            <PlacementCriterion name="NBW" number="1"/>
-            <PlacementCriterion name="SOSW" number="2"/>
-            <PlacementCriterion name="SOSOSW" number="3"/>
-            <PlacementCriterion name="NULL" number="4"/>
-            <PlacementCriterion name="NULL" number="5"/>
-            <PlacementCriterion name="NULL" number="6"/>
+            ${
+                (0..5).map {
+                    """<PlacementCriterion name="${tournament.pairing.placementParams.criteria.getOrNull(it)?.name ?: "NULL"}" number="${it + 1}"/>"""
+                }
+            }
             </PlacementCriteria>
             </PlacementParameterSet>
-            <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="Rating" paiMaAvoidMixingCategories="0" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="2" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="0" paiSePreferMMSDiffRatherThanSameCountry="0" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
+            <PairingParameterSet paiBaAvoidDuplGame="${tournament.pairing.pairingParams.base.dupWeight.toInt()}" paiBaBalanceWB="${tournament.pairing.pairingParams.base.colorBalanceWeight.toInt()}" paiBaDeterministic="${tournament.pairing.pairingParams.base.deterministic}" paiBaRandom="${tournament.pairing.pairingParams.base.random.toInt()}" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="Rating" paiMaAvoidMixingCategories="0" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="2" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="0" paiSePreferMMSDiffRatherThanSameCountry="0" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
             <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
             <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
             </TournamentParameterSet>
