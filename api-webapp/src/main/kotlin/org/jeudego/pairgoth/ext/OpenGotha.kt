@@ -20,21 +20,16 @@ object OpenGotha {
     fun import(element: Element): Tournament<*> {
 
         val context = JAXBContext.newInstance(ObjectFactory::class.java)
-        val parsed = context.createUnmarshaller()/*.also { unmarshaller ->
-            val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
-            val schemaURL = OpenGotha::class.java.getResource("/xsd/opengotha.xsd") ?: throw Error("opengotha.xsd not found")
-            val schema = schemaFactory.newSchema(schemaURL)
-            unmarshaller.schema = schema
-
-        }*/.unmarshal(element) as JAXBElement<TournamentType>
-
+        val parsed = context.createUnmarshaller().unmarshal(element) as JAXBElement<TournamentType>
         val ogt = parsed.value
+
         // import tournament parameters
 
         val genParams = ogt.tournamentParameterSet.generalParameterSet
         val handParams = ogt.tournamentParameterSet.handicapParameterSet
         val placmtParams = ogt.tournamentParameterSet.placementParameterSet
         val pairParams = ogt.tournamentParameterSet.pairingParameterSet
+
         val tournament = StandardTournament(
             id = Store.nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
