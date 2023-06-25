@@ -5,22 +5,9 @@ import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.web.ApiServlet
 import org.jeudego.pairgoth.web.SSEServlet
 import org.jeudego.pairgoth.web.WebappManager
-import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.doAnswer
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
-import java.io.BufferedReader
-import java.io.File
-import java.io.IOException
-import java.io.PrintWriter
-import java.io.StringReader
-import java.io.StringWriter
+import org.mockito.kotlin.*
+import java.io.*
 import java.util.*
-import java.util.regex.Pattern
-import java.util.zip.ZipEntry
-import java.util.zip.ZipException
-import java.util.zip.ZipFile
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -96,3 +83,5 @@ object TestAPI {
 // Get a list of resources
 
 fun getTestResources(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path").listFiles()
+
+fun getTestFile(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path")

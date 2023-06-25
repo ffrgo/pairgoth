@@ -7,11 +7,11 @@ import org.junit.jupiter.api.MethodOrderer.MethodName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
+import java.io.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlin.test.fail
-
 
 @TestMethodOrder(MethodName::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -32,6 +32,27 @@ class BasicTests: TestBase() {
             "increment" to 10
         ),
         "rounds" to 2,
+        "pairing" to Json.Object(
+            "type" to "SWISS",
+            "method" to "SPLIT_AND_SLIP"
+        )
+    )
+
+    val aSimpleSwissTournament = Json.Object(
+        "type" to "INDIVIDUAL",
+        "name" to "Simple Swiss",
+        "shortName" to "simple-swiss",
+        "startDate" to "2023-05-10",
+        "endDate" to "2023-05-12",
+        "country" to "FR",
+        "location" to "Grenoble",
+        "online" to false,
+        "timeSystem" to Json.Object(
+            "type" to "FISCHER",
+            "mainTime" to 1800,
+            "increment" to 15
+        ),
+        "rounds" to 4,
         "pairing" to Json.Object(
             "type" to "SWISS",
             "method" to "SPLIT_AND_SLIP"
@@ -183,5 +204,21 @@ class BasicTests: TestBase() {
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         // TODO check pairing
         // val expected = """"["id":1,"w":5,"b":6,"h":3,"r":"?"]"""
+    }
+
+    @Test
+    fun `008 simple swiss tournament`() {
+        var resp = TestAPI.post("/api/tour", aSimpleSwissTournament).asObject()
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        aTournamentID = resp.getInt("id")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", aPlayer).asObject()
+        assertTrue(resp.getBoolean("success") == true, "expecting success")
+
+        val inputStream: InputStream = getTestFile("aSimpleSwiss/PlayersList.json").inputStream()
+
+        val inputString = inputStream.bufferedReader().use { it.readText() }
+        println(inputString)
+
+
     }
 }
