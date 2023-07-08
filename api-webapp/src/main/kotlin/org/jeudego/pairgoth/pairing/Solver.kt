@@ -14,8 +14,6 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-val DEBUG_EXPORT_WEIGHT = true
-
 private fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
     var inverse = false
     var name1 = p1.nameSeed()
@@ -45,6 +43,7 @@ sealed class Solver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
+        val DEBUG_EXPORT_WEIGHT = true
     }
 
     abstract val scores: Map<ID, Double>
@@ -54,6 +53,11 @@ sealed class Solver(
     // pairables sorted using overloadable sort function
     private val sortedPairables by lazy {
         pairables.sortedWith(::sort)
+    }
+    // Sorting for logging purpose
+    private val logSortedPairablesMap by lazy {
+        val logSortedPairables = pairables.sortedWith(::logSort)
+        logSortedPairables.associateWith { logSortedPairables.indexOf(it) }
     }
 
     protected val pairablesMap by lazy {
@@ -70,6 +74,14 @@ sealed class Solver(
         }
         return 0
     }
+    // Sorting function to order the weight matrix for debugging
+    open fun logSort(p: Pairable, q: Pairable): Int {
+        if (p.rating == q.rating) {
+            return if (p.name > q.name) 1 else -1
+        }
+        return p.rating - q.rating
+    }
+
     open fun weight(p1: Pairable, p2: Pairable) =
         1.0 + // 1 is minimum value because 0 means "no matching allowed"
         pairing.base.apply(p1, p2) +
@@ -82,6 +94,7 @@ sealed class Solver(
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
     fun pair(): List<Game> {
+        weightLogs.clear()
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
@@ -103,6 +116,18 @@ sealed class Solver(
         return result
     }
 
+    var weightLogs: MutableMap<String, Array<DoubleArray>> = mutableMapOf()
+    fun logWeights(weightName: String, p1: Pairable, p2: Pairable, weight: Double) {
+        if (DEBUG_EXPORT_WEIGHT) {
+            if (!weightLogs.contains(weightName)) {
+                weightLogs[weightName] = Array(pairables.size) { DoubleArray(pairables.size) }
+            }
+            val pos1: Int = logSortedPairablesMap[p1]!!
+            val pos2: Int = logSortedPairablesMap[p2]!!
+            weightLogs[weightName]!![pos1][pos2] = weight
+        }
+    }
+
     // base criteria
 
     open fun BaseCritParams.apply(p1: Pairable, p2: Pairable): Double {
@@ -120,13 +145,17 @@ sealed class Solver(
 
     // Weight score computation details
     open fun  BaseCritParams.avoidDuplicatingGames(p1: Pairable, p2: Pairable): Double {
-        return if (p1.played(p2)) 0.0 // We get no score if pairables already played together
+        val score =  if (p1.played(p2)) 0.0 // We get no score if pairables already played together
         else dupWeight
+        logWeights("avoiddup", p1, p2, score)
+        return score
     }
 
     open fun BaseCritParams.applyRandom(p1: Pairable, p2: Pairable): Double {
-        return if (deterministic) detRandom(random, p1, p2)
+        val score =  if (deterministic) detRandom(random, p1, p2)
         else nonDetRandom(random)
+        logWeights("random", p1, p2, score)
+        return score
     }
 
     open fun BaseCritParams.applyColorBalance(p1: Pairable, p2: Pairable): Double {
@@ -134,13 +163,14 @@ sealed class Solver(
         // It is fully applied if wbBalance(sP1) and wbBalance(sP2) are strictly of different signs
         // It is half applied if one of wbBalance is 0 and the other is >=2
         val potentialHd: Int = pairing.handicap.handicap(p1, p2)
-        if (potentialHd == 0) {
+        val score = if (potentialHd == 0) {
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
-            if (wb1 * wb2 < 0) return colorBalanceWeight
-            else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) return colorBalanceWeight / 2
-        }
-        return 0.0
+            if (wb1 * wb2 < 0) colorBalanceWeight
+            else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
+        } else 0.0
+        logWeights("color", p1, p2, score)
+        return score
     }
 
     // Main criteria
@@ -170,6 +200,7 @@ sealed class Solver(
         val k: Double = pairing.base.nx1
         score = scoreWeight * (1.0 - x) * (1.0 + k * x)
 
+        logWeights("score", p1, p2, score)
         return score
     }
 
@@ -207,6 +238,7 @@ sealed class Solver(
                 }
             }
         }
+        logWeights("seed", p1, p2, score)
         return score
     }
 
