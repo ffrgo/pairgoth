@@ -7,7 +7,7 @@ import org.junit.jupiter.api.MethodOrderer.MethodName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
-import java.io.*
+import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -208,17 +208,20 @@ class BasicTests: TestBase() {
 
     @Test
     fun `008 simple swiss tournament`() {
-        var resp = TestAPI.post("/api/tour", aSimpleSwissTournament).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        aTournamentID = resp.getInt("id")
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", aPlayer).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
+        var file = getTestFile("opengotha/simpleswiss.xml")
+        println(file)
 
-        val inputStream: InputStream = getTestFile("aSimpleSwiss/PlayersList.json").inputStream()
-
-        val inputString = inputStream.bufferedReader().use { it.readText() }
-        println(inputString)
-
+        val resource = file.readText(StandardCharsets.UTF_8)
+        val resp = TestAPI.post("/api/tour", resource)
+        val id = resp.asObject().getInt("id")
+        val tournament = TestAPI.get("/api/tour/$id").asObject()
+        logger.info(tournament.toString().slice(0..50) + "...")
+        val players = TestAPI.get("/api/tour/$id/part").asArray()
+        logger.info(players.toString().slice(0..50) + "...")
+        for (round in 1..tournament.getInt("rounds")!!) {
+            val games = TestAPI.get("/api/tour/$id/res/1").asArray()
+            logger.info("games for round $round: {}", games.toString())
+        }
 
     }
 }
