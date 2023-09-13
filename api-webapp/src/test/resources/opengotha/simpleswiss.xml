@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Tournament externalIPAddress="223.62.204.120" fullVersionNumber="3.5203" privateTournament="false" remoteUUID="8ee581b3-6f38-4b98-a655-ce43e5c3158d" runningMode="SAL" saveDT="20230910070840">
+<Tournament externalIPAddress="223.62.204.120" fullVersionNumber="3.52.03" privateTournament="false" remoteUUID="8ee581b3-6f38-4b98-a655-ce43e5c3158d" runningMode="SAL" saveDT="20230910070840">
     <Players>
         <Player agaExpirationDate="" agaId="" club="84Av" country="FR" egfPin="" ffgLicence="0120001" ffgLicenceStatus="L" firstName="Bernard" grade="3K" name="Mignucci" participating="11111111111111111111" rank="3K" rating="1820" ratingOrigin="FFG : -230" registeringStatus="FIN" smmsCorrection="0" userName=""/>
         <Player agaExpirationDate="" agaId="" club="69Ly" country="FR" egfPin="" ffgLicence="8414002" ffgLicenceStatus="L" firstName="Jean-Christophe" grade="3K" name="Honoré" participating="11111111111111111111" rank="3K" rating="1796" ratingOrigin="FFG : -254" registeringStatus="FIN" smmsCorrection="0" userName=""/>

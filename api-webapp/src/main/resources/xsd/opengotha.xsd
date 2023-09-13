@@ -218,7 +218,7 @@
     </xs:sequence>
     <xs:attribute type="xs:int" name="dataVersion"/>
     <xs:attribute type="xs:string" name="externalIPAddress"/>
-    <xs:attribute type="xs:float" name="fullVersionNumber"/>
+    <xs:attribute type="xs:string" name="fullVersionNumber"/>
     <xs:attribute type="xs:string" name="runningMode"/>
     <xs:attribute type="xs:long" name="saveDT"/>
   </xs:complexType>
