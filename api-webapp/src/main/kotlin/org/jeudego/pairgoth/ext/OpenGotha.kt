@@ -9,9 +9,7 @@ import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.Store
 import org.w3c.dom.Element
 import java.util.*
-import javax.xml.XMLConstants
 import javax.xml.datatype.XMLGregorianCalendar
-import javax.xml.validation.SchemaFactory
 
 private const val MILLISECONDS_PER_DAY = 86400000
 fun XMLGregorianCalendar.toLocalDate() = LocalDate.fromEpochDays((toGregorianCalendar().time.time / MILLISECONDS_PER_DAY).toInt())
@@ -21,14 +19,14 @@ object OpenGotha {
 
         val context = JAXBContext.newInstance(ObjectFactory::class.java)
         val parsed = context.createUnmarshaller().unmarshal(element) as JAXBElement<TournamentType>
-        val ogt = parsed.value
+        val ogTournament = parsed.value
 
         // import tournament parameters
 
-        val genParams = ogt.tournamentParameterSet.generalParameterSet
-        val handParams = ogt.tournamentParameterSet.handicapParameterSet
-        val placmtParams = ogt.tournamentParameterSet.placementParameterSet
-        val pairParams = ogt.tournamentParameterSet.pairingParameterSet
+        val genParams = ogTournament.tournamentParameterSet.generalParameterSet
+        val handParams = ogTournament.tournamentParameterSet.handicapParameterSet
+        val placmtParams = ogTournament.tournamentParameterSet.placementParameterSet
+        val pairParams = ogTournament.tournamentParameterSet.pairingParameterSet
 
         val tournament = StandardTournament(
             id = Store.nextTournamentId,
@@ -74,7 +72,7 @@ object OpenGotha {
 
         val canonicMap = mutableMapOf<String, Int>()
         // import players
-        ogt.players.player.map { player ->
+        ogTournament.players.player.map { player ->
             Player(
                 id = Store.nextPlayerId,
                 name = player.name,
@@ -87,10 +85,10 @@ object OpenGotha {
                 canonicMap.put("${player.name}${player.firstName}".uppercase(Locale.ENGLISH), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
-        val gamesPerRound = ogt.games.game.groupBy {
+        val gamesPerRound = ogTournament.games.game.groupBy {
             it.roundNumber
-        }.values.map {
-            it.map { game ->
+        }.entries.sortedBy { it.key }.map {
+            it.value.map { game ->
                 Game(
                     id = Store.nextGameId,
                     black = canonicMap[game.blackPlayer] ?: throw Error("player not found: ${game.blackPlayer}"),
