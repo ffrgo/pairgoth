@@ -36,7 +36,8 @@ fun Game.toJson() = Json.Object(
     "w" to white,
     "b" to black,
     "h" to handicap,
-    "r" to "${result.symbol}"
+    "r" to "${result.symbol}",
+    "dd" to drawnUpDown
 )
 
 fun Game.Companion.fromJson(json: Json.Object) = Game(
@@ -44,5 +45,6 @@ fun Game.Companion.fromJson(json: Json.Object) = Game(
     white = json.getID("white") ?: throw Error("missing white player"),
     black = json.getID("black") ?: throw Error("missing black player"),
     handicap = json.getInt("handicap") ?: 0,
-    result = json.getChar("result")?.let { Game.Result.fromSymbol(it) } ?: UNKNOWN
+    result = json.getChar("result")?.let { Game.Result.fromSymbol(it) } ?: UNKNOWN,
+    drawnUpDown = json.getInt("drawnUpDown") ?: 0
 )
