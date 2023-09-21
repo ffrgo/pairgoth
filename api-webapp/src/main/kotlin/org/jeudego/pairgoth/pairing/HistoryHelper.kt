@@ -22,6 +22,8 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
     open fun nbW(p: Pairable) = wins[p.id]
 
+    fun drawnUpDown(p: Pairable) = drawnUpDown[p.id]
+
     protected val paired: Set<Pair<ID, ID>> by lazy {
         (history.flatten().map { game ->
             Pair(game.black, game.white)
@@ -135,6 +137,24 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
                 .toMap()
         }
     }
+
+    // drawn up down: map ID -> Pair(sum of drawn up, sum of drawn down)
+    val drawnUpDown by lazy {
+        (history.flatten().map { game ->
+            Pair(game.white, Pair(
+                Math.max(0, game.drawnUpDown),
+                Math.max(0, -game.drawnUpDown)
+            ))
+        } + history.flatten().map { game ->
+            Pair(game.black, Pair(
+                Math.max(0, -game.drawnUpDown),
+                Math.max(0, game.drawnUpDown)
+            ))
+        }).groupingBy { it.first }.fold(Pair(0, 0)) { acc, next ->
+            Pair(acc.first + next.second.first, acc.second + next.second.second)
+        }
+    }
+
 }
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores

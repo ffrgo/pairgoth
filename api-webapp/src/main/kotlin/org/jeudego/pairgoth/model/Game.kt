@@ -9,7 +9,8 @@ data class Game(
     var white: ID,
     var black: ID,
     var handicap: Int = 0,
-    var result: Result = UNKNOWN
+    var result: Result = UNKNOWN,
+    var drawnUpDown: Int = 0 // counted for white (black gets the opposite)
 ) {
     companion object {}
     enum class Result(val symbol: Char) {
@@ -26,11 +27,6 @@ data class Game(
             fun fromSymbol(c: Char) = byChar[c] ?: throw Error("unknown result symbol: $c")
         }
     }
-    // pairing needs to know if there has been a draw-up or a draw-down
-    internal var blackDrawnUp = false
-    internal var blackDrawnDown = false
-    internal var whiteDrawnUp = false
-    internal var whiteDrawnDown = false
 }
 
 // serialization
