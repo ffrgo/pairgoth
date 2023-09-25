@@ -152,8 +152,8 @@ class BasicTests: TestBase() {
         var games = TestAPI.post("/api/tour/$aTournamentID/pair/1", Json.Array("all")).asArray()
         aTournamentGameID = (games[0] as Json.Object).getInt("id")
         val possibleResults = setOf(
-            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"?"}]""",
-            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"?"}]"""
+            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"?","dd":0}]""",
+            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"?","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "pairing differs")
         games = TestAPI.get("/api/tour/$aTournamentID/res/1").asArray()
@@ -168,8 +168,8 @@ class BasicTests: TestBase() {
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val games = TestAPI.get("/api/tour/$aTournamentID/res/1")
         val possibleResults = setOf(
-            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"b"}]""",
-            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"b"}]"""
+            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"b","dd":0}]""",
+            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"b","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "results differ")
     }
