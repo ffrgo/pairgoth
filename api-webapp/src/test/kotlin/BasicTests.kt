@@ -208,20 +208,52 @@ class BasicTests: TestBase() {
 
     @Test
     fun `008 simple swiss tournament`() {
-        var file = getTestFile("opengotha/simpleswiss.xml")
-        println(file)
 
+        // read tournament without pairings
+        var file_np = getTestFile("opengotha/simpleswiss_nopairings.xml")
+        logger.info("read from file $file_np")
+        val resource_np = file_np.readText(StandardCharsets.UTF_8)
+        val resp_np = TestAPI.post("/api/tour", resource_np)
+        val id_np = resp_np.asObject().getInt("id")
+        assertNotNull(id_np)
+        val tournament_np = TestAPI.get("/api/tour/$id_np").asObject()
+        logger.info(tournament_np.toString().slice(0..50) + "...")
+        val players_np = TestAPI.get("/api/tour/$id_np/part").asArray()
+        logger.info(players_np.toString().slice(0..50) + "...")
+        var games_np = TestAPI.post("/api/tour/$id_np/pair/1", Json.Array("all")).asArray()
+        logger.info("games for round 1: {}", games_np.toString())
+
+        val pairings_R1 = """[{"id":283,"w":195,"b":201,"h":0,"r":"?","dd":0},
+            |{"id":284,"w":186,"b":184,"h":0,"r":"?","dd":0},{"id":285,"w":200,"b":194,"h":0,"r":"?","dd":0},
+            |{"id":286,"w":179,"b":187,"h":0,"r":"?","dd":0},{"id":287,"w":203,"b":178,"h":0,"r":"?","dd":0},
+            |{"id":288,"w":183,"b":174,"h":0,"r":"?","dd":0},{"id":289,"w":177,"b":176,"h":0,"r":"?","dd":0},
+            |{"id":290,"w":199,"b":182,"h":0,"r":"?","dd":0},{"id":291,"w":185,"b":180,"h":0,"r":"?","dd":0},
+            |{"id":292,"w":172,"b":202,"h":0,"r":"?","dd":0},{"id":293,"w":173,"b":175,"h":0,"r":"?","dd":0},
+            |{"id":294,"w":196,"b":191,"h":0,"r":"?","dd":0},{"id":295,"w":181,"b":190,"h":0,"r":"?","dd":0},
+            |{"id":296,"w":192,"b":188,"h":0,"r":"?","dd":0},{"id":297,"w":197,"b":193,"h":0,"r":"?","dd":0},
+            |{"id":298,"w":198,"b":189,"h":0,"r":"?","dd":0}]""".trimMargin()
+
+        // val games = TestAPI.get("/api/tour/$id/res/1").asArray()
+        assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
+
+/*        // read tournament with pairing
+        var file = getTestFile("opengotha/simpleswiss.xml")
+        logger.info("read from file $file")
         val resource = file.readText(StandardCharsets.UTF_8)
         val resp = TestAPI.post("/api/tour", resource)
         val id = resp.asObject().getInt("id")
         val tournament = TestAPI.get("/api/tour/$id").asObject()
         logger.info(tournament.toString().slice(0..50) + "...")
         val players = TestAPI.get("/api/tour/$id/part").asArray()
-        logger.info(players.toString().slice(0..50) + "...")
+        //logger.info(players.toString().slice(0..50) + "...")
+        logger.info(players.toString())
+
         for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/1").asArray()
+            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
             logger.info("games for round $round: {}", games.toString())
-        }
+            val players = TestAPI.get("/api/tour/$id/part").asArray()
+            //logger.info(players.toString().slice(0..500) + "...")
+        }*/
 
     }
 }
