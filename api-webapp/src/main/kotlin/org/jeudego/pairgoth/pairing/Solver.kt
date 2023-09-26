@@ -89,6 +89,22 @@ sealed class Solver(
         pairing.secondary.apply(p1, p2) +
         pairing.geo.apply(p1, p2)
 
+
+    fun weightsToFile(p1: Pairable, p2: Pairable) {
+            val pos1: Int = logSortedPairablesMap[p1]!!
+            val pos2: Int = logSortedPairablesMap[p2]!!
+            //println("Player1Name="+p1.nameSeed())
+            //println("Player2Name="+p2.nameSeed())
+            //println("total: "+weightLogs["total"]!![pos1][pos2])
+            //println("total: "+weightLogs["total"]!![pos1][pos2])
+            // println(DEBUG_EXPORT_WEIGHT)
+            //println(weightLogs["tot"]!![pos1][pos2])
+            //println(p1)
+            //println(p2)
+            //println(weight)
+
+    }
+
     // The main criterion that will be used to define the groups should be defined by subclasses
     val Pairable.main: Double get() = scores[id] ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
@@ -104,6 +120,20 @@ sealed class Solver(
                 val q = pairables[j]
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
+                if (DEBUG_EXPORT_WEIGHT)
+                {
+                    println("Player1Name="+p.nameSeed())
+                    println("Player2Name="+q.nameSeed())
+                    println("BaseCost="+pairing.base.apply(p, q).toString())
+                    println("MainCost="+pairing.main.apply(p, q).toString())
+                    println("SecoCost="+pairing.secondary.apply(p, q).toString())
+                    println("Geo_Cost="+pairing.geo.apply(p, q).toString())
+                    println("Sum_Cost="+weight(p,q).toString())
+                    //println(weight(q,p))
+                    logWeights("total", p, q, weight(p,q))
+                    //weightsToFile(p, q)
+                    //println("total weight="+weight(p, q))
+                }
             }
         }
         val graph = builder.build()
@@ -125,6 +155,7 @@ sealed class Solver(
             val pos1: Int = logSortedPairablesMap[p1]!!
             val pos2: Int = logSortedPairablesMap[p2]!!
             weightLogs[weightName]!![pos1][pos2] = weight
+
         }
     }
 

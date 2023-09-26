@@ -70,7 +70,7 @@ class Player(
         if (skip.isNotEmpty()) it["skip"] = Json.Array(skip)
     }
     override fun nameSeed(): String {
-        return name + firstname
+        return name + " " + firstname
     }
 }
 
