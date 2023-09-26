@@ -227,9 +227,11 @@ sealed class Solver(
         var score = 0.0
         val scoreRange: Int = groupsCount
         // TODO check category equality if category are used in SwissCat
-        val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
-        val k: Double = pairing.base.nx1
-        score = scoreWeight * (1.0 - x) * (1.0 + k * x)
+        if (scoreRange!=0){
+            val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
+            val k: Double = pairing.base.nx1
+            score = scoreWeight * (1.0 - x) * (1.0 + k * x)
+        }
 
         logWeights("score", p1, p2, score)
         return score
@@ -304,6 +306,7 @@ sealed class Solver(
         } else {
             0.0
         }
+        //println("countryRatio="+countryRatio.toString())
 
         // Same club and club group (TODO club group)
         var clubRatio = 0.0
@@ -334,13 +337,15 @@ sealed class Solver(
         val secPart = min(countryRatio, clubRatio)
 
         var geoRatio = mainPart + secPart / 2.0
-        if (geoRatio > 0.0) {
+
+        if (geoRatio > 0.0 && placementScoreRange != 0) {
             geoRatio += 0.5 / placementScoreRange.toDouble()
         }
 
         // The concavity function is applied to geoRatio to get geoCost
         val dbGeoCost: Double = geoMaxCost.toDouble() * (1.0 - geoRatio) * (1.0 + pairing.base.nx1 * geoRatio)
         var score = pairing.main.scoreWeight - dbGeoCost
+
         score = min(score, geoMaxCost)
 
         return score
