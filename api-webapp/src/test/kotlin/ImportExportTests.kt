@@ -7,7 +7,7 @@ class ImportExportTests: TestBase() {
 
     @Test
     fun `001 test imports`() {
-        getTestResources("opengotha").forEach { file ->
+        getTestResources("opengotha/tournamentfiles/").forEach { file ->
             logger.info("reading resource ${file.canonicalPath}")
             val resource = file.readText(StandardCharsets.UTF_8)
             val resp = TestAPI.post("/api/tour", resource)

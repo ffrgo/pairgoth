@@ -210,7 +210,7 @@ class BasicTests: TestBase() {
     fun `008 simple swiss tournament`() {
 
         // read tournament without pairings
-        var file_np = getTestFile("opengotha/simpleswiss_nopairings.xml")
+        var file_np = getTestFile("opengotha/tournamentfiles/simpleswiss_nopairings.xml")
         logger.info("read from file $file_np")
         val resource_np = file_np.readText(StandardCharsets.UTF_8)
         val resp_np = TestAPI.post("/api/tour", resource_np)
