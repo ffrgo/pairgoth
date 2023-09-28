@@ -9,6 +9,7 @@ import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
+import java.io.File
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -114,6 +115,12 @@ sealed class Solver(
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
+        var WEIGHTS_FILE = "src/test/resources/weights.txt"
+        if (DEBUG_EXPORT_WEIGHT){
+            if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
+            else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
+            File(WEIGHTS_FILE).appendText("Costs\n")
+        }
         for (i in sortedPairables.indices) {
             for (j in i + 1 until pairables.size) {
                 val p = pairables[i]
@@ -122,13 +129,18 @@ sealed class Solver(
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
                 if (DEBUG_EXPORT_WEIGHT)
                 {
-                    println("Player1Name="+p.nameSeed())
-                    println("Player2Name="+q.nameSeed())
-                    println("BaseCost="+pairing.base.apply(p, q).toString())
-                    println("MainCost="+pairing.main.apply(p, q).toString())
-                    println("SecoCost="+pairing.secondary.apply(p, q).toString())
-                    println("Geo_Cost="+pairing.geo.apply(p, q).toString())
-                    println("Sum_Cost="+weight(p,q).toString())
+                    File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
+                    File(WEIGHTS_FILE).appendText("Player2Name="+q.nameSeed()+"\n")
+                    File(WEIGHTS_FILE).appendText("baseDuplicateGameCost="+pairing.base.avoidDuplicatingGames(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("baseRandomCost="+pairing.base.applyRandom(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("baseBWBalanceCost="+pairing.base.applyColorBalance(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("mainCategoryCost="+pairing.main.avoidMixingCategory(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("mainScoreDiffCost="+pairing.main.minimizeScoreDifference(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("mainDUDDCost="+pairing.main.applyDUDD(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("mainSeedCost="+pairing.main.applySeeding(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("secHandiCost="+pairing.handicap.handicap(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("secGeoCost="+pairing.geo.apply(p, q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("totalCost="+weight(p,q).toString()+"\n")
                     //println(weight(q,p))
                     logWeights("total", p, q, weight(p,q))
                     //weightsToFile(p, q)
@@ -209,16 +221,24 @@ sealed class Solver(
         var score = 0.0
 
         // Main criterion 1 avoid mixing category is moved to Swiss with category
-        // TODO
+        score += avoidMixingCategory(p1, p2)
 
         // Main criterion 2 minimize score difference
         score += minimizeScoreDifference(p1, p2)
 
         // Main criterion 3 If different groups, make a directed Draw-up/Draw-down
-        // TODO
+        score += applyDUDD(p1, p2)
 
         // Main criterion 4 seeding
         score += applySeeding(p1, p2)
+
+        return score
+    }
+
+    open fun MainCritParams.avoidMixingCategory(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
+
+        // TODO check category equality if category are used in SwissCat
 
         return score
     }
@@ -234,6 +254,14 @@ sealed class Solver(
         }
 
         logWeights("score", p1, p2, score)
+        return score
+    }
+
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
+
+        // TODO apply Drawn-Up/Drawn-Down if needed
+
         return score
     }
 
