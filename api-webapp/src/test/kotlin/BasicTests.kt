@@ -256,4 +256,62 @@ class BasicTests: TestBase() {
         }*/
 
     }
+
+    @Test
+    fun `009 compare weigths`() {
+
+        // Maps to store name pairs and costs
+        val map1 = HashMap<Pair<String, String>, List<Double>>()
+        val map2 = HashMap<Pair<String, String>, List<Double>>()
+
+        for (file in listOf("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt")) {
+
+            // Read lines
+            val lines = getTestFile(file).readLines()
+
+            // Store headers
+            val header1 = lines[0]
+            val header2 = lines[1]
+
+            logger.info(file)
+            logger.info(header1.toString())
+            logger.info(header2.toString())
+
+            // Loop through sections
+            for (i in 2..lines.size-1 step 12) {
+                logger.info(i.toString())
+                
+                // Get name pair
+                val name1 = lines[i].split("=")[1]
+                val name2 = lines[i+1].split("=")[1]
+
+                // Nested loop over costs
+                val costs = mutableListOf<Double>()
+                for (j in i + 2..i + 11) {
+                    val parts = lines[j].split("=")
+                    costs.add(parts[1].toDouble())
+                }
+
+                if (i==2){
+                    logger.info(name1)
+                    logger.info(name2)
+                    logger.info(costs.toString())
+                }
+
+                // Add to map
+                if (file == "weights.txt") {
+                    map1[Pair(name1, name2)] = costs
+                } else {
+                    map2[Pair(name1, name2)] = costs
+                }
+
+            }
+
+        }
+
+        println(map1)
+        println(map1==map2)
+
+    }
+
 }
