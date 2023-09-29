@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.web
 
 import com.republicate.mailer.SmtpLoop
 import org.apache.commons.lang3.tuple.Pair
+import org.jeudego.pairgoth.util.Translator
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.lang.IllegalAccessError
@@ -51,7 +52,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
         context = sce.servletContext
-        logger.info("---------- Starting Pairgoth Web Client ----------")
+        logger.info("---------- Starting $WEBAPP_NAME ----------")
         context.setAttribute("manager", this)
         webappRoot = context.getRealPath("/")
         try {
@@ -78,11 +79,15 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     }
 
     override fun contextDestroyed(sce: ServletContextEvent) {
-        logger.info("---------- Stopping Web Application ----------")
+        logger.info("---------- Stopping $WEBAPP_NAME ----------")
+
+        Translator.notifyExiting()
 
         val context = sce.servletContext
         for (service in webServices.keys) stopService(service, true)
         // ??? DriverManager.deregisterDriver(com.mysql.cj.jdbc.Driver ...);
+
+        logger.info("---------- Stopped $WEBAPP_NAME ----------")
     }
 
     /* ServletContextAttributeListener interface */
@@ -95,6 +100,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun sessionDestroyed(se: HttpSessionEvent) {}
 
     companion object {
+        const val WEBAPP_NAME = "Pairgoth Web Client"
         const val PAIRGOTH_PROPERTIES_PREFIX = "pairgoth."
         lateinit var webappRoot: String
         lateinit var context: ServletContext

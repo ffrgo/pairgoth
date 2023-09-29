@@ -1,0 +1,84 @@
+<form class="tournament-form" class="ui form">
+  <div class="ui infos tab segment">
+    <div class="field">
+      <label>Tournament name</label>
+      <input type="text" name="name" required placeholder="Tournament name"/>
+    </div>
+    <div class="field">
+      <label>Tournament short name</label>
+      <input type="text" name="shortname" required placeholder="short_name"/>
+    </div>
+    <div class="field">
+      <label>Tournament dates</label>
+      <span class="date-range">from <input type="text" name="start" required class="date" placeholder="start date"/> to <input type="text" name="end" required class="date" placeholder="end date"/></span>
+    </div>
+    <div class="field">
+      <label>Number of rounds</label>
+      <span><input type="number" name="rounds" required min="1"/> rounds</span>
+    </div>
+  </div>
+  <div class="ui type tab segment">
+    <div class="grouped unstackable fields">
+      <label>Tournament type</label>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="standard" required/>
+            Standard tournament of individual players
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="partners" required/>
+            <span>Partner teams tournament of <input type="number" min="2" name="partners"/> players</span> (pairgo / rengo)
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="type" value="teams" required/>
+            <span>Teams tournament of <input type="number" min="2" name="partners"/> players</span> (teams of individual players)
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="ui pairing tab segment">
+    <div class="grouped unstackable fields">
+      <label>Tournament pairing</label>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="pairing" value="macmahon" required/>
+            MacMahon
+          </label>
+        </div>
+      </div>
+      <div class="field">
+        <div class="ui radio">
+          <label>
+            <input type="radio" name="pairing" value="swiss" required/>
+            Swiss
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+<script type="text/javascript">
+  onLoad(() => {
+    $('#tournament-form').on('input', e => {
+
+    })
+  });
+</script>
+
+
+CB TODO :
+s'il y a duplication du formulaire (pour nouveau/édition), il faut changer les ids en class, gérer les pbs d'init du date-range, etc.
+sinon, il faut paramétrer la dialog (mais les steps 1/2/3 deviennent des tabs, etc.)
+
+Donc dans tous les cas il y a qqc à faire !

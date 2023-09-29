@@ -12,3 +12,61 @@
   </button>
 </div>
 #end
+
+##
+## New Tournament dialog
+##
+
+<div id="new-tournament" class="ui fullscreen modal">
+  <i class="close icon"></i>
+  <div class="horz flex header">
+    <span>New tournament</span>
+    <div class="ui ordered unstackable steps">
+      <div class="active step">
+        <div class="content">
+          <div class="title">Infos</div>
+          <div class="description">name, place and date</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="content">
+          <div class="title">Type</div>
+          <div class="description">teams or players, rounds</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="content">
+          <div class="title">Pairing</div>
+          <div class="description">pairing system</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scrolling content">
+#translate('tournament-form.inc.html')
+  </div>
+  <div class="actions">
+    <button class="ui cancel black floating button">Cancel</button>
+    <button class="ui next green right labeled icon floating button">
+      <i class="checkmark icon"></i>
+      Next
+    </button>
+  </div></div>
+<script type="text/javascript">
+  const lang = '${request.lang}';
+  // #[[
+  onLoad(() => {
+    $('#new').on('click', e => {
+      $('#new-tournament').modal(true);
+    });
+    new DateRangePicker($('#date-range')[0], {
+      language: lang
+    });
+    $('#new-tournament .tab.segment:first-child').addClass('active');
+  });
+  // ]]#
+</script>
+<!-- date range picker -->
+<script type="text/javascript" src="/lib/datepicker-1.3.3/datepicker-full.min.js"></script>
+<script type="text/javascript" src="/lib/datepicker-1.3.3/locales/${request.lang}.js"></script>
+<link rel="stylesheet" href="/lib/datepicker-1.3.3/datepicker.min.css">

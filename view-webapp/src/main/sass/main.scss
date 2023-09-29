@@ -1,10 +1,10 @@
-@import "/lib/fomantic-ui-2.8.7/semantic.css" layer(semantic);
+@import "/lib/fomantic-ui-2.9.2/semantic.min.css" layer(semantic);
 
 @layer pairgoth {
   
   /* general styles */
   body {
-    font-size: clamp(12px, .8rem + .25vw, 20px);
+    font-size: clamp(14px, 1rem + 1vw, 24px);
     width: 100vw;
     height: 100vh;
     margin: 0;
@@ -30,6 +30,7 @@
     height: 3em;
     width: 100%;
     position: relative;
+    align-items: flex-start;
     justify-content: space-between;
     #logo {
       height: 100%;
@@ -41,13 +42,15 @@
   }
 
   #center {
-    max-width: clamp(800px, 80vw, 100vw);
     flex: 1;
     overflow: auto;
     #inner {
+      max-width: clamp(800px, 80vw, 100vw);
       display: flex;
       flex-flow: column nowrap;
       align-items: center;
+      margin-left: auto;
+      margin-right: auto;
     }
   }
 
@@ -63,13 +66,53 @@
     padding: 0.5em;
   }
 
-  /* buttons */
-  
-  button {
-    font-size: inherit;
+  /* modal and dimmer */
+
+  #dimmer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: black;
+    opacity: 0;
+    transition: opacity 0.5s;
+    z-index: 1000;
+    pointer-events: none;
   }
 
-  button.floating {
+  body.dimmed #dimmer {
+    display: block;
+    opacity: 0.85;
+    pointer-events: all;
+  }
+  .ui.modal {
+    display: block;
+    opacity: 0;
+    transition: opacity 0.5s;
+    pointer-events: none;
+  }
+
+  .ui.modal .header {
+    font-size: 1em;
+    align-items: baseline;
+    justify-content: space-around;
+    flex-wrap: wrap;
+  }
+
+  .active.ui.modal {
+    font-size: 1em;
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* buttons */
+  
+  .button {
+    font-size: 1em;
+  }
+
+  .button.floating {
     box-shadow: 0px 8px 8px -5px rgba(0,0,0,35%);
     transition: all 0.3s;
     &.white  {
@@ -88,13 +131,16 @@
   }
 
   /* languages */
+
   #lang {
     position: relative;
+    cursor: pointer;
+    transform: scale(1.2);
     #lang-list {
       position: absolute;
       display: none;
       top:100%;
-      left: -200%;
+      right: 1em;
       flex-flow: column nowrap;
       padding: 0.5em;
       gap: 0.5em;
@@ -106,12 +152,33 @@
       }
       a {
         display: inline-block;
+        white-space: nowrap;
         text-align: center;
         i {
           vertical-align: middle;
         }
       }
     }
+  }
+
+  /* UI fixes */
+
+  .ui.form, .ui.segment, .ui.form .field > label { font-size: 1em; }
+  span > input[type="radio"] { vertical-align: text-top; }
+  span > input[type="text"] { vertical-align: baseline; width: initial; }
+  span > input.date { vertical-align: baseline; width: 8em; }
+
+  .step, .step .title { font-size: 1em; }
+  .step:before { font-size: 1em; }
+  .step.description { font-size: 0.8em; }
+  .step:first-child { padding-left: 1em; }
+  .step:last-child { padding-right: 1em; }
+  .step .description { display: none; }
+
+  input[type="number"] {
+    padding: 0.2em 0.1em 0.2em 1em;
+    vertical-align: baseline;
+    width: 3.5em;
   }
 
 }
