@@ -237,7 +237,7 @@ class BasicTests: TestBase() {
                 }
 
                 // Add to map
-                if (file == "weights.txt") {
+                if (file == file1) {
                     map1[Pair(name1, name2)] = costs
                 } else {
                     map2[Pair(name1, name2)] = costs
@@ -245,6 +245,29 @@ class BasicTests: TestBase() {
 
             }
 
+        }
+
+
+        var diff_found = false
+        for ((key, value) in map1) {
+            // Check if key exists in both
+            if (map2.containsKey(key)) {
+                // Compare values
+                if (value != map2[key] && diff_found==false) {
+                    // Key exists but values differ - print key
+                    logger.info("Difference found at $key")
+                    logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
+                    logger.info("baseRandomCost        =   "+value!![1].toString()+"   "+map2[key]!![1].toString())
+                    logger.info("baseBWBalanceCost     =   "+value!![2].toString()+"   "+map2[key]!![2].toString())
+                    logger.info("mainCategoryCost      =   "+value!![3].toString()+"   "+map2[key]!![3].toString())
+                    logger.info("mainScoreDiffCost     =   "+value!![4].toString()+"   "+map2[key]!![4].toString())
+                    logger.info("mainDUDDCost          =   "+value!![5].toString()+"   "+map2[key]!![5].toString())
+                    logger.info("mainSeedCost          =   "+value!![6].toString()+"   "+map2[key]!![6].toString())
+                    logger.info("secHandiCost          =   "+value!![7].toString()+"   "+map2[key]!![7].toString())
+                    logger.info("secGeoCost            =   "+value!![8].toString()+"   "+map2[key]!![8].toString())
+                    diff_found = true
+                }
+            }
         }
 
         return map1==map2
@@ -268,9 +291,9 @@ class BasicTests: TestBase() {
         logger.info("games for round 1: {}", games_np.toString())
 
         logger.info("Compare weights with itself")
-        assertTrue(compare_weights("weights.txt", "weights.txt"), "expecting success")
+        assertTrue(compare_weights("weights.txt", "weights_clone.txt"), "Weights not equal to itselft")
         logger.info("Compare weights with opengotha")
-        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "expecting success")
+        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights")
 
         val pairings_R1 = """[{"id":283,"w":195,"b":201,"h":0,"r":"?","dd":0},
             |{"id":284,"w":186,"b":184,"h":0,"r":"?","dd":0},{"id":285,"w":200,"b":194,"h":0,"r":"?","dd":0},

@@ -84,7 +84,7 @@ sealed class Solver(
     }
 
     open fun weight(p1: Pairable, p2: Pairable) =
-        1.0 + // 1 is minimum value because 0 means "no matching allowed"
+        // 1.0 + // 1 is minimum value because 0 means "no matching allowed"
         pairing.base.apply(p1, p2) +
         pairing.main.apply(p1, p2) +
         pairing.secondary.apply(p1, p2) +
@@ -141,6 +141,7 @@ sealed class Solver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+pairing.handicap.handicap(p, q).toString()+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+pairing.geo.apply(p, q).toString()+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+weight(p,q).toString()+"\n")
+                    //%.2f".format(pi)
                     //println(weight(q,p))
                     logWeights("total", p, q, weight(p,q))
                     //weightsToFile(p, q)
