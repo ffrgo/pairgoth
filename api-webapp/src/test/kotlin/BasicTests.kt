@@ -211,6 +211,7 @@ class BasicTests: TestBase() {
         // Maps to store name pairs and costs
         val map1 = HashMap<Pair<String, String>, List<Double>>()
         val map2 = HashMap<Pair<String, String>, List<Double>>()
+        var count: Int = 1
 
         for (file in listOf(file1, file2)) {
 
@@ -237,16 +238,15 @@ class BasicTests: TestBase() {
                 }
 
                 // Add to map
-                if (file == file1) {
+                if (count == 1) {
                     map1[Pair(name1, name2)] = costs
                 } else {
                     map2[Pair(name1, name2)] = costs
                 }
-
             }
+            count += 1
 
         }
-
 
         var diff_found = false
         for ((key, value) in map1) {
@@ -291,7 +291,7 @@ class BasicTests: TestBase() {
         logger.info("games for round 1: {}", games_np.toString())
 
         logger.info("Compare weights with itself")
-        assertTrue(compare_weights("weights.txt", "weights_clone.txt"), "Weights not equal to itselft")
+        assertTrue(compare_weights("weights.txt", "weights.txt"), "Weights not equal to itselft")
         logger.info("Compare weights with opengotha")
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights")
 
