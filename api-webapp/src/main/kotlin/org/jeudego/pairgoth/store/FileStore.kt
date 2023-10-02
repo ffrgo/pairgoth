@@ -8,6 +8,7 @@ import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.getID
+import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
 import java.nio.file.Path
@@ -49,12 +50,7 @@ class FileStore(pathStr: String): StoreImplementation {
         val filename = tournament.filename()
         val file = path.resolve(filename).toFile()
         if (file.exists()) throw Error("File $filename already exists")
-        val json = Json.MutableObject(tournament.toJson())
-        json["players"] = Json.Array(tournament.players.values.map { it.toJson() })
-        if (tournament is TeamTournament) {
-            json["teams"] = Json.Array(tournament.teams.values.map { it.toJson() })
-        }
-        json["games"] = Json.Array((1..tournament.lastRound()).map { round -> tournament.games(round).values.map { it.toJson() } });
+        val json = tournament.toFullJson()
         file.printWriter().use { out ->
             out.println(json.toPrettyString())
         }

@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import org.jeudego.pairgoth.ext.OpenGotha
+import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.util.XmlUtils
 import org.junit.jupiter.api.Test
@@ -10,10 +11,9 @@ import kotlin.test.assertEquals
 class ImportExportTests: TestBase() {
 
     companion object {
-        val maskIdRegex = Regex("(?<=\"id\" ?: )\\d+")
+        val maskIdRegex = Regex("(?<=\"id\" ?: ?)\\d+")
     }
 
-    /*
     @Test
     fun `001 test imports`() {
         getTestResources("opengotha/tournamentfiles/").forEach { file ->
@@ -34,8 +34,6 @@ class ImportExportTests: TestBase() {
         }
     }
 
-     */
-
     @Test
     fun `002 test opengotha import export`() {
         // We import a tournament
@@ -44,10 +42,14 @@ class ImportExportTests: TestBase() {
             val resource = file.readText(StandardCharsets.UTF_8)
             val root_xml = XmlUtils.parse(resource)
             val tournament = OpenGotha.import(root_xml)
+            // version which also compares players and games (not ready, need to reset ids in store)
+            // val jsonTournament = tournament.toFullJson().toPrettyString()!!.replace(maskIdRegex, "0")
             val jsonTournament = tournament.toJson().toPrettyString()!!.replace(maskIdRegex, "0")
 
             val exported = OpenGotha.export(tournament)
             val tournament2 = OpenGotha.import(XmlUtils.parse(exported))
+            // version which also compares players and games (not ready, need to reset ids in store)
+            // val jsonTournament2 = tournament2.toFullJson().toPrettyString()!!.replace(maskIdRegex, "0")
             val jsonTournament2 = tournament2.toJson().toPrettyString()!!.replace(maskIdRegex, "0")
 
             assertEquals(jsonTournament, jsonTournament2)

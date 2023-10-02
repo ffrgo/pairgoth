@@ -203,3 +203,13 @@ fun Tournament<*>.toJson() = Json.Object(
     "rounds" to rounds,
     "pairing" to pairing.toJson()
 )
+
+fun Tournament<*>.toFullJson(): Json.Object {
+    val json = Json.MutableObject(toJson())
+    json["players"] = Json.Array(players.values.map { it.toJson() })
+    if (this is TeamTournament) {
+        json["teams"] = Json.Array(teams.values.map { it.toJson() })
+    }
+    json["games"] = Json.Array((1..lastRound()).mapTo(Json.MutableArray()) { round -> games(round).values.mapTo(Json.MutableArray()) { it.toJson() } });
+    return json
+}
