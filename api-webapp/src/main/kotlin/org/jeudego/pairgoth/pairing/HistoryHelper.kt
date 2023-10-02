@@ -32,7 +32,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         }).toSet()
     }
 
-    // Returns the number of games played as white
+    // Returns the number of games played as white minus the number of games played as black
     // Only count games without handicap
     private val colorBalance: Map<ID, Int> by lazy {
         history.flatten().filter { game ->
