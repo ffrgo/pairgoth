@@ -265,6 +265,7 @@ class BasicTests: TestBase() {
                     logger.info("mainSeedCost          =   "+value!![6].toString()+"   "+map2[key]!![6].toString())
                     logger.info("secHandiCost          =   "+value!![7].toString()+"   "+map2[key]!![7].toString())
                     logger.info("secGeoCost            =   "+value!![8].toString()+"   "+map2[key]!![8].toString())
+                    logger.info("totalCost             =   "+value!![9].toString()+"   "+map2[key]!![9].toString())
                     diff_found = true
                 }
             }
@@ -285,6 +286,7 @@ class BasicTests: TestBase() {
         assertNotNull(id_np)
         val tournament_np = TestAPI.get("/api/tour/$id_np").asObject()
         logger.info(tournament_np.toString().slice(0..50) + "...")
+        logger.info(tournament_np.toString())
         val players_np = TestAPI.get("/api/tour/$id_np/part").asArray()
         logger.info(players_np.toString().slice(0..50) + "...")
         var games_np = TestAPI.post("/api/tour/$id_np/pair/1", Json.Array("all")).asArray()

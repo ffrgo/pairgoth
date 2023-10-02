@@ -55,6 +55,10 @@ sealed class Solver(
     private val sortedPairables by lazy {
         pairables.sortedWith(::sort)
     }
+    // pairables sorted for pairing purposes
+    private val pairingSortedPairables by lazy {
+        pairables.sortedWith(::pairingSort)
+    }
     // Sorting for logging purpose
     private val logSortedPairablesMap by lazy {
         val logSortedPairables = pairables.sortedWith(::logSort)
@@ -75,6 +79,16 @@ sealed class Solver(
         }
         return 0
     }
+    open fun pairingSort(p: Pairable, q: Pairable): Int {
+        for (criterion in placement.criteria) {
+            val criterionP = p.eval(criterion)
+            val criterionQ = q.eval(criterion)
+            if (criterionP != criterionQ) {
+                return (criterionP * 100 - criterionQ * 100).toInt()
+            }
+        }
+        return (q.rating-p.rating)
+    }
     // Sorting function to order the weight matrix for debugging
     open fun logSort(p: Pairable, q: Pairable): Int {
         if (p.rating == q.rating) {
@@ -84,7 +98,7 @@ sealed class Solver(
     }
 
     open fun weight(p1: Pairable, p2: Pairable) =
-        // 1.0 + // 1 is minimum value because 0 means "no matching allowed"
+        1.0 + // 1 is minimum value because 0 means "no matching allowed"
         pairing.base.apply(p1, p2) +
         pairing.main.apply(p1, p2) +
         pairing.secondary.apply(p1, p2) +
@@ -120,8 +134,12 @@ sealed class Solver(
             if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
             else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
             File(WEIGHTS_FILE).appendText("Costs\n")
+            println("placement criteria" + placement.criteria.toString())
         }
-        for (i in sortedPairables.indices) {
+        for (i in pairingSortedPairables.indices) {
+            println(pairables[i].nameSeed())
+            println("rating = "+pairables[i].rating.toString())
+            println("clasmt = "+pairables[i].placeInGroup.toString())
             for (j in i + 1 until pairables.size) {
                 val p = pairables[i]
                 val q = pairables[j]
@@ -301,7 +319,7 @@ sealed class Solver(
             }
         }
         logWeights("seed", p1, p2, score)
-        return score
+        return Math.round(score).toDouble()
     }
 
     open fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
@@ -422,7 +440,7 @@ sealed class Solver(
     // place (among sorted pairables)
     val Pairable.place: Int get() = _place[id]!!
     private val _place by lazy {
-        sortedPairables.mapIndexed { index, pairable ->
+        pairingSortedPairables.mapIndexed { index, pairable ->
             Pair(pairable.id, index)
         }.toMap()
     }
@@ -431,7 +449,7 @@ sealed class Solver(
     private val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
     private val _placeInGroup by lazy {
         // group by group number
-        sortedPairables.groupBy {
+        pairingSortedPairables.groupBy {
             it.group
         // get a list { id { placeInGroup, groupSize } }
         }.values.flatMap { group ->
