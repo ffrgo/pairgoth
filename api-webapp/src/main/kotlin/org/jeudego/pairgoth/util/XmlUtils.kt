@@ -276,7 +276,7 @@ object XmlUtils {
      * @param xml xml string
      * @return The document object
      */
-    fun parse(xml: String): Element = parse(StringReader(xml))
+    fun parse(xml: String): Element = parse(StringReader(xml.trim()))
 
     /**
      * Search for nodes using an XPath expression

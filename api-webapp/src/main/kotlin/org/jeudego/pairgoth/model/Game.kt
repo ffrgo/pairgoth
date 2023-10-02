@@ -42,9 +42,9 @@ fun Game.toJson() = Json.Object(
 
 fun Game.Companion.fromJson(json: Json.Object) = Game(
     id = json.getID("id") ?: throw Error("missing game id"),
-    white = json.getID("white") ?: throw Error("missing white player"),
-    black = json.getID("black") ?: throw Error("missing black player"),
-    handicap = json.getInt("handicap") ?: 0,
-    result = json.getChar("result")?.let { Game.Result.fromSymbol(it) } ?: UNKNOWN,
-    drawnUpDown = json.getInt("drawnUpDown") ?: 0
+    white = json.getID("w") ?: throw Error("missing white player"),
+    black = json.getID("b") ?: throw Error("missing black player"),
+    handicap = json.getInt("h") ?: 0,
+    result = json.getChar("r")?.let { Game.Result.fromSymbol(it) } ?: UNKNOWN,
+    drawnUpDown = json.getInt("dd") ?: 0
 )

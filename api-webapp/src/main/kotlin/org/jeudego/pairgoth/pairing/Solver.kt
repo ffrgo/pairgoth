@@ -430,12 +430,15 @@ sealed class Solver(
     // placeInGroup (of same score) : Pair(place, groupSize)
     private val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
     private val _placeInGroup by lazy {
+        // group by group number
         sortedPairables.groupBy {
             it.group
+        // get a list { id { placeInGroup, groupSize } }
         }.values.flatMap { group ->
             group.mapIndexed { index, pairable ->
                 Pair(pairable.id, Pair(index, group.size))
             }
+        // get a map id -> { placeInGroup, groupSize }
         }.toMap()
     }
 
