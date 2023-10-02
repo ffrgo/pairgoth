@@ -146,7 +146,7 @@
         <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameClub"/>
         <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameCountry"/>
         <xs:attribute type="xs:string" name="paiSeRankThreshold"/>
-        <xs:attribute type="xs:float" name="paiStandardNX1Factor"/>
+        <xs:attribute type="xs:double" name="paiStandardNX1Factor"/>
       </xs:extension>
     </xs:simpleContent>
   </xs:complexType>

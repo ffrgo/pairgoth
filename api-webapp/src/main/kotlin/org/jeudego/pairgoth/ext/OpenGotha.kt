@@ -12,9 +12,28 @@ import java.util.*
 import javax.xml.datatype.XMLGregorianCalendar
 
 private const val MILLISECONDS_PER_DAY = 86400000
-fun XMLGregorianCalendar.toLocalDate() = LocalDate.fromEpochDays((toGregorianCalendar().time.time / MILLISECONDS_PER_DAY).toInt())
+fun XMLGregorianCalendar.toLocalDate() = LocalDate(year, month, day)
 
 object OpenGotha {
+
+    private fun parseDrawUpDownMode(str: String) = when (str) {
+        "BOT" -> MainCritParams.DrawUpDown.BOTTOM
+        "MID" -> MainCritParams.DrawUpDown.MIDDLE
+        "TOP" -> MainCritParams.DrawUpDown.TOP
+        else -> throw Error("Invalid drawUpDown mode: $str")
+    }
+
+    private fun parseSeedSystem(str: String) = when (str) {
+        "SPLITANDSLIP" -> MainCritParams.SeedMethod.SPLIT_AND_SLIP
+        "SPLITANDRANDOM" -> MainCritParams.SeedMethod.SPLIT_AND_RANDOM
+        "SPLITANDFOLD" -> MainCritParams.SeedMethod.SPLIT_AND_FOLD
+        else -> throw Error("Invalid seed system: $str")
+    }
+
+    private fun String.titlecase(locale: Locale = Locale.ROOT) = lowercase(locale).replaceFirstChar { it.titlecase(locale) }
+
+    private fun MainCritParams.SeedMethod.format() = toString().replace("_", "")
+
     fun import(element: Element): Tournament<*> {
 
         val context = JAXBContext.newInstance(ObjectFactory::class.java)
@@ -27,6 +46,57 @@ object OpenGotha {
         val handParams = ogTournament.tournamentParameterSet.handicapParameterSet
         val placmtParams = ogTournament.tournamentParameterSet.placementParameterSet
         val pairParams = ogTournament.tournamentParameterSet.pairingParameterSet
+
+        val pairgothPairingParams = PairingParams(
+            base = BaseCritParams(
+                nx1 = pairParams.paiStandardNX1Factor.toDouble(),
+                dupWeight = pairParams.paiBaAvoidDuplGame.toDouble(),
+                random = pairParams.paiBaRandom.toDouble(),
+                deterministic = pairParams.paiBaDeterministic.toBoolean(),
+                colorBalanceWeight = pairParams.paiBaBalanceWB.toDouble()
+            ),
+            main = MainCritParams(
+                categoriesWeight = pairParams.paiMaAvoidMixingCategories.toDouble(),
+                scoreWeight = pairParams.paiMaMinimizeScoreDifference.toDouble(),
+                drawUpDownWeight = pairParams.paiMaDUDDWeight.toDouble(),
+                compensateDrawUpDown = pairParams.paiMaCompensateDUDD.toBoolean(),
+                drawUpDownUpperMode = parseDrawUpDownMode(pairParams.paiMaDUDDUpperMode),
+                drawUpDownLowerMode = parseDrawUpDownMode(pairParams.paiMaDUDDLowerMode),
+                seedingWeight =  pairParams.paiMaMaximizeSeeding.toDouble(),
+                lastRoundForSeedSystem1 = pairParams.paiMaLastRoundForSeedSystem1,
+                seedSystem1 = parseSeedSystem(pairParams.paiMaSeedSystem1),
+                seedSystem2 = parseSeedSystem(pairParams.paiMaSeedSystem2 ?: "SPLITANDSLIP"),
+                additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
+                additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE"))
+            ),
+            secondary = SecondaryCritParams(
+                barThresholdActive = pairParams.paiSeBarThresholdActive.toBoolean(),
+                rankThreshold = Pairable.parseRank(pairParams.paiSeRankThreshold),
+                nbWinsThresholdActive = pairParams.paiSeNbWinsThresholdActive.toBoolean(),
+                defSecCrit = pairParams.paiSeDefSecCrit.toDouble()
+            ),
+            geo = GeographicalParams(
+                avoidSameGeo = pairParams.paiSeAvoidSameGeo.toDouble(),
+                preferMMSDiffRatherThanSameCountry = pairParams.paiSePreferMMSDiffRatherThanSameCountry,
+                preferMMSDiffRatherThanSameClubsGroup = 2,
+                preferMMSDiffRatherThanSameClub = pairParams.paiSePreferMMSDiffRatherThanSameClub
+            ),
+            handicap = HandicapParams(
+                weight = pairParams.paiSeMinimizeHandicap.toDouble(),
+                useMMS = handParams.hdBasedOnMMS.toBoolean(),
+                rankThreshold = Pairable.parseRank(pairParams.paiSeRankThreshold),
+                correction = handParams.hdCorrection,
+                ceiling = handParams.hdCeiling
+            )
+        )
+
+        val pairgothPlacementParams = PlacementParams(
+            crit = placmtParams.placementCriteria.placementCriterion.filter {
+                it.name != "NULL"
+            }.map {
+                Criterion.valueOf(it.name)
+            }.toTypedArray()
+        )
 
         val tournament = StandardTournament(
             id = Store.nextTournamentId,
@@ -46,26 +116,8 @@ object OpenGotha {
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
-                0 -> Swiss(
-                    pairingParams = PairingParams(
-
-                    ),
-                    placementParams = PlacementParams(
-                        crit = placmtParams.placementCriteria.placementCriterion.filter {
-                            it.name != "NULL"
-                        }.map {
-                            Criterion.valueOf(it.name)
-                        }.toTypedArray()
-                    )
-                ) // TODO
-                else -> MacMahon(
-                    pairingParams = PairingParams(
-
-                    ),
-                    placementParams = PlacementParams(
-
-                    )
-                ) // TODO
+                0 -> Swiss(pairingParams = pairgothPairingParams, placementParams = pairgothPlacementParams)
+                else -> MacMahon(pairingParams = pairgothPairingParams, placementParams = pairgothPlacementParams)
             },
             rounds = genParams.numberOfRounds
         )
@@ -123,7 +175,7 @@ object OpenGotha {
         // method 2 (quick and dirty) is to rely on templating:
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <Tournament dataVersion="201" externalIPAddress="88.122.144.219" fullVersionNumber="3.51" runningMode="SAL" saveDT="20210111180800">
+            <Tournament dataVersion="201" externalIPAddress="127.0.0.1" fullVersionNumber="3.51" runningMode="SAL" saveDT="20210111180800">
             <Players>
             ${tournament.pairables.values.map { player ->
                     player as Player
@@ -200,7 +252,7 @@ object OpenGotha {
             }
             </PlacementCriteria>
             </PlacementParameterSet>
-            <PairingParameterSet paiBaAvoidDuplGame="${tournament.pairing.pairingParams.base.dupWeight.toInt()}" paiBaBalanceWB="${tournament.pairing.pairingParams.base.colorBalanceWeight.toInt()}" paiBaDeterministic="${tournament.pairing.pairingParams.base.deterministic}" paiBaRandom="${tournament.pairing.pairingParams.base.random.toInt()}" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="Rating" paiMaAvoidMixingCategories="0" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="2" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="0" paiSePreferMMSDiffRatherThanSameCountry="0" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
+            <PairingParameterSet paiBaAvoidDuplGame="${tournament.pairing.pairingParams.base.dupWeight.toLong()}" paiBaBalanceWB="${tournament.pairing.pairingParams.base.colorBalanceWeight.toLong()}" paiBaDeterministic="${tournament.pairing.pairingParams.base.deterministic}" paiBaRandom="${tournament.pairing.pairingParams.base.random.toLong()}" paiMaAdditionalPlacementCritSystem1="${tournament.pairing.pairingParams.main.additionalPlacementCritSystem1.toString().titlecase()}" paiMaAdditionalPlacementCritSystem2="${tournament.pairing.pairingParams.main.additionalPlacementCritSystem2.toString().titlecase()}" paiMaAvoidMixingCategories="${tournament.pairing.pairingParams.main.categoriesWeight.toLong()}" paiMaCompensateDUDD="${tournament.pairing.pairingParams.main.compensateDrawUpDown}" paiMaDUDDLowerMode="${tournament.pairing.pairingParams.main.drawUpDownLowerMode.toString().substring(0, 3)}" paiMaDUDDUpperMode="${tournament.pairing.pairingParams.main.drawUpDownUpperMode.toString().substring(0, 3)}" paiMaDUDDWeight="${tournament.pairing.pairingParams.main.drawUpDownWeight.toLong()}" paiMaLastRoundForSeedSystem1="${tournament.pairing.pairingParams.main.lastRoundForSeedSystem1}" paiMaMaximizeSeeding="${tournament.pairing.pairingParams.main.seedingWeight.toLong()}" paiMaMinimizeScoreDifference="${tournament.pairing.pairingParams.main.scoreWeight.toLong()}" paiMaSeedSystem1="${tournament.pairing.pairingParams.main.seedSystem1.format()}" paiMaSeedSystem2="${tournament.pairing.pairingParams.main.seedSystem2.format()}" paiSeAvoidSameGeo="${tournament.pairing.pairingParams.geo.avoidSameGeo.toLong()}" paiSeBarThresholdActive="${tournament.pairing.pairingParams.secondary.barThresholdActive}" paiSeDefSecCrit="${tournament.pairing.pairingParams.secondary.defSecCrit.toLong()}" paiSeMinimizeHandicap="${tournament.pairing.pairingParams.handicap.weight.toLong()}" paiSeNbWinsThresholdActive="${tournament.pairing.pairingParams.secondary.nbWinsThresholdActive}" paiSePreferMMSDiffRatherThanSameClub="${tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameClub}" paiSePreferMMSDiffRatherThanSameCountry="${tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameCountry}" paiSeRankThreshold="${displayRank(tournament.pairing.pairingParams.secondary.rankThreshold).uppercase()}" paiStandardNX1Factor="${tournament.pairing.pairingParams.base.nx1}"/>
             <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
             <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
             </TournamentParameterSet>
