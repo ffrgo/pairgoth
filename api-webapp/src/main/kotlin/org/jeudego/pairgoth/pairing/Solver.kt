@@ -414,7 +414,7 @@ sealed class Solver(
     //private val standingScore by lazy { computeStandingScore() }
 
     // Decide each pairable group based on the main criterion
-    private val groupsCount get() = (mainLimits.second - mainLimits.first).toInt()
+    private val groupsCount get() = 1 + (mainLimits.second - mainLimits.first).toInt()
     private val _groups by lazy {
         pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
     }
