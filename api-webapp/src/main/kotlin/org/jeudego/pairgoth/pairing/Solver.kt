@@ -10,6 +10,7 @@ import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 import java.io.File
+import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -59,6 +60,10 @@ sealed class Solver(
     private val pairingSortedPairables by lazy {
         pairables.sortedWith(::pairingSort)
     }
+    // pairables sorted for pairing purposes
+    private val nameSortedPairables by lazy {
+        pairables.sortedWith(::nameSort)
+    }
     // Sorting for logging purpose
     private val logSortedPairablesMap by lazy {
         val logSortedPairables = pairables.sortedWith(::logSort)
@@ -87,7 +92,14 @@ sealed class Solver(
                 return (criterionP * 100 - criterionQ * 100).toInt()
             }
         }
-        return (q.rating-p.rating)
+        if (p.rating == q.rating) {
+            return if (p.name > q.name) 1 else -1
+        }
+        return q.rating - p.rating
+
+    }
+    open fun nameSort(p: Pairable, q: Pairable): Int {
+        return if (p.name > q.name) 1 else -1
     }
     // Sorting function to order the weight matrix for debugging
     open fun logSort(p: Pairable, q: Pairable): Int {
@@ -130,35 +142,36 @@ sealed class Solver(
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
         var WEIGHTS_FILE = "src/test/resources/weights.txt"
+        val dec = DecimalFormat("#.#")
         if (DEBUG_EXPORT_WEIGHT){
             if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
             else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
             File(WEIGHTS_FILE).appendText("Costs\n")
             println("placement criteria" + placement.criteria.toString())
         }
-        for (i in pairingSortedPairables.indices) {
-            println(pairables[i].nameSeed())
-            println("rating = "+pairables[i].rating.toString())
-            println("clasmt = "+pairables[i].placeInGroup.toString())
+        for (i in nameSortedPairables.indices) {
+            println(nameSortedPairables[i].nameSeed())
+            println("rating = "+nameSortedPairables[i].rating.toString())
+            println("clasmt = "+nameSortedPairables[i].placeInGroup.toString())
             for (j in i + 1 until pairables.size) {
-                val p = pairables[i]
-                val q = pairables[j]
+                val p = nameSortedPairables[i]
+                val q = nameSortedPairables[j]
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
                 if (DEBUG_EXPORT_WEIGHT)
                 {
                     File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
                     File(WEIGHTS_FILE).appendText("Player2Name="+q.nameSeed()+"\n")
-                    File(WEIGHTS_FILE).appendText("baseDuplicateGameCost="+pairing.base.avoidDuplicatingGames(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("baseRandomCost="+pairing.base.applyRandom(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("baseBWBalanceCost="+pairing.base.applyColorBalance(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("mainCategoryCost="+pairing.main.avoidMixingCategory(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("mainScoreDiffCost="+pairing.main.minimizeScoreDifference(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("mainDUDDCost="+pairing.main.applyDUDD(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("mainSeedCost="+pairing.main.applySeeding(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("secHandiCost="+pairing.handicap.handicap(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("secGeoCost="+pairing.geo.apply(p, q).toString()+"\n")
-                    File(WEIGHTS_FILE).appendText("totalCost="+weight(p,q).toString()+"\n")
+                    File(WEIGHTS_FILE).appendText("baseDuplicateGameCost="+dec.format(pairing.base.avoidDuplicatingGames(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("baseRandomCost="+dec.format(pairing.base.applyRandom(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("baseBWBalanceCost="+dec.format(pairing.base.applyColorBalance(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("mainCategoryCost="+dec.format(pairing.main.avoidMixingCategory(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("mainScoreDiffCost="+dec.format(pairing.main.minimizeScoreDifference(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("mainDUDDCost="+dec.format(pairing.main.applyDUDD(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("mainSeedCost="+dec.format(pairing.main.applySeeding(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
+                    File(WEIGHTS_FILE).appendText("totalCost="+dec.format(weight(p,q))+"\n")
                     //%.2f".format(pi)
                     //println(weight(q,p))
                     logWeights("total", p, q, weight(p,q))
