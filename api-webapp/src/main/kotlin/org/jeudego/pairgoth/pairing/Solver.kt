@@ -116,22 +116,6 @@ sealed class Solver(
         pairing.secondary.apply(p1, p2) +
         pairing.geo.apply(p1, p2)
 
-
-    fun weightsToFile(p1: Pairable, p2: Pairable) {
-            val pos1: Int = logSortedPairablesMap[p1]!!
-            val pos2: Int = logSortedPairablesMap[p2]!!
-            //println("Player1Name="+p1.nameSeed())
-            //println("Player2Name="+p2.nameSeed())
-            //println("total: "+weightLogs["total"]!![pos1][pos2])
-            //println("total: "+weightLogs["total"]!![pos1][pos2])
-            // println(DEBUG_EXPORT_WEIGHT)
-            //println(weightLogs["tot"]!![pos1][pos2])
-            //println(p1)
-            //println(p2)
-            //println(weight)
-
-    }
-
     // The main criterion that will be used to define the groups should be defined by subclasses
     val Pairable.main: Double get() = scores[id] ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
@@ -141,18 +125,19 @@ sealed class Solver(
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
-        var WEIGHTS_FILE = "src/test/resources/weights.txt"
+
+        val WEIGHTS_FILE = "src/test/resources/weights.txt"
         val dec = DecimalFormat("#.#")
+
         if (DEBUG_EXPORT_WEIGHT){
             if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
             else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
             File(WEIGHTS_FILE).appendText("Costs\n")
             println("placement criteria" + placement.criteria.toString())
         }
+
         for (i in nameSortedPairables.indices) {
-            println(nameSortedPairables[i].nameSeed())
-            println("rating = "+nameSortedPairables[i].rating.toString())
-            println("clasmt = "+nameSortedPairables[i].placeInGroup.toString())
+            println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
             for (j in i + 1 until pairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
@@ -172,16 +157,13 @@ sealed class Solver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(weight(p,q))+"\n")
-                    //%.2f".format(pi)
-                    //println(weight(q,p))
+
                     logWeights("total", p, q, weight(p,q))
-                    //weightsToFile(p, q)
-                    //println("total weight="+weight(p, q))
                 }
             }
         }
         val graph = builder.build()
-        val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MINIMIZE)
+        val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MAXIMIZE)
         val solution = matching.matching
 
         val result = solution.flatMap {
