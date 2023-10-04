@@ -277,6 +277,25 @@ class BasicTests: TestBase() {
     @Test
     fun `008 simple swiss tournament`() {
 
+/*        // read tournament with pairing
+        var file = getTestFile("opengotha/tournamentfiles/simpleswiss.xml")
+        logger.info("read from file $file")
+        val resource = file.readText(StandardCharsets.UTF_8)
+        val resp = TestAPI.post("/api/tour", resource)
+        val id = resp.asObject().getInt("id")
+        val tournament = TestAPI.get("/api/tour/$id").asObject()
+        logger.info(tournament.toString().slice(0..50) + "...")
+        val players = TestAPI.get("/api/tour/$id/part").asArray()
+        //logger.info(players.toString().slice(0..50) + "...")
+        logger.info(players.toString())
+
+        for (round in 1..tournament.getInt("rounds")!!) {
+            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
+            logger.info("games for round $round: {}", games.toString())
+            val players = TestAPI.get("/api/tour/$id/part").asArray()
+            //logger.info(players.toString().slice(0..500) + "...")
+        }*/
+
         // read tournament without pairings
         var file_np = getTestFile("opengotha/tournamentfiles/simpleswiss_nopairings.xml")
         logger.info("read from file $file_np")
@@ -297,37 +316,14 @@ class BasicTests: TestBase() {
         logger.info("Compare weights with opengotha")
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights")
 
-        val pairings_R1 = """[{"id":283,"w":195,"b":201,"h":0,"r":"?","dd":0},
-            |{"id":284,"w":186,"b":184,"h":0,"r":"?","dd":0},{"id":285,"w":200,"b":194,"h":0,"r":"?","dd":0},
-            |{"id":286,"w":179,"b":187,"h":0,"r":"?","dd":0},{"id":287,"w":203,"b":178,"h":0,"r":"?","dd":0},
-            |{"id":288,"w":183,"b":174,"h":0,"r":"?","dd":0},{"id":289,"w":177,"b":176,"h":0,"r":"?","dd":0},
-            |{"id":290,"w":199,"b":182,"h":0,"r":"?","dd":0},{"id":291,"w":185,"b":180,"h":0,"r":"?","dd":0},
-            |{"id":292,"w":172,"b":202,"h":0,"r":"?","dd":0},{"id":293,"w":173,"b":175,"h":0,"r":"?","dd":0},
-            |{"id":294,"w":196,"b":191,"h":0,"r":"?","dd":0},{"id":295,"w":181,"b":190,"h":0,"r":"?","dd":0},
-            |{"id":296,"w":192,"b":188,"h":0,"r":"?","dd":0},{"id":297,"w":197,"b":193,"h":0,"r":"?","dd":0},
-            |{"id":298,"w":198,"b":189,"h":0,"r":"?","dd":0}]""".trimMargin()
+        val pairings_R1 = """[{"id":843,"w":525,"b":530,"h":0,"r":"b","dd":0},{"id":844,"w":516,"b":514,"h":0,"r":"b","dd":0},{"id":845,"w":532,"b":524,"h":0,"r":"b","dd":0},{"id":846,"w":513,"b":509,"h":0,"r":"b","dd":0},{"id":847,"w":533,"b":508,"h":0,"r":"b","dd":0},{"id":848,"w":504,"b":517,"h":0,"r":"b","dd":0},{"id":849,"w":507,"b":506,"h":0,"r":"b","dd":0},{"id":850,"w":523,"b":529,"h":0,"r":"b","dd":0},{"id":851,"w":503,"b":518,"h":0,"r":"b","dd":0},{"id":852,"w":512,"b":528,"h":0,"r":"b","dd":0},{"id":853,"w":515,"b":510,"h":0,"r":"b","dd":0},{"id":854,"w":502,"b":531,"h":0,"r":"b","dd":0},{"id":855,"w":505,"b":519,"h":0,"r":"b","dd":0},{"id":856,"w":522,"b":511,"h":0,"r":"b","dd":0},{"id":857,"w":521,"b":526,"h":0,"r":"b","dd":0},{"id":858,"w":527,"b":520,"h":0,"r":"b","dd":0}]"""
+        val pairings_R2 = """[{"id":859,"w":526,"b":530,"h":0,"r":"b","dd":0},{"id":860,"w":524,"b":514,"h":0,"r":"b","dd":0},{"id":861,"w":509,"b":517,"h":0,"r":"b","dd":0},{"id":862,"w":508,"b":518,"h":0,"r":"b","dd":0},{"id":863,"w":510,"b":506,"h":0,"r":"b","dd":0},{"id":864,"w":531,"b":529,"h":0,"r":"b","dd":0},{"id":865,"w":511,"b":528,"h":0,"r":"b","dd":0},{"id":866,"w":520,"b":519,"h":0,"r":"b","dd":0},{"id":867,"w":532,"b":516,"h":0,"r":"b","dd":0},{"id":868,"w":513,"b":504,"h":0,"r":"b","dd":0},{"id":869,"w":503,"b":533,"h":0,"r":"b","dd":0},{"id":870,"w":515,"b":507,"h":0,"r":"b","dd":0},{"id":871,"w":523,"b":502,"h":0,"r":"b","dd":0},{"id":872,"w":522,"b":512,"h":0,"r":"b","dd":0},{"id":873,"w":527,"b":505,"h":0,"r":"b","dd":0},{"id":874,"w":521,"b":525,"h":0,"r":"b","dd":0}]"""
+        val pairings_R3 = """[{"id":875,"w":519,"b":530,"h":0,"r":"b","dd":0},{"id":876,"w":514,"b":517,"h":0,"r":"b","dd":0},{"id":877,"w":529,"b":506,"h":0,"r":"b","dd":0},{"id":878,"w":518,"b":528,"h":0,"r":"b","dd":0},{"id":879,"w":510,"b":509,"h":0,"r":"b","dd":0},{"id":880,"w":505,"b":504,"h":0,"r":"b","dd":0},{"id":881,"w":526,"b":511,"h":0,"r":"b","dd":0},{"id":882,"w":525,"b":520,"h":0,"r":"b","dd":0},{"id":883,"w":507,"b":508,"h":0,"r":"b","dd":0},{"id":884,"w":531,"b":512,"h":0,"r":"b","dd":0},{"id":885,"w":516,"b":502,"h":0,"r":"b","dd":0},{"id":886,"w":524,"b":533,"h":0,"r":"b","dd":0},{"id":887,"w":513,"b":532,"h":0,"r":"b","dd":0},{"id":888,"w":521,"b":515,"h":0,"r":"b","dd":0},{"id":889,"w":522,"b":503,"h":0,"r":"b","dd":0},{"id":890,"w":527,"b":523,"h":0,"r":"b","dd":0}]"""
+        val pairings_R4 = """[{"id":891,"w":506,"b":528,"h":0,"r":"b","dd":0},{"id":892,"w":517,"b":530,"h":0,"r":"b","dd":0},{"id":893,"w":518,"b":512,"h":0,"r":"b","dd":0},{"id":894,"w":511,"b":519,"h":0,"r":"b","dd":0},{"id":895,"w":508,"b":504,"h":0,"r":"b","dd":0},{"id":896,"w":533,"b":514,"h":0,"r":"b","dd":0},{"id":897,"w":529,"b":502,"h":0,"r":"b","dd":0},{"id":898,"w":520,"b":509,"h":0,"r":"b","dd":0},{"id":899,"w":531,"b":516,"h":0,"r":"b","dd":0},{"id":900,"w":507,"b":503,"h":0,"r":"b","dd":0},{"id":901,"w":510,"b":505,"h":0,"r":"b","dd":0},{"id":902,"w":523,"b":524,"h":0,"r":"b","dd":0},{"id":903,"w":532,"b":526,"h":0,"r":"b","dd":0},{"id":904,"w":515,"b":525,"h":0,"r":"b","dd":0},{"id":905,"w":522,"b":527,"h":0,"r":"b","dd":0},{"id":906,"w":513,"b":521,"h":0,"r":"b","dd":0}]"""
+        val pairings_R5 = """[{"id":907,"w":528,"b":530,"h":0,"r":"b","dd":0},{"id":908,"w":512,"b":517,"h":0,"r":"b","dd":0},{"id":909,"w":504,"b":519,"h":0,"r":"b","dd":0},{"id":910,"w":514,"b":509,"h":0,"r":"b","dd":0},{"id":911,"w":506,"b":502,"h":0,"r":"b","dd":0},{"id":912,"w":516,"b":518,"h":0,"r":"b","dd":0},{"id":913,"w":511,"b":505,"h":0,"r":"b","dd":0},{"id":914,"w":520,"b":526,"h":0,"r":"b","dd":0},{"id":915,"w":525,"b":533,"h":0,"r":"b","dd":0},{"id":916,"w":524,"b":508,"h":0,"r":"b","dd":0},{"id":917,"w":503,"b":529,"h":0,"r":"b","dd":0},{"id":918,"w":531,"b":532,"h":0,"r":"b","dd":0},{"id":919,"w":527,"b":510,"h":0,"r":"b","dd":0},{"id":920,"w":523,"b":515,"h":0,"r":"b","dd":0},{"id":921,"w":507,"b":521,"h":0,"r":"b","dd":0},{"id":922,"w":513,"b":522,"h":0,"r":"b","dd":0}]"""
 
         // val games = TestAPI.get("/api/tour/$id/res/1").asArray()
         assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
-
-/*        // read tournament with pairing
-        var file = getTestFile("opengotha/simpleswiss.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
-        val resp = TestAPI.post("/api/tour", resource)
-        val id = resp.asObject().getInt("id")
-        val tournament = TestAPI.get("/api/tour/$id").asObject()
-        logger.info(tournament.toString().slice(0..50) + "...")
-        val players = TestAPI.get("/api/tour/$id/part").asArray()
-        //logger.info(players.toString().slice(0..50) + "...")
-        logger.info(players.toString())
-
-        for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            logger.info("games for round $round: {}", games.toString())
-            val players = TestAPI.get("/api/tour/$id/part").asArray()
-            //logger.info(players.toString().slice(0..500) + "...")
-        }*/
 
     }
 
