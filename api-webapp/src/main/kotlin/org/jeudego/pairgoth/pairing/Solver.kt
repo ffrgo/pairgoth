@@ -166,10 +166,16 @@ sealed class Solver(
         val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MAXIMIZE)
         val solution = matching.matching
 
-        val result = solution.flatMap {
-            games(black = graph.getEdgeSource(it) , white = graph.getEdgeTarget(it))
-        }
+        fun gamesSort(p1:Pairable, p2:Pairable) = 0.5*(p1.place + p2.place)
+
+        var sorted = solution.map{
+            listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
+        }.sortedBy { gamesSort(it[0],it[1])}
+
+        var result = sorted.flatMap { games(white = it[0], black = it[1]) }
+
         return result
+
     }
 
     var weightLogs: MutableMap<String, Array<DoubleArray>> = mutableMapOf()
