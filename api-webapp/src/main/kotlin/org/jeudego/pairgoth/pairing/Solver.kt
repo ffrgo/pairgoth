@@ -16,10 +16,10 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-private fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
+fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
     var inverse = false
-    var name1 = p1.nameSeed()
-    var name2 = p2.nameSeed()
+    var name1 = p1.nameSeed("")
+    var name2 = p2.nameSeed("")
     if (name1 > name2) {
         name1 = name2.also { name2 = name1 }
         inverse = true
@@ -109,12 +109,16 @@ sealed class Solver(
         return p.rating - q.rating
     }
 
-    open fun weight(p1: Pairable, p2: Pairable) =
+    open fun openGothaWeight(p1: Pairable, p2: Pairable) =
         1.0 + // 1 is minimum value because 0 means "no matching allowed"
-        pairing.base.apply(p1, p2) +
-        pairing.main.apply(p1, p2) +
-        pairing.secondary.apply(p1, p2) +
-        pairing.geo.apply(p1, p2)
+                pairing.base.apply(p1, p2) +
+                pairing.main.apply(p1, p2) +
+                pairing.secondary.apply(p1, p2) +
+                pairing.geo.apply(p1, p2)
+
+    open fun weight(p1: Pairable, p2: Pairable) =
+        openGothaWeight(p1, p2) +
+        pairing.handicap.color(p1, p2)
 
     // The main criterion that will be used to define the groups should be defined by subclasses
     val Pairable.main: Double get() = scores[id] ?: 0.0
@@ -133,11 +137,11 @@ sealed class Solver(
             if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
             else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
             File(WEIGHTS_FILE).appendText("Costs\n")
-            println("placement criteria" + placement.criteria.toString())
+            // println("placement criteria" + placement.criteria.toString())
         }
 
         for (i in nameSortedPairables.indices) {
-            println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
+            // println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
             for (j in i + 1 until pairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
@@ -156,7 +160,7 @@ sealed class Solver(
                     File(WEIGHTS_FILE).appendText("mainSeedCost="+dec.format(pairing.main.applySeeding(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("totalCost="+dec.format(weight(p,q))+"\n")
+                    File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
 
                     logWeights("total", p, q, weight(p,q))
                 }
@@ -171,6 +175,7 @@ sealed class Solver(
         var sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedBy { gamesSort(it[0],it[1])}
+
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
 
@@ -422,6 +427,25 @@ sealed class Solver(
         hd = max(hd, -ceiling)
 
         return hd
+    }
+
+    open fun HandicapParams.color(p1: Pairable, p2: Pairable): Double {
+        var score = 0.0
+        val hd = pairing.handicap.handicap(p1,p2)
+        if(hd==0){
+            if (p1.colorBalance > p2.colorBalance) {
+                score = 1.0
+            } else if (p1.colorBalance < p2.colorBalance) {
+                score = -1.0
+            } else { // choose color from a det random
+                if (detRandom(1.0, p1, p2) === 0.0) {
+                    score = 1.0
+                } else {
+                    score = -1.0
+                }
+            }
+        }
+        return score
     }
 
     open fun games(black: Pairable, white: Pairable): List<Game> {

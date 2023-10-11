@@ -13,7 +13,7 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
     abstract fun toJson(): Json.Object
     abstract val club: String?
     abstract val country: String?
-    open fun nameSeed(): String {
+    open fun nameSeed(separator: String =" "): String {
         return name
     }
     val skip = mutableSetOf<Int>() // skipped rounds
@@ -69,8 +69,8 @@ class Player(
     ).also {
         if (skip.isNotEmpty()) it["skip"] = Json.Array(skip)
     }
-    override fun nameSeed(): String {
-        return name + " " + firstname
+    override fun nameSeed(separator: String): String {
+        return name + separator + firstname
     }
 }
 

@@ -315,7 +315,6 @@ class BasicTests: TestBase() {
         assertNotNull(id_np)
         val tournament_np = TestAPI.get("/api/tour/$id_np").asObject()
         logger.info(tournament_np.toString().slice(0..50) + "...")
-        logger.info(tournament_np.toString())
         val players_np = TestAPI.get("/api/tour/$id_np/part").asArray()
         logger.info(players_np.toString().slice(0..50) + "...")
         var games_np = TestAPI.post("/api/tour/$id_np/pair/1", Json.Array("all")).asArray()
@@ -332,10 +331,11 @@ class BasicTests: TestBase() {
         val pairings_R4 = """[{"id":891,"w":506,"b":528,"h":0,"r":"?","dd":0},{"id":892,"w":517,"b":530,"h":0,"r":"?","dd":0},{"id":893,"w":518,"b":512,"h":0,"r":"?","dd":0},{"id":894,"w":511,"b":519,"h":0,"r":"?","dd":0},{"id":895,"w":508,"b":504,"h":0,"r":"?","dd":0},{"id":896,"w":533,"b":514,"h":0,"r":"?","dd":0},{"id":897,"w":529,"b":502,"h":0,"r":"?","dd":0},{"id":898,"w":520,"b":509,"h":0,"r":"?","dd":0},{"id":899,"w":531,"b":516,"h":0,"r":"?","dd":0},{"id":900,"w":507,"b":503,"h":0,"r":"?","dd":0},{"id":901,"w":510,"b":505,"h":0,"r":"?","dd":0},{"id":902,"w":523,"b":524,"h":0,"r":"?","dd":0},{"id":903,"w":532,"b":526,"h":0,"r":"?","dd":0},{"id":904,"w":515,"b":525,"h":0,"r":"?","dd":0},{"id":905,"w":522,"b":527,"h":0,"r":"?","dd":0},{"id":906,"w":513,"b":521,"h":0,"r":"?","dd":0}]"""
         val pairings_R5 = """[{"id":907,"w":528,"b":530,"h":0,"r":"?","dd":0},{"id":908,"w":512,"b":517,"h":0,"r":"?","dd":0},{"id":909,"w":504,"b":519,"h":0,"r":"?","dd":0},{"id":910,"w":514,"b":509,"h":0,"r":"?","dd":0},{"id":911,"w":506,"b":502,"h":0,"r":"?","dd":0},{"id":912,"w":516,"b":518,"h":0,"r":"?","dd":0},{"id":913,"w":511,"b":505,"h":0,"r":"?","dd":0},{"id":914,"w":520,"b":526,"h":0,"r":"?","dd":0},{"id":915,"w":525,"b":533,"h":0,"r":"?","dd":0},{"id":916,"w":524,"b":508,"h":0,"r":"?","dd":0},{"id":917,"w":503,"b":529,"h":0,"r":"?","dd":0},{"id":918,"w":531,"b":532,"h":0,"r":"?","dd":0},{"id":919,"w":527,"b":510,"h":0,"r":"?","dd":0},{"id":920,"w":523,"b":515,"h":0,"r":"?","dd":0},{"id":921,"w":507,"b":521,"h":0,"r":"?","dd":0},{"id":922,"w":513,"b":522,"h":0,"r":"?","dd":0}]"""
 
-        logger.info(compare_string(pairings_R1, games_np.toString()))
+        //logger.info(compare_string(pairings_R1, games_np.toString()))
         // val games = TestAPI.get("/api/tour/$id/res/1").asArray()
+        //logger.info("Compare pairings for round 1")
         assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
-
+        logger.info("Pairings for round 1 match OpenGotha")
 
     }
 
