@@ -134,8 +134,8 @@ sealed class Solver(
         val dec = DecimalFormat("#.#")
 
         if (DEBUG_EXPORT_WEIGHT){
-            if (round==1) File(WEIGHTS_FILE).writeText("Round 1\n")
-            else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
+            File(WEIGHTS_FILE).writeText("Round "+round.toString()+"\n")
+            //else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
             File(WEIGHTS_FILE).appendText("Costs\n")
             // println("placement criteria" + placement.criteria.toString())
         }

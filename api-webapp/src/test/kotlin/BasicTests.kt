@@ -310,7 +310,7 @@ class BasicTests: TestBase() {
         var file_np = getTestFile("opengotha/tournamentfiles/simpleswiss_nopairings.xml")
         logger.info("read from file $file_np")
         val resource_np = file_np.readText(StandardCharsets.UTF_8)
-        val resp_np = TestAPI.post("/api/tour", resource_np)
+        var resp_np = TestAPI.post("/api/tour", resource_np)
         val id_np = resp_np.asObject().getInt("id")
         assertNotNull(id_np)
         val tournament_np = TestAPI.get("/api/tour/$id_np").asObject()
@@ -318,12 +318,12 @@ class BasicTests: TestBase() {
         val players_np = TestAPI.get("/api/tour/$id_np/part").asArray()
         logger.info(players_np.toString().slice(0..50) + "...")
         var games_np = TestAPI.post("/api/tour/$id_np/pair/1", Json.Array("all")).asArray()
-        logger.info("games for round 1: {}", games_np.toString())
+        // logger.info("games for round 1: {}", games_np.toString())
 
-        logger.info("Compare weights with itself")
+        // logger.info("Compare weights with itself")
         assertTrue(compare_weights("weights.txt", "weights.txt"), "Weights not equal to itselft")
-        logger.info("Compare weights with opengotha")
-        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights")
+        // logger.info("Compare weights with opengotha")
+        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights for round 1")
 
         val pairings_R1 = """[{"id":843,"w":525,"b":530,"h":0,"r":"?","dd":0},{"id":844,"w":516,"b":514,"h":0,"r":"?","dd":0},{"id":845,"w":532,"b":524,"h":0,"r":"?","dd":0},{"id":846,"w":513,"b":509,"h":0,"r":"?","dd":0},{"id":847,"w":533,"b":508,"h":0,"r":"?","dd":0},{"id":848,"w":504,"b":517,"h":0,"r":"?","dd":0},{"id":849,"w":507,"b":506,"h":0,"r":"?","dd":0},{"id":850,"w":523,"b":529,"h":0,"r":"?","dd":0},{"id":851,"w":503,"b":518,"h":0,"r":"?","dd":0},{"id":852,"w":512,"b":528,"h":0,"r":"?","dd":0},{"id":853,"w":515,"b":510,"h":0,"r":"?","dd":0},{"id":854,"w":502,"b":531,"h":0,"r":"?","dd":0},{"id":855,"w":505,"b":519,"h":0,"r":"?","dd":0},{"id":856,"w":522,"b":511,"h":0,"r":"?","dd":0},{"id":857,"w":521,"b":526,"h":0,"r":"?","dd":0},{"id":858,"w":527,"b":520,"h":0,"r":"?","dd":0}]"""
         val pairings_R2 = """[{"id":859,"w":526,"b":530,"h":0,"r":"?","dd":0},{"id":860,"w":524,"b":514,"h":0,"r":"?","dd":0},{"id":861,"w":509,"b":517,"h":0,"r":"?","dd":0},{"id":862,"w":508,"b":518,"h":0,"r":"?","dd":0},{"id":863,"w":510,"b":506,"h":0,"r":"?","dd":0},{"id":864,"w":531,"b":529,"h":0,"r":"?","dd":0},{"id":865,"w":511,"b":528,"h":0,"r":"?","dd":0},{"id":866,"w":520,"b":519,"h":0,"r":"?","dd":0},{"id":867,"w":532,"b":516,"h":0,"r":"?","dd":0},{"id":868,"w":513,"b":504,"h":0,"r":"?","dd":0},{"id":869,"w":503,"b":533,"h":0,"r":"?","dd":0},{"id":870,"w":515,"b":507,"h":0,"r":"?","dd":0},{"id":871,"w":523,"b":502,"h":0,"r":"?","dd":0},{"id":872,"w":522,"b":512,"h":0,"r":"?","dd":0},{"id":873,"w":527,"b":505,"h":0,"r":"?","dd":0},{"id":874,"w":521,"b":525,"h":0,"r":"?","dd":0}]"""
@@ -336,6 +336,20 @@ class BasicTests: TestBase() {
         //logger.info("Compare pairings for round 1")
         assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
         logger.info("Pairings for round 1 match OpenGotha")
+
+        //val results_R1 = ["""{"id":843,"result":"b"}""",  """{"id":844,"result":"b"}"""]//,{"id":846,"w":513,"b":509,"h":0,"r":"?","dd":0},{"id":847,"w":533,"b":508,"h":0,"r":"?","dd":0},{"id":848,"w":504,"b":517,"h":0,"r":"?","dd":0},{"id":849,"w":507,"b":506,"h":0,"r":"?","dd":0},{"id":850,"w":523,"b":529,"h":0,"r":"?","dd":0},{"id":851,"w":503,"b":518,"h":0,"r":"?","dd":0},{"id":852,"w":512,"b":528,"h":0,"r":"?","dd":0},{"id":853,"w":515,"b":510,"h":0,"r":"?","dd":0},{"id":854,"w":502,"b":531,"h":0,"r":"?","dd":0},{"id":855,"w":505,"b":519,"h":0,"r":"?","dd":0},{"id":856,"w":522,"b":511,"h":0,"r":"?","dd":0},{"id":857,"w":521,"b":526,"h":0,"r":"?","dd":0},{"id":858,"w":527,"b":520,"h":0,"r":"?","dd":0}]"""
+        for (game_id in 843..858) {
+            resp_np = TestAPI.put("/api/tour/$id_np/res/1", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
+            assertTrue(resp_np.getBoolean("success") == true, "expecting success")
+        }
+        logger.info("Results succesfully entered for round 1")
+
+        games_np = TestAPI.post("/api/tour/$id_np/pair/2", Json.Array("all")).asArray()
+        logger.info("games for round 2: {}", games_np.toString())
+
+        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R2.txt"), "Not matching opengotha weights for round 2")
+        assertEquals(pairings_R2, games_np.toString(), "pairings for round 2 differ")
+
 
     }
 
