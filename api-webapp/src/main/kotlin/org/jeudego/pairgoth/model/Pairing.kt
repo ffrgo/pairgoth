@@ -2,8 +2,8 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.SPLIT_AND_SLIP
 import org.jeudego.pairgoth.model.PairingType.*
-import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.pairing.MacMahonSolver
 import org.jeudego.pairgoth.pairing.SwissSolver
 
@@ -122,8 +122,21 @@ sealed class Pairing(
 }
 
 private fun Tournament<*>.historyBefore(round: Int) =
-    if (lastRound() == 0) emptyList()
-    else (0 until round).map { games(round).values.toList() }
+    if (lastRound() == 1) emptyList()
+    else (1 until round).map { games(it).values.toList() }
+
+/*private fun Tournament<*>.historyBefore(round: Int) : List<List<Game>> {
+    println("Welcome to tournament.historyBefore !")
+    println("lastround and round = "+lastRound().toString()+"   "+round.toString())
+    println((1 until round).map { it })
+    println((1 until round).map { games(it).values.toList() })
+    if (lastRound() == 1){
+        return emptyList()
+    }
+    else {
+        return (1 until round).map { games(it).values.toList() }
+    }
+}*/
 
 class Swiss(
     pairingParams: PairingParams = PairingParams(
