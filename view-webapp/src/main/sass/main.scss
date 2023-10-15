@@ -1,7 +1,8 @@
+@import "/fonts/hornbill.css";
 @import "/lib/fomantic-ui-2.9.2/semantic.min.css" layer(semantic);
 
 @layer pairgoth {
-  
+
   /* general styles */
   body {
     font-size: clamp(14px, 1rem + 1vw, 24px);
@@ -22,6 +23,20 @@
       flex-flow: column nowrap;
       align-items: stretch;
     }
+  }
+
+  .logo {
+    font-family: Hornbill, serif;
+    font-weight: bolder;
+    font-style: normal;
+  }
+
+  .centered {
+    text-align: center;
+  }
+
+  .nobreak {
+    white-space: nowrap;
   }
 
   /* header, center, footer */

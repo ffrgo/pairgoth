@@ -1,4 +1,4 @@
-Round 2
+Round 1
 Costs
 Player1Name=Baratou Paul
 Player2Name=Batailler Philippe

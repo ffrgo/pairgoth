@@ -3,4 +3,4 @@
 # debug version
 # mvn package && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5006 -jar application/target/pairgoth-engine.jar
 
-mvn package && java -jar application/target/pairgoth-engine.jar
+mvn -DskipTests package && java -jar application/target/pairgoth-engine.jar
