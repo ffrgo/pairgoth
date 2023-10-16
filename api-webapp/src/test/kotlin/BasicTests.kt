@@ -237,11 +237,12 @@ class BasicTests: TestBase() {
                     costs.add(parts[1].toDouble())
                 }
 
+                val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
                 // Add to map
                 if (count == 1) {
-                    map1[Pair(name1, name2)] = costs
+                    map1[tmp_pair] = costs
                 } else {
-                    map2[Pair(name1, name2)] = costs
+                    map2[tmp_pair] = costs
                 }
             }
             count += 1
@@ -253,9 +254,10 @@ class BasicTests: TestBase() {
             // Check if key exists in both
             if (map2.containsKey(key)) {
                 // Compare values
+                //logger.info("Comparing $key")
                 if (value != map2[key] && diff_found==false) {
                     // Key exists but values differ - print key
-                    logger.info("Difference found at $key")
+                    logger.info("Difference found at $key : $value")
                     logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
                     logger.info("baseRandomCost        =   "+value!![1].toString()+"   "+map2[key]!![1].toString())
                     logger.info("baseBWBalanceCost     =   "+value!![2].toString()+"   "+map2[key]!![2].toString())
@@ -318,7 +320,7 @@ class BasicTests: TestBase() {
         val players_np = TestAPI.get("/api/tour/$id_np/part").asArray()
         logger.info(players_np.toString().slice(0..50) + "...")
         var games_np = TestAPI.post("/api/tour/$id_np/pair/1", Json.Array("all")).asArray()
-        // logger.info("games for round 1: {}", games_np.toString())
+        logger.info("games for round 1: {}", games_np.toString())
 
         // logger.info("Compare weights with itself")
         assertTrue(compare_weights("weights.txt", "weights.txt"), "Weights not equal to itselft")
