@@ -351,6 +351,20 @@ class BasicTests: TestBase() {
 
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R2.txt"), "Not matching opengotha weights for round 2")
         assertEquals(pairings_R2, games_np.toString(), "pairings for round 2 differ")
+        logger.info("Pairings for round 2 match OpenGotha")
+
+        for (game_id in 859..874) {
+            resp_np = TestAPI.put("/api/tour/$id_np/res/2", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
+            assertTrue(resp_np.getBoolean("success") == true, "expecting success")
+        }
+        logger.info("Results succesfully entered for round 2")
+
+        games_np = TestAPI.post("/api/tour/$id_np/pair/3", Json.Array("all")).asArray()
+        logger.info("games for round 3: {}", games_np.toString())
+
+        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R3.txt"), "Not matching opengotha weights for round 3")
+        assertEquals(pairings_R2, games_np.toString(), "pairings for round 2 differ")
+        logger.info("Pairings for round 3 match OpenGotha")
 
 
     }
