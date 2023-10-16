@@ -37,7 +37,7 @@ private fun nonDetRandom(max: Double) =
 
 sealed class Solver(
     val round: Int,
-    history: List<List<Game>>,
+    val history: List<List<Game>>,
     val pairables: List<Pairable>,
     val pairing: PairingParams,
     val placement: PlacementParams
@@ -125,6 +125,10 @@ sealed class Solver(
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
     fun pair(): List<Game> {
+        if (round>1){
+            println("Solver.kt Games played before round "+round.toString()+" :")
+            println(history[0])
+        }
         weightLogs.clear()
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
@@ -286,6 +290,87 @@ sealed class Solver(
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
+        // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
+        // Modifs V3.44.05 (ideas from Tuomo Salo)
+
+        // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
+        // Modifs V3.44.05 (ideas from Tuomo Salo)
+        var duddCost: Long = 0
+        if (Math.abs(p1.group - p2.group) < 4 && (p1.group != p2.group)) {
+            // 5 scenarii
+            // scenario = 0 : Both players have already been drawn in the same sense
+            // scenario = 1 : One of the players has already been drawn in the same sense           
+            // scenario = 2 : Normal conditions (does not correct anything and no previous drawn in the same sense)
+            //                This case also occurs if one DU/DD is increased, while one is compensated
+            // scenario = 3 : It corrects a previous DU/DD            //        
+            // scenario = 4 : it corrects a previous DU/DD for both
+            var scenario = 2
+            val p1_DU = 0 // TODO compute DUDD for both players
+            val p1_DD = 0
+            val p2_DU = 0
+            val p2_DD = 0
+            
+            if (p1_DU > 0 && p1.group > p2.group) {
+                scenario--
+            }
+            if (p1_DD > 0 && p1.group < p2.group) {
+                scenario--
+            }
+            if (p2_DU > 0 && p2.group > p1.group) {
+                scenario--
+            }
+            if (p2_DD > 0 && p2.group < p1.group) {
+                scenario--
+            }
+            if (scenario != 0 && p1_DU > 0 && p1_DD < p1_DU && p1.group < p2.group) {
+                scenario++
+            }
+            if (scenario != 0 && p1_DD > 0 && p1_DU < p1_DD && p1.group > p2.group) {
+                scenario++
+            }
+            if (scenario != 0 && p2_DU > 0 && p2_DD < p2_DU && p2.group < p1.group) {
+                scenario++
+            }
+            if (scenario != 0 && p2_DD > 0 && p2_DU < p2_DD && p2.group > p1.group) {
+                scenario++
+            }
+            val duddWeight: Double = pairing.main.drawUpDownWeight/5.0
+            val upperSP = if (p1.group < p2.group) p1 else p2
+            val lowerSP = if (p1.group < p2.group) p2 else p1
+            val uSPgroupSize = upperSP.placeInGroup.second
+            val lSPgroupSize = lowerSP.placeInGroup.second
+
+            if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
+                score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
+            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.MIDDLE) {
+                score += duddWeight / 2 * (uSPgroupSize - 1 - Math.abs(2 * upperSP.placeInGroup.first - uSPgroupSize + 1)) / uSPgroupSize
+            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.BOTTOM) {
+                score += duddWeight / 2 * upperSP.placeInGroup.first / uSPgroupSize
+            }
+            if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.TOP) {
+                score += duddWeight / 2 * (lSPgroupSize - 1 - lowerSP.placeInGroup.first) / lSPgroupSize
+            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.MIDDLE) {
+                score += duddWeight / 2 * (lSPgroupSize - 1 - Math.abs(2 * lowerSP.placeInGroup.first - lSPgroupSize + 1)) / lSPgroupSize
+            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.BOTTOM) {
+                score += duddWeight / 2 * lowerSP.placeInGroup.first / lSPgroupSize
+            }
+            if (scenario == 0) {
+                // Do nothing
+            } else if (scenario == 1) {
+                score += 1 * duddWeight
+            } else if (scenario == 2 || scenario > 2 && !pairing.main.compensateDrawUpDown) {
+                score += 2 * duddWeight
+            } else if (scenario == 3) {
+                score += 3 * duddWeight
+            } else if (scenario == 4) {
+                score += 4 * duddWeight
+            }
+        }
+
+        // TODO adapt to Swiss with categories
+        /*// But, if players come from different categories, decrease score(added in 3.11)
+        val catGap: Int = Math.abs(p1.category(gps) - p2.category(gps))
+        score = score / (catGap + 1) / (catGap + 1) / (catGap + 1) / (catGap + 1)*/
 
         return score
     }
