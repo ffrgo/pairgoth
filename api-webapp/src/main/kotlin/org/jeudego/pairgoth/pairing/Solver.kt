@@ -173,12 +173,18 @@ sealed class Solver(
         val graph = builder.build()
         val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MAXIMIZE)
         val solution = matching.matching
-
+        
         val sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
-        }.sortedWith(compareBy({ 0.5*(it[0].place + it[1].place) }, { min(it[0].place, it[1].place) }))
+        }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
 
         val result = sorted.flatMap { games(white = it[0], black = it[1]) }
+
+        if (DEBUG_EXPORT_WEIGHT) {
+            for (it in sorted) {
+                println(it[0].nameSeed() + " " + it[0].place.toString() + " vs " +it[1].nameSeed() + " " +it[1].place.toString())
+            }
+        }
 
         return result
 
