@@ -125,10 +125,6 @@ sealed class Solver(
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
     fun pair(): List<Game> {
-        if (round>1){
-            println("Solver.kt Games played before round "+round.toString()+" :")
-            println(history[0])
-        }
         weightLogs.clear()
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
@@ -173,7 +169,7 @@ sealed class Solver(
         val graph = builder.build()
         val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MAXIMIZE)
         val solution = matching.matching
-        
+
         val sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
