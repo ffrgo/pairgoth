@@ -406,6 +406,21 @@ class BasicTests: TestBase() {
         }
         logger.info("Results succesfully entered for round 4")
 
+        // *** Test Round 5 ***
+        games_np = TestAPI.post("/api/tour/$id_np/pair/5", Json.Array("all")).asArray()
+        logger.info("games for round 5: {}", games_np.toString())
+
+        assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R5.txt"), "Not matching opengotha weights for round 4")
+        assertTrue(compare_games(games_np, Json.parse(pairings_R5.toString())!!.asArray()), "pairings for round 5 differ")
+        //assertEquals(pairings_R4, games_np.toString(), "pairings for round 3 differ")
+        logger.info("Pairings for round 5 match OpenGotha")
+
+        for (game_id in 907..922) {
+            resp_np = TestAPI.put("/api/tour/$id_np/res/5", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
+            assertTrue(resp_np.getBoolean("success") == true, "expecting success")
+        }
+        logger.info("Results succesfully entered for round 5")
+
     }
 
 }
