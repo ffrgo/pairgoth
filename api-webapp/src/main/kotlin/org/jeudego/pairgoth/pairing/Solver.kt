@@ -64,11 +64,6 @@ sealed class Solver(
     private val nameSortedPairables by lazy {
         pairables.sortedWith(::nameSort)
     }
-    // Sorting for logging purpose
-    private val logSortedPairablesMap by lazy {
-        val logSortedPairables = pairables.sortedWith(::logSort)
-        logSortedPairables.associateWith { logSortedPairables.indexOf(it) }
-    }
 
     protected val pairablesMap by lazy {
         pairables.associateBy { it.id }
@@ -100,13 +95,6 @@ sealed class Solver(
     }
     open fun nameSort(p: Pairable, q: Pairable): Int {
         return if (p.name > q.name) 1 else -1
-    }
-    // Sorting function to order the weight matrix for debugging
-    open fun logSort(p: Pairable, q: Pairable): Int {
-        if (p.rating == q.rating) {
-            return if (p.name > q.name) 1 else -1
-        }
-        return p.rating - q.rating
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
