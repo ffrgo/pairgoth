@@ -1,8 +1,10 @@
-package org.jeudego.pairgoth.pairing
+package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
-import org.jeudego.pairgoth.model.Criterion.*
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
+import org.jeudego.pairgoth.pairing.BasePairingHelper
+import org.jeudego.pairgoth.pairing.detRandom
+import org.jeudego.pairgoth.pairing.nonDetRandom
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -16,86 +18,18 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
-    var inverse = false
-    var name1 = p1.nameSeed("")
-    var name2 = p2.nameSeed("")
-    if (name1 > name2) {
-        name1 = name2.also { name2 = name1 }
-        inverse = true
-    }
-    var nR = "$name1$name2".mapIndexed { i, c ->
-        c.code.toDouble() * (i + 1)
-    }.sum() * 1234567 % (max + 1)
-    if (inverse) nR = max - nR
-    return nR
-}
-
-private fun nonDetRandom(max: Double) =
-    if (max == 0.0) 0.0
-    else Math.random() * (max + 1.0)
-
-sealed class Solver(
+sealed class BaseSolver(
     val round: Int, // Round number
-    val history: List<List<Game>>, // History of all games played for each round
-    var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
-    val pairing: PairingParams,
-    val placement: PlacementParams,
+    history: List<List<Game>>, // History of all games played for each round
+    pairables: List<Pairable>, // All pairables for this round, it may include the bye player
+    pairing: PairingParams,
+    placement: PlacementParams,
     val forcedBye: Pairable? = null, // This parameter is non-null to force the given pairable to be chosen as a bye player.
-    ) {
+    ) : BasePairingHelper(history, pairables, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
         val DEBUG_EXPORT_WEIGHT = true
-    }
-
-    abstract val scores: Map<ID, Double>
-    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
-        else HistoryHelper(history) { scores }
-
-    // pairables sorted using overloadable sort function
-    private val sortedPairables by lazy {
-        pairables.sortedWith(::sort)
-    }
-    // pairables sorted for pairing purposes
-    private val pairingSortedPairables by lazy {
-        pairables.sortedWith(::pairingSort)
-    }
-    // pairables sorted for pairing purposes
-    private val nameSortedPairables by lazy {
-        pairables.sortedWith(::nameSort)
-    }
-
-    protected val pairablesMap by lazy {
-        pairables.associateBy { it.id }
-    }
-
-    open fun sort(p: Pairable, q: Pairable): Int {
-        for (criterion in placement.criteria) {
-            val criterionP = p.eval(criterion)
-            val criterionQ = q.eval(criterion)
-            if (criterionP != criterionQ) {
-                return (criterionQ * 100 - criterionP * 100).toInt()
-            }
-        }
-        return 0
-    }
-    open fun pairingSort(p: Pairable, q: Pairable): Int {
-        for (criterion in placement.criteria) {
-            val criterionP = p.eval(criterion)
-            val criterionQ = q.eval(criterion)
-            if (criterionP != criterionQ) {
-                return (criterionQ * 1e6 - criterionP * 1e6).toInt()
-            }
-        }
-        if (p.rating == q.rating) {
-            return if (p.name > q.name) 1 else -1
-        }
-        return q.rating - p.rating
-
-    }
-    open fun nameSort(p: Pairable, q: Pairable): Int {
-        return if (p.name > q.name) 1 else -1
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -108,11 +42,6 @@ sealed class Solver(
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
-
-    // The main criterion that will be used to define the groups should be defined by subclasses
-    val Pairable.main: Double get() = scores[id] ?: 0.0
-    abstract val mainLimits: Pair<Double, Double>
-    // SOS and variants will be computed based on this score
 
     fun pair(): List<Game> {
         // The byeGame is a list of one game with the bye player or an empty list
@@ -189,11 +118,11 @@ sealed class Solver(
     }
 
     fun chooseByePlayer(): Pairable {
+        // TODO https://github.com/lucvannier/opengotha/blob/master/src/info/vannier/gotha/Tournament.java#L1471
         return ByePlayer
     }
 
-    // base criteria
-
+    // Base criteria
     open fun BaseCritParams.apply(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         // Base Criterion 1 : Avoid Duplicating Game
@@ -523,71 +452,5 @@ sealed class Solver(
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
         return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white)))
-    }
-
-    // Generic parameters calculation
-    //private val standingScore by lazy { computeStandingScore() }
-
-    // Decide each pairable group based on the main criterion
-    private val groupsCount get() = 1 + (mainLimits.second - mainLimits.first).toInt()
-    private val _groups by lazy {
-        pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
-    }
-
-    // place (among sorted pairables)
-    val Pairable.place: Int get() = _place[id]!!
-    private val _place by lazy {
-        pairingSortedPairables.mapIndexed { index, pairable ->
-            Pair(pairable.id, index)
-        }.toMap()
-    }
-
-    // placeInGroup (of same score) : Pair(place, groupSize)
-    private val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
-    private val _placeInGroup by lazy {
-        // group by group number
-        pairingSortedPairables.groupBy {
-            it.group
-        // get a list { id { placeInGroup, groupSize } }
-        }.values.flatMap { group ->
-            group.mapIndexed { index, pairable ->
-                Pair(pairable.id, Pair(index, group.size))
-            }
-        // get a map id -> { placeInGroup, groupSize }
-        }.toMap()
-    }
-
-    // already paired players map
-    private fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
-
-    // color balance (nw - nb)
-    private val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
-
-    private val Pairable.group: Int get() = _groups[id]!!
-
-    // score (number of wins)
-    val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
-
-    val Pairable.sos: Double get() = historyHelper.sos[id] ?: 0.0
-    val Pairable.sosm1: Double get() = historyHelper.sosm1[id] ?: 0.0
-    val Pairable.sosm2: Double get() = historyHelper.sosm2[id] ?: 0.0
-    val Pairable.sosos: Double get() = historyHelper.sosos[id] ?: 0.0
-    val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
-    val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
-
-    fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
-    open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
-        NONE -> 0.0
-        CATEGORY -> TODO()
-        RANK -> pairable.rank.toDouble()
-        RATING -> pairable.rating.toDouble()
-        NBW -> pairable.nbW
-        SOSW -> pairable.sos
-        SOSWM1 -> pairable.sosm1
-        SOSWM2 -> pairable.sosm2
-        SOSOSW -> pairable.sosos
-        SODOSW -> pairable.sodos
-        CUSSW -> pairable.cums
-        else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
     }
 }
