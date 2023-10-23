@@ -11,6 +11,7 @@
   <script type="text/javascript" src="/js/domhelper.js"></script>
 </head>
 <body class="vert flex">
+#foreach($attr in $application.getAttributeNames())$attr #end
   <div id="header" class="horz flex">
     <div id="logo">
       <img src="/img/logov2.svg"/>

@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.store.Store
-import org.jeudego.pairgoth.web.Event
+import org.jeudego.pairgoth.server.Event
 import javax.servlet.http.HttpServletRequest
 
 interface PairgothApiHandler: ApiHandler {

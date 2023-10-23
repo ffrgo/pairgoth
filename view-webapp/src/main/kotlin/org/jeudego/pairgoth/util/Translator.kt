@@ -132,7 +132,7 @@ class Translator private constructor(private val iso: String) {
         get() = textAccessor[this] as String
         set(value: String) { textAccessor[this] = value }
 
-    private val saveMissingTranslations = System.getProperty("pairgoth.env") == "dev"
+    private val saveMissingTranslations = System.getProperty("pairgoth.webapp.env") == "dev"
     private val missingTranslations: MutableSet<String> = ConcurrentSkipListSet()
 
     private fun reportMissingTranslation(enText: String) {

@@ -8,8 +8,8 @@ import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.web.Event
-import org.jeudego.pairgoth.web.Event.*
+import org.jeudego.pairgoth.server.Event
+import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 

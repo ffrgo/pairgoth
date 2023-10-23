@@ -10,9 +10,9 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.Store
-import org.jeudego.pairgoth.web.ApiServlet
-import org.jeudego.pairgoth.web.Event
-import org.jeudego.pairgoth.web.Event.*
+import org.jeudego.pairgoth.server.ApiServlet
+import org.jeudego.pairgoth.server.Event
+import org.jeudego.pairgoth.server.Event.*
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

@@ -8,6 +8,52 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <profiles>
+    <profile>
+      <id>default-properties</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <api.env>dev</api.env>
+        <api.url>http://localhost:8085</api.url>
+        <webapp.env>dev</webapp.env>
+        <webapp.url>http://localhost:8080</webapp.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>custom-properties</id>
+      <activation>
+        <file>
+          <exists>../pairgoth.properties</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.2.0</version>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>read-project-properties</goal>
+                </goals>
+                <configuration>
+                  <!--<quiet>true</quiet>-->
+                  <files>
+                    <file>../pairgoth.properties</file>
+                  </files>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <!-- CB: Temporary add my repository, while waiting for SSE Java server module author to incorporate my PR or for me to fork it --> 
   <repositories>
     <repository>
@@ -19,7 +65,8 @@
       <snapshots>
         <enabled>true</enabled>
       </snapshots>
-    </repository>    <repository>
+    </repository>
+    <repository>
       <id>republicate.com</id>
       <url>https://republicate.com/maven2</url>
       <releases>
@@ -144,6 +191,47 @@
           <artifactId>maven-war-plugin</artifactId>
           <version>${maven.war.plugin.version}</version>
         </plugin>
+
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>3.4.0</version>
+          <executions>
+            <execution>
+              <id>regex-property</id>
+              <goals>
+                <goal>regex-property</goal>
+              </goals>
+              <configuration>
+                <name>webapp.port</name>
+                <value>${webapp.url}</value>
+                <regex>^.*:(\d+).*$</regex>
+                <replacement>$1</replacement>
+                <failIfNoMatch>true</failIfNoMatch>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>3.1.0</version>
+          <executions>
+            <execution>
+              <id>echo-property</id>
+              <goals>
+                <goal>run</goal>
+              </goals>
+              <configuration>
+                <tasks>
+                  <echo>----------------- webapp.port=${webapp.port}</echo>
+                </tasks>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+
         <plugin>
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>

@@ -2,7 +2,7 @@ package org.jeudego.pairgoth.store
 
 import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Tournament
-import org.jeudego.pairgoth.web.WebappManager
+import org.jeudego.pairgoth.server.WebappManager
 import java.util.concurrent.atomic.AtomicInteger
 
 private fun createStoreImplementation(): StoreImplementation {

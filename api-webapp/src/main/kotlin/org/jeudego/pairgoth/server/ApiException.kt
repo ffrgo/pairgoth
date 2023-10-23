@@ -1,4 +1,4 @@
-package org.jeudego.pairgoth.web
+package org.jeudego.pairgoth.server
 
 import com.republicate.kson.Json
 import java.io.IOException

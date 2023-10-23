@@ -8,7 +8,7 @@
     <listener-class>com.republicate.slf4j.impl.ServletContextLoggerListener</listener-class>
   </listener>
   <listener>
-    <listener-class>org.jeudego.pairgoth.web.WebappManager</listener-class>
+    <listener-class>org.jeudego.pairgoth.server.WebappManager</listener-class>
   </listener>
 
   <!-- filters -->
@@ -29,11 +29,11 @@
   <!-- servlets -->
   <servlet>
     <servlet-name>api</servlet-name>
-    <servlet-class>org.jeudego.pairgoth.web.ApiServlet</servlet-class>
+    <servlet-class>org.jeudego.pairgoth.server.ApiServlet</servlet-class>
   </servlet>
   <servlet>
     <servlet-name>sse</servlet-name>
-    <servlet-class>org.jeudego.pairgoth.web.SSEServlet</servlet-class>
+    <servlet-class>org.jeudego.pairgoth.server.SSEServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>

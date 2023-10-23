@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.oauth
 // In progress
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.web.WebappManager
+import org.jeudego.pairgoth.server.WebappManager
 //import com.republicate.modality.util.AESCryptograph
 //import com.republicate.modality.util.Cryptograph
 import org.apache.commons.codec.binary.Base64

@@ -2,9 +2,9 @@ package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler
-import org.jeudego.pairgoth.web.ApiServlet
-import org.jeudego.pairgoth.web.SSEServlet
-import org.jeudego.pairgoth.web.WebappManager
+import org.jeudego.pairgoth.server.ApiServlet
+import org.jeudego.pairgoth.server.SSEServlet
+import org.jeudego.pairgoth.server.WebappManager
 import org.mockito.kotlin.*
 import java.io.*
 import java.util.*

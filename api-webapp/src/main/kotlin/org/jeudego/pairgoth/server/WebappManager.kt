@@ -1,4 +1,4 @@
-package org.jeudego.pairgoth.web
+package org.jeudego.pairgoth.server
 
 import com.republicate.mailer.SmtpLoop
 import org.apache.commons.lang3.tuple.Pair
@@ -51,8 +51,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
         context = sce.servletContext
-        logger.info("---------- Starting Pairgoth Server ----------")
-        context.setAttribute("manager", this)
+        logger.info("---------- Starting $WEBAPP_NAME ----------")
         webappRoot = context.getRealPath("/")
         try {
             // load default properties
@@ -63,7 +62,8 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
                 properties[(key as String).removePrefix(PAIRGOTH_PROPERTIES_PREFIX)] = value
             }
 
-            logger.info("Using profile {}", properties.getProperty("webapp.env"))
+            val env = properties.getProperty("webapp.env")
+            logger.info("Using profile $env", )
 
             // set system user agent string to empty string
             System.setProperty("http.agent", "")
@@ -84,11 +84,15 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     }
 
     override fun contextDestroyed(sce: ServletContextEvent) {
-        logger.info("---------- Stopping Web Application ----------")
+        logger.info("---------- Stopping $WEBAPP_NAME ----------")
+
+        stopService("smtp");
 
         val context = sce.servletContext
         for (service in webServices.keys) stopService(service, true)
         // ??? DriverManager.deregisterDriver(com.mysql.cj.jdbc.Driver ...);
+
+        logger.info("---------- Stopped $WEBAPP_NAME ----------")
     }
 
     /* ServletContextAttributeListener interface */
@@ -101,6 +105,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun sessionDestroyed(se: HttpSessionEvent) {}
 
     companion object {
+        const val WEBAPP_NAME = "Pairgoth API Server"
         const val PAIRGOTH_PROPERTIES_PREFIX = "pairgoth."
         lateinit var webappRoot: String
         lateinit var context: ServletContext

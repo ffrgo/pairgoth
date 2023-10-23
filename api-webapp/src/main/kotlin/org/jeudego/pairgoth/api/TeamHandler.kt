@@ -4,8 +4,8 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.TeamTournament
-import org.jeudego.pairgoth.web.Event
-import org.jeudego.pairgoth.web.Event.*
+import org.jeudego.pairgoth.server.Event
+import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 

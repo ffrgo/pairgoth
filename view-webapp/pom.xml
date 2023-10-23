@@ -101,15 +101,18 @@
                     <httpConnector>
                         <port>8080</port>
                     </httpConnector>
+                    <!--
                     <systemProperties>
-                        <pairgoth.api.url>http://localhost:8085/api/</pairgoth.api.url>
-                        <pairgoth.env>dev</pairgoth.env>
+                        <pairgoth.api.url>${webapp.url}</pairgoth.api.url>
+                        <pairgoth.env>${webapp.env}</pairgoth.env>
                     </systemProperties>
+                    -->
                     <webApp>
                         <resourceBases>${project.basedir}/src/main/webapp,${project.build.directory}/generated-resources/</resourceBases>
                     </webApp>
                 </configuration>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
@@ -124,6 +127,10 @@
                         </resource>
                     </webResources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

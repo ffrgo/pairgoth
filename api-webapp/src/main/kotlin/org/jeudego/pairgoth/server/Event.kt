@@ -1,4 +1,4 @@
-package org.jeudego.pairgoth.web
+package org.jeudego.pairgoth.server
 
 import info.macias.sse.events.MessageEvent
 import java.util.concurrent.atomic.AtomicLong
