@@ -17,6 +17,10 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
         return name
     }
     val skip = mutableSetOf<Int>() // skipped rounds
+
+    fun equals(other: Pairable): Boolean {
+        return id == other.id
+    }
 }
 
 object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {

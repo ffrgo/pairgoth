@@ -36,11 +36,12 @@ private fun nonDetRandom(max: Double) =
     else Math.random() * (max + 1.0)
 
 sealed class Solver(
-    val round: Int,
-    val history: List<List<Game>>,
-    val pairables: List<Pairable>,
+    val round: Int, // Round number
+    val history: List<List<Game>>, // History of all games played for each round
+    var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     val pairing: PairingParams,
-    val placement: PlacementParams
+    val placement: PlacementParams,
+    val forcedBye: Pairable? = null, // This parameter is non-null to force the given pairable to be chosen as a bye player.
     ) {
 
     companion object {
@@ -112,7 +113,23 @@ sealed class Solver(
     val Pairable.main: Double get() = scores[id] ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
+
     fun pair(): List<Game> {
+        // The byeGame is a list of one game with the bye player or an empty list
+        val byeGame: List<Game> = if (pairables.size % 2 != 0) {
+            // We must choose a bye player
+            val physicalByePlayer = forcedBye ?: chooseByePlayer()
+            // Remove the bye from the pairables
+            pairables = pairables.filterNot { it == physicalByePlayer }
+            // Assign a special game to the bye player
+            listOf( Game(Store.nextGameId, physicalByePlayer.id, ByePlayer.id) )
+        } else {
+            listOf()
+        }
+
+        return listOf(pairEvenNumberOfPlayers(), byeGame).flatten() // Add the bye game to the actual paired games
+    }
+    fun pairEvenNumberOfPlayers(): List<Game> {
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
@@ -169,6 +186,10 @@ sealed class Solver(
 
         return result
 
+    }
+
+    fun chooseByePlayer(): Pairable {
+        return ByePlayer
     }
 
     // base criteria
