@@ -125,7 +125,6 @@ sealed class Solver(
     abstract val mainLimits: Pair<Double, Double>
     // SOS and variants will be computed based on this score
     fun pair(): List<Game> {
-        weightLogs.clear()
         // check that at this stage, we have an even number of pairables
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
@@ -161,8 +160,6 @@ sealed class Solver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
-
-                    logWeights("total", p, q, weight(p,q))
                 }
             }
         }
@@ -186,19 +183,6 @@ sealed class Solver(
 
     }
 
-    var weightLogs: MutableMap<String, Array<DoubleArray>> = mutableMapOf()
-    fun logWeights(weightName: String, p1: Pairable, p2: Pairable, weight: Double) {
-        if (DEBUG_EXPORT_WEIGHT) {
-            if (!weightLogs.contains(weightName)) {
-                weightLogs[weightName] = Array(pairables.size) { DoubleArray(pairables.size) }
-            }
-            val pos1: Int = logSortedPairablesMap[p1]!!
-            val pos2: Int = logSortedPairablesMap[p2]!!
-            weightLogs[weightName]!![pos1][pos2] = weight
-
-        }
-    }
-
     // base criteria
 
     open fun BaseCritParams.apply(p1: Pairable, p2: Pairable): Double {
@@ -218,14 +202,12 @@ sealed class Solver(
     open fun  BaseCritParams.avoidDuplicatingGames(p1: Pairable, p2: Pairable): Double {
         val score =  if (p1.played(p2)) 0.0 // We get no score if pairables already played together
         else dupWeight
-        logWeights("avoiddup", p1, p2, score)
         return score
     }
 
     open fun BaseCritParams.applyRandom(p1: Pairable, p2: Pairable): Double {
         val score =  if (deterministic) detRandom(random, p1, p2)
         else nonDetRandom(random)
-        logWeights("random", p1, p2, score)
         return score
     }
 
@@ -240,7 +222,6 @@ sealed class Solver(
             if (wb1 * wb2 < 0) colorBalanceWeight
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else 0.0
-        logWeights("color", p1, p2, score)
         return score
     }
 
@@ -281,7 +262,6 @@ sealed class Solver(
             score = scoreWeight * (1.0 - x) * (1.0 + k * x)
         }
 
-        logWeights("score", p1, p2, score)
         return score
     }
 
@@ -408,7 +388,6 @@ sealed class Solver(
                 }
             }
         }
-        logWeights("seed", p1, p2, score)
         return Math.round(score).toDouble()
     }
 
