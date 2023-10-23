@@ -4,8 +4,8 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.SPLIT_AND_SLIP
 import org.jeudego.pairgoth.model.PairingType.*
-import org.jeudego.pairgoth.pairing.MacMahonSolver
-import org.jeudego.pairgoth.pairing.SwissSolver
+import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import org.jeudego.pairgoth.pairing.solver.SwissSolver
 
 // base pairing parameters
 data class BaseCritParams(
