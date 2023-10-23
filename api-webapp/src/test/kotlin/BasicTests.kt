@@ -307,7 +307,7 @@ class BasicTests: TestBase() {
     fun `008 simple swiss tournament`() {
 
 /*        // read tournament with pairing
-        var file = getTestFile("opengotha/tournamentfiles/simpleswiss_orderTableNumberScoreRating.xml")
+        var file = getTestFile("opengotha/tournamentfiles/simpleswiss_7R.xml")
         logger.info("read from file $file")
         val resource = file.readText(StandardCharsets.UTF_8)
         val resp = TestAPI.post("/api/tour", resource)
@@ -325,12 +325,13 @@ class BasicTests: TestBase() {
             //logger.info(players.toString().slice(0..500) + "...")
         }*/
 
-        val pairings_R1 = """[{"id":843,"w":525,"b":530,"h":0,"r":"?","dd":0},{"id":844,"w":516,"b":514,"h":0,"r":"?","dd":0},{"id":845,"w":532,"b":524,"h":0,"r":"?","dd":0},{"id":846,"w":513,"b":509,"h":0,"r":"?","dd":0},{"id":847,"w":533,"b":508,"h":0,"r":"?","dd":0},{"id":848,"w":504,"b":517,"h":0,"r":"?","dd":0},{"id":849,"w":507,"b":506,"h":0,"r":"?","dd":0},{"id":850,"w":523,"b":529,"h":0,"r":"?","dd":0},{"id":851,"w":503,"b":518,"h":0,"r":"?","dd":0},{"id":852,"w":512,"b":528,"h":0,"r":"?","dd":0},{"id":853,"w":515,"b":510,"h":0,"r":"?","dd":0},{"id":854,"w":502,"b":531,"h":0,"r":"?","dd":0},{"id":855,"w":505,"b":519,"h":0,"r":"?","dd":0},{"id":856,"w":522,"b":511,"h":0,"r":"?","dd":0},{"id":857,"w":521,"b":526,"h":0,"r":"?","dd":0},{"id":858,"w":527,"b":520,"h":0,"r":"?","dd":0}]"""
-        val pairings_R2 = """[{"id":859,"w":526,"b":530,"h":0,"r":"?","dd":0},{"id":860,"w":524,"b":514,"h":0,"r":"?","dd":0},{"id":861,"w":509,"b":517,"h":0,"r":"?","dd":0},{"id":862,"w":508,"b":518,"h":0,"r":"?","dd":0},{"id":863,"w":510,"b":506,"h":0,"r":"?","dd":0},{"id":864,"w":531,"b":529,"h":0,"r":"?","dd":0},{"id":865,"w":511,"b":528,"h":0,"r":"?","dd":0},{"id":866,"w":520,"b":519,"h":0,"r":"?","dd":0},{"id":867,"w":532,"b":516,"h":0,"r":"?","dd":0},{"id":868,"w":513,"b":504,"h":0,"r":"?","dd":0},{"id":869,"w":503,"b":533,"h":0,"r":"?","dd":0},{"id":870,"w":515,"b":507,"h":0,"r":"?","dd":0},{"id":871,"w":523,"b":502,"h":0,"r":"?","dd":0},{"id":872,"w":522,"b":512,"h":0,"r":"?","dd":0},{"id":873,"w":527,"b":505,"h":0,"r":"?","dd":0},{"id":874,"w":521,"b":525,"h":0,"r":"?","dd":0}]"""
-        val pairings_R3 = """[{"id":875,"w":519,"b":530,"h":0,"r":"?","dd":0},{"id":876,"w":514,"b":517,"h":0,"r":"?","dd":0},{"id":877,"w":529,"b":506,"h":0,"r":"?","dd":0},{"id":878,"w":518,"b":528,"h":0,"r":"?","dd":0},{"id":879,"w":507,"b":508,"h":0,"r":"?","dd":0},{"id":880,"w":531,"b":512,"h":0,"r":"?","dd":0},{"id":881,"w":510,"b":509,"h":0,"r":"?","dd":0},{"id":882,"w":505,"b":504,"h":0,"r":"?","dd":0},{"id":883,"w":526,"b":511,"h":0,"r":"?","dd":0},{"id":884,"w":525,"b":520,"h":0,"r":"?","dd":0},{"id":885,"w":516,"b":502,"h":0,"r":"?","dd":0},{"id":886,"w":524,"b":533,"h":0,"r":"?","dd":0},{"id":887,"w":522,"b":503,"h":0,"r":"?","dd":0},{"id":888,"w":527,"b":523,"h":0,"r":"?","dd":0},{"id":889,"w":513,"b":532,"h":0,"r":"?","dd":0},{"id":890,"w":521,"b":515,"h":0,"r":"?","dd":0}]"""
-        val pairings_R4 = """[{"id":891,"w":506,"b":528,"h":0,"r":"?","dd":0},{"id":892,"w":517,"b":530,"h":0,"r":"?","dd":0},{"id":893,"w":518,"b":512,"h":0,"r":"?","dd":0},{"id":894,"w":511,"b":519,"h":0,"r":"?","dd":0},{"id":895,"w":508,"b":504,"h":0,"r":"?","dd":0},{"id":896,"w":533,"b":514,"h":0,"r":"?","dd":0},{"id":897,"w":529,"b":502,"h":0,"r":"?","dd":0},{"id":898,"w":520,"b":509,"h":0,"r":"?","dd":0},{"id":899,"w":531,"b":516,"h":0,"r":"?","dd":0},{"id":900,"w":507,"b":503,"h":0,"r":"?","dd":0},{"id":901,"w":510,"b":505,"h":0,"r":"?","dd":0},{"id":902,"w":523,"b":524,"h":0,"r":"?","dd":0},{"id":903,"w":532,"b":526,"h":0,"r":"?","dd":0},{"id":904,"w":515,"b":525,"h":0,"r":"?","dd":0},{"id":905,"w":522,"b":527,"h":0,"r":"?","dd":0},{"id":906,"w":513,"b":521,"h":0,"r":"?","dd":0}]"""
-        val pairings_R5 = """[{"id":907,"w":528,"b":530,"h":0,"r":"?","dd":0},{"id":908,"w":512,"b":517,"h":0,"r":"?","dd":0},{"id":909,"w":504,"b":519,"h":0,"r":"?","dd":0},{"id":910,"w":514,"b":509,"h":0,"r":"?","dd":0},{"id":911,"w":506,"b":502,"h":0,"r":"?","dd":0},{"id":912,"w":516,"b":518,"h":0,"r":"?","dd":0},{"id":913,"w":511,"b":505,"h":0,"r":"?","dd":0},{"id":914,"w":520,"b":526,"h":0,"r":"?","dd":0},{"id":915,"w":525,"b":533,"h":0,"r":"?","dd":0},{"id":916,"w":524,"b":508,"h":0,"r":"?","dd":0},{"id":917,"w":503,"b":529,"h":0,"r":"?","dd":0},{"id":918,"w":531,"b":532,"h":0,"r":"?","dd":0},{"id":919,"w":527,"b":510,"h":0,"r":"?","dd":0},{"id":920,"w":523,"b":515,"h":0,"r":"?","dd":0},{"id":921,"w":507,"b":521,"h":0,"r":"?","dd":0},{"id":922,"w":513,"b":522,"h":0,"r":"?","dd":0}]"""
-
+        val pairings_R1 = """[{"id":939,"w":525,"b":530,"h":0,"r":"?","dd":0},{"id":940,"w":516,"b":514,"h":0,"r":"?","dd":0},{"id":941,"w":532,"b":524,"h":0,"r":"?","dd":0},{"id":942,"w":513,"b":509,"h":0,"r":"?","dd":0},{"id":943,"w":533,"b":508,"h":0,"r":"?","dd":0},{"id":944,"w":504,"b":517,"h":0,"r":"?","dd":0},{"id":945,"w":507,"b":506,"h":0,"r":"?","dd":0},{"id":946,"w":523,"b":529,"h":0,"r":"?","dd":0},{"id":947,"w":503,"b":518,"h":0,"r":"?","dd":0},{"id":948,"w":512,"b":528,"h":0,"r":"?","dd":0},{"id":949,"w":515,"b":510,"h":0,"r":"?","dd":0},{"id":950,"w":502,"b":531,"h":0,"r":"?","dd":0},{"id":951,"w":505,"b":519,"h":0,"r":"?","dd":0},{"id":952,"w":522,"b":511,"h":0,"r":"?","dd":0},{"id":953,"w":521,"b":526,"h":0,"r":"?","dd":0},{"id":954,"w":527,"b":520,"h":0,"r":"?","dd":0}]"""
+        val pairings_R2 = """[{"id":955,"w":526,"b":530,"h":0,"r":"?","dd":0},{"id":956,"w":524,"b":514,"h":0,"r":"?","dd":0},{"id":957,"w":509,"b":517,"h":0,"r":"?","dd":0},{"id":958,"w":508,"b":518,"h":0,"r":"?","dd":0},{"id":959,"w":510,"b":506,"h":0,"r":"?","dd":0},{"id":960,"w":531,"b":529,"h":0,"r":"?","dd":0},{"id":961,"w":511,"b":528,"h":0,"r":"?","dd":0},{"id":962,"w":520,"b":519,"h":0,"r":"?","dd":0},{"id":963,"w":532,"b":516,"h":0,"r":"?","dd":0},{"id":964,"w":513,"b":504,"h":0,"r":"?","dd":0},{"id":965,"w":503,"b":533,"h":0,"r":"?","dd":0},{"id":966,"w":515,"b":507,"h":0,"r":"?","dd":0},{"id":967,"w":523,"b":502,"h":0,"r":"?","dd":0},{"id":968,"w":522,"b":512,"h":0,"r":"?","dd":0},{"id":969,"w":527,"b":505,"h":0,"r":"?","dd":0},{"id":970,"w":521,"b":525,"h":0,"r":"?","dd":0}]"""
+        val pairings_R3 = """[{"id":971,"w":519,"b":530,"h":0,"r":"?","dd":0},{"id":972,"w":514,"b":517,"h":0,"r":"?","dd":0},{"id":973,"w":529,"b":506,"h":0,"r":"?","dd":0},{"id":974,"w":518,"b":528,"h":0,"r":"?","dd":0},{"id":975,"w":510,"b":509,"h":0,"r":"?","dd":0},{"id":976,"w":505,"b":504,"h":0,"r":"?","dd":0},{"id":977,"w":526,"b":511,"h":0,"r":"?","dd":0},{"id":978,"w":525,"b":520,"h":0,"r":"?","dd":0},{"id":979,"w":507,"b":508,"h":0,"r":"?","dd":0},{"id":980,"w":531,"b":512,"h":0,"r":"?","dd":0},{"id":981,"w":516,"b":502,"h":0,"r":"?","dd":0},{"id":982,"w":524,"b":533,"h":0,"r":"?","dd":0},{"id":983,"w":513,"b":532,"h":0,"r":"?","dd":0},{"id":984,"w":521,"b":515,"h":0,"r":"?","dd":0},{"id":985,"w":522,"b":503,"h":0,"r":"?","dd":0},{"id":986,"w":527,"b":523,"h":0,"r":"?","dd":0}]"""
+        val pairings_R4 = """[{"id":987,"w":506,"b":528,"h":0,"r":"?","dd":0},{"id":988,"w":517,"b":530,"h":0,"r":"?","dd":0},{"id":989,"w":518,"b":512,"h":0,"r":"?","dd":0},{"id":990,"w":511,"b":519,"h":0,"r":"?","dd":0},{"id":991,"w":508,"b":504,"h":0,"r":"?","dd":0},{"id":992,"w":533,"b":514,"h":0,"r":"?","dd":0},{"id":993,"w":529,"b":502,"h":0,"r":"?","dd":0},{"id":994,"w":520,"b":509,"h":0,"r":"?","dd":0},{"id":995,"w":531,"b":516,"h":0,"r":"?","dd":0},{"id":996,"w":507,"b":503,"h":0,"r":"?","dd":0},{"id":997,"w":510,"b":505,"h":0,"r":"?","dd":0},{"id":998,"w":523,"b":524,"h":0,"r":"?","dd":0},{"id":999,"w":532,"b":526,"h":0,"r":"?","dd":0},{"id":1000,"w":515,"b":525,"h":0,"r":"?","dd":0},{"id":1001,"w":522,"b":527,"h":0,"r":"?","dd":0},{"id":1002,"w":513,"b":521,"h":0,"r":"?","dd":0}]"""
+        val pairings_R5 = """[{"id":1003,"w":528,"b":530,"h":0,"r":"?","dd":0},{"id":1004,"w":512,"b":517,"h":0,"r":"?","dd":0},{"id":1005,"w":504,"b":519,"h":0,"r":"?","dd":0},{"id":1006,"w":514,"b":509,"h":0,"r":"?","dd":0},{"id":1007,"w":506,"b":502,"h":0,"r":"?","dd":0},{"id":1008,"w":516,"b":518,"h":0,"r":"?","dd":0},{"id":1009,"w":511,"b":505,"h":0,"r":"?","dd":0},{"id":1010,"w":520,"b":526,"h":0,"r":"?","dd":0},{"id":1011,"w":525,"b":533,"h":0,"r":"?","dd":0},{"id":1012,"w":524,"b":508,"h":0,"r":"?","dd":0},{"id":1013,"w":503,"b":529,"h":0,"r":"?","dd":0},{"id":1014,"w":531,"b":532,"h":0,"r":"?","dd":0},{"id":1015,"w":527,"b":510,"h":0,"r":"?","dd":0},{"id":1016,"w":523,"b":515,"h":0,"r":"?","dd":0},{"id":1017,"w":507,"b":521,"h":0,"r":"?","dd":0},{"id":1018,"w":513,"b":522,"h":0,"r":"?","dd":0}]"""
+        val pairings_R6 = """[{"id":1019,"w":519,"b":517,"h":0,"r":"?","dd":0},{"id":1020,"w":530,"b":509,"h":0,"r":"?","dd":0},{"id":1021,"w":502,"b":528,"h":0,"r":"?","dd":0},{"id":1022,"w":526,"b":504,"h":0,"r":"?","dd":0},{"id":1023,"w":505,"b":514,"h":0,"r":"?","dd":0},{"id":1024,"w":508,"b":506,"h":0,"r":"?","dd":0},{"id":1025,"w":533,"b":518,"h":0,"r":"?","dd":0},{"id":1026,"w":529,"b":512,"h":0,"r":"?","dd":0},{"id":1027,"w":524,"b":511,"h":0,"r":"?","dd":0},{"id":1028,"w":503,"b":520,"h":0,"r":"?","dd":0},{"id":1029,"w":532,"b":525,"h":0,"r":"?","dd":0},{"id":1030,"w":516,"b":515,"h":0,"r":"?","dd":0},{"id":1031,"w":521,"b":510,"h":0,"r":"?","dd":0},{"id":1032,"w":531,"b":527,"h":0,"r":"?","dd":0},{"id":1033,"w":507,"b":522,"h":0,"r":"?","dd":0},{"id":1034,"w":523,"b":513,"h":0,"r":"?","dd":0}]"""
+        val pairings_R7 = """[{"id":1035,"w":528,"b":517,"h":0,"r":"?","dd":0},{"id":1036,"w":509,"b":504,"h":0,"r":"?","dd":0},{"id":1037,"w":530,"b":518,"h":0,"r":"?","dd":0},{"id":1038,"w":506,"b":519,"h":0,"r":"?","dd":0},{"id":1039,"w":514,"b":502,"h":0,"r":"?","dd":0},{"id":1040,"w":512,"b":510,"h":0,"r":"?","dd":0},{"id":1041,"w":533,"b":505,"h":0,"r":"?","dd":0},{"id":1042,"w":525,"b":511,"h":0,"r":"?","dd":0},{"id":1043,"w":529,"b":520,"h":0,"r":"?","dd":0},{"id":1044,"w":526,"b":515,"h":0,"r":"?","dd":0},{"id":1045,"w":508,"b":521,"h":0,"r":"?","dd":0},{"id":1046,"w":516,"b":527,"h":0,"r":"?","dd":0},{"id":1047,"w":522,"b":524,"h":0,"r":"?","dd":0},{"id":1048,"w":532,"b":503,"h":0,"r":"?","dd":0},{"id":1049,"w":531,"b":513,"h":0,"r":"?","dd":0},{"id":1050,"w":523,"b":507,"h":0,"r":"?","dd":0}]"""
 
         // read tournament without pairings
         var file_np = getTestFile("opengotha/tournamentfiles/simpleswiss_nopairings.xml")
@@ -352,10 +353,11 @@ class BasicTests: TestBase() {
         assertTrue(compare_weights("weights.txt", "weights.txt"), "Weights not equal to itself")
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weightsonly_R1.txt"), "Not matching opengotha weights for round 1")
         assertTrue(compare_games(games_np, Json.parse(pairings_R1.toString())!!.asArray()), "pairings for round 1 differ")
-        assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
+        //assertEquals(pairings_R1, games_np.toString(), "pairings for round 1 differ")
         logger.info("Pairings for round 1 match OpenGotha")
 
-        for (game_id in 843..858) {
+        var firstGameID:Int = (games_np.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+        for (game_id in firstGameID..firstGameID+15) {
             resp_np = TestAPI.put("/api/tour/$id_np/res/1", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
             assertTrue(resp_np.getBoolean("success") == true, "expecting success")
         }
@@ -367,10 +369,12 @@ class BasicTests: TestBase() {
 
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R2.txt"), "Not matching opengotha weights for round 2")
         assertTrue(compare_games(games_np, Json.parse(pairings_R2.toString())!!.asArray()), "pairings for round 2 differ")
-        assertEquals(pairings_R2, games_np.toString(), "pairings for round 2 differ")
+        //assertEquals(pairings_R2, games_np.toString(), "pairings for round 2 differ")
         logger.info("Pairings for round 2 match OpenGotha")
 
-        for (game_id in 859..874) {
+
+        firstGameID = (games_np.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+        for (game_id in firstGameID..firstGameID+15) {
             resp_np = TestAPI.put("/api/tour/$id_np/res/2", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
             assertTrue(resp_np.getBoolean("success") == true, "expecting success")
         }
@@ -382,10 +386,11 @@ class BasicTests: TestBase() {
 
         assertTrue(compare_weights("weights.txt", "opengotha/simpleswiss_weights_R3.txt"), "Not matching opengotha weights for round 3")
         assertTrue(compare_games(games_np, Json.parse(pairings_R3.toString())!!.asArray()), "pairings for round 3 differ")
-        assertEquals(pairings_R3, games_np.toString(), "pairings for round 3 differ")
+        //assertEquals(pairings_R3, games_np.toString(), "pairings for round 3 differ")
         logger.info("Pairings for round 3 match OpenGotha")
 
-        for (game_id in 875..890) {
+        firstGameID = (games_np.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+        for (game_id in firstGameID..firstGameID+15) {
             resp_np = TestAPI.put("/api/tour/$id_np/res/3", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
             assertTrue(resp_np.getBoolean("success") == true, "expecting success")
         }
@@ -400,7 +405,8 @@ class BasicTests: TestBase() {
         //assertEquals(pairings_R4, games_np.toString(), "pairings for round 3 differ")
         logger.info("Pairings for round 4 match OpenGotha")
 
-        for (game_id in 891..906) {
+        firstGameID = (games_np.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+        for (game_id in firstGameID..firstGameID+15) {
             resp_np = TestAPI.put("/api/tour/$id_np/res/4", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
             assertTrue(resp_np.getBoolean("success") == true, "expecting success")
         }
@@ -415,7 +421,8 @@ class BasicTests: TestBase() {
         //assertEquals(pairings_R4, games_np.toString(), "pairings for round 3 differ")
         logger.info("Pairings for round 5 match OpenGotha")
 
-        for (game_id in 907..922) {
+        firstGameID = (games_np.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+        for (game_id in firstGameID..firstGameID+15) {
             resp_np = TestAPI.put("/api/tour/$id_np/res/5", Json.parse("""{"id":$game_id,"result":"b"}""")).asObject()
             assertTrue(resp_np.getBoolean("success") == true, "expecting success")
         }

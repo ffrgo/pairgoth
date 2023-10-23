@@ -36,7 +36,7 @@
     </Players>
     <Games/>
     <TournamentParameterSet>
-        <GeneralParameterSet bInternet="false" basicTime="60" beginDate="2020-12-22" canByoYomiTime="300" complementaryTimeSystem="STDBYOYOMI" director="François Mizessyn" endDate="2021-01-07" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Internet" name="Championnat des Vieux Dragons" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="5" shortName="simpleswiss_nopairings" size="19" stdByoYomiTime="30"/>
+        <GeneralParameterSet bInternet="false" basicTime="60" beginDate="2020-12-22" canByoYomiTime="300" complementaryTimeSystem="STDBYOYOMI" director="François Mizessyn" endDate="2021-01-07" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Internet" name="Championnat des Vieux Dragons" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="7" shortName="simpleswiss_nopairings" size="19" stdByoYomiTime="30"/>
         <HandicapParameterSet hdBasedOnMMS="true" hdCeiling="0" hdCorrection="0" hdNoHdRankThreshold="30K"/>
         <PlacementParameterSet>
             <PlacementCriteria>
