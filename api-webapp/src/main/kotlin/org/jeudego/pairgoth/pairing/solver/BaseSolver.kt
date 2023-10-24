@@ -96,7 +96,16 @@ sealed class BaseSolver(
 
         if (DEBUG_EXPORT_WEIGHT) {
             for (it in sorted) {
-                println(it[0].nameSeed() + " " + it[0].place.toString() + " " + it[0].colorBalance.toString() + " vs " +it[1].nameSeed() + " " +it[1].place.toString() + " " + it[1].colorBalance.toString())
+                println(it[0].nameSeed() + " " + it[0].place.toString()
+                                         + " " + it[0].colorBalance.toString()
+                                         + " " + it[0].group.toString()
+                                         + " " + it[0].drawnUpDown.toString()
+                                      + " vs " + it[1].nameSeed()
+                                         + " " + it[1].place.toString()
+                                         + " " + it[1].colorBalance.toString()
+                                         + " " + it[1].group.toString()
+                                         + " " + it[1].drawnUpDown.toString()
+                )
             }
         }
 
@@ -202,9 +211,6 @@ sealed class BaseSolver(
         // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
         // Modifs V3.44.05 (ideas from Tuomo Salo)
 
-        // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
-        // Modifs V3.44.05 (ideas from Tuomo Salo)
-        var duddCost: Long = 0
         if (Math.abs(p1.group - p2.group) < 4 && (p1.group != p2.group)) {
             // 5 scenarii
             // scenario = 0 : Both players have already been drawn in the same sense
@@ -214,10 +220,10 @@ sealed class BaseSolver(
             // scenario = 3 : It corrects a previous DU/DD            //        
             // scenario = 4 : it corrects a previous DU/DD for both
             var scenario = 2
-            val p1_DU = 0 // TODO compute DUDD for both players
-            val p1_DD = 0
-            val p2_DU = 0
-            val p2_DD = 0
+            val p1_DU = p1.drawnUpDown.first
+            val p1_DD = p1.drawnUpDown.second
+            val p2_DU = p2.drawnUpDown.first
+            val p2_DD = p2.drawnUpDown.second
             
             if (p1_DU > 0 && p1.group > p2.group) {
                 scenario--
@@ -267,7 +273,7 @@ sealed class BaseSolver(
                 // Do nothing
             } else if (scenario == 1) {
                 score += 1 * duddWeight
-            } else if (scenario == 2 || scenario > 2 && !pairing.main.compensateDrawUpDown) {
+            } else if (scenario == 2 || (scenario > 2 && !pairing.main.compensateDrawUpDown)) {
                 score += 2 * duddWeight
             } else if (scenario == 3) {
                 score += 3 * duddWeight
@@ -443,6 +449,7 @@ sealed class BaseSolver(
 
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
-        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white)))
+
+        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white), drawnUpDown = white.group-black.group))
     }
 }
