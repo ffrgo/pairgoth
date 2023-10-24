@@ -75,6 +75,8 @@ abstract class BasePairingHelper(
 
     protected val Pairable.group: Int get() = _groups[id]!!
 
+    protected val Pairable.nbBye: Int get() = historyHelper.nbPlayedWithBye(this) ?: 0
+
     // score (number of wins)
     val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
 

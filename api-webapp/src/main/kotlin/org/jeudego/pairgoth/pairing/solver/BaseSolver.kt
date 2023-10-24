@@ -40,6 +40,7 @@ sealed class BaseSolver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
+        pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
@@ -140,6 +141,17 @@ sealed class BaseSolver(
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else 0.0
         return score
+    }
+
+    open fun BaseCritParams.applyByeWeight(p1: Pairable, p2: Pairable): Double {
+        // The weight is applied if one of p1 or p2 is the BYE player
+        return if (p1.id == ByePlayer.id || p2.id == ByePlayer.id) {
+            val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
+            // TODO maybe use a different formula than opengotha
+            BaseCritParams.MAX_BYE_WEIGHT - (1000 * actualPlayer.nbBye + actualPlayer.rank + 2*actualPlayer.main)
+        } else {
+            0.0
+        }
     }
 
     // Main criteria

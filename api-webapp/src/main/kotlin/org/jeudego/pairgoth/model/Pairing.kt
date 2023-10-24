@@ -14,7 +14,8 @@ data class BaseCritParams(
     val dupWeight: Double = MAX_AVOIDDUPGAME,
     val random: Double = 0.0,
     val deterministic: Boolean = true,
-    val colorBalanceWeight: Double = MAX_COLOR_BALANCE
+    val colorBalanceWeight: Double = MAX_COLOR_BALANCE,
+    val byeWeight: Double = MAX_BYE_WEIGHT // This weight is not in opengotha
 ) {
     init {
         if (nx1 < 0.0 || nx1 > 1.0) throw Error("invalid standardNX1Factor")
@@ -25,6 +26,7 @@ data class BaseCritParams(
 
     companion object {
         const val MAX_AVOIDDUPGAME = 500000000000000.0 // 5e14
+        const val MAX_BYE_WEIGHT = 100000000000.0 // 1e11
         const val MAX_RANDOM = 1000000000.0 // 1e9
         const val MAX_COLOR_BALANCE = 1000000.0 // 1e6
         val default = BaseCritParams()
