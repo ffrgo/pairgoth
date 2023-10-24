@@ -20,6 +20,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
+    open fun nbPlayedWithBye(p: Pairable) = nbPlayedWithBye[p.id]
     open fun nbW(p: Pairable) = wins[p.id]
 
     fun drawnUpDown(p: Pairable) = drawnUpDown[p.id]
@@ -43,6 +44,17 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             it.first
         }.fold(0) { acc, next ->
             acc + next.second
+        }
+    }
+
+    private val nbPlayedWithBye: Map<ID, Int> by lazy {
+        history.flatten().flatMap { game ->
+            // Duplicates (white, black) into (white, black) and (black, white)
+            listOf(Pair(game.white, game.black), Pair(game.black, game.white))
+        }.groupingBy {
+            it.first
+        }.fold(0) { acc, next ->
+            acc + if (next.second == ByePlayer.id) 1 else 0
         }
     }
 

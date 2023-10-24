@@ -24,7 +24,6 @@ sealed class BaseSolver(
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     pairing: PairingParams,
     placement: PlacementParams,
-    val forcedBye: Pairable? = null, // This parameter is non-null to force the given pairable to be chosen as a bye player.
     ) : BasePairingHelper(history, pairables, pairing, placement) {
 
     companion object {
@@ -41,25 +40,12 @@ sealed class BaseSolver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
+        pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
-        // The byeGame is a list of one game with the bye player or an empty list
-        val byeGame: List<Game> = if (pairables.size % 2 != 0) {
-            // We must choose a bye player
-            val physicalByePlayer = forcedBye ?: chooseByePlayer()
-            // Remove the bye from the pairables
-            pairables = pairables.filterNot { it == physicalByePlayer }
-            // Assign a special game to the bye player
-            listOf( Game(Store.nextGameId, physicalByePlayer.id, ByePlayer.id) )
-        } else {
-            listOf()
-        }
-
-        return listOf(pairEvenNumberOfPlayers(), byeGame).flatten() // Add the bye game to the actual paired games
-    }
-    fun pairEvenNumberOfPlayers(): List<Game> {
         // check that at this stage, we have an even number of pairables
+        // The BYE player should have been added beforehand to make a number of pairables even.
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 
@@ -115,12 +101,6 @@ sealed class BaseSolver(
         }
 
         return result
-
-    }
-
-    fun chooseByePlayer(): Pairable {
-        // TODO https://github.com/lucvannier/opengotha/blob/master/src/info/vannier/gotha/Tournament.java#L1471
-        return ByePlayer
     }
 
     // Base criteria
@@ -162,6 +142,17 @@ sealed class BaseSolver(
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else 0.0
         return score
+    }
+
+    open fun BaseCritParams.applyByeWeight(p1: Pairable, p2: Pairable): Double {
+        // The weight is applied if one of p1 or p2 is the BYE player
+        return if (p1.id == ByePlayer.id || p2.id == ByePlayer.id) {
+            val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
+            // TODO maybe use a different formula than opengotha
+            BaseCritParams.MAX_BYE_WEIGHT - (1000 * actualPlayer.nbBye + actualPlayer.rank + 2*actualPlayer.main)
+        } else {
+            0.0
+        }
     }
 
     // Main criteria
