@@ -40,7 +40,7 @@ sealed class BaseSolver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
-        pairing.base.applyByeWeight(p1, p2) +
+        //pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
@@ -149,7 +149,9 @@ sealed class BaseSolver(
         return if (p1.id == ByePlayer.id || p2.id == ByePlayer.id) {
             val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
             // TODO maybe use a different formula than opengotha
-            BaseCritParams.MAX_BYE_WEIGHT - (1000 * actualPlayer.nbBye + actualPlayer.rank + 2*actualPlayer.main)
+            val x = (actualPlayer.rank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
+            concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
+            BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
         } else {
             0.0
         }
@@ -188,8 +190,7 @@ sealed class BaseSolver(
         // TODO check category equality if category are used in SwissCat
         if (scoreRange!=0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
-            val k: Double = pairing.base.nx1
-            score = scoreWeight * (1.0 - x) * (1.0 + k * x)
+            score = concavityFunction(x, scoreWeight)
         }
 
         return score
@@ -439,6 +440,11 @@ sealed class BaseSolver(
             }
         }
         return score
+    }
+
+    fun concavityFunction(x: Double, scale: Double) : Double {
+        val k = pairing.base.nx1
+        return scale * (1.0 - x) * (1.0 + k * x)
     }
 
     open fun games(black: Pairable, white: Pairable): List<Game> {
