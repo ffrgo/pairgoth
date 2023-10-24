@@ -80,6 +80,7 @@ sealed class BaseSolver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
+
                 }
             }
         }
@@ -95,7 +96,7 @@ sealed class BaseSolver(
 
         if (DEBUG_EXPORT_WEIGHT) {
             for (it in sorted) {
-                println(it[0].nameSeed() + " " + it[0].place.toString() + " vs " +it[1].nameSeed() + " " +it[1].place.toString())
+                println(it[0].nameSeed() + " " + it[0].place.toString() + " " + it[0].colorBalance.toString() + " vs " +it[1].nameSeed() + " " +it[1].place.toString() + " " + it[1].colorBalance.toString())
             }
         }
 
@@ -426,9 +427,9 @@ sealed class BaseSolver(
         val hd = pairing.handicap.handicap(p1,p2)
         if(hd==0){
             if (p1.colorBalance > p2.colorBalance) {
-                score = 1.0
+                score = - 1.0
             } else if (p1.colorBalance < p2.colorBalance) {
-                score = -1.0
+                score = 1.0
             } else { // choose color from a det random
                 if (detRandom(1.0, p1, p2) === 0.0) {
                     score = 1.0
