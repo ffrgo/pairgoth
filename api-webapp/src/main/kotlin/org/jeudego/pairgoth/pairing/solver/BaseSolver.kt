@@ -24,7 +24,6 @@ sealed class BaseSolver(
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     pairing: PairingParams,
     placement: PlacementParams,
-    val forcedBye: Pairable? = null, // This parameter is non-null to force the given pairable to be chosen as a bye player.
     ) : BasePairingHelper(history, pairables, pairing, placement) {
 
     companion object {
@@ -44,22 +43,8 @@ sealed class BaseSolver(
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
-        // The byeGame is a list of one game with the bye player or an empty list
-        val byeGame: List<Game> = if (pairables.size % 2 != 0) {
-            // We must choose a bye player
-            val physicalByePlayer = forcedBye ?: chooseByePlayer()
-            // Remove the bye from the pairables
-            pairables = pairables.filterNot { it == physicalByePlayer }
-            // Assign a special game to the bye player
-            listOf( Game(Store.nextGameId, physicalByePlayer.id, ByePlayer.id) )
-        } else {
-            listOf()
-        }
-
-        return listOf(pairEvenNumberOfPlayers(), byeGame).flatten() // Add the bye game to the actual paired games
-    }
-    fun pairEvenNumberOfPlayers(): List<Game> {
         // check that at this stage, we have an even number of pairables
+        // The BYE player should have been added beforehand to make a number of pairables even.
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 
@@ -114,12 +99,6 @@ sealed class BaseSolver(
         }
 
         return result
-
-    }
-
-    fun chooseByePlayer(): Pairable {
-        // TODO https://github.com/lucvannier/opengotha/blob/master/src/info/vannier/gotha/Tournament.java#L1471
-        return ByePlayer
     }
 
     // Base criteria
