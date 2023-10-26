@@ -95,18 +95,24 @@ sealed class BaseSolver(
         val result = sorted.flatMap { games(white = it[0], black = it[1]) }
 
         if (DEBUG_EXPORT_WEIGHT) {
+            var sumOfWeights = 0.0
             for (it in sorted) {
                 println(it[0].nameSeed() + " " + it[0].place.toString()
+                                         + " " + it[0].id.toString()
                                          + " " + it[0].colorBalance.toString()
                                          + " " + it[0].group.toString()
                                          + " " + it[0].drawnUpDown.toString()
                                       + " vs " + it[1].nameSeed()
                                          + " " + it[1].place.toString()
+                                         + " " + it[1].id.toString()
                                          + " " + it[1].colorBalance.toString()
                                          + " " + it[1].group.toString()
                                          + " " + it[1].drawnUpDown.toString()
                 )
+                sumOfWeights += weight(it[0], it[1])
             }
+            val dec = DecimalFormat("#.#")
+            println("sumOfWeights = " + dec.format(sumOfWeights))
         }
 
         return result
