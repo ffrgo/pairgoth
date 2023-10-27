@@ -3,12 +3,9 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.model.Pairing
-import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.web.Event
 import org.jeudego.pairgoth.web.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -29,7 +26,7 @@ object PairingHandler: PairgothApiHandler {
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
-        if (!allPlayers && tournament.pairing.type == PairingType.SWISS) badRequest("Swiss pairing requires all pairable players")
+        //if (!allPlayers && tournament.pairing.type == PairingType.SWISS) badRequest("Swiss pairing requires all pairable players")
         val playing = (tournament.games(round).values).flatMap {
             listOf(it.black, it.white)
         }.toSet()

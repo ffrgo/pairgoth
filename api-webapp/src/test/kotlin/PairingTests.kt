@@ -244,9 +244,16 @@ class PairingTests: TestBase() {
 
         var games: Json.Array
         var firstGameID: Int
+        var playersList = mutableListOf<Long>()
+
+        for (i in 0..34){
+            playersList.add(players.getJson(i)!!.asObject()["id"] as Long)
+        }
+
+        val byePlayerList = mutableListOf<Long>(354, 359, 356, 357, 345, 339, 368, 344, 349, 341)
 
         for (round in 1..7) {
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
             logger.info("games for round $round: {}", games.toString())
 
             assertTrue(compare_weights("weights.txt", "opengotha/notsosimpleswiss_weights_R$round.txt"), "Not matching opengotha weights for round $round")
