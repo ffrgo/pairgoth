@@ -9,6 +9,7 @@ import org.jeudego.pairgoth.store.Store
 sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int) {
     companion object {
         val MIN_RANK: Int = -30 // 30k
+        val MAX_RANK: Int = 20
     }
     abstract fun toJson(): Json.Object
     abstract val club: String?
@@ -17,6 +18,10 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
         return name
     }
     val skip = mutableSetOf<Int>() // skipped rounds
+
+    fun equals(other: Pairable): Boolean {
+        return id == other.id
+    }
 }
 
 object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {

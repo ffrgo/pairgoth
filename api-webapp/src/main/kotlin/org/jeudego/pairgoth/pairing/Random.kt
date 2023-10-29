@@ -1,0 +1,22 @@
+package org.jeudego.pairgoth.pairing
+
+import org.jeudego.pairgoth.model.Pairable
+
+fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
+    var inverse = false
+    var name1 = p1.nameSeed("")
+    var name2 = p2.nameSeed("")
+    if (name1 > name2) {
+        name1 = name2.also { name2 = name1 }
+        inverse = true
+    }
+    var nR = "$name1$name2".mapIndexed { i, c ->
+        c.code.toDouble() * (i + 1)
+    }.sum() * 1234567 % (max + 1)
+    if (inverse) nR = max - nR
+    return nR
+}
+
+fun nonDetRandom(max: Double) =
+    if (max == 0.0) 0.0
+    else Math.random() * (max + 1.0)

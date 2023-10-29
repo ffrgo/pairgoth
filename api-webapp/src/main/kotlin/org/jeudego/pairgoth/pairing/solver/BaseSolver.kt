@@ -1,8 +1,10 @@
-package org.jeudego.pairgoth.pairing
+package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
-import org.jeudego.pairgoth.model.Criterion.*
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
+import org.jeudego.pairgoth.pairing.BasePairingHelper
+import org.jeudego.pairgoth.pairing.detRandom
+import org.jeudego.pairgoth.pairing.nonDetRandom
 import org.jeudego.pairgoth.store.Store
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -16,97 +18,17 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
-    var inverse = false
-    var name1 = p1.nameSeed("")
-    var name2 = p2.nameSeed("")
-    if (name1 > name2) {
-        name1 = name2.also { name2 = name1 }
-        inverse = true
-    }
-    var nR = "$name1$name2".mapIndexed { i, c ->
-        c.code.toDouble() * (i + 1)
-    }.sum() * 1234567 % (max + 1)
-    if (inverse) nR = max - nR
-    return nR
-}
-
-private fun nonDetRandom(max: Double) =
-    if (max == 0.0) 0.0
-    else Math.random() * (max + 1.0)
-
-sealed class Solver(
-    val round: Int,
-    history: List<List<Game>>,
-    val pairables: List<Pairable>,
-    val pairing: PairingParams,
-    val placement: PlacementParams
-    ) {
+sealed class BaseSolver(
+    val round: Int, // Round number
+    history: List<List<Game>>, // History of all games played for each round
+    pairables: List<Pairable>, // All pairables for this round, it may include the bye player
+    pairing: PairingParams,
+    placement: PlacementParams,
+    ) : BasePairingHelper(history, pairables, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
         val DEBUG_EXPORT_WEIGHT = true
-    }
-
-    abstract val scores: Map<ID, Double>
-    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
-        else HistoryHelper(history) { scores }
-
-    // pairables sorted using overloadable sort function
-    private val sortedPairables by lazy {
-        pairables.sortedWith(::sort)
-    }
-    // pairables sorted for pairing purposes
-    private val pairingSortedPairables by lazy {
-        pairables.sortedWith(::pairingSort)
-    }
-    // pairables sorted for pairing purposes
-    private val nameSortedPairables by lazy {
-        pairables.sortedWith(::nameSort)
-    }
-    // Sorting for logging purpose
-    private val logSortedPairablesMap by lazy {
-        val logSortedPairables = pairables.sortedWith(::logSort)
-        logSortedPairables.associateWith { logSortedPairables.indexOf(it) }
-    }
-
-    protected val pairablesMap by lazy {
-        pairables.associateBy { it.id }
-    }
-
-    open fun sort(p: Pairable, q: Pairable): Int {
-        for (criterion in placement.criteria) {
-            val criterionP = p.eval(criterion)
-            val criterionQ = q.eval(criterion)
-            if (criterionP != criterionQ) {
-                return (criterionP * 100 - criterionQ * 100).toInt()
-            }
-        }
-        return 0
-    }
-    open fun pairingSort(p: Pairable, q: Pairable): Int {
-        for (criterion in placement.criteria) {
-            val criterionP = p.eval(criterion)
-            val criterionQ = q.eval(criterion)
-            if (criterionP != criterionQ) {
-                return (criterionP * 100 - criterionQ * 100).toInt()
-            }
-        }
-        if (p.rating == q.rating) {
-            return if (p.name > q.name) 1 else -1
-        }
-        return q.rating - p.rating
-
-    }
-    open fun nameSort(p: Pairable, q: Pairable): Int {
-        return if (p.name > q.name) 1 else -1
-    }
-    // Sorting function to order the weight matrix for debugging
-    open fun logSort(p: Pairable, q: Pairable): Int {
-        if (p.rating == q.rating) {
-            return if (p.name > q.name) 1 else -1
-        }
-        return p.rating - q.rating
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -118,15 +40,12 @@ sealed class Solver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
+        //pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
-    // The main criterion that will be used to define the groups should be defined by subclasses
-    val Pairable.main: Double get() = scores[id] ?: 0.0
-    abstract val mainLimits: Pair<Double, Double>
-    // SOS and variants will be computed based on this score
     fun pair(): List<Game> {
-        weightLogs.clear()
         // check that at this stage, we have an even number of pairables
+        // The BYE player should have been added beforehand to make a number of pairables even.
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 
@@ -162,7 +81,6 @@ sealed class Solver(
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
 
-                    logWeights("total", p, q, weight(p,q))
                 }
             }
         }
@@ -170,34 +88,37 @@ sealed class Solver(
         val matching = KolmogorovWeightedPerfectMatching(graph, ObjectiveSense.MAXIMIZE)
         val solution = matching.matching
 
-        fun gamesSort(p1:Pairable, p2:Pairable) = 0.5*(p1.place + p2.place)
-
-        var sorted = solution.map{
+        val sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
-        }.sortedBy { gamesSort(it[0],it[1])}
+        }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
 
+        val result = sorted.flatMap { games(white = it[0], black = it[1]) }
 
-        var result = sorted.flatMap { games(white = it[0], black = it[1]) }
+        if (DEBUG_EXPORT_WEIGHT) {
+            var sumOfWeights = 0.0
+            for (it in sorted) {
+                println(it[0].nameSeed() + " " + it[0].place.toString()
+                                         + " " + it[0].id.toString()
+                                         + " " + it[0].colorBalance.toString()
+                                         + " " + it[0].group.toString()
+                                         + " " + it[0].drawnUpDown.toString()
+                                      + " vs " + it[1].nameSeed()
+                                         + " " + it[1].place.toString()
+                                         + " " + it[1].id.toString()
+                                         + " " + it[1].colorBalance.toString()
+                                         + " " + it[1].group.toString()
+                                         + " " + it[1].drawnUpDown.toString()
+                )
+                sumOfWeights += weight(it[0], it[1])
+            }
+            val dec = DecimalFormat("#.#")
+            println("sumOfWeights = " + dec.format(sumOfWeights))
+        }
 
         return result
-
     }
 
-    var weightLogs: MutableMap<String, Array<DoubleArray>> = mutableMapOf()
-    fun logWeights(weightName: String, p1: Pairable, p2: Pairable, weight: Double) {
-        if (DEBUG_EXPORT_WEIGHT) {
-            if (!weightLogs.contains(weightName)) {
-                weightLogs[weightName] = Array(pairables.size) { DoubleArray(pairables.size) }
-            }
-            val pos1: Int = logSortedPairablesMap[p1]!!
-            val pos2: Int = logSortedPairablesMap[p2]!!
-            weightLogs[weightName]!![pos1][pos2] = weight
-
-        }
-    }
-
-    // base criteria
-
+    // Base criteria
     open fun BaseCritParams.apply(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         // Base Criterion 1 : Avoid Duplicating Game
@@ -215,14 +136,12 @@ sealed class Solver(
     open fun  BaseCritParams.avoidDuplicatingGames(p1: Pairable, p2: Pairable): Double {
         val score =  if (p1.played(p2)) 0.0 // We get no score if pairables already played together
         else dupWeight
-        logWeights("avoiddup", p1, p2, score)
         return score
     }
 
     open fun BaseCritParams.applyRandom(p1: Pairable, p2: Pairable): Double {
         val score =  if (deterministic) detRandom(random, p1, p2)
         else nonDetRandom(random)
-        logWeights("random", p1, p2, score)
         return score
     }
 
@@ -237,8 +156,20 @@ sealed class Solver(
             if (wb1 * wb2 < 0) colorBalanceWeight
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else 0.0
-        logWeights("color", p1, p2, score)
         return score
+    }
+
+    open fun BaseCritParams.applyByeWeight(p1: Pairable, p2: Pairable): Double {
+        // The weight is applied if one of p1 or p2 is the BYE player
+        return if (p1.id == ByePlayer.id || p2.id == ByePlayer.id) {
+            val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
+            // TODO maybe use a different formula than opengotha
+            val x = (actualPlayer.rank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
+            concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
+            BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
+        } else {
+            0.0
+        }
     }
 
     // Main criteria
@@ -274,11 +205,9 @@ sealed class Solver(
         // TODO check category equality if category are used in SwissCat
         if (scoreRange!=0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
-            val k: Double = pairing.base.nx1
-            score = scoreWeight * (1.0 - x) * (1.0 + k * x)
+            score = concavityFunction(x, scoreWeight)
         }
 
-        logWeights("score", p1, p2, score)
         return score
     }
 
@@ -286,6 +215,84 @@ sealed class Solver(
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
+        // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
+        // Modifs V3.44.05 (ideas from Tuomo Salo)
+
+        if (Math.abs(p1.group - p2.group) < 4 && (p1.group != p2.group)) {
+            // 5 scenarii
+            // scenario = 0 : Both players have already been drawn in the same sense
+            // scenario = 1 : One of the players has already been drawn in the same sense           
+            // scenario = 2 : Normal conditions (does not correct anything and no previous drawn in the same sense)
+            //                This case also occurs if one DU/DD is increased, while one is compensated
+            // scenario = 3 : It corrects a previous DU/DD            //        
+            // scenario = 4 : it corrects a previous DU/DD for both
+            var scenario = 2
+            val p1_DU = p1.drawnUpDown.first
+            val p1_DD = p1.drawnUpDown.second
+            val p2_DU = p2.drawnUpDown.first
+            val p2_DD = p2.drawnUpDown.second
+            
+            if (p1_DU > 0 && p1.group > p2.group) {
+                scenario--
+            }
+            if (p1_DD > 0 && p1.group < p2.group) {
+                scenario--
+            }
+            if (p2_DU > 0 && p2.group > p1.group) {
+                scenario--
+            }
+            if (p2_DD > 0 && p2.group < p1.group) {
+                scenario--
+            }
+            if (scenario != 0 && p1_DU > 0 && p1_DD < p1_DU && p1.group < p2.group) {
+                scenario++
+            }
+            if (scenario != 0 && p1_DD > 0 && p1_DU < p1_DD && p1.group > p2.group) {
+                scenario++
+            }
+            if (scenario != 0 && p2_DU > 0 && p2_DD < p2_DU && p2.group < p1.group) {
+                scenario++
+            }
+            if (scenario != 0 && p2_DD > 0 && p2_DU < p2_DD && p2.group > p1.group) {
+                scenario++
+            }
+            val duddWeight: Double = pairing.main.drawUpDownWeight/5.0
+            val upperSP = if (p1.group < p2.group) p1 else p2
+            val lowerSP = if (p1.group < p2.group) p2 else p1
+            val uSPgroupSize = upperSP.placeInGroup.second
+            val lSPgroupSize = lowerSP.placeInGroup.second
+
+            if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
+                score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
+            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.MIDDLE) {
+                score += duddWeight / 2 * (uSPgroupSize - 1 - Math.abs(2 * upperSP.placeInGroup.first - uSPgroupSize + 1)) / uSPgroupSize
+            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.BOTTOM) {
+                score += duddWeight / 2 * upperSP.placeInGroup.first / uSPgroupSize
+            }
+            if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.TOP) {
+                score += duddWeight / 2 * (lSPgroupSize - 1 - lowerSP.placeInGroup.first) / lSPgroupSize
+            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.MIDDLE) {
+                score += duddWeight / 2 * (lSPgroupSize - 1 - Math.abs(2 * lowerSP.placeInGroup.first - lSPgroupSize + 1)) / lSPgroupSize
+            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.BOTTOM) {
+                score += duddWeight / 2 * lowerSP.placeInGroup.first / lSPgroupSize
+            }
+            if (scenario == 0) {
+                // Do nothing
+            } else if (scenario == 1) {
+                score += 1 * duddWeight
+            } else if (scenario == 2 || (scenario > 2 && !pairing.main.compensateDrawUpDown)) {
+                score += 2 * duddWeight
+            } else if (scenario == 3) {
+                score += 3 * duddWeight
+            } else if (scenario == 4) {
+                score += 4 * duddWeight
+            }
+        }
+
+        // TODO adapt to Swiss with categories
+        /*// But, if players come from different categories, decrease score(added in 3.11)
+        val catGap: Int = Math.abs(p1.category(gps) - p2.category(gps))
+        score = score / (catGap + 1) / (catGap + 1) / (catGap + 1) / (catGap + 1)*/
 
         return score
     }
@@ -324,7 +331,6 @@ sealed class Solver(
                 }
             }
         }
-        logWeights("seed", p1, p2, score)
         return Math.round(score).toDouble()
     }
 
@@ -434,9 +440,9 @@ sealed class Solver(
         val hd = pairing.handicap.handicap(p1,p2)
         if(hd==0){
             if (p1.colorBalance > p2.colorBalance) {
-                score = 1.0
+                score = - 1.0
             } else if (p1.colorBalance < p2.colorBalance) {
-                score = -1.0
+                score = 1.0
             } else { // choose color from a det random
                 if (detRandom(1.0, p1, p2) === 0.0) {
                     score = 1.0
@@ -448,74 +454,14 @@ sealed class Solver(
         return score
     }
 
+    fun concavityFunction(x: Double, scale: Double) : Double {
+        val k = pairing.base.nx1
+        return scale * (1.0 - x) * (1.0 + k * x)
+    }
+
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
-        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white)))
-    }
 
-    // Generic parameters calculation
-    //private val standingScore by lazy { computeStandingScore() }
-
-    // Decide each pairable group based on the main criterion
-    private val groupsCount get() = 1 + (mainLimits.second - mainLimits.first).toInt()
-    private val _groups by lazy {
-        pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
-    }
-
-    // place (among sorted pairables)
-    val Pairable.place: Int get() = _place[id]!!
-    private val _place by lazy {
-        pairingSortedPairables.mapIndexed { index, pairable ->
-            Pair(pairable.id, index)
-        }.toMap()
-    }
-
-    // placeInGroup (of same score) : Pair(place, groupSize)
-    private val Pairable.placeInGroup: Pair<Int, Int> get() = _placeInGroup[id]!!
-    private val _placeInGroup by lazy {
-        // group by group number
-        pairingSortedPairables.groupBy {
-            it.group
-        // get a list { id { placeInGroup, groupSize } }
-        }.values.flatMap { group ->
-            group.mapIndexed { index, pairable ->
-                Pair(pairable.id, Pair(index, group.size))
-            }
-        // get a map id -> { placeInGroup, groupSize }
-        }.toMap()
-    }
-
-    // already paired players map
-    private fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
-
-    // color balance (nw - nb)
-    private val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
-
-    private val Pairable.group: Int get() = _groups[id]!!
-
-    // score (number of wins)
-    val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
-
-    val Pairable.sos: Double get() = historyHelper.sos[id] ?: 0.0
-    val Pairable.sosm1: Double get() = historyHelper.sosm1[id] ?: 0.0
-    val Pairable.sosm2: Double get() = historyHelper.sosm2[id] ?: 0.0
-    val Pairable.sosos: Double get() = historyHelper.sosos[id] ?: 0.0
-    val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
-    val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
-
-    fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
-    open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
-        NONE -> 0.0
-        CATEGORY -> TODO()
-        RANK -> pairable.rank.toDouble()
-        RATING -> pairable.rating.toDouble()
-        NBW -> pairable.nbW
-        SOSW -> pairable.sos
-        SOSWM1 -> pairable.sosm1
-        SOSWM2 -> pairable.sosm2
-        SOSOSW -> pairable.sosos
-        SODOSW -> pairable.sodos
-        CUSSW -> pairable.cums
-        else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
+        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white), drawnUpDown = white.group-black.group))
     }
 }
