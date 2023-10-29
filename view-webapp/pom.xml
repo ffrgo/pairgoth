@@ -99,12 +99,13 @@
                 <configuration>
                     <scan>1</scan>
                     <httpConnector>
-                        <port>8080</port>
+                        <host>${pairgoth.webapp.host}</host>
+                        <port>${pairgoth.webapp.port}</port>
                     </httpConnector>
                     <!--
                     <systemProperties>
-                        <pairgoth.api.url>${webapp.url}</pairgoth.api.url>
-                        <pairgoth.env>${webapp.env}</pairgoth.env>
+                        <pairgoth.api.url>${pairgoth.api.url}</pairgoth.api.url>
+                        <pairgoth.env>${pairgoth.env}</pairgoth.env>
                     </systemProperties>
                     -->
                     <webApp>

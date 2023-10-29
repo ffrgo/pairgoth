@@ -59,10 +59,11 @@
                 <configuration>
                     <scan>0</scan>
                     <httpConnector>
-                        <port>8085</port>
+                        <host>${pairgoth.api.host}</host>
+                        <port>${pairgoth.api.port}</port>
                     </httpConnector>
                     <webApp>
-                        <contextPath>/api/</contextPath>
+                        <contextPath>${pairgoth.api.context}/</contextPath>
                     </webApp>
                 </configuration>
             </plugin>

@@ -78,6 +78,39 @@
     </repository>
   </repositories>
 
+  <profiles>
+    <profile>
+      <id>manual-properties</id>
+      <activation>
+        <file>
+          <exists>pairgoth.properties</exists>
+        </file>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>properties-maven-plugin</artifactId>
+            <version>1.2.0</version>
+            <executions>
+              <execution>
+                <phase>initialize</phase>
+                <goals>
+                  <goal>read-project-properties</goal>
+                </goals>
+                <configuration>
+                  <files>
+                    <file>pairgoth.properties</file>
+                  </files>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
@@ -109,6 +142,28 @@
     <kotlin.code.style>official</kotlin.code.style>
     <kotlin.compiler.jvmTarget>10</kotlin.compiler.jvmTarget>
     <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+
+    <!-- pairgoth default properties -->
+    <pairgoth.env>dev</pairgoth.env>
+    <pairgoth.webapp.protocol>http</pairgoth.webapp.protocol>
+    <pairgoth.webapp.host>localhost</pairgoth.webapp.host>
+    <pairgoth.webapp.port>8080</pairgoth.webapp.port>
+    <pairgoth.webapp.context>/</pairgoth.webapp.context>
+    <pairgoth.webapp.external.url>http://localhost:8080</pairgoth.webapp.external.url>
+    <pairgoth.api.protocol>http</pairgoth.api.protocol>
+    <pairgoth.api.host>localhost</pairgoth.api.host>
+    <pairgoth.api.port>8085</pairgoth.api.port>
+    <pairgoth.api.context>/api</pairgoth.api.context>
+    <pairgoth.api.external.url>http://localhost:8085/api</pairgoth.api.external.url>
+    <pairgoth.store>file</pairgoth.store>
+    <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
+    <pairgoth.smtp.sender></pairgoth.smtp.sender>
+    <pairgoth.smtp.host></pairgoth.smtp.host>
+    <pairgoth.smtp.port>587</pairgoth.smtp.port>
+    <pairgoth.smtp.user></pairgoth.smtp.user>
+    <pairgoth.smtp.password></pairgoth.smtp.password>
+    <pairgoth.logger.level>info</pairgoth.logger.level>
+    <pairgoth.logger.format>[%level] %ip [%logger] %message</pairgoth.logger.format>
   </properties>
 
   <modules>
