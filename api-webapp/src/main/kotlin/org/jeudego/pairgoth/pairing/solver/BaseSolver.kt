@@ -40,7 +40,7 @@ sealed class BaseSolver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
-        //pairing.base.applyByeWeight(p1, p2) +
+        // pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
@@ -59,9 +59,28 @@ sealed class BaseSolver(
             // println("placement criteria" + placement.criteria.toString())
         }
 
+        var chosenByePlayer: Pairable = ByePlayer
+        // Choose bye player and remove from pairables
+        if (ByePlayer in nameSortedPairables){
+            nameSortedPairables.remove(ByePlayer)
+            var minWeight = 1000.0*round + (Pairable.MAX_RANK - Pairable.MIN_RANK) + 1;
+            var weightForBye : Double
+            var byePlayerIndex = 0
+            for (p in nameSortedPairables){
+                weightForBye = p.rank + 2*p.main
+                if (weightForBye <= minWeight){
+                    minWeight = weightForBye
+                    chosenByePlayer = p
+                }
+                println("choose Bye: " + p.nameSeed() + " " + weightForBye)
+            }
+            println("Bye player : " + chosenByePlayer.nameSeed())
+            nameSortedPairables.remove(chosenByePlayer)
+        }
+
         for (i in nameSortedPairables.indices) {
             // println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
-            for (j in i + 1 until pairables.size) {
+            for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
@@ -80,6 +99,7 @@ sealed class BaseSolver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
+                    //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
 
                 }
             }
@@ -92,7 +112,12 @@ sealed class BaseSolver(
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
 
+/*        println(sorted.size)
+        if (chosenByePlayer != ByePlayer) sorted.add(listOf(chosenByePlayer, ByePlayer))
+        println(sorted.size)*/
+
         val result = sorted.flatMap { games(white = it[0], black = it[1]) }
+
 
         if (DEBUG_EXPORT_WEIGHT) {
             var sumOfWeights = 0.0
@@ -165,8 +190,9 @@ sealed class BaseSolver(
             val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
             // TODO maybe use a different formula than opengotha
             val x = (actualPlayer.rank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
-            concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
-            BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
+            //concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
+            //BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
+            BaseCritParams.MAX_BYE_WEIGHT*(1 - x)
         } else {
             0.0
         }

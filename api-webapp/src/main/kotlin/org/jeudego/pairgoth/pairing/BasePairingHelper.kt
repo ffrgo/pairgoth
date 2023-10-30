@@ -28,7 +28,7 @@ abstract class BasePairingHelper(
     }
     // pairables sorted for pairing purposes
     protected val nameSortedPairables by lazy {
-        pairables.sortedWith(::nameSort)
+        pairables.sortedWith(::nameSort).toMutableList()
     }
 
     protected val pairablesMap by lazy {
