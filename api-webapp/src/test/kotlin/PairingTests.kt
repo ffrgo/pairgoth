@@ -257,7 +257,7 @@ class PairingTests: TestBase() {
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
             logger.info("games for round $round: {}", games.toString())
 
-            assertTrue(compare_weights("weights.txt", "opengotha/notsosimpleswiss_weights_nobye_R$round.txt"), "Not matching opengotha weights for round $round")
+            assertTrue(compare_weights("weights.txt", "opengotha/notsosimpleswiss_weights_R$round.txt"), "Not matching opengotha weights for round $round")
             assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray()),"pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
