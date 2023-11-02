@@ -70,50 +70,31 @@
                     <outputFolder>${project.build.directory}/generated-resources/css</outputFolder>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>com.gitlab.haynes</groupId>
-                <artifactId>libsass-maven-plugin</artifactId>
-                <version>0.2.29</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <inputPath>${basedir}/src/main/sass/</inputPath>
-                    <inputSyntax>scss</inputSyntax>
-                    <outputPath>${project.build.directory}/${project.build.finalName}/css</outputPath>
-                    <generateSourceMap>true</generateSourceMap>
-                    <sourceMapOutputPath>${project.build.directory}/${project.build.finalName}/css</sourceMapOutputPath>
-                </configuration>
-            </plugin>
-            -->
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <configuration>
-                    <scan>1</scan>
+                    <scan>0</scan>
                     <httpConnector>
                         <host>${pairgoth.webapp.host}</host>
                         <port>${pairgoth.webapp.port}</port>
                     </httpConnector>
-                    <!--
                     <systemProperties>
-                        <pairgoth.api.url>${pairgoth.api.url}</pairgoth.api.url>
                         <pairgoth.env>${pairgoth.env}</pairgoth.env>
+                        <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
+                        <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
+                        <pairgoth.store>${pairgoth.store}</pairgoth.store>
+                        <pairgoth.store.file.path>${pairgoth.store}</pairgoth.store.file.path>
+                        <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
+                        <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
                     </systemProperties>
-                    -->
                     <webApp>
+                        <contextPath>${pairgoth.webapp.context}/</contextPath>
                         <resourceBases>${project.basedir}/src/main/webapp,${project.build.directory}/generated-resources/</resourceBases>
                     </webApp>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>

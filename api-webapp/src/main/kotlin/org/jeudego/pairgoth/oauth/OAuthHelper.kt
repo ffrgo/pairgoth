@@ -21,7 +21,7 @@ abstract class OAuthHelper {
         protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".secret")
     protected val redirectURI: String?
         protected get() = try {
-            val uri: String = WebappManager.Companion.getProperty("webapp.url") + "/oauth.html"
+            val uri: String = WebappManager.getProperty("webapp.external.url") + "/oauth.html"
             URLEncoder.encode(uri, "UTF-8")
         } catch (uee: UnsupportedEncodingException) {
             logger.error("could not encode redirect URI", uee)

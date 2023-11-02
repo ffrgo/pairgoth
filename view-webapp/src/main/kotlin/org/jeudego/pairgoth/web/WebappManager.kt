@@ -63,11 +63,11 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
                 properties[(key as String).removePrefix(PAIRGOTH_PROPERTIES_PREFIX)] = value
             }
 
-            val env = properties.getProperty("webapp.env")
+            val env = properties.getProperty("env")
             logger.info("Using profile {}", )
 
             // let the view be aware of the environment
-            context.setAttribute("webapp.env", env)
+            context.setAttribute("env", env)
 
             // set system user agent string to empty string
             System.setProperty("http.agent", "")
@@ -114,10 +114,10 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
             return properties.getProperty(prop)
         }
         fun getMandatoryProperty(prop: String): String {
-            return properties.getProperty(prop) ?: throw Error("missing property: ${prop}")
+            return getProperty(prop) ?: throw Error("missing property: ${prop}")
         }
 
-        val webappURL by lazy { getProperty("webapp.url") }
+        val webappURL by lazy { getProperty("webapp.external.url") }
 
         private val services = mutableMapOf<String, Pair<Runnable, Thread>>()
 

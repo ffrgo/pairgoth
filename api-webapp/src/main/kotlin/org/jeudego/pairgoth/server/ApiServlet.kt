@@ -62,7 +62,7 @@ class ApiServlet : HttpServlet() {
 
             // validate request
 
-            if ("dev" == WebappManager.getProperty("webapp.env")) {
+            if ("dev" == WebappManager.getProperty("env")) {
                 response.addHeader("Access-Control-Allow-Origin", "*")
             }
             validateAccept(request);

@@ -62,6 +62,15 @@
                         <host>${pairgoth.api.host}</host>
                         <port>${pairgoth.api.port}</port>
                     </httpConnector>
+                    <systemProperties>
+                        <pairgoth.env>${pairgoth.env}</pairgoth.env>
+                        <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
+                        <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
+                        <pairgoth.store>${pairgoth.store}</pairgoth.store>
+                        <pairgoth.store.file.path>${pairgoth.store}</pairgoth.store.file.path>
+                        <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
+                        <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
+                    </systemProperties>
                     <webApp>
                         <contextPath>${pairgoth.api.context}/</contextPath>
                     </webApp>
@@ -87,26 +96,6 @@
                     </sources>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>echo-property</id>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <phase>validate</phase>
-                        <configuration>
-                            <tasks>
-                                <echo>///////////////////////////// webapp.port=${webapp.port}</echo>
-                            </tasks>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-                -->
         </plugins>
     </build>
     <dependencyManagement>

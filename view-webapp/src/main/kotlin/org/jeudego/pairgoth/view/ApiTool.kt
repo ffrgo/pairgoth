@@ -11,8 +11,8 @@ class ApiTool {
     companion object {
         const val JSON = "application/json"
         val apiRoot =
-            System.getProperty("pairgoth.api.url")?.let { "${it.removeSuffix("/")}/" }
-            ?: System.getProperty("pairgoth.webapp.url")?.let { "${it.removeSuffix("/")}/api/" }
+            System.getProperty("pairgoth.api.external.url")?.let { "${it.removeSuffix("/")}/" }
+            ?: System.getProperty("pairgoth.webapp.external.url")?.let { "${it.removeSuffix("/")}/api/" }
             ?: throw Error("no configured API url")
     }
     private val client = OkHttpClient()
