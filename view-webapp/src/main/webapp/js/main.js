@@ -102,6 +102,35 @@ Element.prototype.modal = function(show) {
   return this;
 }
 
+/* DOM helpers */
+
+function formValue(name) {
+  let ctl = $(`[name="${name}"]`)[0];
+  let type = ctl.tagName;
+  if (
+    (type === 'INPUT' && ['text', 'number'].includes(ctl.attr('type'))) ||
+    type === 'SELECT'
+  ) {
+    return ctl.value;
+  } else if (type === 'INPUT' && ctl.attr('type') === 'radio') {
+    ctl = $(`input[name="${name}"]:checked`)[0];
+    if (ctl) return ctl.value;
+  } else if (type === 'INPUT' && ctl.attr('type') === 'radio') {
+    return ctl.checked;
+  }
+  console.error(`unknown input name: ${name}`);
+  return null;
+}
+
+function msg(id) {
+  let ctl = $(`#${id}`)[0];
+  return ctl.textContent;
+}
+
+function spinner(show) {
+  if (show) $('#backdrop').addClass('active');
+  else $('#backdrop').removeClass('active');
+}
 
 onLoad(() => {
   /*

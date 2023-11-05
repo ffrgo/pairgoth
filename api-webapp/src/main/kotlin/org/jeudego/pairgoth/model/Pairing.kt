@@ -49,7 +49,7 @@ data class MainCritParams(
     val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
     val additionalPlacementCritSystem2: Criterion = Criterion.NONE,
 ) {
-    enum class DrawUpDown {TOP, MIDDLE, BOTTOM}
+    enum class DrawUpDown { TOP, MIDDLE, BOTTOM }
     enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
     companion object {
         const val MAX_CATEGORIES_WEIGHT = 20000000000000.0 // 2e13

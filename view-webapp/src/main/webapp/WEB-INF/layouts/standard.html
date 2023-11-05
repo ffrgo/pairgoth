@@ -1,17 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${request.lang}">
 <head>
   <meta charset="UTF-8">
   <title>Pairgoth</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Pairgoth Go Paring Engine">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="stylesheet" href="/lib/fork-awesome-1.2.0/fork-awesome.min.css">
-  <link rel="stylesheet" href="/css/main.css">
-  <script type="text/javascript" src="/js/domhelper.js"></script>
+  <script type="text/javascript">
+    // #[[
+    let initFunctions = [];
+    function onLoad(fct) {
+      if (typeof(fct) == "function") initFunctions.push(fct);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      initFunctions.forEach(fct => {
+        fct();
+      });
+    });
+  // ]]#
+  </script>
 </head>
 <body class="vert flex">
-#foreach($attr in $application.getAttributeNames())$attr #end
+#* Debugging code to list all web context properties
+<blockquote>
+#foreach($attr in $application.getAttributeNames())
+  <div>$attr = $application.getAttribute($attr)</div>
+#end
+</blockquote>
+*#
   <div id="header" class="horz flex">
     <div id="logo">
       <img src="/img/logov2.svg"/>
@@ -38,13 +54,22 @@
     <div id="version">pairgoth v0.1</div>
     <div id="contact"><a href="mailto:pairgoth@jeudego.org">contact</a></div>
   </div>
+  <div id="feedback">
+    <div id="success" class="hidden"></div>
+    <div id="error" class="hidden"></div>
+  </div>
+  <div id="backdrop">
   <div id="dimmer"></div>
-  <script type="text/javascript" src="/js/store2-2.14.2.min.js"></script>
-  <script type="text/javascript" src="/js/tablesort-5.4.0.min.js"></script>
-  <script type="text/javascript" src="/js/formproxy.js"></script>
+  <script type="text/javascript" src="/lib/store2-2.14.2.min.js"></script>
+  <script type="text/javascript" src="/lib/tablesort-5.4.0.min.js"></script>
+  <script type="text/javascript" src="/lib/imaskjs-7.1.3/imask.min.js"></script>
   <script type="text/javascript" src="/js/api.js"></script>
   <script type="text/javascript" src="/js/main.js"></script>
+  <script type="text/javascript" src="/js/domhelper.js"></script>
+  <link rel="stylesheet" href="/lib/fork-awesome-1.2.0/fork-awesome.min.css"/>
+  <link rel="stylesheet" href="/css/main.css"/>
   <script type="text/javascript">
+    const lang = '${request.lang}';
     // #[[
     onLoad(() => {
       $('#lang').on('click', e => {
@@ -61,6 +86,18 @@
         }
       });
     });
+
+    // syntaxic sugar for IMask
+    NodeList.prototype.imask = function(options) {
+      this.forEach(function (elem, i) {
+        elem.imask(options);
+      });
+      return this;
+    }
+    HTMLInputElement.prototype.imask = function(options) {
+      IMask(this, options);
+    }
+
     // ]]#
   </script>
 </body>

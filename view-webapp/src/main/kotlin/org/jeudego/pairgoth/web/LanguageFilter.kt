@@ -22,13 +22,18 @@ class LanguageFilter : Filter {
     override fun doFilter(req: ServletRequest, resp: ServletResponse, chain: FilterChain) {
         val request = req as HttpServletRequest
         val response = resp as HttpServletResponse
+        val uri = request.requestURI
+
+        if (uri.startsWith("/api/")) {
+            chain.doFilter(request, response)
+            return
+        }
 
         val reqLang = request.getAttribute("lang") as String?
         if (reqLang != null) {
             TranslationTool.translator.set(Translator.getTranslator(reqLang))
             chain.doFilter(request, response)
         } else {
-            val uri = request.requestURI
             val match = langPattern.matchEntire(uri)
             val lang = match?.groupValues?.get(1)
             val target = match?.groupValues?.get(2) ?: uri
@@ -64,6 +69,6 @@ class LanguageFilter : Filter {
 
     companion object {
         private val langPattern = Regex("/([a-z]{2})(/.+)")
-        private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:_\\w+)?)(?:;q=([0-9.]+))?")
+        private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)\\w+)?)(?:;q=([0-9.]+))?")
     }
 }

@@ -53,6 +53,8 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun contextInitialized(sce: ServletContextEvent) {
         context = sce.servletContext
         logger.info("---------- Starting $WEBAPP_NAME ----------")
+        logger.debug("debug level is active")
+        logger.trace("trace level is active")
         webappRoot = context.getRealPath("/")
         try {
             // load default properties

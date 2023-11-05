@@ -19,6 +19,7 @@
 
     <toolbox scope="request">
         <tool key="api" class="org.jeudego.pairgoth.view.ApiTool"/>
+        <tool key="countries" class="org.jeudego.pairgoth.view.CountriesTool"/>
     </toolbox>
 
 </tools>

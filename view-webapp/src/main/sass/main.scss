@@ -179,6 +179,7 @@
   /* UI fixes */
 
   .ui.form, .ui.segment, .ui.form .field > label { font-size: 1em; }
+  .ui.form .fields {  }
   span > input[type="radio"] { vertical-align: text-top; }
   span > input[type="text"] { vertical-align: baseline; width: initial; }
   span > input.date { vertical-align: baseline; width: 8em; }
@@ -190,10 +191,71 @@
   .step:last-child { padding-right: 1em; }
   .step .description { display: none; }
 
+  .ui.form input[type=text], .ui.form input[type="number"], .ui.form select {
+    padding: 0.4em 0.2em;
+  }
+  .ui.form input[type="number"], input.duration {
+    text-align: center;
+  }
+
   input[type="number"] {
     padding: 0.2em 0.1em 0.2em 1em;
     vertical-align: baseline;
     width: 3.5em;
   }
 
+  .hidden {
+    display: none;
+  }
+
+  .roundbox {
+    border: solid 2px darkgray;
+    border-radius: 10px;
+    margin: 1em;
+    padding: 1em;
+  }
+
+  #backdrop {
+    display: none;
+    &.active {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
+      background-color: rgba(0,0,0,0.2);
+      cursor: wait;
+    }
+  }
+
+  #backdrop.active {
+  }
+
+  #feedback {
+    position: absolute;
+    top: 1em;
+    left: 50%;
+    font-weight: bold;
+  }
+
+  #success, #error {
+    position: relative;
+    left: -50%;
+    border-radius: 10px;
+    padding: 0.5em 1em;
+  }
+
+  #success {
+    background: lightgreen;
+    border: solid 2px green;
+    color: green;
+  }
+
+  #error {
+    background: lightcoral;
+    border: solid 2px red;
+    color: red;
+  }
 }

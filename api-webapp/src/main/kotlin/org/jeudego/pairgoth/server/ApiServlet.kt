@@ -235,7 +235,7 @@ class ApiServlet : HttpServlet() {
         cause: Throwable? = null
     ) {
         try {
-            if (code == 500) {
+            if (code == 500 || response.isCommitted) {
                 logger.error(
                     "Request {} {} gave error {} {}",
                     request.method,
@@ -245,7 +245,13 @@ class ApiServlet : HttpServlet() {
                     cause
                 )
             }
-            response.sendError(code, message)
+            response.status = code
+            if (response.isCommitted) return
+            val errorPayload = Json.Object(
+                "error" to (message ?: "unknown error")
+            )
+            setContentType(response)
+            errorPayload.toString(response.writer)
         } catch (ioe: IOException) {
             logger.error("Could not send back error", ioe)
         }

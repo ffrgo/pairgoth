@@ -5,6 +5,7 @@ import org.apache.velocity.context.Context
 import org.apache.velocity.exception.ResourceNotFoundException
 import org.apache.velocity.tools.view.ServletUtils
 import org.apache.velocity.tools.view.VelocityViewServlet
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.io.UnsupportedEncodingException
 import java.net.URLDecoder
@@ -95,7 +96,14 @@ class ViewServlet : VelocityViewServlet() {
 
     }
 
+    override fun doRequest(request: HttpServletRequest, response: HttpServletResponse ) {
+        // val uri = request.requestURI
+        logger.logRequest(request) //, !uri.contains(".") && uri.length > 1)
+        super.doRequest(request, response)
+    }
+
     companion object {
+        private var logger = LoggerFactory.getLogger("view")
         private const val STANDARD_LAYOUT = "/WEB-INF/layouts/standard.html"
     }
 }

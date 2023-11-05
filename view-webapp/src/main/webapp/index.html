@@ -1,15 +1,16 @@
 <div class="section">
-  <button id="new" class="ui blue icon floating button">
+  <a href="tour" class="ui blue icon floating button">
     <i class="fa fa-plus-square-o"></i>
     New tournament
-  </button>
+  </a>
 </div>
 #foreach($tour in $api.get('tour').entrySet())
 <div class="section">
-  <button data-tour-id="$tour.key" class="ui open basic secondary white icon floating button">
+  $tour
+  <a href="tour?tour_id=${tour.key}" class="ui open basic secondary white icon floating button">
     <i class="fa fa-folder-open-o"></i>
-    Open $tour.value
-  </button>
+    Open
+  </a>
 </div>
 #end
 
@@ -53,15 +54,16 @@
     </button>
   </div></div>
 <script type="text/javascript">
-  const lang = '${request.lang}';
   // #[[
   onLoad(() => {
     $('#new').on('click', e => {
       $('#new-tournament').modal(true);
     });
+    /*
     new DateRangePicker($('#date-range')[0], {
       language: lang
     });
+     */
     $('#new-tournament .tab.segment:first-child').addClass('active');
   });
   // ]]#

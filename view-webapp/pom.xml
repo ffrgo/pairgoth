@@ -68,6 +68,7 @@
                 </executions>
                 <configuration>
                     <outputFolder>${project.build.directory}/generated-resources/css</outputFolder>
+                    <version>1.69.5</version>
                 </configuration>
             </plugin>
             <plugin>
@@ -88,6 +89,8 @@
                         <pairgoth.store.file.path>${pairgoth.store}</pairgoth.store.file.path>
                         <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
                         <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
+                        <pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>debug</pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>
+                        <org.slf4j.simpleLogger.defaultLogLevel>debug</org.slf4j.simpleLogger.defaultLogLevel>
                     </systemProperties>
                     <webApp>
                         <contextPath>${pairgoth.webapp.context}/</contextPath>
@@ -156,6 +159,12 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${servlet.api.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- proxy -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-proxy</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>

@@ -78,27 +78,27 @@ Element.prototype.data = function (key) {
 NodeList.prototype.data = function(key) {
   this.item(0).data(key);
 }
-NodeList.prototype.show = function(key) {
-  this.item(0).show(key);
+NodeList.prototype.show = function() {
+  this.item(0).show();
   return this;
 }
-Element.prototype.show = function (key) {
+Element.prototype.show = function() {
   this.style.display = 'block';
 }
-NodeList.prototype.hide = function(key) {
-  this.item(0).hide(key);
+NodeList.prototype.hide = function() {
+  this.item(0).hide();
   return this;
 }
-Element.prototype.hide = function (key) {
+Element.prototype.hide = function() {
   this.style.display = 'none';
 }
-
-let initFunctions = [];
-function onLoad(fct) {
-  if (typeof(fct) == "function") initFunctions.push(fct);
+NodeList.prototype.text = function(txt) {
+  this.item(0).text(txt);
 }
-document.on("DOMContentLoaded", () => {
-  initFunctions.forEach(fct => {
-    fct();
-  });
-});
+Element.prototype.text = function(txt) {
+  if (typeof(txt) === 'undefined') {
+    return this.textContent;
+  } else {
+    this.textContent = txt;
+  }
+}
