@@ -116,8 +116,16 @@ object OpenGotha {
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
-                0 -> Swiss(pairingParams = pairgothPairingParams, placementParams = pairgothPlacementParams)
-                else -> MacMahon(pairingParams = pairgothPairingParams, placementParams = pairgothPlacementParams)
+                0 -> Swiss(
+                    pairingParams = pairgothPairingParams,
+                    placementParams = pairgothPlacementParams
+                )
+                else -> MacMahon(
+                    pairingParams = pairgothPairingParams,
+                    placementParams = pairgothPlacementParams,
+                    mmsFloor = Pairable.parseRank(genParams.genMMFloor),
+                    mmsBar = Pairable.parseRank(genParams.genMMBar)
+                )
             },
             rounds = genParams.numberOfRounds
         )
@@ -241,7 +249,15 @@ object OpenGotha {
                 TimeSystem.TimeSystemType.STANDARD -> "STDBYOYOMI"
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
-            } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
+            } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
+                displayRank(
+                    if (tournament.pairing is MacMahon) tournament.pairing.mmsBar else 8
+                ).uppercase(Locale.ROOT)
+            }" genMMFloor="${
+                displayRank(
+                    if (tournament.pairing is MacMahon) tournament.pairing.mmsFloor else -30
+                ).uppercase(Locale.ROOT)
+            }" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
             <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
             <PlacementParameterSet>
             <PlacementCriteria>

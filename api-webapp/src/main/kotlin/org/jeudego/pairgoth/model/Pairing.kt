@@ -180,11 +180,13 @@ class MacMahon(
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
-    )
+    ),
+    var mmsFloor: Int = -20,
+    var mmsBar: Int = 0
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams).pair()
+        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, mmsFloor, mmsBar).pair()
     }
 }
 
