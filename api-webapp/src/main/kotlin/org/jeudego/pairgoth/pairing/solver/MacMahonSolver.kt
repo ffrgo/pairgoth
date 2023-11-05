@@ -9,7 +9,7 @@ class MacMahonSolver(round: Int,
                      pairables: List<Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
-                     private val mmsFloor: Int, private val mmsBar: Int):
+                     private val mmFloor: Int, private val mmBar: Int):
     BaseSolver(round, history, pairables, pairingParams, placementParams) {
 
     override val scores: Map<ID, Double> by lazy {
@@ -19,11 +19,11 @@ class MacMahonSolver(round: Int,
             }
         }
     }
-    val Pairable.mmBase: Double get() = min(max(rank, mmsFloor), mmsBar) + mmsZero
+    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria
-    override val mainLimits get() = Pair(mmsFloor.toDouble(), 100.0) // TODO ?
+    override val mainLimits get() = Pair(mmFloor.toDouble(), 100.0) // TODO ?
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
         else -> super.evalCriterion(pairable, criterion)

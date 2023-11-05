@@ -123,8 +123,8 @@ object OpenGotha {
                 else -> MacMahon(
                     pairingParams = pairgothPairingParams,
                     placementParams = pairgothPlacementParams,
-                    mmsFloor = Pairable.parseRank(genParams.genMMFloor),
-                    mmsBar = Pairable.parseRank(genParams.genMMBar)
+                    mmFloor = Pairable.parseRank(genParams.genMMFloor),
+                    mmBar = Pairable.parseRank(genParams.genMMBar)
                 )
             },
             rounds = genParams.numberOfRounds
@@ -251,11 +251,11 @@ object OpenGotha {
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
             } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
                 displayRank(
-                    if (tournament.pairing is MacMahon) tournament.pairing.mmsBar else 8
+                    if (tournament.pairing is MacMahon) tournament.pairing.mmBar else 8
                 ).uppercase(Locale.ROOT)
             }" genMMFloor="${
                 displayRank(
-                    if (tournament.pairing is MacMahon) tournament.pairing.mmsFloor else -30
+                    if (tournament.pairing is MacMahon) tournament.pairing.mmFloor else -30
                 ).uppercase(Locale.ROOT)
             }" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
             <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
