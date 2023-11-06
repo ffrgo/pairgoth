@@ -246,6 +246,11 @@ class PairingTests: TestBase() {
         var firstGameID: Int
         var playersList = mutableListOf<Long>()
 
+        var forcedPairingList = mutableListOf<Int>(1)
+        var forcedPairing = mutableListOf<Json>()
+        var forcedGames: Json.Array
+        var game: Json
+
         for (i in 0..34){
             playersList.add(players.getJson(i)!!.asObject()["id"] as Long)
         }
@@ -254,12 +259,25 @@ class PairingTests: TestBase() {
 
         for (round in 1..7) {
             //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString())
 
-            assertTrue(compare_weights("weights.txt", "opengotha/notsosimpleswiss_weights_R$round.txt"), "Not matching opengotha weights for round $round")
-            assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray()),"pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
+            if (round in forcedPairingList){
+                forcedPairing = mutableListOf<Json>()
+                forcedGames = Json.parse(pairingsR1)!!.asArray()
+                for (j in 0..forcedGames.size-1) {
+                    game = forcedGames.getJson(j)!!.asObject()
+                    forcedPairing.add(TestAPI.post("/api/tour/$id/pair/$round", Json.Array(listOf(game["w"],game["b"]))).asArray().getJson(0)!!)
+                }
+                games = Json.Array(forcedPairing)
+            }
+            else {
+                games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+                logger.info("games for round $round: {}", games.toString())
+
+                assertTrue(compare_weights("weights.txt", "opengotha/notsosimpleswiss_weights_R$round.txt"), "Not matching opengotha weights for round $round")
+                assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray()),"pairings for round $round differ")
+                logger.info("Pairings for round $round match OpenGotha")
+            }
+            logger.info("games for round $round: {}", games.toString())
 
             firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
             for (gameID in firstGameID..firstGameID + 15) {
