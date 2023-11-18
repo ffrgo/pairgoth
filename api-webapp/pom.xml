@@ -67,7 +67,7 @@
                         <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
                         <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
                         <pairgoth.store>${pairgoth.store}</pairgoth.store>
-                        <pairgoth.store.file.path>${pairgoth.store}</pairgoth.store.file.path>
+                        <pairgoth.store.file.path>${pairgoth.store.file.path}</pairgoth.store.file.path>
                         <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
                         <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
                     </systemProperties>

@@ -7,7 +7,7 @@
 #foreach($tour in $api.get('tour').entrySet())
 <div class="section">
   $tour
-  <a href="tour?tour_id=${tour.key}" class="ui open basic secondary white icon floating button">
+  <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button">
     <i class="fa fa-folder-open-o"></i>
     Open
   </a>
@@ -68,7 +68,3 @@
   });
   // ]]#
 </script>
-<!-- date range picker -->
-<script type="text/javascript" src="/lib/datepicker-1.3.3/datepicker-full.min.js"></script>
-<script type="text/javascript" src="/lib/datepicker-1.3.3/locales/${request.lang}.js"></script>
-<link rel="stylesheet" href="/lib/datepicker-1.3.3/datepicker.min.css">

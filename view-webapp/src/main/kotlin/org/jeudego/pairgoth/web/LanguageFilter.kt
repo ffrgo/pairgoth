@@ -53,15 +53,21 @@ class LanguageFilter : Filter {
     }
 
     private fun getPreferredLanguage(request: HttpServletRequest): String {
-        return (request.session.getAttribute("lang") as String?) ?:
-        ( langHeaderParser.findAll(request.getHeader("Accept-Language") ?: "").filter {
+        var lang = request.session.getAttribute("lang") as String?
+        if (lang == null) {
+            parseLanguageHeader(request)
+            lang = request.session.getAttribute("lang") as String?
+        }
+        return lang ?: defaultLanguage
+    }
+
+    private fun parseLanguageHeader(request: HttpServletRequest) {
+        langHeaderParser.findAll(request.getHeader("Accept-Language") ?: "").filter {
             providedLanguages.contains(it.groupValues[1])
         }.sortedByDescending {
-            it.groupValues[2].toDoubleOrNull() ?: 1.0
+            it.groupValues[3].toDoubleOrNull() ?: 1.0
         }.firstOrNull()?.let {
             it.groupValues[1]
-        } ?: defaultLanguage ).also {
-            request.session.setAttribute("lang", it)
         }
     }
 
@@ -69,6 +75,6 @@ class LanguageFilter : Filter {
 
     companion object {
         private val langPattern = Regex("/([a-z]{2})(/.+)")
-        private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)\\w+)?)(?:;q=([0-9.]+))?")
+        private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)\\w+)?)(?:;q=([0-9.]+))?") ADD locale group captue
     }
 }

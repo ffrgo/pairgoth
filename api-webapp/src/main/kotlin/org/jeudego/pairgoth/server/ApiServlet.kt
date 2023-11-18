@@ -248,6 +248,7 @@ class ApiServlet : HttpServlet() {
             response.status = code
             if (response.isCommitted) return
             val errorPayload = Json.Object(
+                "success" to false,
                 "error" to (message ?: "unknown error")
             )
             setContentType(response)

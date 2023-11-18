@@ -314,7 +314,7 @@ fun Pairing.toJson() = Json.Object(
     "type" to type.name,
     "base" to pairingParams.base.toJson(),
     "main" to pairingParams.main.toJson(),
-    "secondary" to pairingParams.main.toJson(),
+    "secondary" to pairingParams.secondary.toJson(),
     "geo" to pairingParams.geo.toJson(),
     "handicap" to pairingParams.handicap.toJson(),
     "placement" to placementParams.toJson()

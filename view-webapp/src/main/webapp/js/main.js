@@ -106,19 +106,23 @@ Element.prototype.modal = function(show) {
 
 function formValue(name) {
   let ctl = $(`[name="${name}"]`)[0];
-  let type = ctl.tagName;
+  if (!ctl) {
+    console.error(`unknown input name: ${name}`)
+  }
+  let tag = ctl.tagName;
+  let type = tag === 'INPUT' ? ctl.attr('type') : undefined;
   if (
-    (type === 'INPUT' && ['text', 'number'].includes(ctl.attr('type'))) ||
-    type === 'SELECT'
+    (tag === 'INPUT' && ['text', 'number'].includes(ctl.attr('type'))) ||
+    tag === 'SELECT'
   ) {
     return ctl.value;
-  } else if (type === 'INPUT' && ctl.attr('type') === 'radio') {
+  } else if (tag === 'INPUT' && ctl.attr('type') === 'radio') {
     ctl = $(`input[name="${name}"]:checked`)[0];
     if (ctl) return ctl.value;
-  } else if (type === 'INPUT' && ctl.attr('type') === 'radio') {
+  } else if (tag === 'INPUT' && ctl.attr('type') === 'checkbox') {
     return ctl.checked;
   }
-  console.error(`unknown input name: ${name}`);
+  console.error(`unhandled input tag or type for input ${name} (tag: ${tag}, type:${type}`);
   return null;
 }
 
