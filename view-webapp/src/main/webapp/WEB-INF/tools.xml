@@ -3,11 +3,11 @@
 
     <toolbox scope="application">
         <tool key="translate" class="org.jeudego.pairgoth.view.TranslationTool"/>
+        <tool key="strings" class="org.apache.commons.lang3.StringUtils"/>
         <!--
         <tool key="number" format="#0.00"/>
         <tool key="date" locale="fr_FR" format="yyyy-MM-dd"/>
         <tool key="inflector" class="org.atteo.evo.inflector.English"/>
-        <tool key="strings" class="org.apache.commons.lang3.StringUtils"/>
         -->
     </toolbox>
 

@@ -144,6 +144,12 @@
             <artifactId>jakarta.mail</artifactId>
             <version>1.6.7</version>
         </dependency>
+        <!-- utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
         <!-- auth -->
         <dependency>
             <groupId>org.pac4j</groupId>
