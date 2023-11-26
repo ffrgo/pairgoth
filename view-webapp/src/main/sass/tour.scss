@@ -1,0 +1,22 @@
+@layer pairgoth {
+  #tournament-infos {
+    input, select, .edit {
+      display: none;
+    }
+    &.edit {
+      input, select, .edit {
+        display: initial;
+      }
+      .info, #edit {
+        display: none;
+      }
+    }
+  }
+  div.field:not(.hidden) {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-between;
+    margin: 1px;
+    background-color: #eeeeee;
+  }
+}

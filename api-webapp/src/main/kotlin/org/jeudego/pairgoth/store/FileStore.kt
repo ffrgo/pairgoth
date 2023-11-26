@@ -98,8 +98,9 @@ class FileStore(pathStr: String): StoreImplementation {
     override fun replaceTournament(tournament: Tournament<*>) {
         val filename = tournament.filename()
         val file = path.resolve(filename).toFile()
-        if (!file.exists()) throw Error("File $filename does not exist")
-        file.renameTo(path.resolve(filename + "-${timestamp}").toFile())
+        if (file.exists()) {
+            file.renameTo(path.resolve(filename + "-${timestamp}").toFile())
+        }
         addTournament(tournament)
     }
 

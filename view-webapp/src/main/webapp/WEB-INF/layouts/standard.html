@@ -68,6 +68,9 @@
   <script type="text/javascript" src="/js/domhelper.js"></script>
   <link rel="stylesheet" href="/lib/fork-awesome-1.2.0/fork-awesome.min.css"/>
   <link rel="stylesheet" href="/css/main.css"/>
+#if($css)
+    <link rel="stylesheet" href="$css"/>
+#end
   <script type="text/javascript">
     const lang = '${request.lang}';
     const locale = '${request.locale}';

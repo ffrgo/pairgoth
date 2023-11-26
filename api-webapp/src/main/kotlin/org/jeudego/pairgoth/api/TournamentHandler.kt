@@ -64,8 +64,7 @@ object TournamentHandler: PairgothApiHandler {
             clear()
             putAll(tournament.games(round))
         }
-        Store.replaceTournament(updated)
-        tournament.dispatchEvent(tournamentUpdated, tournament.toJson())
+        updated.dispatchEvent(tournamentUpdated, updated.toJson())
         return Json.Object("success" to true)
     }
 

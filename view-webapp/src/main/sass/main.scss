@@ -198,6 +198,12 @@
     text-align: center;
   }
 
+  .form-actions {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
   input[type="number"] {
     padding: 0.2em 0.1em 0.2em 1em;
     vertical-align: baseline;
