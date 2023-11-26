@@ -20,7 +20,29 @@
   #end
 #end
 <div class="section">
-  <h2>#if($tour)$tour.name#{else}New tournament#end</h2>
+  <h1 class="centered title">#if($tour)$tour.name#{else}New tournament#end</h1>
+#if($tour)
+  <div class="ui ordered centered steps">
+    <div class="active step" data-step="info">
+      <div class="content">
+        <div class="title">Information</div>
+        <div class="description">name, place and date</div>
+      </div>
+    </div>
+    <div class="step" data-step="pairing">
+      <div class="content">
+        <div class="title">Pairing</div>
+        <div class="description">teams or players, rounds</div>
+      </div>
+    </div>
+    <div class="step" data-step="standings">
+      <div class="content">
+        <div class="title">Standings</div>
+        <div class="description">pairing system</div>
+      </div>
+    </div>
+  </div>
+#end
   <form id="tournament-infos" class="ui form #if(!$tour)edit#end">
     <div class="roundbox">
       <div class="two stackable fields">
@@ -253,17 +275,22 @@
       </button>
     </div>
   </form>
+  <div id="pairing">
+    Pairing...
+  </div>
+  <div id="standings">
+    Standings...
+  </div>
 </div>
 <!-- error messages included as html elements so that they are translated -->
 <div id="required_field" class="hidden">Required field</div>
-<div id="invalid_character" class="hidden">Invalid character</div>
 <script type="text/javascript">
-#if($tour)
+  #if($tour)
   const tour_id = ${tour.id};
-#end
-#set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
+  #end
+  #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
-  // #[[ale
+  // #[[
   const safeRegex = /^[-a-zA-Z0-9_.]+$/;
   function parseDate(value) {
     let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
@@ -285,6 +312,13 @@
     console.log(`invalid hh:mm:ss value: ${value}`);
     return 0;
   }
+  function chooseStep(step) {
+    $('.section').removeClass('info').removeClass('pairing').removeClass('standings').addClass(step);
+    $('.step').removeClass('active');
+    $(`.step[data-step="${step}"]`).addClass('active');
+    window.location.hash = `#${step}`;
+  }
+
   onLoad(() => {
 
     $('#edit').on('click', e => {
@@ -443,15 +477,42 @@
             info.textContent = sel[0].textContent;
           }
         } else {
-          info.textContent = input.value;
+          if (input.attr('name') === 'location' && $('input[name="online"]')[0].checked) {
+            info.textContent = 'online';
+          } else {
+            info.textContent = input.value;
+          }
         }
       }
     })
+
+    if (!window.location.hash && window.location.search) {
+      window.location.hash = '#info'
+      $('.section').removeClass('pairing');
+      $('.section').removeClass('standings');
+      $('.section').addClass('info');
+    }
+    if (window.location.hash) {
+      let step = window.location.hash.substring(1);
+      chooseStep(step);
+    }
+
+    $('.step').on('click', e => {
+      let tab = e.target.closest('.step');
+      if (tab.classList.contains('active')) return;
+      let step = tab.attr('data-step');
+      chooseStep(step);
+    });
+
+    window.on('hashchange', e => {
+      console.log(window.location.hash);
+    });
 
   });
 
   // ]]#
 </script>
+<div id="invalid_character" class="hidden">Invalid character</div>
 <script type="text/javascript" src="/lib/datepicker-1.3.4/datepicker-full#*.min*#.js"></script>
 #if($datepickerLocale != 'en')
 <script type="text/javascript" src="/lib/datepicker-1.3.4/locales/${datepickerLocale}.js"></script>

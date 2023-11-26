@@ -19,4 +19,22 @@
     margin: 1px;
     background-color: #eeeeee;
   }
+  .steps .step:not(.active) {
+    cursor: pointer;
+  }
+  .section.info {
+    #pairing, #standings {
+      display: none;
+    }
+  }
+  .section.pairing {
+    #tournament-infos, #standings {
+      display: none;
+    }
+  }
+  .section.standings {
+    #tournament-infos, #pairing {
+      display: none;
+    }
+  }
 }
