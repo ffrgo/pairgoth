@@ -261,13 +261,15 @@ class PairingTests: TestBase() {
             //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
 
             if (round in forcedPairingList){
+                // games must be created and then modified by PUT
+                games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
                 forcedPairing = mutableListOf<Json>()
                 forcedGames = Json.parse(pairingsR1)!!.asArray()
                 for (j in 0..forcedGames.size-1) {
                     game = forcedGames.getJson(j)!!.asObject()
-                    forcedPairing.add(TestAPI.post("/api/tour/$id/pair/$round", Json.Array(listOf(game["w"],game["b"]))).asArray().getJson(0)!!)
+                    TestAPI.put("/api/tour/$id/pair/$round", game)
                 }
-                games = Json.Array(forcedPairing)
+                games = TestAPI.get("/api/tour/$id/res/$round").asArray()
             }
             else {
                 games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
