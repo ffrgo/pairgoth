@@ -282,7 +282,7 @@ class PairingTests: TestBase() {
             logger.info("games for round $round: {}", games.toString())
 
             firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (gameID in firstGameID..firstGameID + 15) {
+            for (gameID in firstGameID..firstGameID + 16) {
                 resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"b"}""")).asObject()
                 assertTrue(resp.getBoolean("success") == true, "expecting success")
             }

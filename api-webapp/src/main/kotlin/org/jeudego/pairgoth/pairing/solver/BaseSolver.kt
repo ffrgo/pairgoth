@@ -121,6 +121,7 @@ sealed class BaseSolver(
 
         if (DEBUG_EXPORT_WEIGHT) {
             var sumOfWeights = 0.0
+            println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
                 println(it[0].nameSeed() + " " + it[0].place.toString()
                                          + " " + it[0].id.toString()
@@ -282,11 +283,15 @@ sealed class BaseSolver(
             if (scenario != 0 && p2_DD > 0 && p2_DU < p2_DD && p2.group > p1.group) {
                 scenario++
             }
+
             val duddWeight: Double = pairing.main.drawUpDownWeight/5.0
-            val upperSP = if (p1.group < p2.group) p1 else p2
-            val lowerSP = if (p1.group < p2.group) p2 else p1
+            val upperSP = if (p1.group < p2.group) p2 else p1
+            val lowerSP = if (p1.group < p2.group) p1 else p2
             val uSPgroupSize = upperSP.placeInGroup.second
             val lSPgroupSize = lowerSP.placeInGroup.second
+
+
+
 
             if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
                 score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
@@ -313,7 +318,16 @@ sealed class BaseSolver(
             } else if (scenario == 4) {
                 score += 4 * duddWeight
             }
+
+           /* println("Names "+upperSP.nameSeed()+"  "+lowerSP.nameSeed())
+            println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
+            println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
+            println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
+            println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
+            println("score = " + score.toString())*/
         }
+
+
 
         // TODO adapt to Swiss with categories
         /*// But, if players come from different categories, decrease score(added in 3.11)
