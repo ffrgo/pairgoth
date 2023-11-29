@@ -1,4 +1,18 @@
 @layer pairgoth {
+  /* general rules */
+
+  .steps .step:not(.active) {
+    cursor: pointer;
+  }
+  .tab-content {
+    display: none;
+    &.active {
+      display: block;
+    }
+  }
+
+  /* information section */
+
   #tournament-infos {
     input, select, .edit {
       display: none;
@@ -19,22 +33,15 @@
     margin: 1px;
     background-color: #eeeeee;
   }
-  .steps .step:not(.active) {
-    cursor: pointer;
-  }
-  .section.info {
-    #pairing, #standings {
-      display: none;
-    }
-  }
-  .section.pairing {
-    #tournament-infos, #standings {
-      display: none;
-    }
-  }
-  .section.standings {
-    #tournament-infos, #pairing {
-      display: none;
+
+  /* registration section */
+
+  #registration {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    > .roundbox {
+      flex: 1;
     }
   }
 }

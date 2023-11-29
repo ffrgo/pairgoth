@@ -20,278 +20,53 @@
   #end
 #end
 <div class="section">
-  <h1 class="centered title">#if($tour)$tour.name#{else}New tournament#end</h1>
+  <h1 class="centered title">#if($tour)$tour.name#{else}New Tournament#end</h1>
 #if($tour)
   <div class="ui ordered centered steps">
-    <div class="active step" data-step="info">
+    <div class="active step" data-step="information">
       <div class="content">
         <div class="title">Information</div>
-        <div class="description">name, place and date</div>
+      </div>
+    </div>
+    <div class="step" data-step="registration">
+      <div class="content">
+        <div class="title">Registration</div>
       </div>
     </div>
     <div class="step" data-step="pairing">
       <div class="content">
         <div class="title">Pairing</div>
-        <div class="description">teams or players, rounds</div>
+      </div>
+    </div>
+    <div class="step" data-step="results">
+      <div class="content">
+        <div class="title">Results</div>
       </div>
     </div>
     <div class="step" data-step="standings">
       <div class="content">
         <div class="title">Standings</div>
-        <div class="description">pairing system</div>
       </div>
     </div>
   </div>
+  #translate('tour-registration.inc.html')
+  #translate('tour-pairing.inc.html')
+  #translate('tour-results.inc.html')
+  #translate('tour-standings.inc.html')
 #end
-  <form id="tournament-infos" class="ui form #if(!$tour)edit#end">
-    <div class="roundbox">
-      <div class="two stackable fields">
-        <div class="eleven wide field">
-          <label>Name</label>
-          <span class="info"></span>
-          <input type="text" name="name" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
-        </div>
-        <div class="five wide field">
-          <label>Short name</label>
-          <span class="info"></span>
-          <input type="text" name="shortName" required placeholder="short_name" #if($tour) value="$tour.shortName" #end/>
-        </div>
-      </div>
-      <div class="fields">
-        <div class="ten wide field">
-          <label>Dates</label>
-          <span id="date-range">
-          from
-          <span class="info"></span>
-          <input type="text" name="startDate" required class="date" placeholder="start date" #if($tour) value="$tour.startDate" #end/>
-          to
-          <span class="info"></span>
-          <input type="text" name="endDate" required class="date" placeholder="end date" #if($tour) value="$tour.startDate" #end/>
-        </span>
-        </div>
-      </div>
-      <div class="two stackable fields">
-        <div class="seven wide field">
-          <label>Country</label>
-          <span class="info"></span>
-          <select name="country" placeholder="country">
-            <option></option>
-#set($defaultCountry = $translate.defaultCountry[$request.lang])
-#foreach($country in $countries.countries)
-            <option value="$country.key" #if($tour && $country.key == $tour.country || !$tour && $country.key == $defaultCountry) selected #end>$country.value</option>
-#end
-          </select>
-        </div>
-        <div class="nine wide field">
-          <label>Location</label>
-          <span class="info"></span>
-          <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
-          <div class="edit online">
-            or
-            <label>
-              <input name="online" type="checkbox" #if($tour && $tour.online) checked #end/>&nbsp;<b>online tournament</b>
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="roundbox">
-      <div class="two fields">
-        <div class="twelve wide field">
-          <label>Tournament type</label>
-          <span class="info"></span>
-          <select name="type">
-            <option value="INDIVIDUAL" #if(!$tour || $tour.type == 'INDIVIDUAL') checked #end>Individual players</option>
-            <option value="PAIRGO" #if($tour && $tour.type == 'PAIRGO') checked #end>Pair-go tournament</option>
-            <option value="RENGO2" #if($tour && $tour.type == 'RENGO2') checked #end>Rengo with 2 players teams</option>
-            <option value="RENGO3" #if($tour && $tour.type == 'RENGO3') checked #end>Rengo with 3 players team</option>
-            <option value="TEAM2" #if($tour && $tour.type == 'TEAM2') checked #end>Team of 2 individual players</option>
-            <option value="TEAM3" #if($tour && $tour.type == 'TEAM3') checked #end>Team of 3 individual players</option>
-            <option value="TEAM4" #if($tour && $tour.type == 'TEAM4') checked #end>Team of 4 individual players</option>
-            <option value="TEAM5" #if($tour && $tour.type == 'TEAM5') checked #end>Team of 5 individual players</option>
-          </select>
-        </div>
-        <div class="four wide field">
-          <label>Rounds</label>
-          <span class="info"></span>
-          <input type="number" name="rounds" required min="1" value="#if($tour)$tour.rounds#{else}1#end"/>
-        </div>
-      </div>
-      <div class="four fields">
-        <div class="four wide field">
-          <label>Pairing</label>
-          <span class="info"></span>
-          <select name="pairing">
-            <option value="MAC_MAHON" #if(!$tour || $tour.pairing.type == 'MAC_MAHON') checked #end>Mac Mahon</option>
-            <option value="SWISS" #if($tour && $tour.pairing.type == 'SWISS') checked #end>Swiss</option>
-            <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') checked #end>Round-robin</option>
-          </select>
-        </div>
-#* MM floor parameter not shown on creation page
-        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>MM floor</label>
-          <span class="info"></span>
-          <select name="mmFloor">
-#set($floor = -20)
-#if($tour) #set($floor = $tour.pairing.mmFloor) #end
-#levels($floor)
-          </select>
-        </div>
-*#
-        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>Hd correction</label>
-          <span class="info"></span>
-          <input name="correction" type="number" min="-9" max="0" value="#if($tour && "$!tour.pairing.handicap.correction" != "")$tour.pairing.handicap.correction#{else}-1#end"/>
-        </div>
-        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>MM bar</label>
-          <span class="info"></span>
-          <select name="mmBar">
-#set($bar = 0)
-#if($tour && "$!tour.pairing.mmBar" != "") #set($bar = $tour.pairing.mmBar) #end
-#levels($bar)
-          </select>
-        </div>
-        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>Hd treshold</label>
-          <span class="info"></span>
-          <select name="treshold">
-#set($limit = 0)
-#if($tour && "$!tour.pairing.handicap.treshold" != "") #set($limit = $tour.pairing.handicap.treshold) #end
-#levels($limit)
-          </select>
-        </div>
-      </div>
-      <div class="swiss pairing four wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS') hidden #end">
-        <label>1st round seeding</label>
-        <span class="info"></span>
-        <select name="firstSeed">
-          <option value="SPLIT_AND_FOLD" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
-          <option value="SPLIT_AND_RANDOM" #if(!$tour || "$!tour.pairing.main.firstSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
-          <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
-        </select>
-      </div>
-      <div class="swiss pairing four wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS')hidden#end">
-        <label>Next rounds seeding</label>
-        <span class="info"></span>
-        <select name="secondSeed">
-          <option value="SPLIT_AND_FOLD" #if(!$tour || "$!tour.pairing.main.secondSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
-          <option value="SPLIT_AND_RANDOM" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
-          <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
-        </select>
-      </div>
-    </div>
-    <div class="roundbox">
-      <div class="three stackable fields">
-        <div class="seven wide field">
-          <label>Rules</label>
-          <span class="info"></span>
-          <select name="rules">
-            <option value="CHINESE" #if($tour && $tour.rules == 'CHINESE') selected #end>Chinese rules</option>
-            <option value="FRENCH" #if(!$tour || $tour.rules == 'FRENCH') selected #end>French rules</option>
-            <option value="JAPANESE" #if($tour && $tour.rules == 'JAPANESE') selected #end>Japanese rules</option>
-          </select>
-        </div>
-        <div class="three wide field">
-          <label>Goban</label>
-          <span class="info"></span>
-          <select name="gobanSize">
-            <option value="9" #if($tour && $tour.gobanSize == 9) selected #end>9x9</option>
-            <option value="13" #if($tour && $tour.gobanSize == 13) selected #end>13x13</option>
-            <option value="19" #if(!$tour || $tour.gobanSize == 19) selected #end>19x19</option>
-          </select>
-        </div>
-        <div class="three wide field">
-          <label>Komi</label>
-          <span class="info"></span>
-          <input name="komi" type="number" step="0.5" value="#if($tour)$tour.komi#{else}7.5#end"/>
-        </div>
-      </div>
-      <div class="four fields">
-        <div class="seven wide field">
-          <label>Time system</label>
-          <span class="info"></span>
-          <select name="timeSystemType">
-            <option value="FISCHER" #if(!$tour || $tour.timeSystem.type == 'FISCHER') selected #end>Fischer timing</option>
-            <option value="CANADIAN" #if($tour && $tour.timeSystem.type == 'CANADIAN') selected #end>Canadian byo-yomi</option>
-            <option value="STANDARD" #if($tour && $tour.timeSystem.type == 'STANDARD') selected #end>Standard byo-yomi</option>
-            <option value="SUDDEN_DEATH" #if($tour && $tour.timeSystem.type == 'SUDDEN_DEATH') selected #end>Sudden death</option>
-          </select>
-        </div>
-        <div class="three wide field">
-          <label>Main time</label>
-          <span class="info"></span>
-          <input name="mainTime" type="text" class="duration" value="#if($tour && $tour.timeSystem.mainTime)#toHMS($tour.timeSystem.mainTime)#{else}00:40:00#end"/>
-        </div>
-        <div id="increment" class="three wide field #if($tour && $tour.timeSystem.type != 'FISCHER')hidden#end">
-          <label>Increment</label>
-          <span class="info"></span>
-          <input name="increment" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.increment" != "")#toHMS($tour.timeSystem.increment)#{else}00:00:20#end"/>
-        </div>
-        <div id="maxTime" class="three wide field #if($tour && $tour.timeSystem.type != 'FISCHER')hidden#end">
-          <label>Max time</label>
-          <span class="info"></span>
-          <input name="maxTime" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.maxTime" != "")#toHMS($tour.timeSystem.maxTime)#{else}00:40:00#end"/>
-        </div>
-        <div id="byoyomi" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN' && $tour.timeSystem.type != 'STANDARD')hidden#end">
-          <label>Byo-yomi time</label>
-          <span class="info"></span>
-          <input name="byoyomi" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.byoyomi" != "")#toHMS($tour.timeSystem.byoyomi)#{else}00:05:00#end"/>
-        </div>
-        <div id="periods" class="three wide field #if(!$tour || $tour.timeSystem.type != 'STANDARD')hidden#end">
-          <label>Byo-yomi periods</label>
-          <span class="info"></span>
-          <input name="periods" type="number" min="0" value="#if($tour && "$!tour.timeSystem.periods" != "")$tour.timeSystem.periods#{else}3#end"/>
-        </div>
-        <div id="stones" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN')hidden#end">
-          <label>Byo-yomi stones</label>
-          <span class="info"></span>
-          <input name="stones" class="seconds" type="number" min="0" value="#if($tour && "$!tour.timeSystem.stones" != "")$tour.timeSystem.stones#{else}15#end"/>
-        </div>
-      </div>
-    </div>
-    <div class="form-actions">
-      <button id="cancel" class="ui gray right labeled icon floating edit button">
-        <i class="times icon"></i>
-        Cancel
-      </button>
-#if($tour)
-      <button id="close" class="ui gray right labeled icon floating info button">
-        <i class="times icon"></i>
-        Close
-      </button>
-      <button id="edit" class="ui blue right labeled icon floating info button">
-        <i class="pencil icon"></i>
-        Edit
-      </button>
-#end
-      <button id="validate" class="ui next green right labeled icon floating edit button">
-        <i class="checkmark icon"></i>
-#if($tour)
-          Update
-#else
-        Create
-#end
-      </button>
-    </div>
-  </form>
-  <div id="pairing">
-    Pairing...
-  </div>
-  <div id="standings">
-    Standings...
-  </div>
+#translate('tour-information.inc.html')
 </div>
 <!-- error messages included as html elements so that they are translated -->
 <div id="required_field" class="hidden">Required field</div>
 <script type="text/javascript">
-  #if($tour)
+#if($tour)
   const tour_id = ${tour.id};
-  #end
-  #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
+#end
+#set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
   // #[[
   const safeRegex = /^[-a-zA-Z0-9_.]+$/;
+
   function parseDate(value) {
     let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
     let date = Datepicker.parseDate(value, format, datepickerLocale);
@@ -302,7 +77,7 @@
     let date = Datepicker.parseDate(value, 'yyyy-mm-dd', datepickerLocale);
     return Datepicker.formatDate(date, format)
   }
-  function fromHMS(value) {
+  function fromHMS(value) {$('.step').map(item => item.data('step')).forEach(i => console.log(i))
     if (value && /\d+:\d+:\d+/.test(value)) {
       let parts = value.split(':');
       let seconds = parts[0] * 3600 + parts[1] * 60 + parts[2] * 1;
@@ -313,159 +88,19 @@
     return 0;
   }
   function chooseStep(step) {
-    $('.section').removeClass('info').removeClass('pairing').removeClass('standings').addClass(step);
+    $('.tab-content').removeClass('active');
     $('.step').removeClass('active');
-    $(`.step[data-step="${step}"]`).addClass('active');
+    $(`.step[data-step="${step}"], #${step}`).addClass('active');
     window.location.hash = `#${step}`;
   }
 
   onLoad(() => {
 
-    $('#edit').on('click', e => {
-      e.preventDefault();
-      $('#tournament-infos').addClass('edit');
-      return false;
-    });
-
-    $('#cancel, #close').on('click', e => {
-      e.preventDefault();
-      if ($('#tournament-infos').hasClass('edit')) {
-        $('#tournament-infos').removeClass('edit')
-      } else {
-        document.location.href = '/index';
-      }
-      return false;
-    });
-
-    $('#validate').on('click', e => {
-      let valid = true;
-      // validate required fields
-      let required = ['name', 'shortName', 'startDate', 'endDate'];
-      if (!$('input[name="online"]')[0].checked) required.push('location')
-      for (let name of required) {
-        let ctl = $(`input[name=${name}]`)[0];
-        let val = ctl.value;
-        if (val) {
-          ctl.setCustomValidity('');
-        } else {
-          valid = false;
-          ctl.setCustomValidity(msg('required_field'));
-        }
-      }
-      if (!valid) return;
-      // validate short_name
-      let shortNameCtl = $('input[name="shortName"]')[0];
-      let shortName = shortNameCtl.value;
-      if (safeRegex.test(shortName)) {
-        shortNameCtl.setCustomValidity('');
-      } else {
-        valid  = false;
-        shortNameCtl.setCustomValidity(msg('invalid_character'));
-      }
-      if (!valid) return;
-    });
-
-    for(let name of ['startDate', 'endDate']) {
-      let control = $(`input[name="${name}"]`)[0];
-      if (control.value) {
-        control.value = formatDate(control.value);
-      }
-    }
-    new DateRangePicker($('#date-range')[0], {
-      autohide: true,
-      language: datepickerLocale || 'en'
-    });
-
-    $('input[name="online"]').on('change', e => {
-      $('input[name="location"]')[0].disabled = e.target.checked;
-    });
-
-    $('select[name="timeSystemType"]').on('change', e => {
-      switch (e.target.value) {
-        case 'CANADIAN':
-          $('#increment').addClass('hidden');
-          $('#maxTime').addClass('hidden');
-          $('#byoyomi').removeClass('hidden');
-          $('#periods').addClass('hidden');
-          $('#stones').removeClass('hidden');
-          break;
-        case 'FISCHER':
-          $('#increment').removeClass('hidden');
-          $('#maxTime').removeClass('hidden');
-          $('#byoyomi').addClass('hidden');
-          $('#periods').addClass('hidden');
-          $('#stones').addClass('hidden');
-          break;
-        case 'STANDARD':
-          $('#increment').addClass('hidden');
-          $('#maxTime').addClass('hidden');
-          $('#byoyomi').removeClass('hidden');
-          $('#periods').removeClass('hidden');
-          $('#stones').addClass('hidden');
-          break;
-        case 'SUDDEN_DEATH':
-          $('#increment').addClass('hidden');
-          $('#maxTime').addClass('hidden');
-          $('#byoyomi').addClass('hidden');
-          $('#periods').addClass('hidden');
-          $('#stones').addClass('hidden');
-          break;
-      }
-    });
-
-    $('input.duration').imask({
-      mask: '00:00:00',
-      lazy: false,
-      overwrite: true
-    });
-
-    $('#tournament-infos').on('submit', e => {
-      e.preventDefault();
-      let tour = {
-        name: formValue('name'),
-        shortName: formValue('shortName'),
-        startDate: parseDate(formValue('startDate')),
-        endDate: parseDate(formValue('endDate')),
-        type: formValue('type'),
-        rounds: formValue('rounds'),
-        country: formValue('country'),
-        online: formValue('online'),
-        location: formValue('online') ? "" : formValue('location'),
-        pairing: {
-          type: formValue('pairing'),
-          // mmFloor: formValue('mmFloor'),
-          mmBar: formValue('mmBar'),
-          main: {
-            firstSeed: formValue('firstSeed'),
-            secondSeed: formValue('secondSeed')
-          },
-          handicap: {
-            correction: formValue('correction'),
-            treshold: formValue('treshold')
-          }
-        },
-        timeSystem: {
-          type: formValue('timeSystemType'),
-          mainTime: fromHMS(formValue('mainTime')),
-          increment: fromHMS(formValue('increment')),
-          maxTime: fromHMS(formValue('maxTime')),
-          byoyomi: fromHMS(formValue('byoyomi')),
-          periods: formValue('periods'),
-          stones: formValue('stones')
-        }
-      }
-      console.log(tour);
-      if (typeof(tour_id) !== 'undefined') {
-        api.putJson(`tour/${tour_id}`, tour)
-          .then(tour => {
-            window.location.reload();
-          });
-      } else {
-        api.postJson('tour', tour)
-          .then(tour => {
-            window.location.href += `?id=${tour.id}`;
-          });
-      }
+    $('.step').on('click', e => {
+      let tab = e.target.closest('.step');
+      if (tab.classList.contains('active')) return;
+      let step = tab.attr('data-step');
+      chooseStep(step);
     });
 
     $('input,select').forEach(input => {
@@ -484,33 +119,11 @@
           }
         }
       }
-    })
-
-    if (!window.location.hash && window.location.search) {
-      window.location.hash = '#info'
-      $('.section').removeClass('pairing');
-      $('.section').removeClass('standings');
-      $('.section').addClass('info');
-    }
-    if (window.location.hash) {
-      let step = window.location.hash.substring(1);
-      chooseStep(step);
-    }
-
-    $('.step').on('click', e => {
-      let tab = e.target.closest('.step');
-      if (tab.classList.contains('active')) return;
-      let step = tab.attr('data-step');
-      chooseStep(step);
-    });
-
-    window.on('hashchange', e => {
-      console.log(window.location.hash);
     });
 
   });
-
   // ]]#
+#include('/js/tour-information.inc.js')
 </script>
 <div id="invalid_character" class="hidden">Invalid character</div>
 <script type="text/javascript" src="/lib/datepicker-1.3.4/datepicker-full#*.min*#.js"></script>

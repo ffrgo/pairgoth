@@ -1,0 +1,234 @@
+<div id="information" class="tab-content">
+  <form id="tournament-infos" class="ui form #if(!$tour)edit#end">
+    <div class="roundbox">
+      <div class="two stackable fields">
+        <div class="eleven wide field">
+          <label>Name</label>
+          <span class="info"></span>
+          <input type="text" name="name" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
+        </div>
+        <div class="five wide field">
+          <label>Short name</label>
+          <span class="info"></span>
+          <input type="text" name="shortName" required placeholder="short_name" #if($tour) value="$tour.shortName" #end/>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="ten wide field">
+          <label>Dates</label>
+          <span id="date-range">
+          from
+          <span class="info"></span>
+          <input type="text" name="startDate" required class="date" placeholder="start date" #if($tour) value="$tour.startDate" #end/>
+          to
+          <span class="info"></span>
+          <input type="text" name="endDate" required class="date" placeholder="end date" #if($tour) value="$tour.startDate" #end/>
+        </span>
+        </div>
+      </div>
+      <div class="two stackable fields">
+        <div class="seven wide field">
+          <label>Country</label>
+          <span class="info"></span>
+          <select name="country" placeholder="country">
+            <option></option>
+#set($defaultCountry = $translate.defaultCountry[$request.lang])
+#foreach($country in $countries.countries)
+            <option value="$country.key" #if($tour && $country.key == $tour.country || !$tour && $country.key == $defaultCountry) selected #end>$country.value</option>
+#end
+          </select>
+        </div>
+        <div class="nine wide field">
+          <label>Location</label>
+          <span class="info"></span>
+          <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
+          <div class="edit online">
+            or
+            <label>
+              <input name="online" type="checkbox" #if($tour && $tour.online) checked #end/>&nbsp;<b>online tournament</b>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="roundbox">
+      <div class="two fields">
+        <div class="twelve wide field">
+          <label>Tournament type</label>
+          <span class="info"></span>
+          <select name="type">
+            <option value="INDIVIDUAL" #if(!$tour || $tour.type == 'INDIVIDUAL') checked #end>Individual players</option>
+            <option value="PAIRGO" #if($tour && $tour.type == 'PAIRGO') checked #end>Pair-go tournament</option>
+            <option value="RENGO2" #if($tour && $tour.type == 'RENGO2') checked #end>Rengo with 2 players teams</option>
+            <option value="RENGO3" #if($tour && $tour.type == 'RENGO3') checked #end>Rengo with 3 players team</option>
+            <option value="TEAM2" #if($tour && $tour.type == 'TEAM2') checked #end>Team of 2 individual players</option>
+            <option value="TEAM3" #if($tour && $tour.type == 'TEAM3') checked #end>Team of 3 individual players</option>
+            <option value="TEAM4" #if($tour && $tour.type == 'TEAM4') checked #end>Team of 4 individual players</option>
+            <option value="TEAM5" #if($tour && $tour.type == 'TEAM5') checked #end>Team of 5 individual players</option>
+          </select>
+        </div>
+        <div class="four wide field">
+          <label>Rounds</label>
+          <span class="info"></span>
+          <input type="number" name="rounds" required min="1" value="#if($tour)$tour.rounds#{else}1#end"/>
+        </div>
+      </div>
+      <div class="four fields">
+        <div class="four wide field">
+          <label>Pairing</label>
+          <span class="info"></span>
+          <select name="pairing">
+            <option value="MAC_MAHON" #if(!$tour || $tour.pairing.type == 'MAC_MAHON') checked #end>Mac Mahon</option>
+            <option value="SWISS" #if($tour && $tour.pairing.type == 'SWISS') checked #end>Swiss</option>
+            <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') checked #end>Round-robin</option>
+          </select>
+        </div>
+#* MM floor parameter not shown on creation page
+        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
+          <label>MM floor</label>
+          <span class="info"></span>
+          <select name="mmFloor">
+#set($floor = -20)
+#if($tour) #set($floor = $tour.pairing.mmFloor) #end
+#levels($floor)
+          </select>
+        </div>
+*#
+        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
+          <label>Hd correction</label>
+          <span class="info"></span>
+          <input name="correction" type="number" min="-9" max="0" value="#if($tour && "$!tour.pairing.handicap.correction" != "")$tour.pairing.handicap.correction#{else}-1#end"/>
+        </div>
+        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
+          <label>MM bar</label>
+          <span class="info"></span>
+          <select name="mmBar">
+#set($bar = 0)
+#if($tour && "$!tour.pairing.mmBar" != "") #set($bar = $tour.pairing.mmBar) #end
+#levels($bar)
+          </select>
+        </div>
+        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
+          <label>Hd treshold</label>
+          <span class="info"></span>
+          <select name="treshold">
+#set($limit = 0)
+#if($tour && "$!tour.pairing.handicap.treshold" != "") #set($limit = $tour.pairing.handicap.treshold) #end
+#levels($limit)
+          </select>
+        </div>
+      </div>
+      <div class="swiss pairing four wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS') hidden #end">
+        <label>1st round seeding</label>
+        <span class="info"></span>
+        <select name="firstSeed">
+          <option value="SPLIT_AND_FOLD" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
+          <option value="SPLIT_AND_RANDOM" #if(!$tour || "$!tour.pairing.main.firstSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
+          <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
+        </select>
+      </div>
+      <div class="swiss pairing four wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS')hidden#end">
+        <label>Next rounds seeding</label>
+        <span class="info"></span>
+        <select name="secondSeed">
+          <option value="SPLIT_AND_FOLD" #if(!$tour || "$!tour.pairing.main.secondSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
+          <option value="SPLIT_AND_RANDOM" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
+          <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
+        </select>
+      </div>
+    </div>
+    <div class="roundbox">
+      <div class="three stackable fields">
+        <div class="seven wide field">
+          <label>Rules</label>
+          <span class="info"></span>
+          <select name="rules">
+            <option value="CHINESE" #if($tour && $tour.rules == 'CHINESE') selected #end>Chinese rules</option>
+            <option value="FRENCH" #if(!$tour || $tour.rules == 'FRENCH') selected #end>French rules</option>
+            <option value="JAPANESE" #if($tour && $tour.rules == 'JAPANESE') selected #end>Japanese rules</option>
+          </select>
+        </div>
+        <div class="three wide field">
+          <label>Goban</label>
+          <span class="info"></span>
+          <select name="gobanSize">
+            <option value="9" #if($tour && $tour.gobanSize == 9) selected #end>9x9</option>
+            <option value="13" #if($tour && $tour.gobanSize == 13) selected #end>13x13</option>
+            <option value="19" #if(!$tour || $tour.gobanSize == 19) selected #end>19x19</option>
+          </select>
+        </div>
+        <div class="three wide field">
+          <label>Komi</label>
+          <span class="info"></span>
+          <input name="komi" type="number" step="0.5" value="#if($tour)$tour.komi#{else}7.5#end"/>
+        </div>
+      </div>
+      <div class="four fields">
+        <div class="seven wide field">
+          <label>Time system</label>
+          <span class="info"></span>
+          <select name="timeSystemType">
+            <option value="FISCHER" #if(!$tour || $tour.timeSystem.type == 'FISCHER') selected #end>Fischer timing</option>
+            <option value="CANADIAN" #if($tour && $tour.timeSystem.type == 'CANADIAN') selected #end>Canadian byo-yomi</option>
+            <option value="STANDARD" #if($tour && $tour.timeSystem.type == 'STANDARD') selected #end>Standard byo-yomi</option>
+            <option value="SUDDEN_DEATH" #if($tour && $tour.timeSystem.type == 'SUDDEN_DEATH') selected #end>Sudden death</option>
+          </select>
+        </div>
+        <div class="three wide field">
+          <label>Main time</label>
+          <span class="info"></span>
+          <input name="mainTime" type="text" class="duration" value="#if($tour && $tour.timeSystem.mainTime)#toHMS($tour.timeSystem.mainTime)#{else}00:40:00#end"/>
+        </div>
+        <div id="increment" class="three wide field #if($tour && $tour.timeSystem.type != 'FISCHER')hidden#end">
+          <label>Increment</label>
+          <span class="info"></span>
+          <input name="increment" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.increment" != "")#toHMS($tour.timeSystem.increment)#{else}00:00:20#end"/>
+        </div>
+        <div id="maxTime" class="three wide field #if($tour && $tour.timeSystem.type != 'FISCHER')hidden#end">
+          <label>Max time</label>
+          <span class="info"></span>
+          <input name="maxTime" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.maxTime" != "")#toHMS($tour.timeSystem.maxTime)#{else}00:40:00#end"/>
+        </div>
+        <div id="byoyomi" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN' && $tour.timeSystem.type != 'STANDARD')hidden#end">
+          <label>Byo-yomi time</label>
+          <span class="info"></span>
+          <input name="byoyomi" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.byoyomi" != "")#toHMS($tour.timeSystem.byoyomi)#{else}00:05:00#end"/>
+        </div>
+        <div id="periods" class="three wide field #if(!$tour || $tour.timeSystem.type != 'STANDARD')hidden#end">
+          <label>Byo-yomi periods</label>
+          <span class="info"></span>
+          <input name="periods" type="number" min="0" value="#if($tour && "$!tour.timeSystem.periods" != "")$tour.timeSystem.periods#{else}3#end"/>
+        </div>
+        <div id="stones" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN')hidden#end">
+          <label>Byo-yomi stones</label>
+          <span class="info"></span>
+          <input name="stones" class="seconds" type="number" min="0" value="#if($tour && "$!tour.timeSystem.stones" != "")$tour.timeSystem.stones#{else}15#end"/>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button id="cancel" class="ui gray right labeled icon floating edit button">
+        <i class="times icon"></i>
+        Cancel
+      </button>
+#if($tour)
+      <button id="close" class="ui gray right labeled icon floating info button">
+        <i class="times icon"></i>
+        Close
+      </button>
+      <button id="edit" class="ui blue right labeled icon floating info button">
+        <i class="pencil icon"></i>
+        Edit
+      </button>
+#end
+      <button id="validate" class="ui next green right labeled icon floating edit button">
+        <i class="checkmark icon"></i>
+#if($tour)
+          Update
+#else
+          Create
+#end
+      </button>
+    </div>
+  </form>
+</div>
