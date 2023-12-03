@@ -136,19 +136,27 @@ function spinner(show) {
   else $('#backdrop').removeClass('active');
 }
 
+function modal(id) {
+  $('body').addClass('dimmed');
+  $(`#${id}.popup`).addClass('shown');
+}
+
 onLoad(() => {
-  /*
-  document.on('click', e => {
-    if (!e.target.closest('.modal')) $('.modal').hide();
-  })
+  $('button.close').on('click', e => {
+    let modal = e.target.closest('.popup');
+    if (modal) {
+      modal.removeClass('shown');
+      $('body').removeClass('dimmed');
+    }
+  });
+  $('.checkbox').on('click', e => {
+    let chk = e.target.closest('.checkbox');
+    chk.toggleClass('active');
+    let checkbox = chk.find('input')[0];
+    checkbox.checked = !checkbox.checked;
+  });
+  /* commented for now - do we want this?
+  $('#dimmer').on('click', e => $('.popup').removeClass('shown');
    */
-  $('i.close.icon').on('click', e => {
-    let modal = e.target.closest('.modal');
-    if (modal) modal.modal(false);
-  });
-  $('.modal .actions .cancel').on('click', e => {
-    e.target.closest('.modal').modal(false);
-  });
-  $('#dimmer').on('click', e => $('.modal').modal(false));
 });
 

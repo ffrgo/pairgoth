@@ -18,7 +18,7 @@
       display: none;
     }
     &.edit {
-      input, select, .edit {
+      input:not(.hidden), select:not(.hidden), .edit:not(.hidden) {
         display: initial;
       }
       .info, #edit {
@@ -29,7 +29,7 @@
   div.field:not(.hidden) {
     display: flex;
     flex-flow: column nowrap;
-    justify-content: space-between;
+    justify-content: space-around;
     margin: 1px;
     background-color: #eeeeee;
   }

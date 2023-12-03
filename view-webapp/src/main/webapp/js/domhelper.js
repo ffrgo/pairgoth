@@ -49,7 +49,7 @@ Element.prototype.toggleClass = function(className) {
 NodeList.prototype.hasClass = function(className) {
   return this.item(0).classList.contains(className);
 }
-Element.prototype.toggleClass = function(className) {
+Element.prototype.hasClass = function(className) {
   this.classList.contains(className);
 }
 Node.prototype.offset = function() {
@@ -101,4 +101,18 @@ Element.prototype.text = function(txt) {
   } else {
     this.textContent = txt;
   }
+}
+NodeList.prototype.item = function (i) {
+  return this[+i || 0];
+};
+NodeList.prototype.find = function(selector) {
+  let result = [];
+  this.forEach(function (elem, i) {
+    let partial = elem.find(selector);
+    result = result.concat([...partial]);
+  });
+  return Reflect.construct(Array, result, NodeList);
+}
+Element.prototype.find = function (selector) {
+  return this.querySelectorAll(':scope ' + selector);
 }

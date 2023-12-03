@@ -7,7 +7,7 @@ onLoad(() => {
 
   $('#cancel, #close').on('click', e => {
     e.preventDefault();
-    if ($('#tournament-infos').hasClass('edit')) {
+    if ($('#tournament-infos').hasClass('edit') && typeof(tour_id) !== 'undefined') {
       $('#tournament-infos').removeClass('edit')
     } else {
       document.location.href = '/index';

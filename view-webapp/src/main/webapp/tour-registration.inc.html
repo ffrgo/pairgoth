@@ -14,31 +14,100 @@ $parts
 </div>
 <div id="player" class="popup">
   <div class="popup-body">
-    <div class="close">
-      <i class="ui circular times icon"></i>
-    </div>
     <div class="popup-content">
-      <form id="player-form" class="edit">
-        <div class="two fields">
-          <div class="field">
+      <form id="player-form" class="ui form edit">
+        <div class="four stackable fields">
+          <div class="twelve wide field">
+            <div class="ui icon input">
+              <input type="text" placeholder="Search...">
+              <i class="search icon"></i>
+            </div>
+          </div>
+          <div class="two wide field">
+            <div class="active checkbox">
+              <div class="circle"></div>
+              <input type="checkbox" class="hidden" checked/>
+            </div>
+            AGA
+          </div>
+          <div class="two wide field">
+            <div class="active checkbox">
+              <div class="circle"></div>
+              <input type="checkbox" class="hidden" checked/>
+            </div>
+            EGF
+          </div>
+          <div class="two wide field">
+            <div class="active checkbox">
+              <div class="circle"></div>
+              <input type="checkbox" class="hidden" checked/>
+            </div>
+            FFG
+          </div>
+        </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
             <label>Family name</label>
             <span class="info"></span>
             <input type="text" name="name" placeholder="last name"/>
           </div>
-          <div class="field">
+          <div class="eight wide field">
             <label>Given name</label>
             <span class="info"></span>
             <input type="text" name="name" placeholder="first name"/>
           </div>
         </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
+            <label>Country</label>
+            <span class="info"></span>
+            <select name="country">
+              <option></option>
+#set($defaultCountry = $translate.defaultCountry[$request.lang])
+#foreach($country in $countries.countries)
+              <option value="$country.key">$country.value</option>
+#end
+            </select>
+          </div>
+          <div class="eight wide field">
+            <label>Club</label>
+            <span class="info"></span>
+            <input type="text" name="name" placeholder="club"/>
+          </div>
+        </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
+            <label>Rank</label>
+            <span class="info"></span>
+            <select name="rank">
+              <option></option>
+#levels()
+            </select>
+          </div>
+          <div class="eight wide field">
+            <label>Rating</label>
+            <span class="info"></span>
+            <input name="rating" type="text" class="numeric"/>
+          </div>
+        </div>
       </form>
+    </div>
+    <div class="popup-footer">
+      <button class="ui gray right labeled icon floating close button">
+        <i class="times icon"></i>
+        Cancel
+      </button>
+      <button class="ui green right labeled icon floating add button">
+        <i class="plus icon"></i>
+        Register
+      </button>
     </div>
   </div>
 </div>
 <script type="text/javascript">
   onLoad(() => {
     $('#add').on('click', e => {
-      $('#player').addClass('shown');
+      modal('player');
     });
   });
 </script>

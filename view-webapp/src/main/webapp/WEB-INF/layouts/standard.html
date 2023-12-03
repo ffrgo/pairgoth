@@ -20,7 +20,7 @@
   // ]]#
   </script>
 </head>
-<body class="vert flex">
+<body class="vert flex initial">
 #* Debugging code to list all web context properties
 <blockquote>
 #foreach($attr in $application.getAttributeNames())
@@ -58,7 +58,7 @@
     <div id="success" class="hidden"></div>
     <div id="error" class="hidden"></div>
   </div>
-  <div id="backdrop">
+  <div id="backdrop"></div>
   <div id="dimmer"></div>
   <script type="text/javascript" src="/lib/store2-2.14.2.min.js"></script>
   <script type="text/javascript" src="/lib/tablesort-5.4.0.min.js"></script>
@@ -76,6 +76,7 @@
     const locale = '${request.locale}';
     // #[[
     onLoad(() => {
+      $('body').removeClass('initial');
       $('#lang').on('click', e => {
         $('#lang-list').toggleClass('shown');
       });
@@ -90,10 +91,10 @@
         }
       });
       $('.popup .close').on('click', e => {
-        console.log('click');
         let popup = e.target.closest('.popup');
         if (popup) {
           popup.classList.remove('shown');
+          $('body').removeClass('dimmed');
         }
       });
 
