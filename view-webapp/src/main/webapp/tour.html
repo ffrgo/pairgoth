@@ -23,7 +23,7 @@
   <h1 class="centered title">#if($tour)$tour.name#{else}New Tournament#end</h1>
 #if($tour)
   <div class="ui ordered centered steps">
-    <div class="active step" data-step="information">
+    <div class="step" data-step="information">
       <div class="content">
         <div class="title">Information</div>
       </div>
@@ -49,12 +49,14 @@
       </div>
     </div>
   </div>
+#end
+#translate('tour-information.inc.html')
+#if($tour)
   #translate('tour-registration.inc.html')
   #translate('tour-pairing.inc.html')
   #translate('tour-results.inc.html')
   #translate('tour-standings.inc.html')
 #end
-#translate('tour-information.inc.html')
 </div>
 <!-- error messages included as html elements so that they are translated -->
 <div id="required_field" class="hidden">Required field</div>

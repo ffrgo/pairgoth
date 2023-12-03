@@ -13,7 +13,7 @@
 
   /* information section */
 
-  #tournament-infos {
+  form {
     input, select, .edit {
       display: none;
     }
@@ -36,12 +36,5 @@
 
   /* registration section */
 
-  #registration {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-between;
-    > .roundbox {
-      flex: 1;
-    }
-  }
+
 }
