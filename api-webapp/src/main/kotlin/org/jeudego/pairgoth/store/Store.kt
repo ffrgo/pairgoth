@@ -9,7 +9,7 @@ private fun createStoreImplementation(): StoreImplementation {
     return when (val storeProperty = WebappManager.getProperty("store") ?: "memory") {
         "memory" -> MemoryStore()
         "file" -> {
-            val filePath = WebappManager.getMandatoryProperty("store.file.path") ?: "."
+            val filePath = WebappManager.getProperty("store.file.path") ?: "."
             FileStore(filePath)
         }
         else -> throw Error("unknown store: $storeProperty")

@@ -16,12 +16,13 @@ onLoad(() => {
   });
 
   $('#validate').on('click', e => {
+    let form = e.target.closest('form');
     let valid = true;
     // validate required fields
     let required = ['name', 'shortName', 'startDate', 'endDate'];
-    if (!$('input[name="online"]')[0].checked) required.push('location')
+    if (!form.find('input[name="online"]')[0].checked) required.push('location')
     for (let name of required) {
-      let ctl = $(`input[name=${name}]`)[0];
+      let ctl = form.find(`input[name=${name}]`)[0];
       let val = ctl.value;
       if (val) {
         ctl.setCustomValidity('');
@@ -32,7 +33,7 @@ onLoad(() => {
     }
     if (!valid) return;
     // validate short_name
-    let shortNameCtl = $('input[name="shortName"]')[0];
+    let shortNameCtl = form.find('input[name="shortName"]')[0];
     let shortName = shortNameCtl.value;
     if (safeRegex.test(shortName)) {
       shortNameCtl.setCustomValidity('');
@@ -40,7 +41,8 @@ onLoad(() => {
       valid  = false;
       shortNameCtl.setCustomValidity(msg('invalid_character'));
     }
-    if (!valid) return;
+    // if (!valid) return;
+    // ...
   });
 
   for(let name of ['startDate', 'endDate']) {
@@ -99,37 +101,38 @@ onLoad(() => {
 
   $('#tournament-infos').on('submit', e => {
     e.preventDefault();
+    let form = e.target;
     let tour = {
-      name: formValue('name'),
-      shortName: formValue('shortName'),
-      startDate: parseDate(formValue('startDate')),
-      endDate: parseDate(formValue('endDate')),
-      type: formValue('type'),
-      rounds: formValue('rounds'),
-      country: formValue('country'),
-      online: formValue('online'),
-      location: formValue('online') ? "" : formValue('location'),
+      name: form.val('name'),
+      shortName: form.val('shortName'),
+      startDate: parseDate(form.val('startDate')),
+      endDate: parseDate(form.val('endDate')),
+      type: form.val('type'),
+      rounds: form.val('rounds'),
+      country: form.val('country'),
+      online: form.val('online'),
+      location: form.val('online') ? "" : form.val('location'),
       pairing: {
-        type: formValue('pairing'),
-        // mmFloor: formValue('mmFloor'),
-        mmBar: formValue('mmBar'),
+        type: form.val('pairing'),
+        // mmFloor: form.val('mmFloor'),
+        mmBar: form.val('mmBar'),
         main: {
-          firstSeed: formValue('firstSeed'),
-          secondSeed: formValue('secondSeed')
+          firstSeed: form.val('firstSeed'),
+          secondSeed: form.val('secondSeed')
         },
         handicap: {
-          correction: formValue('correction'),
-          treshold: formValue('treshold')
+          correction: form.val('correction'),
+          treshold: form.val('treshold')
         }
       },
       timeSystem: {
-        type: formValue('timeSystemType'),
-        mainTime: fromHMS(formValue('mainTime')),
-        increment: fromHMS(formValue('increment')),
-        maxTime: fromHMS(formValue('maxTime')),
-        byoyomi: fromHMS(formValue('byoyomi')),
-        periods: formValue('periods'),
-        stones: formValue('stones')
+        type: form.val('timeSystemType'),
+        mainTime: fromHMS(form.val('mainTime')),
+        increment: fromHMS(form.val('increment')),
+        maxTime: fromHMS(form.val('maxTime')),
+        byoyomi: fromHMS(form.val('byoyomi')),
+        periods: form.val('periods'),
+        stones: form.val('stones')
       }
     }
     console.log(tour);

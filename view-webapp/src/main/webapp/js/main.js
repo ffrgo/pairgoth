@@ -84,8 +84,8 @@ function exportCSV(filename, content) {
   document.body.removeChild(link);
 }
 
-/* modals */
-
+/* modals
+  NOT IN USE, see popup-related code.
 NodeList.prototype.modal = function(show) {
   this.item(0).modal(show);
   return this;
@@ -101,11 +101,12 @@ Element.prototype.modal = function(show) {
   }
   return this;
 }
+ */
 
 /* DOM helpers */
 
-function formValue(name) {
-  let ctl = $(`[name="${name}"]`)[0];
+HTMLFormElement.prototype.val = function(name) {
+  let ctl = this.find(`[name="${name}"]`)[0];
   if (!ctl) {
     console.error(`unknown input name: ${name}`)
   }
@@ -124,7 +125,7 @@ function formValue(name) {
   }
   console.error(`unhandled input tag or type for input ${name} (tag: ${tag}, type:${type}`);
   return null;
-}
+};
 
 function msg(id) {
   let ctl = $(`#${id}`)[0];

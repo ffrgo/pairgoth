@@ -1,15 +1,13 @@
 package org.jeudego.pairgoth.web
 
-import com.republicate.mailer.SmtpLoop
 import org.apache.commons.lang3.tuple.Pair
+import org.jeudego.pairgoth.ratings.RatingsManager
 import org.jeudego.pairgoth.util.Translator
 import org.slf4j.LoggerFactory
 import java.io.IOException
-import java.lang.IllegalAccessError
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.*
-import java.util.IllegalFormatCodePointException
 import javax.net.ssl.*
 import javax.servlet.*
 import javax.servlet.annotation.WebListener
@@ -53,6 +51,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
     override fun contextInitialized(sce: ServletContextEvent) {
         context = sce.servletContext
         logger.info("---------- Starting $WEBAPP_NAME ----------")
+        logger.info("info level is active")
         logger.debug("debug level is active")
         logger.trace("trace level is active")
         webappRoot = context.getRealPath("/")
@@ -77,6 +76,9 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
             // disable (for now ?) the SSL certificate checks, because many sites
             // fail to correctly implement SSL...
             disableSSLCertificateChecks()
+
+            registerService("ratings", RatingsManager)
+            startService("ratings")
 
         } catch (ioe: IOException) {
             logger.error("webapp initialization error", ioe)
