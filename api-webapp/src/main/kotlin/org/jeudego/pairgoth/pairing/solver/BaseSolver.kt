@@ -29,6 +29,7 @@ sealed class BaseSolver(
     companion object {
         val rand = Random(/* seed from properties - TODO */)
         val DEBUG_EXPORT_WEIGHT = true
+        var byePlayers: MutableList<Pairable> = mutableListOf()
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -68,6 +69,7 @@ sealed class BaseSolver(
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
                 weightForBye = p.rank + 2*p.main
+                if (p in byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
                     chosenByePlayer = p
@@ -75,6 +77,7 @@ sealed class BaseSolver(
                 println("choose Bye: " + p.nameSeed() + " " + weightForBye)
             }
             println("Bye player : " + chosenByePlayer.nameSeed())
+            byePlayers.add(chosenByePlayer)
             nameSortedPairables.remove(chosenByePlayer)
         }
 
@@ -83,8 +86,8 @@ sealed class BaseSolver(
             for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
-                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
-                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
+                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1.0) }
+                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1.0) }
                 if (DEBUG_EXPORT_WEIGHT)
                 {
                     File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
