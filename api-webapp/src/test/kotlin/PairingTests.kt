@@ -272,6 +272,7 @@ class PairingTests: TestBase() {
                 games = TestAPI.get("/api/tour/$id/res/$round").asArray()
             }
             else {
+                //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
                 games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
                 logger.info("games for round $round: {}", games.toString())
 
