@@ -119,8 +119,9 @@ sealed class BaseSolver(
         if (chosenByePlayer != ByePlayer) sorted.add(listOf(chosenByePlayer, ByePlayer))
         println(sorted.size)*/
 
-        val result = sorted.flatMap { games(white = it[0], black = it[1]) }
-
+        var result = sorted.flatMap { games(white = it[0], black = it[1]) }
+        // add game for ByePlayer
+        if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         if (DEBUG_EXPORT_WEIGHT) {
             var sumOfWeights = 0.0
