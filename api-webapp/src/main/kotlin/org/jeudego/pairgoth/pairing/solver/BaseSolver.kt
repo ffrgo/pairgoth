@@ -124,6 +124,9 @@ sealed class BaseSolver(
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         if (DEBUG_EXPORT_WEIGHT) {
+            println("DUDD debug")
+            println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
+            pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
             var sumOfWeights = 0.0
             println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
@@ -242,7 +245,7 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
@@ -323,12 +326,15 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
-           /* println("Names "+upperSP.nameSeed()+"  "+lowerSP.nameSeed())
-            println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
-            println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
-            println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
-            println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
-            println("score = " + score.toString())*/
+            if(debug){
+                println("Names "+upperSP.nameSeed()+"  "+lowerSP.nameSeed())
+                println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
+                println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
+                println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
+                println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
+                println("score = " + score.toString())
+            }
+
         }
 
 
