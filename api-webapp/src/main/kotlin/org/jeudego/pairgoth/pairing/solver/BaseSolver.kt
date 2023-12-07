@@ -86,8 +86,8 @@ sealed class BaseSolver(
             for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
-                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1.0) }
-                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1.0) }
+                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
+                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
                 if (DEBUG_EXPORT_WEIGHT)
                 {
                     File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
