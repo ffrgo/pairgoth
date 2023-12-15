@@ -11,16 +11,18 @@ import java.nio.charset.StandardCharsets
 object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
     override val defaultURL = URL("https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt")
     override fun parsePayload(payload: String): Json.Array {
-        return payload.lines().mapNotNullTo(Json.MutableArray()) {
-            val match = linePattern.matchEntire(it)
+        return payload.lines().mapNotNullTo(Json.MutableArray()) { line ->
+            val match = linePattern.matchEntire(line)
             if (match == null) {
-                logger.error("could not parse line: $it")
+                logger.error("could not parse line: $line")
                 null
             } else {
                 val pairs = groups.map {
                     Pair(it, match.groups[it]?.value)
                 }.toTypedArray()
-                Json.Object(*pairs)
+                Json.MutableObject(*pairs).also {
+                    it["origin"] = "FFG"
+                }
             }
         }
     }

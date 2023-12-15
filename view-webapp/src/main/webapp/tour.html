@@ -11,6 +11,7 @@
     <option value="$k" #if($sel && $sel == $k)selected#end>$disp</option>
   #end
 #end
+#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
 #if($params.id)
   #set($tour = $api.get("tour/${params.id}"))
   #if (!$tour)
@@ -63,6 +64,7 @@
 <script type="text/javascript">
 #if($tour)
   const tour_id = ${tour.id};
+  const tour_rounds = ${tour.rounds};
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';

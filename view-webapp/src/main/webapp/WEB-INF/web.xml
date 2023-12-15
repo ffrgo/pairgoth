@@ -65,6 +65,12 @@
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>
+  <servlet>
+    <servlet-name>search</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.SearchServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
@@ -77,7 +83,11 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>api</servlet-name>
-    <url-pattern>/api/*</url-pattern>
+    <url-pattern>/api/tour/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>search</servlet-name>
+    <url-pattern>/api/search/*</url-pattern>
   </servlet-mapping>
 
   <!-- context params -->

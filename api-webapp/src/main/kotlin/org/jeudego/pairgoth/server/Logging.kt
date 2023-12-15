@@ -15,9 +15,11 @@ fun Logger.logRequest(req: HttpServletRequest, logHeaders: Boolean = false) {
         .append(req.localName)
     val port = req.localPort
     if (port != 80) builder.append(':').append(port)
+    /*
     if (!req.contextPath.isEmpty()) {
         builder.append(req.contextPath)
     }
+     */
     builder.append(req.requestURI)
     if (req.method == "GET") {
         val qs = req.queryString

@@ -105,7 +105,8 @@ Element.prototype.modal = function(show) {
 
 /* DOM helpers */
 
-HTMLFormElement.prototype.val = function(name) {
+HTMLFormElement.prototype.val = function(name, value) {
+  let hasValue = typeof(value) !== 'undefined';
   let ctl = this.find(`[name="${name}"]`)[0];
   if (!ctl) {
     console.error(`unknown input name: ${name}`)
@@ -113,15 +114,30 @@ HTMLFormElement.prototype.val = function(name) {
   let tag = ctl.tagName;
   let type = tag === 'INPUT' ? ctl.attr('type') : undefined;
   if (
-    (tag === 'INPUT' && ['text', 'number'].includes(ctl.attr('type'))) ||
+    (tag === 'INPUT' && ['text', 'number', 'hidden'].includes(ctl.attr('type'))) ||
     tag === 'SELECT'
   ) {
-    return ctl.value;
+    if (hasValue) {
+      ctl.value = value;
+      return;
+    }
+    else return ctl.value;
   } else if (tag === 'INPUT' && ctl.attr('type') === 'radio') {
-    ctl = $(`input[name="${name}"]:checked`)[0];
-    if (ctl) return ctl.value;
+    if (hasValue) {
+      ctl = $(`input[name="${name}"][value="${value}"]`);
+      if (ctl) ctl.checked = true;
+      return;
+    } else {
+      ctl = $(`input[name="${name}"]:checked`);
+      if (ctl) return ctl[0].value;
+      else return null;
+    }
   } else if (tag === 'INPUT' && ctl.attr('type') === 'checkbox') {
-    return ctl.checked;
+    if (hasValue) {
+      ctl.checked = value !== 'false' && Boolean(value);
+      return;
+    }
+    else return ctl.checked;
   }
   console.error(`unhandled input tag or type for input ${name} (tag: ${tag}, type:${type}`);
   return null;
@@ -140,6 +156,11 @@ function spinner(show) {
 function modal(id) {
   $('body').addClass('dimmed');
   $(`#${id}.popup`).addClass('shown');
+}
+
+function close_modal() {
+  $('body').removeClass('dimmed');
+  $(`.popup`).removeClass('shown');
 }
 
 onLoad(() => {

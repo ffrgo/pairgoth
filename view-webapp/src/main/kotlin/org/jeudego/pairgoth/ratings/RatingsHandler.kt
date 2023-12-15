@@ -19,13 +19,14 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     open val active = true
     val cacheFile = RatingsManager.path.resolve("${origin.name}.json").toFile()
     lateinit var players: Json.Array
+    private var updated = false
 
     val url: URL by lazy {
         WebappManager.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
     }
 
-    fun updateIfNeeded() {
-        if (Date().time - cacheFile.lastModified() > delay) {
+    fun updateIfNeeded(): Boolean {
+        return if (Date().time - cacheFile.lastModified() > delay) {
             RatingsManager.logger.info("Updating $origin cache from $url")
             val payload = fetchPayload()
             players = parsePayload(payload).also {
@@ -34,13 +35,17 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
                     out.println(cachePayload)
                 }
             }
+            true
         } else if (!this::players.isInitialized) {
             players = Json.parse(cacheFile.readText())?.asArray() ?: Json.Array()
+            true
+        } else {
+            false
         }
     }
 
     fun fetchPlayers(): Json.Array {
-        updateIfNeeded()
+        updated = updateIfNeeded()
         return players
     }
 
@@ -56,6 +61,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         }
     }
     open fun defaultCharset() = StandardCharsets.UTF_8
+    fun updated() = updated
     abstract fun parsePayload(payload: String): Json.Array
     val logger = LoggerFactory.getLogger(origin.name)
     val atom = "[-._`'a-zA-ZÀ-ÿ]"

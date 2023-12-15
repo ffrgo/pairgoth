@@ -17,7 +17,9 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                 val pairs = groups.map {
                     Pair(it, match.groups[it]?.value)
                 }.toTypedArray()
-                Json.Object(*pairs)
+                Json.MutableObject(*pairs).also {
+                    it["origin"] = "EGF"
+                }
             }
         }
     }

@@ -79,6 +79,7 @@
   }
 
   .section {
+    text-align: center;
     padding: 0.5em;
   }
 
@@ -152,27 +153,31 @@
     position: relative;
     cursor: pointer;
     transform: scale(1.2);
-    #lang-list {
-      position: absolute;
-      display: none;
-      top:100%;
-      right: 1em;
-      flex-flow: column nowrap;
-      padding: 0.5em;
-      gap: 0.5em;
-      background-color: #dddddd;
-      align-items: flex-start;
-      z-index: 50;
-      &.shown {
-        display: flex;
-      }
-      a {
-        display: inline-block;
-        white-space: nowrap;
-        text-align: center;
-        i {
-          vertical-align: middle;
-        }
+  }
+
+  #lang-list {
+    position: fixed;
+    display: none;
+    top:3em;
+    right: 1em;
+    flex-flow: column nowrap;
+    padding: 0.5em;
+    gap: 0.5em;
+    background-color: #dddddd;
+    align-items: flex-start;
+    z-index: 60;
+    &.shown {
+      display: flex;
+    }
+    .lang {
+      cursor: pointer;
+    }
+    a {
+      display: inline-block;
+      white-space: nowrap;
+      text-align: center;
+      i {
+        vertical-align: middle;
       }
     }
   }

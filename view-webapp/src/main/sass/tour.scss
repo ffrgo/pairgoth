@@ -32,9 +32,43 @@
     justify-content: space-around;
     margin: 1px;
     background-color: #eeeeee;
+    &.centered {
+      align-items: center;
+    }
+  }
+  .inline.fields {
+    background-color: #eeeeee;
+    margin-left: -0.5em;
+    margin-right: -0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    .centered.field > label {
+      margin-right: 0;
+    }
   }
 
   /* registration section */
-
+  #player-form {
+    &:not(.add) {
+      #search-form, #search-result {
+        display: none;
+      }
+    }
+  }
+  #search-form {
+    position: relative;
+  }
+  #search-result {
+    position: absolute;
+    background-color: gray;
+    z-index: 2;
+    width:100%;
+    top: 100%;
+    padding: 1em;
+    overflow-y: auto;
+    &.hidden {
+      display: none;
+    }
+  }
 
 }

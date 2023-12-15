@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-class ApiServlet : HttpServlet() {
+class ApiServlet: HttpServlet() {
 
     public override fun doGet(request: HttpServletRequest, response: HttpServletResponse) {
         doRequest(request, response)
@@ -90,7 +90,7 @@ class ApiServlet : HttpServlet() {
                         "team" -> TeamHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
-                "player" -> PlayerHandler
+                // "player" -> PlayerHandler
                 else -> ApiHandler.badRequest("unknown entity: $entity")
             }
 

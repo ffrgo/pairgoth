@@ -17,6 +17,7 @@
     <url>TODO</url>
     <properties>
         <pac4j.version>5.7.1</pac4j.version>
+        <lucene.version>9.9.0</lucene.version>
     </properties>
     <build>
         <defaultGoal>package</defaultGoal>
@@ -246,6 +247,22 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>2.4-SNAPSHOT</version>
+        </dependency>
+        <!-- indexing -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analysis-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
         <!-- tests -->
         <dependency>

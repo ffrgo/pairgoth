@@ -2,7 +2,39 @@
   <div id="reg-view">
     <div id="players-list" class="roundbox">
 #set($parts = $api.get("tour/${params.id}/part"))
-$parts
+      <table id="players" class="ui celled selectable striped table">
+        <thead>
+          <th>name</th>
+          <th>first name</th>
+          <th>country</th>
+          <th>club</th>
+          <th>rank</th>
+          <th>rating</th>
+          <th>participation</th>
+        </thead>
+        <tbody>
+#foreach($part in $parts)
+          <tr data-id="$part.id">
+            <td>$part.name</td>
+            <td>$part.firstname</td>
+            <td>$part.country</td>
+            <td>$part.club</td>
+            <td data-sort="$part.rank">#rank($part.rank)</td>
+            <td>$part.rating</td>
+            <td>
+  #foreach($round in [1..$tour.rounds])
+    ## CB TODO - upstream json parsing should not give longs here, should it?
+    #if($part.skip && $part.skip.contains($round.longValue()))
+              <label class="ui red circular label">$round</label>
+    #else
+              <label class="ui green circular label">$round</label>
+    #end
+  #end
+            </td>
+          </tr>
+#end
+        </tbody>
+      </table>
     </div>
     <div class="form-actions">
       <button id="add" class="ui blue right labeled icon floating info button">
@@ -15,35 +47,37 @@ $parts
 <div id="player" class="popup">
   <div class="popup-body">
     <form id="player-form" class="ui form edit">
+      <input type="hidden" name="id"/>
       <div class="popup-content">
-        <div class="four stackable fields">
+        <div id="search-form" class="four stackable fields">
           <div class="twelve wide field">
             <div class="ui icon input">
-              <input type="text" placeholder="Search...">
+              <input id="needle" name="needle" type="text" placeholder="Search...">
               <i class="search icon"></i>
             </div>
           </div>
           <div class="two wide field">
             <div class="active checkbox">
               <div class="circle"></div>
-              <input type="checkbox" class="hidden" checked/>
+              <input name="aga" type="checkbox" class="hidden" checked/>
             </div>
             AGA
           </div>
           <div class="two wide field">
             <div class="active checkbox">
               <div class="circle"></div>
-              <input type="checkbox" class="hidden" checked/>
+              <input name="egf" type="checkbox" class="hidden" checked/>
             </div>
             EGF
           </div>
           <div class="two wide field">
             <div class="active checkbox">
               <div class="circle"></div>
-              <input type="checkbox" class="hidden" checked/>
+              <input name="ffg" type="checkbox" class="hidden" checked/>
             </div>
             FFG
           </div>
+          <div id="search-result" class="hidden">hophop</div>
         </div>
         <div class="two stackable fields">
           <div class="eight wide field">
@@ -90,9 +124,18 @@ $parts
             <input name="rating" type="text" class="numeric"/>
           </div>
         </div>
+        <div class="inline fields">
+          <label>Participation</label>
+#foreach($r in [1..$tour.rounds])
+          <div class="centered field">
+            <label>R${r}</label>
+            <input name="r${r}" type="checkbox" checked="checked" class="participation"/>
+          </div>
+#end
+        </div>
       </div>
       <div class="popup-footer">
-        <button class="ui gray right labeled icon floating close button">
+        <button id="cancel-register" class="ui gray right labeled icon floating close button">
           <i class="times icon"></i>
           Cancel
         </button>
@@ -104,10 +147,3 @@ $parts
     </form>
   </div>
 </div>
-<script type="text/javascript">
-  onLoad(() => {
-    $('#add').on('click', e => {
-      modal('player');
-    });
-  });
-</script>
