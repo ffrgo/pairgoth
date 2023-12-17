@@ -236,8 +236,7 @@ sealed class BaseSolver(
     open fun MainCritParams.minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         val scoreRange: Int = groupsCount
-        // TODO check category equality if category are used in SwissCat
-        if (scoreRange!=0){
+        if (scoreRange != 0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
             score = concavityFunction(x, scoreWeight)
         }

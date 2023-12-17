@@ -181,8 +181,8 @@ class MacMahon(
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
     ),
-    var mmFloor: Int = -20,
-    var mmBar: Int = 0
+    var mmFloor: Int = -20, // 20k
+    var mmBar: Int = 0 // 1D
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
