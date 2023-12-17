@@ -137,7 +137,7 @@ HTMLFormElement.prototype.val = function(name, value) {
       ctl.checked = value !== 'false' && Boolean(value);
       return;
     }
-    else return ctl.checked;
+    else return ctl.checked && ctl.value ? ctl.value : ctl.checked;
   }
   console.error(`unhandled input tag or type for input ${name} (tag: ${tag}, type:${type}`);
   return null;
@@ -170,12 +170,6 @@ onLoad(() => {
       modal.removeClass('shown');
       $('body').removeClass('dimmed');
     }
-  });
-  $('.checkbox').on('click', e => {
-    let chk = e.target.closest('.checkbox');
-    chk.toggleClass('active');
-    let checkbox = chk.find('input')[0];
-    checkbox.checked = !checkbox.checked;
   });
   /* commented for now - do we want this?
   $('#dimmer').on('click', e => $('.popup').removeClass('shown');

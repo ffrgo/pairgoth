@@ -113,6 +113,32 @@ NodeList.prototype.find = function(selector) {
   });
   return Reflect.construct(Array, result, NodeList);
 }
-Element.prototype.find = function (selector) {
+Element.prototype.find = function(selector) {
   return this.querySelectorAll(':scope ' + selector);
 }
+
+NodeList.prototype.clear = function() {
+  this.forEach(function (elem, i) {
+    elem.clear();
+  });
+  return this;
+}
+Element.prototype.clear = function() {
+  this.innerHTML = '';
+  return this;
+}
+
+/*
+ TODO - conflicts with from.val(), rename one of the two
+NodeList.prototype.val = function(value) {
+  this.item(0).val(value);
+}
+Element.prototype.val = function(value) {
+  // TODO - check that "this" has the "value" property
+  if (typeof(value) === 'undefined') {
+    return this.value;
+  } else {
+    this.value = value;
+  }
+}
+*/

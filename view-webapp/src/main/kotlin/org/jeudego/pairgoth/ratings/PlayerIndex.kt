@@ -31,8 +31,9 @@ class PlayerIndex {
         val NAME = "name"
         val FIRSTNAME = "firstname"
         val TEXT = "text"
+        val COUNTRY = "country"
 
-        val MAX_HITS = 100
+        val MAX_HITS = 20
         val logger = LoggerFactory.getLogger("index")
         val queryParser = ComplexPhraseQueryParser(TEXT, StandardAnalyzer())
     }
@@ -53,10 +54,11 @@ class PlayerIndex {
             players.forEachIndexed { i, p ->
                 val player = p as Json.Object
                 val origin = p.getString(ORIGIN) ?: throw Error("unknown origin")
-                val text = player.field(NAME)
+                val text = player.field(NAME).lowercase(Locale.ROOT)
                 val doc = Document()
                 doc.add(StoredField(ID, i));
-                doc.add(StringField(ORIGIN, player.field(ORIGIN), Field.Store.NO))
+                doc.add(StringField(ORIGIN, player.field(ORIGIN).lowercase(Locale.ROOT), Field.Store.NO))
+                doc.add(StringField(COUNTRY, player.field(COUNTRY).lowercase(Locale.ROOT), Field.Store.NO))
                 doc.add(TextField(TEXT, "${player.field(NAME)} ${player.nullableField(FIRSTNAME)}", Field.Store.NO))
                 writer.addDocument(doc);
                 ++count
@@ -65,12 +67,16 @@ class PlayerIndex {
         logger.info("indexed $count players")
     }
 
-    fun match(needle: String, origins: Int): List<Int> {
-        // val fuzzy = FuzzyQuery(Term(TEXT, needle))
-        val terms = needle.split(Regex("[ -_']+"))
+    fun match(needle: String, origins: Int, country: String?): List<Int> {
+        val terms = needle.lowercase(Locale.ROOT)
+            .replace(Regex("([+&|!(){}\\[\\]^\\\\\"~*?:/]|(?<!\\b)-)"), "")
+            .split(Regex("[ -_']+"))
             .filter { !it.isEmpty() }
             .map { "$it~" }
             .joinToString(" ")
+            .let { if (it.isEmpty()) it else "$it ${it.substring(0, it.length - 1) + "*^5"}" }
+        if (terms.isEmpty()) return emptyList()
+        logger.info("Search query: $terms")
         val fuzzy = queryParser.parse(terms)
         val activeMask = RatingsManager.activeMask()
         val query = when (origins.countOneBits()) {
@@ -79,7 +85,7 @@ class PlayerIndex {
                 val filter = TermQuery(Term(ORIGIN, RatingsManager.Ratings.codeOf(origins)))
                 BooleanQuery.Builder()
                     .add(fuzzy, BooleanClause.Occur.SHOULD)
-                    .add(filter, BooleanClause.Occur.MUST)
+                    .add(filter, BooleanClause.Occur.FILTER)
                     .build()
             }
             2 -> {
@@ -94,6 +100,15 @@ class PlayerIndex {
             }
             3 -> fuzzy
             else -> throw Error("wrong origins mask")
+        }.let {
+            if (country == null) it
+            else {
+                val countryFilter = TermQuery(Term(COUNTRY, country.lowercase(Locale.ROOT)))
+                BooleanQuery.Builder()
+                    .add(it, BooleanClause.Occur.SHOULD)
+                    .add(countryFilter, BooleanClause.Occur.FILTER)
+                    .build()
+            }
         }
         val docs = searcher.search(query, MAX_HITS)
         return docs.scoreDocs.map { searcher.doc(it.doc).getField(ID).numericValue().toInt() }.toList()

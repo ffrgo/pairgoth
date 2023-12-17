@@ -1,3 +1,50 @@
+const SEARCH_DELAY = 100;
+let searchTimer = undefined;
+let resultTemplate;
+
+function initSearch() {
+  let needle = $('#needle')[0].value;
+  if (searchTimer) {
+    clearTimeout(searchTimer);
+  }
+  searchTimer = setTimeout(() => {
+    search(needle);
+  }, SEARCH_DELAY);
+}
+
+function search(needle) {
+  needle = needle.trim();
+  console.log(needle)
+  if (needle && needle.length > 2) {
+    let form = $('#player-form')[0];
+    let search = {
+      needle: needle,
+      aga: form.val('aga'),
+      egf: form.val('egf'),
+      ffg: form.val('ffg'),
+    }
+    let country = form.val('countryFilter');
+    if (country) search.countryFilter = country;
+    let searchFormState = {
+      countryFilter: country ? true : false,
+      aga: search.aga,
+      egf: search.egf,
+      ffg: search.ffg
+    };
+    store('searchFormState', searchFormState);
+    console.log(search)
+    api.postJson('search', search)
+      .then(result => {
+        if (Array.isArray(result)) {
+          console.log(result)
+          let html = resultTemplate.render(result);
+          $('#search-result')[0].innerHTML = html;
+        } else console.log(result);
+      })
+  } else $('#search-result').clear();
+
+}
+
 onLoad(() => {
   $('input.numeric').imask({
     mask: Number,
@@ -11,6 +58,7 @@ onLoad(() => {
     form.addClass('add');
     // $('#player-form input.participation').forEach(chk => chk.checked = true);
     form.reset();
+    $('#player').removeClass('edit').addClass('create');
     modal('player');
   });
   $('#cancel-register').on('click', e => {
@@ -85,24 +133,29 @@ onLoad(() => {
             form.val(`r${r}`, !(player.skip && player.skip.includes(r)));
           }
           form.removeClass('add');
+          $('#player').removeClass('create').addClass('edit');
           modal('player');
         }
       });
   });
+  resultTemplate = jsrender.templates($('#result')[0]);
   $('#needle').on('input', e => {
-    let needle = $('#needle')[0].value;
-    if (needle && needle.length > 2) {
-      let form = $('#player-form')[0];
-      let search = {
-        needle: needle,
-        aga: form.val('aga'),
-        egf: form.val('egf'),
-        ffg: form.val('ffg')
-      }
-      api.postJson('search', search)
-        .then(result => {
-          console.log(result);
-        })
-    } else $('#search-result').addClass('hidden');
+    initSearch();
+  });
+  $('#clear-search').on('click', e => {
+    $('#needle')[0].value = '';
+    $('#search-result').clear();
+  });
+  let searchFromState = store('searchFormState')
+  if (searchFromState) {
+    for (let id of ["countryFilter", "aga", "egf", "ffg"]) {
+      $(`#${id}`)[0].checked = searchFromState[id];
+    }
+  }
+  $('.toggle').on('click', e => {
+    let chk = e.target.closest('.toggle');
+    let checkbox = chk.find('input')[0];
+    checkbox.checked = !checkbox.checked;
+    initSearch();
   });
 });

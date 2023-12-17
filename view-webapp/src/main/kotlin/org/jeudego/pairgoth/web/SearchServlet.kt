@@ -23,10 +23,11 @@ class SearchServlet: HttpServlet() {
             validateContentType(request)
             val query = request.getAttribute(PAYLOAD_KEY) as Json.Object? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
             val needle =  query.getString("needle") ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no needle")
+            val country = query.getString("countryFilter")
             val aga =  query.getBoolean("aga") ?: false
             val egf =  query.getBoolean("egf") ?: false
             val ffg =  query.getBoolean("ffg") ?: false
-            payload = RatingsManager.search(needle, aga, egf, ffg)
+            payload = RatingsManager.search(needle, aga, egf, ffg, country)
             setContentType(response)
             payload.toString(response.writer)
         } catch (ioe: IOException) {

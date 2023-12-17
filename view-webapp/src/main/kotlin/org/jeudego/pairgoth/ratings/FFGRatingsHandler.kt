@@ -22,6 +22,10 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
                 }.toTypedArray()
                 Json.MutableObject(*pairs).also {
                     it["origin"] = "FFG"
+                    val rating = it["rating"]?.toString()?.toIntOrNull()
+                    if (rating != null) {
+                        it["rank"] = (rating/100).let { if (it < 0) "${-it}k" else "${it+1}d" }
+                    }
                 }
             }
         }

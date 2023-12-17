@@ -25,6 +25,6 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     }
     //  19574643  Abad Jahin                            FR  38GJ   20k   --     15     2  T200202B
     var linePattern =
-        Regex("\\s+(?<egf>\\d{8})\\s+(?<name>$atom+)\\s(?<firstname>$atom+)?,?\\s+(?<country>[A-Z]{2})\\s+(?<club>\\S{1,4})\\s+(?<grade>[1-9][0-9]?[kdp])\\s+(?<promotion>[1-9][0-9]?[kdp]|--)\\s+(?<rating>-?[0-9]+)\\s+(?<nt>[0-9]+)\\s+(?<last>\\S+)\\s*")
-    val groups = arrayOf("egf", "name", "firstname", "country", "club", "grade", "rating")
+        Regex("\\s+(?<egf>\\d{8})\\s+(?<name>$atom+)\\s(?<firstname>$atom+)?,?\\s+(?<country>[A-Z]{2})\\s+(?<club>\\S{1,4})\\s+(?<rank>[1-9][0-9]?[kdp])\\s+(?<promotion>[1-9][0-9]?[kdp]|--)\\s+(?<rating>-?[0-9]+)\\s+(?<nt>[0-9]+)\\s+(?<last>\\S+)\\s*")
+    val groups = arrayOf("egf", "name", "firstname", "country", "club", "rank", "rating")
 }

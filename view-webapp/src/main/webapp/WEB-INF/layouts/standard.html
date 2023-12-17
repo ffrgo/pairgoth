@@ -92,14 +92,13 @@
           $('#lang-list').removeClass('shown');
         }
       });
-      $('.popup .close').on('click', e => {
+      $('.popup .popup-footer .close').on('click', e => {
         let popup = e.target.closest('.popup');
         if (popup) {
           popup.classList.remove('shown');
           $('body').removeClass('dimmed');
         }
       });
-
     });
 
     // syntaxic sugar for IMask

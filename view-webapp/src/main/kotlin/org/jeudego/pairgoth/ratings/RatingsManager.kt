@@ -69,14 +69,14 @@ object RatingsManager: Runnable {
         if (!file.mkdirs() && !file.isDirectory) throw Error("Property pairgoth.ratings.path must be a directory")
     }
 
-    fun search(needle: String, aga: Boolean, egf: Boolean, ffg: Boolean): Json.Array {
+    fun search(needle: String, aga: Boolean, egf: Boolean, ffg: Boolean, country: String?): Json.Array {
         try {
             updateLock.readLock().lock()
             var mask = 0
             if (aga && ratingsHandlers[Ratings.AGA]!!.active) mask = mask or Ratings.AGA.flag
             if (egf && ratingsHandlers[Ratings.EGF]!!.active) mask = mask or Ratings.EGF.flag
             if (ffg && ratingsHandlers[Ratings.FFG]!!.active) mask = mask or Ratings.FFG.flag
-            val matches = index.match(needle, mask)
+            val matches = index.match(needle, mask, country)
             return matches.map { it -> players[it] }.toCollection(Json.MutableArray())
         } finally {
             updateLock.readLock().unlock()

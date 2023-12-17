@@ -49,35 +49,50 @@
     <form id="player-form" class="ui form edit">
       <input type="hidden" name="id"/>
       <div class="popup-content">
-        <div id="search-form" class="four stackable fields">
-          <div class="twelve wide field">
+        <div id="search-form" class="five stackable fields">
+          <div class="two wide field">
+            <div class="toggle">
+              <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>$tour.country.toUpperCase()</label>
+            </div>
+          </div>
+          <div class="ten wide field">
             <div class="ui icon input">
               <input id="needle" name="needle" type="text" placeholder="Search...">
-              <i class="search icon"></i>
+              <i id="clear-search" class="clickable close icon"></i>
             </div>
           </div>
           <div class="two wide field">
-            <div class="active checkbox">
-              <div class="circle"></div>
-              <input name="aga" type="checkbox" class="hidden" checked/>
+            <div class="toggle">
+              <input id="aga" name="aga" type="checkbox" value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>AGA</label>
             </div>
-            AGA
           </div>
           <div class="two wide field">
-            <div class="active checkbox">
-              <div class="circle"></div>
-              <input name="egf" type="checkbox" class="hidden" checked/>
+            <div class="toggle">
+              <input id="egf" name="egf" type="checkbox" checked value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>EGF</label>
             </div>
-            EGF
           </div>
           <div class="two wide field">
-            <div class="active checkbox">
-              <div class="circle"></div>
-              <input name="ffg" type="checkbox" class="hidden" checked/>
+            <div class="toggle">
+              <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>FFG</label>
             </div>
-            FFG
           </div>
-          <div id="search-result" class="hidden">hophop</div>
+          <div id="search-result"></div>
         </div>
         <div class="two stackable fields">
           <div class="eight wide field">
@@ -137,13 +152,21 @@
       <div class="popup-footer">
         <button id="cancel-register" class="ui gray right labeled icon floating close button">
           <i class="times icon"></i>
-          Cancel
+          <span class="edition">Close</span>
+          <span class="creation">Cancel</span>
         </button>
         <button id="register" class="ui green right labeled icon floating button">
           <i class="plus icon"></i>
-          Register
+          <span class="edition">Update</span>
+          <span class="creation">Register</span>
         </button>
       </div>
     </form>
   </div>
 </div>
+<script id="result" type="text/template">
+  {{for #data}}
+    <div class="result-line">[{{:origin}}] {{:country}} {{:name}} {{:firstname}} {{:rank}} ({{:club}})</div>
+  {{/for}}
+</script>
+<script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>
