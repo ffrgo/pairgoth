@@ -23,6 +23,10 @@ class MacMahonSolver(round: Int,
     override val mainLimits get() = Pair(0.0, 100.0) // TODO
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
+        Criterion.SOSM -> pairable.sos
+        Criterion.SOSOSM -> pairable.sosos
+        Criterion.SOSMM1 -> pairable.sosm1
+        Criterion.SOSMM2 -> pairable.sosm2
         else -> super.evalCriterion(pairable, criterion)
     }
 
