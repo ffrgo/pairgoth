@@ -1,12 +1,15 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import kotlin.math.max
+import kotlin.math.min
 
 class MacMahonSolver(round: Int,
                      history: List<List<Game>>,
                      pairables: List<Pairable>,
                      pairingParams: PairingParams,
-                     placementParams: PlacementParams):
+                     placementParams: PlacementParams,
+                     private val mmFloor: Int, private val mmBar: Int):
     BaseSolver(round, history, pairables, pairingParams, placementParams) {
 
     override val scores: Map<ID, Double> by lazy {
@@ -16,11 +19,11 @@ class MacMahonSolver(round: Int,
             }
         }
     }
-    val Pairable.mmBase: Double get() = rank + 30.0    // TODO use params
+    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria
-    override val mainLimits get() = Pair(0.0, 100.0) // TODO
+    override val mainLimits get() = Pair(mmFloor.toDouble(), 100.0) // TODO ?
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
         Criterion.SOSM -> pairable.sos
@@ -28,6 +31,10 @@ class MacMahonSolver(round: Int,
         Criterion.SOSMM1 -> pairable.sosm1
         Criterion.SOSMM2 -> pairable.sosm2
         else -> super.evalCriterion(pairable, criterion)
+    }
+
+    companion object {
+        const val mmsZero = 30.0
     }
 
 }

@@ -180,11 +180,13 @@ class MacMahon(
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
-    )
+    ),
+    var mmFloor: Int = -20,
+    var mmBar: Int = 0
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams).pair()
+        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, mmFloor, mmBar).pair()
     }
 }
 
@@ -305,12 +307,15 @@ fun Pairing.Companion.fromJson(json: Json.Object): Pairing {
     val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: defaultParams.placementParams
     return when (type) {
         SWISS -> Swiss(pairingParams, placementParams)
-        MAC_MAHON -> MacMahon(pairingParams, placementParams)
+        MAC_MAHON -> MacMahon(pairingParams, placementParams).also { mm ->
+            mm.mmFloor = json.getInt("mmFloor") ?: -20
+            mm.mmBar = json.getInt("mmBar") ?: 0
+        }
         ROUND_ROBIN -> RoundRobin(pairingParams, placementParams)
     }
 }
 
-fun Pairing.toJson() = Json.Object(
+fun Pairing.toJson(): Json.Object = Json.MutableObject(
     "type" to type.name,
     "base" to pairingParams.base.toJson(),
     "main" to pairingParams.main.toJson(),
@@ -318,4 +323,9 @@ fun Pairing.toJson() = Json.Object(
     "geo" to pairingParams.geo.toJson(),
     "handicap" to pairingParams.handicap.toJson(),
     "placement" to placementParams.toJson()
-)
+).also { ret ->
+    if (this is MacMahon) {
+        ret["mmFloor"] = mmFloor
+        ret["mmBar"] = mmBar
+    }
+}
