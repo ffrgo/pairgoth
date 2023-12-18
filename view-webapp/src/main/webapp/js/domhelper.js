@@ -47,10 +47,15 @@ Element.prototype.toggleClass = function(className) {
   return this;
 }
 NodeList.prototype.hasClass = function(className) {
+  console.log('nodelist.hasClass')
+  console.log(this.item(0));
   return this.item(0).classList.contains(className);
 }
 Element.prototype.hasClass = function(className) {
-  this.classList.contains(className);
+  console.log('element.hasClass')
+  console.log(this.classList)
+  console.log(this.classList.contains(className))
+  return this.classList.contains(className);
 }
 Node.prototype.offset = function() {
   let _x = 0;
@@ -142,3 +147,8 @@ Element.prototype.val = function(value) {
   }
 }
 */
+
+NodeList.prototype.focus = function() {
+  let first = this.item(0);
+  if (first) first.focus();
+}

@@ -171,8 +171,57 @@ onLoad(() => {
       $('body').removeClass('dimmed');
     }
   });
+
   /* commented for now - do we want this?
   $('#dimmer').on('click', e => $('.popup').removeClass('shown');
    */
+
+  // keyboard handling
+  document.on('keyup', e => {
+    switch (e.key) {
+      case 'Escape': {
+        if ($('#player').hasClass('shown')) {
+          if ($('#needle')[0].value) {
+            $('#needle')[0].value = '';
+            initSearch();
+          } else {
+            close_modal();
+          }
+        }
+        break;
+      }
+      case 'ArrowDown': {
+        if (searchResultShown()) {
+          let lines = $('.result-line');
+          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+          else ++searchHighlight;
+          searchHighlight = Math.min(searchHighlight, lines.length - 1);
+          lines.removeClass('highlighted');
+          lines[searchHighlight].addClass('highlighted');
+        }
+        break;
+      }
+      case 'ArrowUp': {
+        if (searchResultShown()) {
+          let lines = $('.result-line');
+          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+          else --searchHighlight;
+          searchHighlight = Math.max(searchHighlight, 0);
+          lines.removeClass('highlighted');
+          lines[searchHighlight].addClass('highlighted');
+        }
+        break;
+      }
+      case 'Enter': {
+        if (searchResultShown()) {
+          fillPlayer(searchResult[searchHighlight]);
+        } else {
+          $('#register')[0].click();
+        }
+        break;
+      }
+    }
+  });
+
 });
 

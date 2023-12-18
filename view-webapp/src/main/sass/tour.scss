@@ -50,11 +50,18 @@
   /* registration section */
 
   #player {
-    &.create .edition {
-      display: none;
+    &.create {
+      .edition {
+        display: none;
+      }
+      #unregister {
+        display: none;
+      }
     }
-    &.edit .creation {
-      display: none;
+    &.edit {
+      .creation {
+        display: none;
+      }
     }
   }
 
@@ -117,9 +124,13 @@
     }
     .result-line {
       cursor: pointer;
-      &:hover {
+      &:hover, &.highlighted {
         background-color: rgba(100,200,255,200);
       }
     }
+  }
+
+  #player.popup {
+    min-width: 65vw;
   }
 }

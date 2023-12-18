@@ -128,6 +128,27 @@ let api = {
           .finally(() => {
              spinner(false);
           });
-    }
+    },
+
+  deleteJson: (path, body) => {
+    clearFeedback();
+    spinner(true);
+    return api.delete(path, body)
+      .then(resp => {
+        if (resp.ok) {
+          success();
+          return resp.json();
+        }
+        else throw resp;
+      })
+      .catch(err => {
+        error(err);
+        return 'error';
+      })
+      .finally(() => {
+        spinner(false);
+      });
+  }
+
 };
 

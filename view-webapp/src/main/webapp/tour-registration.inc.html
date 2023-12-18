@@ -150,12 +150,16 @@
         </div>
       </div>
       <div class="popup-footer">
-        <button id="cancel-register" class="ui gray right labeled icon floating close button">
+        <button id="cancel-register" type="button" class="ui gray right labeled icon floating close button">
           <i class="times icon"></i>
           <span class="edition">Close</span>
           <span class="creation">Cancel</span>
         </button>
-        <button id="register" class="ui green right labeled icon floating button">
+        <button id="unregister" type="button" class="ui red right labeled icon floating button">
+          <i class="trash icon"></i>
+          Unregister
+        </button>
+        <button id="register" type="button" class="ui green right labeled icon floating button">
           <i class="plus icon"></i>
           <span class="edition">Update</span>
           <span class="creation">Register</span>
@@ -164,9 +168,11 @@
     </form>
   </div>
 </div>
+#[[
 <script id="result" type="text/template">
   {{for #data}}
-    <div class="result-line">[{{:origin}}] {{:country}} {{:name}} {{:firstname}} {{:rank}} ({{:club}})</div>
+    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}})</div>
   {{/for}}
 </script>
 <script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>
+]]#

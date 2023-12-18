@@ -74,7 +74,7 @@ class PlayerIndex {
             .filter { !it.isEmpty() }
             .map { "$it~" }
             .joinToString(" ")
-            .let { if (it.isEmpty()) it else "$it ${it.substring(0, it.length - 1) + "*^5"}" }
+            .let { if (it.isEmpty()) it else "$it ${it.substring(0, it.length - 1) + "*^4"}" }
         if (terms.isEmpty()) return emptyList()
         logger.info("Search query: $terms")
         val fuzzy = queryParser.parse(terms)

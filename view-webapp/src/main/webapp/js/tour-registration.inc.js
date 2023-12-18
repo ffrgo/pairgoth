@@ -1,9 +1,11 @@
 const SEARCH_DELAY = 100;
 let searchTimer = undefined;
 let resultTemplate;
+let searchResult;
+let searchHighlight;
 
 function initSearch() {
-  let needle = $('#needle')[0].value;
+  let needle = $('#needle')[0].value.trim();
   if (searchTimer) {
     clearTimeout(searchTimer);
   }
@@ -12,9 +14,12 @@ function initSearch() {
   }, SEARCH_DELAY);
 }
 
+function searchResultShown() {
+  return !(typeof(searchHighlight) === 'undefined' || !searchResult || !searchResult.length || typeof(searchResult[searchHighlight]) === 'undefined')
+}
+
 function search(needle) {
   needle = needle.trim();
-  console.log(needle)
   if (needle && needle.length > 2) {
     let form = $('#player-form')[0];
     let search = {
@@ -32,17 +37,46 @@ function search(needle) {
       ffg: search.ffg
     };
     store('searchFormState', searchFormState);
-    console.log(search)
     api.postJson('search', search)
       .then(result => {
         if (Array.isArray(result)) {
-          console.log(result)
+          searchResult = result
           let html = resultTemplate.render(result);
           $('#search-result')[0].innerHTML = html;
         } else console.log(result);
       })
-  } else $('#search-result').clear();
+  } else {
+    $('#search-result').clear();
+    searchTimer = undefined;
+    searchResult = undefined;
+    searchHighlight = undefined;
+  }
+}
 
+function parseRank(rank) {
+  let groups = /(\d+)([kd])/.exec(rank)
+  if (groups) {
+    let level = parseInt(groups[1]);
+    let letter = groups[2];
+    switch (letter) {
+      case 'k': return -level;
+      case 'd': return level - 1;
+    }
+  }
+  return '';
+}
+
+function fillPlayer(player) {
+  let form = $('#player-form')[0];
+  form.val('name', player.name);
+  form.val('firstname', player.firstname);
+  form.val('country', player.country.toLowerCase());
+  form.val('club', player.club);
+  form.val('rank', parseRank(player.rank));
+  form.val('rating', player.rating);
+  $('#needle')[0].value = '';
+  initSearch();
+  $('#register').focus();
 }
 
 onLoad(() => {
@@ -60,10 +94,12 @@ onLoad(() => {
     form.reset();
     $('#player').removeClass('edit').addClass('create');
     modal('player');
+    $('#needle').focus();
   });
   $('#cancel-register').on('click', e => {
     e.preventDefault();
     close_modal();
+    searchHighlight = undefined;
     return false;
   });
 
@@ -82,10 +118,13 @@ onLoad(() => {
       }
     }
     if (!valid) return;
+    // $('#player-form')[0].requestSubmit() not working?!
+    $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
   $('#player-form').on('submit', e => {
+    ("submitting!!")
     e.preventDefault();
-    let form = e.target;
+    let form = $('#player-form')[0];
     let player = {
       name: form.val('name'),
       firstname: form.val('firstname'),
@@ -95,11 +134,10 @@ onLoad(() => {
       club: form.val('club'),
       skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0])
     }
-    console.log(player);
     if (form.hasClass('add')) {
+      ("ADDING")
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
-          console.log(player)
           if (player !== 'error') {
             window.location.reload();
           }
@@ -109,7 +147,6 @@ onLoad(() => {
       player['id'] = id;
       api.putJson(`tour/${tour_id}/part/${id}`, player)
         .then(player => {
-          console.log(player)
           if (player !== 'error') {
             window.location.reload();
           }
@@ -157,5 +194,22 @@ onLoad(() => {
     let checkbox = chk.find('input')[0];
     checkbox.checked = !checkbox.checked;
     initSearch();
+  });
+  document.on('click', e => {
+    let resultLine = e.target.closest('.result-line');
+    if (resultLine) {
+      let index = e.target.closest('.result-line').data('index');
+      fillPlayer(searchResult[index]);
+    }
+  });
+  $('#unregister').on('click', e => {
+    let form = $('#player-form')[0];
+    let id = form.val('id');
+    api.deleteJson(`tour/${tour_id}/part/${id}`)
+      .then(ret => {
+        if (ret !== 'error') {
+          window.location.reload();
+        }
+    });
   });
 });
