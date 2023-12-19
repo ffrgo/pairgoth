@@ -79,6 +79,8 @@ sealed class BaseSolver(
             println("Bye player : " + chosenByePlayer.nameSeed())
             byePlayers.add(chosenByePlayer)
             nameSortedPairables.remove(chosenByePlayer)
+            // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
+            pairingSortedPairables.remove(ByePlayer)
         }
 
         for (i in nameSortedPairables.indices) {
@@ -326,7 +328,7 @@ sealed class BaseSolver(
             }
 
             if(debug){
-                println("Names "+upperSP.nameSeed()+"  "+lowerSP.nameSeed())
+                println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
                 println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
                 println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
