@@ -126,9 +126,12 @@ sealed class BaseSolver(
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         if (DEBUG_EXPORT_WEIGHT) {
-            println("DUDD debug")
-            println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
-            pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
+            //println("DUDD debug")
+            //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
+            //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
+            println("Seeding debug")
+            pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
+            pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
             println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
@@ -348,7 +351,7 @@ sealed class BaseSolver(
         return score
     }
 
-    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable): Double {
+    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
         var score = 0.0
         // Apply seeding for players in the same group
         if (p1.group == p2.group) {
@@ -380,6 +383,14 @@ sealed class BaseSolver(
                         0.0
                     }
                 }
+            }
+
+            if(debug){
+                println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
+                println("Seed Sytem = " + currentSeedSystem.toString())
+                println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
+                println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
+                println("score = " + Math.round(score).toString())
             }
         }
         return Math.round(score).toDouble()
