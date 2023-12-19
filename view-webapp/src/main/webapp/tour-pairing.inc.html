@@ -1,3 +1,29 @@
+#set($paired = $api.get("tour/${params.id}/part"))
 <div class="tab-content" id="pairing">
-  Pairing...
+  <div id="pairing-content">
+    <div id="pairing-round">
+      Pairings for round
+      <button class="ui floating choose-round prev-round button">&laquo;</button>
+      <span class="active-round">1</span>
+      <button class="ui floating choose-round next-round button">&raquo;</button>
+    </div>
+    <div id="pairing-lists">
+      <div id="pairables" class="multi-select" title="pairable players">
+      </div>
+      <div id="pairing-buttons">
+        <button id="pair" class="ui blue right labeled icon floating button">
+          <i class="angle double right icon"></i>
+          Pair
+        </button>
+        <button id="unpair" class="ui orange right labeled icon floating button">
+          <i class="angle double left icon"></i>
+          Unpair
+        </button>
+      </div>
+      <div id="paired" class="multi-select" title="games">
+      </div>
+    </div>
+    <div id="unpairables" class="multi-select" title="unpairable players">
+    </div>
+  </div>
 </div>

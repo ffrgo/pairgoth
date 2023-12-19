@@ -47,14 +47,9 @@ Element.prototype.toggleClass = function(className) {
   return this;
 }
 NodeList.prototype.hasClass = function(className) {
-  console.log('nodelist.hasClass')
-  console.log(this.item(0));
   return this.item(0).classList.contains(className);
 }
 Element.prototype.hasClass = function(className) {
-  console.log('element.hasClass')
-  console.log(this.classList)
-  console.log(this.classList.contains(className))
   return this.classList.contains(className);
 }
 Node.prototype.offset = function() {

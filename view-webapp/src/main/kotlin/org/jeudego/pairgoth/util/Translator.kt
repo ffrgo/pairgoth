@@ -149,7 +149,7 @@ class Translator private constructor(private val iso: String) {
         private val logger = LoggerFactory.getLogger("translation")
         private val translatedTemplates: MutableMap<Pair<String, String>, Template> = ConcurrentHashMap<Pair<String, String>, Template>()
         private val textExtractor = Pattern.compile(
-            "<[^>]+\\splaceholder=\"(?<placeholder>[^\"]*)\"[^>]*>|(?<=>)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<|$)|(?<=>|^)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text2>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<)|^(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?<text3>[^<>]+?)(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?=$)",
+            "<[^>]+\\s(?:placeholder|title)=\"(?<placeholder>[^\"]*)\"[^>]*>|(?<=>)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<|$)|(?<=>|^)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text2>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<)|^(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?<text3>[^<>]+?)(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?=$)",
             Pattern.DOTALL
         )
         private val ignoredTags = setOf("head", "script", "style")

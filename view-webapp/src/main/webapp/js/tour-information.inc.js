@@ -148,13 +148,4 @@ onLoad(() => {
         });
     }
   });
-
-  if (!window.location.hash && window.location.search) {
-    window.location.hash = '#information'
-  }
-  if (window.location.hash) {
-    let step = window.location.hash.substring(1);
-    chooseStep(step);
-  }
-
 });

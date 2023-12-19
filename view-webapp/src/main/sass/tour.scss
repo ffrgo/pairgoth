@@ -133,4 +133,64 @@
   #player.popup {
     min-width: 65vw;
   }
+
+  /* pairing section */
+
+  #pairing-content {
+    display: flex;
+    flex-flow: column;
+    justify-content: start;
+    align-items: center;
+    gap: 1em;
+  }
+
+  #pairing-lists {
+    margin-top: 1em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 1em;
+    align-items: start;
+  }
+  .multi-select {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 30vh;
+    max-height: 60vh;
+    min-width: 20vw;
+    max-width: 40vw;
+    border: solid 2px darkgray;
+    border-radius: 5px;
+    padding-top: 1em;
+    &:before {
+      position: absolute;
+      content: attr(title);
+      top: -0.5em;
+      left: 50%;
+      transform: translate(-50%, 0px);
+      white-space: nowrap;
+      font-size: smaller;
+      font-weight: bold;
+    }
+  }
+  #pairing-buttons {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    align-items: stretch;
+    gap: 1em;
+  }
+  #unpairables {
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: 10vh;
+    max-height: 30vh;
+    min-width: 50vw;
+  }
+  .choose-round.button {
+    padding: 0.2em 0.8em;
+  }
 }
