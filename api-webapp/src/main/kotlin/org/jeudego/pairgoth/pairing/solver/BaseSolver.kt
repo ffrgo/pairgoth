@@ -377,7 +377,9 @@ sealed class BaseSolver(
                 SPLIT_AND_RANDOM -> {
                     if ((2 * cla1 < groupSize && 2 * cla2 >= groupSize) || (2 * cla1 >= groupSize && 2 * cla2 < groupSize)) {
                         val randRange = maxSeedingWeight * 0.2
-                        val rand = detRandom(randRange, p1, p2)
+                        val rand: Double
+                        if (p1.nameSeed() > p2.nameSeed()) {rand = detRandom(randRange, p2, p1)}
+                        else {rand = detRandom(randRange, p1, p2)}
                         maxSeedingWeight - rand
                     } else {
                         0.0

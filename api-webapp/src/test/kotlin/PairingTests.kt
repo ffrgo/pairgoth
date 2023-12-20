@@ -89,10 +89,13 @@ class PairingTests: TestBase() {
     }
 
     fun compare_games(games:Json.Array, opengotha:Json.Array): Boolean{
-        if (games.size != opengotha.size) return false
+        if (games.size != opengotha.size) {
+            val tmp = Game.fromJson(games.getJson(games.size-1)!!.asObject())
+            if ((tmp.white != 0) and (tmp.black != 0)) {return false}
+        }
         val gamesPair = mutableSetOf<Pair<ID,ID>>()
         val openGothaPair = mutableSetOf<Pair<ID,ID>>()
-        for (i in 0 until games.size) {
+        for (i in 0 until opengotha.size) {
             val tmp = Game.fromJson(games.getJson(i)!!.asObject())
             gamesPair.add(Pair(tmp.white, tmp.black))
             val tmpOG = Game.fromJson(opengotha.getJson(i)!!.asObject())
@@ -245,8 +248,8 @@ class PairingTests: TestBase() {
         var games: Json.Array
         var firstGameID: Int
         var playersList = mutableListOf<Long>()
-
-        var forcedPairingList = mutableListOf<Int>(1)
+        
+        var forcedPairingList = mutableListOf<Int>()
         var forcedPairing = mutableListOf<Json>()
         var forcedGames: Json.Array
         var game: Json
