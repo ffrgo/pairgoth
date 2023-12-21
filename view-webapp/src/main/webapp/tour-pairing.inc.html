@@ -1,3 +1,18 @@
+#set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
+#if($roundPairing.error)
+<script type="text/javascript">
+  onLoad(() => {
+    showError("$roundPairing.error")
+  });
+</script>
+  #set($pairables = [])
+  #set($games = [])
+  #set($unpairables = [])
+#else
+  #set($pairables = $roundPairing.pairables)
+  #set($games = $roundPairing.games)
+  #set($unpairables = $roundPairing.unpairables)
+#end
 <div class="tab-content" id="pairing">
   <div id="pairing-content">
     <div id="pairing-round">
@@ -8,18 +23,9 @@
     </div>
     <div id="pairing-lists">
       <div id="pairables" class="multi-select" title="pairable players">
-#set($pairables = $api.get("tour/${params.id}/pair/$round"))
-#if($pairables.isObject() && $pairables.error)
-        <script type="text/javascript">
-          onLoad(() => {
-            showError("$pairables.error")
-          });
-        </script>
-#else
-  #foreach($p in $pairables)
-    #set($part = $pmap[$p])
-        <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>$part.country #rank($part.rank)</span></div>
-  #end
+#foreach($p in $pairables)
+  #set($part = $pmap[$p])
+        <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
 #end
       </div>
       <div id="pairing-buttons">
@@ -33,9 +39,18 @@
         </button>
       </div>
       <div id="paired" class="multi-select" title="games">
+#foreach($game in $games)
+  #set($white = $pmap[$game.w])
+  #set($black = $pmap[$game.b])
+        <div class="listitem game" data-id="$game.id"><span class="table">#t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span><span class="handicap">$game.h</span></div>
+#end
       </div>
     </div>
     <div id="unpairables" class="multi-select" title="unpairable players">
+#foreach($p in $unpairables)
+  #set($part = $pmap[$p])
+      <div class="listitem unpairable" data-id="$part.id"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+#end
     </div>
   </div>
 </div>

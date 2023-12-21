@@ -9,6 +9,15 @@ function pair(parts) {
     });
 }
 
+function unpair(games) {
+  api.deleteJson(`tour/${tour_id}/pair/${activeRound}`, games)
+    .then(rst => {
+      if (rst !== 'error') {
+        document.location.reload();
+      }
+    });
+}
+
 onLoad(()=>{
   $('.listitem').on('click', e => {
     if (e.shiftKey && typeof(focused) !== 'undefined') {
@@ -33,5 +42,9 @@ onLoad(()=>{
   $('#pair').on('click', e => {
     let parts = $('#pairables')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
     pair(parts);
+  });
+  $('#unpair').on('click', e => {
+    let games = $('#paired')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    unpair(games);
   });
 });
