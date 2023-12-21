@@ -33,6 +33,12 @@ function success() {
   $('#error').addClass('hidden');
 }
 
+function showError(message) {
+  console.error(message);
+  $('#error')[0].innerText = message;
+  $('#error').removeClass('hidden');
+}
+
 function error(response) {
   const contentType = response.headers.get("content-type");
   let promise =
@@ -40,10 +46,8 @@ function error(response) {
     ? response.json().then(json => json.error || "unknown error")
     : Promise.resolve(response.statusText);
   promise.then(message => {
-    message = message.replaceAll(/([a-z])([A-Z])/g,"$1 $2").toLowerCase()
-    console.error(message);
-    $('#error')[0].innerText = message;
-    $('#error').removeClass('hidden');
+    message = message.replaceAll(/([a-z])([A-Z])/g,"$1 $2").toLowerCase();
+    showError(message);
   });
 }
 

@@ -1,14 +1,26 @@
-#set($paired = $api.get("tour/${params.id}/part"))
 <div class="tab-content" id="pairing">
   <div id="pairing-content">
     <div id="pairing-round">
       Pairings for round
       <button class="ui floating choose-round prev-round button">&laquo;</button>
-      <span class="active-round">1</span>
+      <span class="active-round">$round</span>
       <button class="ui floating choose-round next-round button">&raquo;</button>
     </div>
     <div id="pairing-lists">
       <div id="pairables" class="multi-select" title="pairable players">
+#set($pairables = $api.get("tour/${params.id}/pair/$round"))
+#if($pairables.isObject() && $pairables.error)
+        <script type="text/javascript">
+          onLoad(() => {
+            showError("$pairables.error")
+          });
+        </script>
+#else
+  #foreach($p in $pairables)
+    #set($part = $pmap[$p])
+        <div class="listitem pairable"><span>$part.name $part.firstname</span><span>$part.country #rank($part.rank)</span></div>
+  #end
+#end
       </div>
       <div id="pairing-buttons">
         <button id="pair" class="ui blue right labeled icon floating button">

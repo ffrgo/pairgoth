@@ -20,6 +20,15 @@
 </div>
   #end
 #end
+## set up some global context templating variables
+#if($tour)
+  #set($round = $math.toInteger($!params.round))
+  #if(!$round)
+    #set($round = 1)
+  #else
+    #set($round = $math.min($math.max($round, 1), $tour.rounds))
+  #end
+#end
 <div class="section">
   <h1 class="centered title">#if($tour)$tour.name#{else}New Tournament#end</h1>
 #if($tour)
@@ -65,7 +74,8 @@
 #if($tour)
   const tour_id = ${tour.id};
   const tour_rounds = ${tour.rounds};
-  let activeRound = 1;
+  let activeRound = ${round};
+  // $params
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
@@ -106,12 +116,6 @@
     }
     if (window.location.hash) {
       let step = window.location.hash.substring(1);
-      let suffix = /^(.)+-(\d+)$/.exec(step);
-      if (suffix) {
-        step = suffix[1];
-        activeRound = parseInt(suffix[2]);
-        $('.active-round').forEach(e => e.innerHTML = `${activeRound}`);
-      }
       chooseStep(step);
     }
 
@@ -148,14 +152,16 @@
       $('.next-round').addClass('disabled');
     }
     $('.prev-round').on('click', e => {
-      let base = window.location.href.replace(/-\d+$/g, '');
-      window.location.href = `#${base}-${activeRound - 1}`;
-      window.location.reload();
+      let round = activeRound - 1;
+      if (round > 0) {
+        window.location.search = `id=${tour_id}&round=${round}`
+      }
     });
     $('.next-round').on('click', e => {
-      let base = window.location.href.replace(/-\d+$/g, '');
-      window.location.href = `#${base}-${activeRound + 1}`;
-      window.location.reload();
+      let round = activeRound + 1;
+      if (round <= tour_rounds) {
+        window.location.search = `id=${tour_id}&round=${round}`
+      }
     });
   });
   // ]]#

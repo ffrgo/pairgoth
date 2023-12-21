@@ -66,17 +66,41 @@ Node.prototype.offset = function() {
 NodeList.prototype.offset = function() {
   this.item(0).offset();
 }
-Element.prototype.attr = function (key) {
-  return this.attributes[key].value;
+Element.prototype.attr = function (key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.attributes[key].value;
+  } else {
+    this.setAttribute(key, value);
+    return this;
+  }
 }
-NodeList.prototype.attr = function(key) {
-  this.item(0).attr(key);
+NodeList.prototype.attr = function(key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.item(0).attr(key);
+  } else {
+    this.forEach(elem => {
+      elem.attr(key, value);
+    });
+    return this;
+  }
 }
-Element.prototype.data = function (key) {
-  return this.attributes[`data-${key}`].value
+Element.prototype.data = function (key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.attributes[`data-${key}`].value
+  } else {
+    this.setAttribute(`data-${key}`, value);
+    return this;
+  }
 }
-NodeList.prototype.data = function(key) {
-  this.item(0).data(key);
+NodeList.prototype.data = function(key, value) {
+  if (typeof(value) === 'undefined') {
+    this.item(0).data(key);
+  } else {
+    this.forEach(elem => {
+      elem.data(key, value);
+    })
+    return this;
+  }
 }
 NodeList.prototype.show = function() {
   this.item(0).show();
@@ -147,3 +171,25 @@ NodeList.prototype.focus = function() {
   let first = this.item(0);
   if (first) first.focus();
 }
+
+Element.prototype.index = function(selector) {
+  let i = 0;
+  let child = this;
+  while ((child = child.previousSibling) != null) {
+    if (typeof(selector) === 'undefined' || child.nodeType === Node.ELEMENT_NODE && child.matches(selector)) {
+      ++i;
+    }
+  }
+  return i;
+}
+
+NodeList.prototype.filter = function(selector) {
+  let result = [];
+  this.forEach(elem => {
+    if (elem.nodeType === Node.ELEMENT_NODE && elem.matches(selector)) {
+      result.push(elem);
+    }
+  });
+  return Reflect.construct(Array, result, NodeList);
+}
+

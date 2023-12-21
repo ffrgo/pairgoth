@@ -2,6 +2,7 @@
   <div id="reg-view">
     <div id="players-list" class="roundbox">
 #set($parts = $api.get("tour/${params.id}/part"))
+#set($pmap = $utils.toMap($parts))
       <table id="players" class="ui celled selectable striped table">
         <thead>
           <th>name</th>

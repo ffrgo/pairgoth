@@ -164,7 +164,7 @@
     max-width: 40vw;
     border: solid 2px darkgray;
     border-radius: 5px;
-    padding-top: 1em;
+    padding: 1em 0.5em;
     &:before {
       position: absolute;
       content: attr(title);
@@ -174,6 +174,21 @@
       white-space: nowrap;
       font-size: smaller;
       font-weight: bold;
+    }
+    .listitem {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      gap: 1em;
+      cursor: pointer;
+      user-select: none;
+      &:hover {
+        background-color: rgba(50, 50, 50, .2);
+      }
+      &.selected {
+        background-color: rgba(100,200,255,200);
+        cursor: grab;
+      }
     }
   }
   #pairing-buttons {
