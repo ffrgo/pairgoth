@@ -28,7 +28,7 @@ sealed class BaseSolver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
-        val DEBUG_EXPORT_WEIGHT = true
+        val DEBUG_EXPORT_WEIGHT = false
         var byePlayers: MutableList<Pairable> = mutableListOf()
     }
 
