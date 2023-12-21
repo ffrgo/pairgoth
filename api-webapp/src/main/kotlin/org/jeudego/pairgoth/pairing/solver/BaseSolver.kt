@@ -130,8 +130,8 @@ sealed class BaseSolver(
             //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
             //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
             println("Seeding debug")
-            pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
-            pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
+            //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
+            //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
             println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
