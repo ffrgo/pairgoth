@@ -10,7 +10,7 @@ import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toID
-import org.jeudego.pairgoth.model.toJson
+import java.lang.Integer.max
 import java.nio.file.Path
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -64,11 +64,15 @@ class FileStore(pathStr: String): StoreImplementation {
         }
         val json = Json.parse(path.resolve(file).readText())?.asObject() ?: throw Error("could not read tournament")
         val tournament = Tournament.fromJson(json)
+        var maxPlayerId = 0
+        var maxGameId = 0
         val players = json["players"] as Json.Array? ?: Json.Array()
         tournament.players.putAll(
             players.associate {
                 (it as Json.Object).let { player ->
-                    Pair(player.getID("id") ?: throw Error("invalid tournament file"), Player.fromJson(player))
+                    Pair(player.getID("id") ?: throw Error("invalid tournament file"), Player.fromJson(player)).also {
+                        maxPlayerId = max(maxPlayerId, it.first)
+                    }
                 }
             }
         )
@@ -77,21 +81,28 @@ class FileStore(pathStr: String): StoreImplementation {
             tournament.teams.putAll(
                 teams.associate {
                     (it as Json.Object).let { team ->
-                        Pair(team.getID("id") ?: throw Error("invalid tournament file"), tournament.teamFromJson(team))
+                        Pair(team.getID("id") ?: throw Error("invalid tournament file"), tournament.teamFromJson(team)).also {
+                            maxPlayerId = max(maxPlayerId, it.first)
+                        }
                     }
                 }
             )
         }
         val games = json["games"] as Json.Array? ?: Json.Array()
         (1..games.size).forEach { round ->
+            val roundGames = games[round - 1] as Json.Array
             tournament.games(round).putAll(
-                games.associate {
+                roundGames.associate {
                     (it as Json.Object).let { game ->
-                        Pair(game.getID("id") ?: throw Error("invalid tournament file"), Game.fromJson(game))
+                        Pair(game.getID("id") ?: throw Error("invalid tournament file"), Game.fromJson(game)).also {
+                            maxGameId = max(maxGameId, it.first)
+                        }
                     }
                 }
             )
         }
+        _nextPlayerId.set(maxPlayerId + 1)
+        _nextGameId.set(maxGameId + 1)
         return tournament
     }
 
