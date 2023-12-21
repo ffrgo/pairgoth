@@ -10,7 +10,7 @@ import java.util.*
 sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int) {
     companion object {
         val MIN_RANK: Int = -30 // 30k
-        val MAX_RANK: Int = 20
+        val MAX_RANK: Int = 8 // 9D
     }
     abstract fun toJson(): Json.Object
     abstract val club: String?

@@ -29,6 +29,7 @@ sealed class BaseSolver(
     companion object {
         val rand = Random(/* seed from properties - TODO */)
         val DEBUG_EXPORT_WEIGHT = true
+        var byePlayers: MutableList<Pairable> = mutableListOf()
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -40,7 +41,7 @@ sealed class BaseSolver(
 
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
-        //pairing.base.applyByeWeight(p1, p2) +
+        // pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
     fun pair(): List<Game> {
@@ -59,13 +60,34 @@ sealed class BaseSolver(
             // println("placement criteria" + placement.criteria.toString())
         }
 
+        var chosenByePlayer: Pairable = ByePlayer
+        // Choose bye player and remove from pairables
+        if (ByePlayer in nameSortedPairables){
+            nameSortedPairables.remove(ByePlayer)
+            var minWeight = 1000.0*round + (Pairable.MAX_RANK - Pairable.MIN_RANK) + 1;
+            var weightForBye : Double
+            var byePlayerIndex = 0
+            for (p in nameSortedPairables){
+                weightForBye = p.rank + 2*p.main
+                if (p in byePlayers) weightForBye += 1000
+                if (weightForBye <= minWeight){
+                    minWeight = weightForBye
+                    chosenByePlayer = p
+                }
+                println("choose Bye: " + p.nameSeed() + " " + weightForBye)
+            }
+            println("Bye player : " + chosenByePlayer.nameSeed())
+            byePlayers.add(chosenByePlayer)
+            nameSortedPairables.remove(chosenByePlayer)
+        }
+
         for (i in nameSortedPairables.indices) {
             // println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
-            for (j in i + 1 until pairables.size) {
+            for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
-                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it) }
-                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it) }
+                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
+                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
                 if (DEBUG_EXPORT_WEIGHT)
                 {
                     File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
@@ -80,6 +102,7 @@ sealed class BaseSolver(
                     File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
                     File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
+                    //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
 
                 }
             }
@@ -92,10 +115,20 @@ sealed class BaseSolver(
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
 
-        val result = sorted.flatMap { games(white = it[0], black = it[1]) }
+/*        println(sorted.size)
+        if (chosenByePlayer != ByePlayer) sorted.add(listOf(chosenByePlayer, ByePlayer))
+        println(sorted.size)*/
+
+        var result = sorted.flatMap { games(white = it[0], black = it[1]) }
+        // add game for ByePlayer
+        if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         if (DEBUG_EXPORT_WEIGHT) {
+            println("DUDD debug")
+            println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
+            pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
             var sumOfWeights = 0.0
+            println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
                 println(it[0].nameSeed() + " " + it[0].place.toString()
                                          + " " + it[0].id.toString()
@@ -165,8 +198,9 @@ sealed class BaseSolver(
             val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
             // TODO maybe use a different formula than opengotha
             val x = (actualPlayer.rank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
-            concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
-            BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
+            //concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
+            //BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
+            BaseCritParams.MAX_BYE_WEIGHT*(1 - x)
         } else {
             0.0
         }
@@ -202,8 +236,7 @@ sealed class BaseSolver(
     open fun MainCritParams.minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         val scoreRange: Int = groupsCount
-        // TODO check category equality if category are used in SwissCat
-        if (scoreRange!=0){
+        if (scoreRange != 0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
             score = concavityFunction(x, scoreWeight)
         }
@@ -211,7 +244,7 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
@@ -256,11 +289,15 @@ sealed class BaseSolver(
             if (scenario != 0 && p2_DD > 0 && p2_DU < p2_DD && p2.group > p1.group) {
                 scenario++
             }
+
             val duddWeight: Double = pairing.main.drawUpDownWeight/5.0
-            val upperSP = if (p1.group < p2.group) p1 else p2
-            val lowerSP = if (p1.group < p2.group) p2 else p1
+            val upperSP = if (p1.group < p2.group) p2 else p1
+            val lowerSP = if (p1.group < p2.group) p1 else p2
             val uSPgroupSize = upperSP.placeInGroup.second
             val lSPgroupSize = lowerSP.placeInGroup.second
+
+
+
 
             if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
                 score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
@@ -287,7 +324,19 @@ sealed class BaseSolver(
             } else if (scenario == 4) {
                 score += 4 * duddWeight
             }
+
+            if(debug){
+                println("Names "+upperSP.nameSeed()+"  "+lowerSP.nameSeed())
+                println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
+                println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
+                println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
+                println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
+                println("score = " + score.toString())
+            }
+
         }
+
+
 
         // TODO adapt to Swiss with categories
         /*// But, if players come from different categories, decrease score(added in 3.11)
