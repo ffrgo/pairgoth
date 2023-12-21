@@ -155,7 +155,7 @@ class BasicTests: TestBase() {
             """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"?","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "pairing differs")
-        games = TestAPI.get("/api/tour/$aTournamentID/res/1").asArray()
+        games = TestAPI.get("/api/tour/$aTournamentID/res/1").asObject().getArray("games")!!
         assertTrue(possibleResults.contains(games.toString()), "results differs")
         val empty = TestAPI.get("/api/tour/$aTournamentID/pair/1").asArray()
         assertEquals("[]", empty.toString(), "no more pairables for round 1")
