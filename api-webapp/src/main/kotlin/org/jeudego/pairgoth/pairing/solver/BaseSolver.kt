@@ -237,10 +237,20 @@ sealed class BaseSolver(
 
         return score
     }
+    open fun debug(p: Pairable) {
 
+    }
     open fun MainCritParams.minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         val scoreRange: Int = groupsCount
+        if (p1.name == "Lefebvre" && p2.name == "Bonjean") {
+            println("p1 ${p1.name} ${p1.group} ${p1.nbW}")
+            debug(p1)
+
+            println("p2 ${p2.name} ${p2.group} ${p2.nbW}")
+            debug(p2)
+
+        }
         if (scoreRange != 0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
             score = concavityFunction(x, scoreWeight)
@@ -417,7 +427,8 @@ sealed class BaseSolver(
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = groupsCount
 
-        val geoMaxCost = avoidSameGeo
+        //val geoMaxCost = avoidSameGeo
+        val geoMaxCost = 100000000000.0
 
         val countryFactor = preferMMSDiffRatherThanSameCountry
         val clubFactor: Int = preferMMSDiffRatherThanSameClub
@@ -455,7 +466,6 @@ sealed class BaseSolver(
         // TODO Same family
 
         // compute geoRatio
-
         val mainPart = max(countryRatio, clubRatio)
         val secPart = min(countryRatio, clubRatio)
 
@@ -466,7 +476,7 @@ sealed class BaseSolver(
         }
 
         // The concavity function is applied to geoRatio to get geoCost
-        val dbGeoCost: Double = geoMaxCost.toDouble() * (1.0 - geoRatio) * (1.0 + pairing.base.nx1 * geoRatio)
+        val dbGeoCost: Double = concavityFunction(geoRatio, geoMaxCost)
         var score = pairing.main.scoreWeight - dbGeoCost
 
         score = min(score, geoMaxCost)

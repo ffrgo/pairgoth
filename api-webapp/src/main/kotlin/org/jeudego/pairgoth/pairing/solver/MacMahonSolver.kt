@@ -18,6 +18,10 @@ class MacMahonSolver(round: Int,
         } }
     }
 
+    override fun debug(p: Pairable) {
+        println("${p.mms} ${p.mmBase} ${p.nbW}")
+    }
+
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
