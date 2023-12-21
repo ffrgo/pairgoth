@@ -135,7 +135,6 @@ onLoad(() => {
       skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0])
     }
     if (form.hasClass('add')) {
-      ("ADDING")
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
           if (player !== 'error') {

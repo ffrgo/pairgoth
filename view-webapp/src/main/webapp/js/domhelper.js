@@ -68,7 +68,7 @@ NodeList.prototype.offset = function() {
 }
 Element.prototype.attr = function (key, value) {
   if (typeof(value) === 'undefined') {
-    return this.attributes[key].value;
+    return this.attributes[key]?.value;
   } else {
     this.setAttribute(key, value);
     return this;
@@ -86,7 +86,7 @@ NodeList.prototype.attr = function(key, value) {
 }
 Element.prototype.data = function (key, value) {
   if (typeof(value) === 'undefined') {
-    return this.attributes[`data-${key}`].value
+    return this.attributes[`data-${key}`]?.value
   } else {
     this.setAttribute(`data-${key}`, value);
     return this;

@@ -18,7 +18,7 @@
 #else
   #foreach($p in $pairables)
     #set($part = $pmap[$p])
-        <div class="listitem pairable"><span>$part.name $part.firstname</span><span>$part.country #rank($part.rank)</span></div>
+        <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>$part.country #rank($part.rank)</span></div>
   #end
 #end
       </div>

@@ -1,5 +1,14 @@
 let focused = undefined;
 
+function pair(parts) {
+  api.postJson(`tour/${tour_id}/pair/${activeRound}`, parts)
+    .then(rst => {
+      if (rst !== 'error') {
+        document.location.reload();
+      }
+    });
+}
+
 onLoad(()=>{
   $('.listitem').on('click', e => {
     if (e.shiftKey && typeof(focused) !== 'undefined') {
@@ -17,7 +26,12 @@ onLoad(()=>{
         children.item(j).attr('draggable', true);
       }
     } else {
-      focused = e.target.closest('.listitem').toggleClass('selected').attr('draggable', true);
+      let target = e.target.closest('.listitem');
+      focused = target.toggleClass('selected').attr('draggable', target.hasClass('selected'));
     }
+  });
+  $('#pair').on('click', e => {
+    let parts = $('#pairables')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    pair(parts);
   });
 });
