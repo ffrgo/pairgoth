@@ -176,7 +176,12 @@ class MacMahon(
         geo = GeographicalParams(
             avoidSameGeo = MainCritParams.MAX_SCORE_WEIGHT
         ),
-        handicap = HandicapParams()
+        handicap = HandicapParams(
+            weight = MainCritParams.MAX_SCORE_WEIGHT,
+            useMMS = true,
+            rankThreshold = -20,
+            ceiling = 9
+        )
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
