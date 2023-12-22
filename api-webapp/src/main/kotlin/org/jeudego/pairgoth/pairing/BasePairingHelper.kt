@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
+import java.util.*
 
 abstract class BasePairingHelper(
     history: List<List<Game>>, // History of all games played for each round
@@ -130,5 +131,12 @@ abstract class BasePairingHelper(
     }
     open fun nameSort(p: Pairable, q: Pairable): Int {
         return if (p.name > q.name) 1 else -1
+    }
+
+    val tables = history.mapTo(mutableListOf()) { games ->
+        games.map { it.table }.fold(BitSet()) { acc, table ->
+            acc.set(table)
+            acc
+        }
     }
 }

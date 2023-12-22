@@ -90,11 +90,15 @@ class FileStore(pathStr: String): StoreImplementation {
         }
         val games = json["games"] as Json.Array? ?: Json.Array()
         (1..games.size).forEach { round ->
+            var nextDefaultTable = 1;
             val roundGames = games[round - 1] as Json.Array
             tournament.games(round).putAll(
                 roundGames.associate {
                     (it as Json.Object).let { game ->
-                        Pair(game.getID("id") ?: throw Error("invalid tournament file"), Game.fromJson(game)).also {
+                        val fixedGame =
+                            if (game.containsKey("t")) game
+                            else Json.MutableObject(game).set("t", nextDefaultTable++)
+                        Pair(game.getID("id") ?: throw Error("invalid tournament file"), Game.fromJson(fixedGame)).also {
                             maxGameId = max(maxGameId, it.first)
                         }
                     }
