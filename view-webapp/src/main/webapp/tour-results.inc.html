@@ -13,7 +13,7 @@
   #set($black = $pmap[$game.b])
   #if($black && $white)
         <tr data-id="$game.id">
-          <td>#t</td>
+          <td>#$game.t</td>
           <td class="player" data-id="$white.id" data-sort="$white.name $white.firstname"><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span></td>
           <td class="player" data-id="$black.id" data-sort="$black.name $black.firstname"><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span></td>
           <td class="result centered">$game.r</td>

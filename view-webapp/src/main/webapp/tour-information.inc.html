@@ -97,7 +97,7 @@
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
           <label>Hd correction</label>
           <span class="info"></span>
-          <input name="correction" type="number" min="-9" max="0" value="#if($tour && "$!tour.pairing.handicap.correction" != "")$tour.pairing.handicap.correction#{else}-1#end"/>
+          <input name="correction" type="number" min="-9" max="0" value="#if($tour && "$!tour.pairing.handicap.correction" != "")-$tour.pairing.handicap.correction#{else}-1#end"/>
         </div>
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
           <label>MM bar</label>

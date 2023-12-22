@@ -121,7 +121,7 @@ onLoad(() => {
           secondSeed: form.val('secondSeed')
         },
         handicap: {
-          correction: form.val('correction'),
+          correction: -form.val('correction'),
           treshold: form.val('treshold')
         }
       },
