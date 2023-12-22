@@ -1,3 +1,26 @@
 <div class="tab-content" id="results">
-  Results...
+  <div id="results-list" class="roundbox">
+    <table id="results-table" class="ui celled striped table">
+      <thead class="centered">
+        <th>table</th>
+        <th>white</th>
+        <th>black</th>
+        <th>result</th>
+      </thead>
+      <tbody>
+#foreach($game in $games)
+  #set($white = $pmap[$game.w])
+  #set($black = $pmap[$game.b])
+  #if($black && $white)
+        <tr data-id="$game.id">
+          <td>#t</td>
+          <td class="player" data-id="$white.id" data-sort="$white.name $white.firstname"><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span></td>
+          <td class="player" data-id="$black.id" data-sort="$black.name $black.firstname"><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span></td>
+          <td class="result centered">$game.r</td>
+        </tr>
+  #end
+#end
+      </tbody>
+    </table>
+  </div>
 </div>

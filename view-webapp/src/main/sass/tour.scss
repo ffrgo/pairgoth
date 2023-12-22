@@ -208,4 +208,18 @@
   .choose-round.button {
     padding: 0.2em 0.8em;
   }
+
+  /* results section */
+
+  #results-list {
+    text-align: center;
+    .player, .result {
+      cursor: pointer;
+      &:hover {
+        background: rgba(0,0,0,.05);
+        color: rgba(0,0,0,.95);
+      }
+    }
+  }
+
 }

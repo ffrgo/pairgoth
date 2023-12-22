@@ -30,7 +30,8 @@ onLoad(()=>{
       }
       let parent = e.target.closest('.multi-select');
       let children = parent.childNodes.filter('.listitem');
-      for (let j = from; j <= to; ++j) {
+      for (let j = from; j <= to; ++j) {  new Tablesort($('#players')[0]);
+
         children.item(j).addClass('selected');
         children.item(j).attr('draggable', true);
       }
