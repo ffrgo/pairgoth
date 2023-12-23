@@ -16,112 +16,113 @@ import kotlin.test.fail
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BasicTests: TestBase() {
 
-    val aTournament = Json.Object(
-        "type" to "INDIVIDUAL",
-        "name" to "Mon Tournoi",
-        "shortName" to "mon-tournoi",
-        "startDate" to "2023-05-10",
-        "endDate" to "2023-05-12",
-        "country" to "FR",
-        "location" to "Marseille",
-        "online" to false,
-        "timeSystem" to Json.Object(
-            "type" to "FISCHER",
-            "mainTime" to 1200,
-            "increment" to 10
-        ),
-        "rounds" to 2,
-        "pairing" to Json.Object(
-            "type" to "SWISS",
-            "method" to "SPLIT_AND_SLIP"
-        )
-    )
+    companion object {
 
-    val aSimpleSwissTournament = Json.Object(
-        "type" to "INDIVIDUAL",
-        "name" to "Simple Swiss",
-        "shortName" to "simple-swiss",
-        "startDate" to "2023-05-10",
-        "endDate" to "2023-05-12",
-        "country" to "FR",
-        "location" to "Grenoble",
-        "online" to false,
-        "timeSystem" to Json.Object(
-            "type" to "FISCHER",
-            "mainTime" to 1800,
-            "increment" to 15
-        ),
-        "rounds" to 4,
-        "pairing" to Json.Object(
-            "type" to "SWISS",
-            "method" to "SPLIT_AND_SLIP"
-        )
-    )
-
-    val aTeamTournament = Json.Object(
-        "type" to "TEAM2",
-        "name" to "Mon Tournoi par équipes",
-        "shortName" to "mon-tournoi-par-equipes",
-        "startDate" to "2023-05-20",
-        "endDate" to "2023-05-23",
-        "country" to "FR",
-        "location" to "Marseille",
-        "online" to true,
-        "timeSystem" to Json.Object(
-            "type" to "FISCHER",
-            "mainTime" to 1200,
-            "increment" to 10
-        ),
-        "rounds" to 2,
-        "pairing" to Json.Object(
-            "type" to "MAC_MAHON"
-        )
-    )
-
-    val aPlayer = Json.Object(
-        "name" to "Burma",
-        "firstname" to "Nestor",
-        "rating" to -500,
-        "rank" to -5,
-        "country" to "FR",
-        "club" to "13Ma"
-    )
-
-    val anotherPlayer = Json.Object(
-        "name" to "Poirot",
-        "firstname" to "Hercule",
-        "rating" to -100,
-        "rank" to -1,
-        "country" to "FR",
-        "club" to "75Op"
-    )
-
-    val aMMTournament = Json.Object(
-        "type" to "INDIVIDUAL",
-        "name" to "Mon Tournoi",
-        "shortName" to "mon-tournoi",
-        "startDate" to "2023-05-10",
-        "endDate" to "2023-05-12",
-        "country" to "FR",
-        "location" to "Marseille",
-        "online" to false,
-        "timeSystem" to Json.Object(
-            "type" to "FISCHER",
-            "mainTime" to 1200,
-            "increment" to 10
-        ),
-        "rounds" to 2,
-        "pairing" to Json.Object(
-            "type" to "MAC_MAHON",
-            "handicap" to Json.Object(
-                "correction" to 1
+        val aTournament = Json.Object(
+            "type" to "INDIVIDUAL",
+            "name" to "Mon Tournoi",
+            "shortName" to "mon-tournoi",
+            "startDate" to "2023-05-10",
+            "endDate" to "2023-05-12",
+            "country" to "FR",
+            "location" to "Marseille",
+            "online" to false,
+            "timeSystem" to Json.Object(
+                "type" to "FISCHER",
+                "mainTime" to 1200,
+                "increment" to 10
+            ),
+            "rounds" to 2,
+            "pairing" to Json.Object(
+                "type" to "SWISS",
+                "method" to "SPLIT_AND_SLIP"
             )
         )
-    )
+
+        val aSimpleSwissTournament = Json.Object(
+            "type" to "INDIVIDUAL",
+            "name" to "Simple Swiss",
+            "shortName" to "simple-swiss",
+            "startDate" to "2023-05-10",
+            "endDate" to "2023-05-12",
+            "country" to "FR",
+            "location" to "Grenoble",
+            "online" to false,
+            "timeSystem" to Json.Object(
+                "type" to "FISCHER",
+                "mainTime" to 1800,
+                "increment" to 15
+            ),
+            "rounds" to 4,
+            "pairing" to Json.Object(
+                "type" to "SWISS",
+                "method" to "SPLIT_AND_SLIP"
+            )
+        )
+
+        val aTeamTournament = Json.Object(
+            "type" to "TEAM2",
+            "name" to "Mon Tournoi par équipes",
+            "shortName" to "mon-tournoi-par-equipes",
+            "startDate" to "2023-05-20",
+            "endDate" to "2023-05-23",
+            "country" to "FR",
+            "location" to "Marseille",
+            "online" to true,
+            "timeSystem" to Json.Object(
+                "type" to "FISCHER",
+                "mainTime" to 1200,
+                "increment" to 10
+            ),
+            "rounds" to 2,
+            "pairing" to Json.Object(
+                "type" to "MAC_MAHON"
+            )
+        )
+        val aPlayer = Json.Object(
+            "name" to "Burma",
+            "firstname" to "Nestor",
+            "rating" to -500,
+            "rank" to -5,
+            "country" to "FR",
+            "club" to "13Ma"
+        )
+
+        val anotherPlayer = Json.Object(
+            "name" to "Poirot",
+            "firstname" to "Hercule",
+            "rating" to -100,
+            "rank" to -1,
+            "country" to "FR",
+            "club" to "75Op"
+        )
+
+        val aMMTournament = Json.Object(
+            "type" to "INDIVIDUAL",
+            "name" to "Mon Tournoi",
+            "shortName" to "mon-tournoi",
+            "startDate" to "2023-05-10",
+            "endDate" to "2023-05-12",
+            "country" to "FR",
+            "location" to "Marseille",
+            "online" to false,
+            "timeSystem" to Json.Object(
+                "type" to "FISCHER",
+                "mainTime" to 1200,
+                "increment" to 10
+            ),
+            "rounds" to 2,
+            "pairing" to Json.Object(
+                "type" to "MAC_MAHON",
+                "handicap" to Json.Object(
+                    "correction" to 1
+                )
+            )
+        )
+    }
 
 
     var aTournamentID: ID? = null
-    var aTeamTournamentID: ID? = null
     var aPlayerID: ID? = null
     var anotherPlayerID: ID? = null
     var aTournamentGameID: ID? = null
@@ -195,51 +196,5 @@ class BasicTests: TestBase() {
             """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"b","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "results differ")
-    }
-
-    @Test
-    fun `007 Mac Mahon handicap`() {
-        var resp = TestAPI.post("/api/tour", aMMTournament).asObject()
-        val tourId = resp.getInt("id") ?: throw Error("tournament creation failed")
-        resp = TestAPI.post("/api/tour/$tourId/part", aPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
-        val p1 = resp.getInt("id")!!
-        resp = TestAPI.post("/api/tour/$tourId/part", anotherPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
-        val p2 = resp.getInt("id")!!
-        val game = TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray().getObject(0) ?: throw Error("pairing failed")
-        assertEquals(p2, game.getInt("w"))
-        assertEquals(p1, game.getInt("b"))
-        assertEquals(3, game.getInt("h"))
-    }
-
-    @Test
-    fun `008 team tournament, MacMahon`() {
-        var resp = TestAPI.post("/api/tour", aTeamTournament).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        aTeamTournamentID = resp.getInt("id")
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", aPlayer).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val aTeamPlayerID = resp.getInt("id") ?: fail("id cannot be null")
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", anotherPlayer).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val anotherTeamPlayerID = resp.getInt("id") ?: fail("id cannot be null")
-        var arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asArray()
-        assertEquals("[]", arr.toString(), "expecting an empty array")
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Buffallos", "players":[$aTeamPlayerID, $anotherTeamPlayerID] }""")?.asObject() ?: fail("no null allowed here")).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val aTeamID = resp.getInt("id") ?: error("no null allowed here")
-        resp = TestAPI.get("/api/tour/$aTeamTournamentID/team/$aTeamID").asObject()
-        assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID]}""", resp.toString(), "expecting team description")
-        arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asArray()
-        assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
-        // nothing stops us in reusing players in different teams, at least for now...
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aTeamPlayerID, $anotherTeamPlayerID] }""")?.asObject() ?: fail("no null here")).asObject()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        val anotherTeamID = resp.getInt("id") ?: fail("no null here")
-        arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asArray()
-        assertEquals("[$aTeamID,$anotherTeamID]", arr.toString(), "expecting two pairables")
-        arr = TestAPI.post("/api/tour/$aTeamTournamentID/pair/1", Json.parse("""["all"]""")).asArray()
-        assertTrue(resp.getBoolean("success") == true, "expecting success")
-        // TODO check pairing
-        // val expected = """"["id":1,"w":5,"b":6,"h":3,"r":"?"]"""
     }
 }
