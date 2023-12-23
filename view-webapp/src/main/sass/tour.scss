@@ -1,0 +1,225 @@
+@layer pairgoth {
+  /* general rules */
+
+  .steps .step:not(.active) {
+    cursor: pointer;
+  }
+  .tab-content {
+    display: none;
+    &.active {
+      display: block;
+    }
+  }
+
+  /* information section */
+
+  form {
+    input, select, .edit {
+      display: none;
+    }
+    &.edit {
+      input:not(.hidden), select:not(.hidden), .edit:not(.hidden) {
+        display: initial;
+      }
+      .info, #edit {
+        display: none;
+      }
+    }
+  }
+  div.field:not(.hidden) {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: space-around;
+    margin: 1px;
+    background-color: #eeeeee;
+    &.centered {
+      align-items: center;
+    }
+  }
+  .inline.fields {
+    background-color: #eeeeee;
+    margin-left: -0.5em;
+    margin-right: -0.5em;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    .centered.field > label {
+      margin-right: 0;
+    }
+  }
+
+  /* registration section */
+
+  #player {
+    &.create {
+      .edition {
+        display: none;
+      }
+      #unregister {
+        display: none;
+      }
+    }
+    &.edit {
+      .creation {
+        display: none;
+      }
+    }
+  }
+
+  #player-form {
+    &:not(.add) {
+      #search-form, #search-result {
+        display: none;
+      }
+    }
+  }
+  #search-form {
+    position: relative;
+    .toggle {
+      cursor: pointer;
+      input {
+        display: none;
+      }
+      label {
+        display: block;
+        text-align: center;
+        cursor: pointer;
+      }
+      .checkbox {
+        width: 50px;
+        height: 26px;
+        border-radius: 18px;
+        background-color: #F7D6A3;
+        display: flex;
+        align-items: center;
+        padding-left: 5px;
+        padding-right: 5px;
+        cursor: pointer;
+        .circle {
+          background-color: #6B5E8A;
+          transform: translateX(0px);
+          border-radius: 50%;
+          width: 20px;
+          height: 20px;
+          transition: 300ms;
+        }
+      }
+      input:checked + .checkbox {
+        background-color: rgb(218, 114, 80);
+        .circle {
+          transform: translateX(20px);
+        }
+      }
+    }
+  }
+  #search-result {
+    position: absolute;
+    background-color: gray;
+    z-index: 2;
+    width:100%;
+    top: 100%;
+    padding: 1em;
+    overflow-y: auto;
+    &:empty {
+      display: none;
+    }
+    .result-line {
+      cursor: pointer;
+      &:hover, &.highlighted {
+        background-color: rgba(100,200,255,200);
+      }
+    }
+  }
+
+  #player.popup {
+    min-width: 65vw;
+  }
+
+  /* pairing section */
+
+  #pairing-content {
+    display: flex;
+    flex-flow: column;
+    justify-content: start;
+    align-items: center;
+    gap: 1em;
+  }
+
+  #pairing-lists {
+    margin-top: 1em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 1em;
+    align-items: start;
+  }
+  .multi-select {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 30vh;
+    max-height: 60vh;
+    min-width: 20vw;
+    max-width: 40vw;
+    border: solid 2px darkgray;
+    border-radius: 5px;
+    padding: 1em 0.5em;
+    &:before {
+      position: absolute;
+      content: attr(title);
+      top: -0.5em;
+      left: 50%;
+      transform: translate(-50%, 0px);
+      white-space: nowrap;
+      font-size: smaller;
+      font-weight: bold;
+    }
+    .listitem {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      gap: 1em;
+      cursor: pointer;
+      user-select: none;
+      &:hover {
+        background-color: rgba(50, 50, 50, .2);
+      }
+      &.selected {
+        background-color: rgba(100,200,255,200);
+        cursor: grab;
+      }
+    }
+  }
+  #pairing-buttons {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    align-items: stretch;
+    gap: 1em;
+  }
+  #unpairables {
+    display: flex;
+    flex-flow: column nowrap;
+    min-height: 10vh;
+    max-height: 30vh;
+    min-width: 50vw;
+  }
+  .choose-round.button {
+    padding: 0.2em 0.8em;
+  }
+
+  /* results section */
+
+  #results-list {
+    text-align: center;
+    .player, .result {
+      cursor: pointer;
+      &:hover {
+        background: rgba(0,0,0,.05);
+        color: rgba(0,0,0,.95);
+      }
+    }
+  }
+
+}

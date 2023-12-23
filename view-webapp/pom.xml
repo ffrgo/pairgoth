@@ -17,6 +17,7 @@
     <url>TODO</url>
     <properties>
         <pac4j.version>5.7.1</pac4j.version>
+        <lucene.version>9.9.0</lucene.version>
     </properties>
     <build>
         <defaultGoal>package</defaultGoal>
@@ -68,44 +69,32 @@
                 </executions>
                 <configuration>
                     <outputFolder>${project.build.directory}/generated-resources/css</outputFolder>
+                    <version>1.69.5</version>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>com.gitlab.haynes</groupId>
-                <artifactId>libsass-maven-plugin</artifactId>
-                <version>0.2.29</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <inputPath>${basedir}/src/main/sass/</inputPath>
-                    <inputSyntax>scss</inputSyntax>
-                    <outputPath>${project.build.directory}/${project.build.finalName}/css</outputPath>
-                    <generateSourceMap>true</generateSourceMap>
-                    <sourceMapOutputPath>${project.build.directory}/${project.build.finalName}/css</sourceMapOutputPath>
-                </configuration>
-            </plugin>
-            -->
             <plugin>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-maven-plugin</artifactId>
                 <version>${jetty.version}</version>
                 <configuration>
-                    <scan>1</scan>
+                    <scan>0</scan>
                     <httpConnector>
-                        <port>8080</port>
+                        <host>${pairgoth.webapp.host}</host>
+                        <port>${pairgoth.webapp.port}</port>
                     </httpConnector>
                     <systemProperties>
-                        <pairgoth.api.url>http://localhost:8085/api/</pairgoth.api.url>
-                        <pairgoth.env>dev</pairgoth.env>
+                        <pairgoth.env>${pairgoth.env}</pairgoth.env>
+                        <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
+                        <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
+                        <pairgoth.store>${pairgoth.store}</pairgoth.store>
+                        <pairgoth.store.file.path>${pairgoth.store}</pairgoth.store.file.path>
+                        <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
+                        <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
+                        <pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>debug</pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>
+                        <org.slf4j.simpleLogger.defaultLogLevel>debug</org.slf4j.simpleLogger.defaultLogLevel>
                     </systemProperties>
                     <webApp>
+                        <contextPath>${pairgoth.webapp.context}/</contextPath>
                         <resourceBases>${project.basedir}/src/main/webapp,${project.build.directory}/generated-resources/</resourceBases>
                     </webApp>
                 </configuration>
@@ -124,6 +113,10 @@
                         </resource>
                     </webResources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>properties-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
@@ -167,6 +160,12 @@
             <artifactId>jakarta.servlet-api</artifactId>
             <version>${servlet.api.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!-- proxy -->
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-proxy</artifactId>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.mail</groupId>
@@ -248,6 +247,22 @@
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-engine-core</artifactId>
             <version>2.4-SNAPSHOT</version>
+        </dependency>
+        <!-- indexing -->
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analysis-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
         <!-- tests -->
         <dependency>

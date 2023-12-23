@@ -59,10 +59,20 @@
                 <configuration>
                     <scan>0</scan>
                     <httpConnector>
-                        <port>8085</port>
+                        <host>${pairgoth.api.host}</host>
+                        <port>${pairgoth.api.port}</port>
                     </httpConnector>
+                    <systemProperties>
+                        <pairgoth.env>${pairgoth.env}</pairgoth.env>
+                        <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
+                        <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
+                        <pairgoth.store>${pairgoth.store}</pairgoth.store>
+                        <pairgoth.store.file.path>${pairgoth.store.file.path}</pairgoth.store.file.path>
+                        <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
+                        <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
+                    </systemProperties>
                     <webApp>
-                        <contextPath>/api/</contextPath>
+                        <contextPath>${pairgoth.api.context}/</contextPath>
                     </webApp>
                 </configuration>
             </plugin>
@@ -133,6 +143,12 @@
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>
             <version>1.6.7</version>
+        </dependency>
+        <!-- utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
         <!-- auth -->
         <dependency>

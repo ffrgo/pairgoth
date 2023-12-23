@@ -49,8 +49,8 @@ Element.prototype.toggleClass = function(className) {
 NodeList.prototype.hasClass = function(className) {
   return this.item(0).classList.contains(className);
 }
-Element.prototype.toggleClass = function(className) {
-  this.classList.contains(className);
+Element.prototype.hasClass = function(className) {
+  return this.classList.contains(className);
 }
 Node.prototype.offset = function() {
   let _x = 0;
@@ -66,39 +66,130 @@ Node.prototype.offset = function() {
 NodeList.prototype.offset = function() {
   this.item(0).offset();
 }
-Element.prototype.attr = function (key) {
-  return this.attributes[key].value;
+Element.prototype.attr = function (key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.attributes[key]?.value;
+  } else {
+    this.setAttribute(key, value);
+    return this;
+  }
 }
-NodeList.prototype.attr = function(key) {
-  this.item(0).attr(key);
+NodeList.prototype.attr = function(key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.item(0).attr(key);
+  } else {
+    this.forEach(elem => {
+      elem.attr(key, value);
+    });
+    return this;
+  }
 }
-Element.prototype.data = function (key) {
-  return this.attributes[`data-${key}`].value
+Element.prototype.data = function (key, value) {
+  if (typeof(value) === 'undefined') {
+    return this.attributes[`data-${key}`]?.value
+  } else {
+    this.setAttribute(`data-${key}`, value);
+    return this;
+  }
 }
-NodeList.prototype.data = function(key) {
-  this.item(0).data(key);
+NodeList.prototype.data = function(key, value) {
+  if (typeof(value) === 'undefined') {
+    this.item(0).data(key);
+  } else {
+    this.forEach(elem => {
+      elem.data(key, value);
+    })
+    return this;
+  }
 }
-NodeList.prototype.show = function(key) {
-  this.item(0).show(key);
+NodeList.prototype.show = function() {
+  this.item(0).show();
   return this;
 }
-Element.prototype.show = function (key) {
+Element.prototype.show = function() {
   this.style.display = 'block';
 }
-NodeList.prototype.hide = function(key) {
-  this.item(0).hide(key);
+NodeList.prototype.hide = function() {
+  this.item(0).hide();
   return this;
 }
-Element.prototype.hide = function (key) {
+Element.prototype.hide = function() {
   this.style.display = 'none';
 }
-
-let initFunctions = [];
-function onLoad(fct) {
-  if (typeof(fct) == "function") initFunctions.push(fct);
+NodeList.prototype.text = function(txt) {
+  this.item(0).text(txt);
 }
-document.on("DOMContentLoaded", () => {
-  initFunctions.forEach(fct => {
-    fct();
+Element.prototype.text = function(txt) {
+  if (typeof(txt) === 'undefined') {
+    return this.textContent;
+  } else {
+    this.textContent = txt;
+  }
+}
+NodeList.prototype.item = function (i) {
+  return this[+i || 0];
+};
+NodeList.prototype.find = function(selector) {
+  let result = [];
+  this.forEach(function (elem, i) {
+    let partial = elem.find(selector);
+    result = result.concat([...partial]);
   });
-});
+  return Reflect.construct(Array, result, NodeList);
+}
+Element.prototype.find = function(selector) {
+  return this.querySelectorAll(':scope ' + selector);
+}
+
+NodeList.prototype.clear = function() {
+  this.forEach(function (elem, i) {
+    elem.clear();
+  });
+  return this;
+}
+Element.prototype.clear = function() {
+  this.innerHTML = '';
+  return this;
+}
+
+/*
+ TODO - conflicts with from.val(), rename one of the two
+NodeList.prototype.val = function(value) {
+  this.item(0).val(value);
+}
+Element.prototype.val = function(value) {
+  // TODO - check that "this" has the "value" property
+  if (typeof(value) === 'undefined') {
+    return this.value;
+  } else {
+    this.value = value;
+  }
+}
+*/
+
+NodeList.prototype.focus = function() {
+  let first = this.item(0);
+  if (first) first.focus();
+}
+
+Element.prototype.index = function(selector) {
+  let i = 0;
+  let child = this;
+  while ((child = child.previousSibling) != null) {
+    if (typeof(selector) === 'undefined' || child.nodeType === Node.ELEMENT_NODE && child.matches(selector)) {
+      ++i;
+    }
+  }
+  return i;
+}
+
+NodeList.prototype.filter = function(selector) {
+  let result = [];
+  this.forEach(elem => {
+    if (elem.nodeType === Node.ELEMENT_NODE && elem.matches(selector)) {
+      result.push(elem);
+    }
+  });
+  return Reflect.construct(Array, result, NodeList);
+}
+

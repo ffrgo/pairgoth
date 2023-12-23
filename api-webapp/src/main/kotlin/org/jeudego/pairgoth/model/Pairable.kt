@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.model
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
+import java.util.*
 
 // Pairable
 
@@ -51,6 +52,13 @@ fun Pairable.Companion.parseRank(rankStr: String): Int {
 
 // Player
 
+enum class DatabaseId {
+    AGA,
+    EGF,
+    FFG;
+    val key get() = this.name.lowercase(Locale.ROOT)
+}
+
 class Player(
     id: ID,
     name: String,
@@ -62,7 +70,7 @@ class Player(
 ): Pairable(id, name, rating, rank) {
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)
-    val externalIds = mutableMapOf<String, String>()
+    val externalIds = mutableMapOf<DatabaseId, String>()
     override fun toJson(): Json.Object = Json.MutableObject(
         "id" to id,
         "name" to name,
@@ -71,8 +79,11 @@ class Player(
         "rank" to rank,
         "country" to country,
         "club" to club
-    ).also {
-        if (skip.isNotEmpty()) it["skip"] = Json.Array(skip)
+    ).also { json ->
+        if (skip.isNotEmpty()) json["skip"] = Json.Array(skip)
+        externalIds.forEach { (dbid, id) ->
+            json[dbid.key] = id
+        }
     }
     override fun nameSeed(separator: String): String {
         return name + separator + firstname
@@ -91,5 +102,10 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     player.skip.clear()
     json.getArray("skip")?.let {
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
+    }
+    DatabaseId.values().forEach { dbid ->
+        json.getString(dbid.key)?.let { id ->
+            player.externalIds[dbid] = id
+        }
     }
 }

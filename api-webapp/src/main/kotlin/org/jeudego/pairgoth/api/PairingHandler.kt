@@ -6,7 +6,8 @@ import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.web.Event.*
+import org.jeudego.pairgoth.server.Event
+import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -15,10 +16,18 @@ object PairingHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
+        if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
         val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        return tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.map { it.id }.toJsonArray()
+        val unpairables = tournament.pairables.values.filter { it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val pairables = tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val games = tournament.games(round).values
+        return Json.Object(
+            "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
+            "pairables" to pairables,
+            "unpairables" to unpairables
+        )
     }
 
     override fun post(request: HttpServletRequest): Json {
@@ -54,9 +63,19 @@ object PairingHandler: PairgothApiHandler {
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
         if (round != tournament.lastRound()) badRequest("cannot edit pairings in other rounds but the last")
         val payload = getObjectPayload(request)
-        val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
+        val gameId = payload.getInt("id") ?: badRequest("invalid game id")
+        val game = tournament.games(round)[gameId] ?: badRequest("invalid game id")
+        val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
+            listOf(it.black, it.white)
+        }.toSet()
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
+        val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
+        val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
+        if (black.skip.contains(round)) badRequest("black is not playing this round")
+        if (white.skip.contains(round)) badRequest("white is not playing this round")
+        if (playing.contains(black.id)) badRequest("black is already in another game")
+        if (playing.contains(white.id)) badRequest("white is already in another game")
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
         tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
         return Json.Object("success" to true)

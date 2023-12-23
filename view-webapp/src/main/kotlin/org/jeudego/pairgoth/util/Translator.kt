@@ -80,11 +80,15 @@ class Translator private constructor(private val iso: String) {
                 if (groupStart == -1) throw RuntimeException("unexpected case")
                 if (groupStart > start) output.print(text.substring(start, groupStart))
                 val capture = matcher.group(group)
-                var token: String = StringEscapeUtils.unescapeHtml4(capture)
+
+                // CB TODO - unescape and escape steps removed, because it breaks text blocks containing unescaped quotes.
+                // See how it impacts the remaining.
+
+                var token: String = capture // StringEscapeUtils.unescapeHtml4(capture)
                 if (StringUtils.containsOnly(token, "\r\n\t -;:.'\"/<>\u00A00123456789€[]!")) output.print(capture) else {
                     token = normalize(token)
                     token = translate(token)
-                    output.print(StringEscapeUtils.escapeHtml4(token))
+                    output.print(token) // (StringEscapeUtils.escapeHtml4(token))
                 }
                 val groupEnd = matcher.end(group)
                 if (groupEnd < end) output.print(text.substring(groupEnd, end))
@@ -132,7 +136,7 @@ class Translator private constructor(private val iso: String) {
         get() = textAccessor[this] as String
         set(value: String) { textAccessor[this] = value }
 
-    private val saveMissingTranslations = System.getProperty("pairgoth.env") == "dev"
+    private val saveMissingTranslations = System.getProperty("pairgoth.webapp.env") == "dev"
     private val missingTranslations: MutableSet<String> = ConcurrentSkipListSet()
 
     private fun reportMissingTranslation(enText: String) {
@@ -145,7 +149,7 @@ class Translator private constructor(private val iso: String) {
         private val logger = LoggerFactory.getLogger("translation")
         private val translatedTemplates: MutableMap<Pair<String, String>, Template> = ConcurrentHashMap<Pair<String, String>, Template>()
         private val textExtractor = Pattern.compile(
-            "<[^>]+\\splaceholder=\"(?<placeholder>[^\"]*)\"[^>]*>|(?<=>)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<|$)|(?<=>|^)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text2>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<)|^(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?<text3>[^<>]+?)(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?=$)",
+            "<[^>]+\\s(?:placeholder|title)=\"(?<placeholder>[^\"]*)\"[^>]*>|(?<=>)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<|$)|(?<=>|^)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text2>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<)|^(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?<text3>[^<>]+?)(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?=$)",
             Pattern.DOTALL
         )
         private val ignoredTags = setOf("head", "script", "style")
@@ -168,6 +172,7 @@ class Translator private constructor(private val iso: String) {
 
         val providedLanguages = setOf("en", "fr")
         const val defaultLanguage = "en"
+        const val defaultLocale = "en"
 
         internal fun notifyExiting() {
             translators.values.filter {

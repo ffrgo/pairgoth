@@ -32,7 +32,7 @@ class DispatchingFilter : Filter {
         when {
             uri.endsWith('/') -> response.sendRedirect("${uri}index")
             uri.contains('.') ->
-                if (uri.endsWith(".html")) resp.sendError(404)
+                if (uri.endsWith(".html") || uri.contains(".inc.")) resp.sendError(404)
                 else defaultRequestDispatcher.forward(request, response)
             else -> chain.doFilter(request, response)
         }

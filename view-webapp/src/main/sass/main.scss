@@ -1,7 +1,8 @@
+@import "/fonts/hornbill.css";
 @import "/lib/fomantic-ui-2.9.2/semantic.min.css" layer(semantic);
 
 @layer pairgoth {
-  
+
   /* general styles */
   body {
     font-size: clamp(14px, 1rem + 1vw, 24px);
@@ -24,6 +25,20 @@
     }
   }
 
+  .logo {
+    font-family: Hornbill, serif;
+    font-weight: bolder;
+    font-style: normal;
+  }
+
+  .centered {
+    text-align: center;
+  }
+
+  .nobreak {
+    white-space: nowrap;
+  }
+
   /* header, center, footer */
   
   #header {
@@ -42,6 +57,7 @@
   }
 
   #center {
+    position: relative;
     flex: 1;
     overflow: auto;
     #inner {
@@ -63,6 +79,7 @@
   }
 
   .section {
+    text-align: center;
     padding: 0.5em;
   }
 
@@ -77,7 +94,7 @@
     background-color: black;
     opacity: 0;
     transition: opacity 0.5s;
-    z-index: 1000;
+    z-index: 50;
     pointer-events: none;
   }
 
@@ -136,27 +153,31 @@
     position: relative;
     cursor: pointer;
     transform: scale(1.2);
-    #lang-list {
-      position: absolute;
-      display: none;
-      top:100%;
-      right: 1em;
-      flex-flow: column nowrap;
-      padding: 0.5em;
-      gap: 0.5em;
-      background-color: #dddddd;
-      align-items: flex-start;
-      z-index: 50;
-      &.shown {
-        display: flex;
-      }
-      a {
-        display: inline-block;
-        white-space: nowrap;
-        text-align: center;
-        i {
-          vertical-align: middle;
-        }
+  }
+
+  #lang-list {
+    position: fixed;
+    display: none;
+    top:3em;
+    right: 1em;
+    flex-flow: column nowrap;
+    padding: 0.5em;
+    gap: 0.5em;
+    background-color: #dddddd;
+    align-items: flex-start;
+    z-index: 60;
+    &.shown {
+      display: flex;
+    }
+    .lang {
+      cursor: pointer;
+    }
+    a {
+      display: inline-block;
+      white-space: nowrap;
+      text-align: center;
+      i {
+        vertical-align: middle;
       }
     }
   }
@@ -164,6 +185,7 @@
   /* UI fixes */
 
   .ui.form, .ui.segment, .ui.form .field > label { font-size: 1em; }
+  .ui.form .fields {  }
   span > input[type="radio"] { vertical-align: text-top; }
   span > input[type="text"] { vertical-align: baseline; width: initial; }
   span > input.date { vertical-align: baseline; width: 8em; }
@@ -175,10 +197,150 @@
   .step:last-child { padding-right: 1em; }
   .step .description { display: none; }
 
+  .ui.form input[type=text], .ui.form input[type="number"], .ui.form select {
+    padding: 0.4em 0.2em;
+  }
+  .ui.form input[type="number"], input.duration {
+    text-align: center;
+  }
+
+  .form-actions {
+    position: sticky;
+    bottom: 1em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+  }
+
   input[type="number"] {
     padding: 0.2em 0.1em 0.2em 1em;
     vertical-align: baseline;
     width: 3.5em;
   }
 
+  .hidden {
+    display: none;
+  }
+
+  .roundbox {
+    border: solid 2px darkgray;
+    border-radius: 10px;
+    margin: 1em;
+    padding: 1em;
+  }
+
+  #backdrop {
+    display: none;
+    &.active {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 999;
+      background-color: rgba(0,0,0,0.2);
+      cursor: wait;
+    }
+  }
+
+  #backdrop.active {
+  }
+
+  #feedback {
+    position: absolute;
+    top: 1em;
+    left: 50%;
+    font-weight: bold;
+  }
+
+  #success, #error {
+    position: relative;
+    left: -50%;
+    border-radius: 10px;
+    padding: 0.5em 1em;
+    z-index: 100;
+  }
+
+  #success {
+    background: lightgreen;
+    border: solid 2px green;
+    color: green;
+  }
+
+  #error {
+    background: lightcoral;
+    border: solid 2px red;
+    color: red;
+  }
+
+  body.initial {
+    .popup-body {
+      transition: initial;
+    }
+  }
+  .popup {
+    position: fixed;
+    top: 10vh;
+    left: 50%;
+    transform: translate(-50%, 0px);
+    max-width: max(90vw, 800px);
+    max-height: 80vh;
+    margin: auto;
+    z-index: 100;
+    pointer-events: none;
+    div.close {
+      position: absolute;
+      width: 30px;
+      height: 30px;
+      top: -10px;
+      right: -10px;
+      cursor: pointer;
+      .icon {
+        background-color: white;
+        box-shadow: 0px 2px 4px 0px rgb(0 0 0 / 34%);
+      }
+    }
+    .popup-body {
+      max-height: 80vh;
+      max-width: 80vw;
+      transform: rotate3d(1, 0, 0, 90deg);
+      transition: transform 1s cubic-bezier(0.500, 0.250, 0.300, 1.650);
+      background-color: white;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      .popup-content {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        justify-content: start;
+        text-align: justify;
+        max-height: inherit;
+      }
+      .popup-footer {
+        position: relative;
+        text-align: justify;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+        gap: 2em;
+        align-items: center;
+      }
+    }
+    &.shown {
+      pointer-events: initial;
+      transition: transform 1s cubic-bezier(0.500, 0.250, 0.300, 1.650);
+      display: block;
+      .popup-body {
+        transform: rotate3d(1, 0, 0, 0deg);
+      }
+    }
+  }
+
+  .clickable {
+    pointer-events: all;
+    cursor: pointer;
+  }
 }

@@ -21,6 +21,14 @@ class TranslationTool {
         }.let { Pair(iso, it) }
     }
 
+    val defaultCountry = Translator.providedLanguages.associate { iso ->
+        when (iso) {
+            "en" -> "gb"
+            "zh" -> "cn"
+            else -> iso
+        }.let { Pair(iso, it) }
+    }
+
     fun url(request: HttpServletRequest, lang: String): String {
         val out = StringBuilder()
         out.append(request.requestURL.replaceFirst(Regex("://"), "://$lang/"))
@@ -29,7 +37,12 @@ class TranslationTool {
         return out.toString()
     }
 
+    fun datepickerLocale(language: String, locale: String) =
+        if (datepickerLocales.contains(locale)) locale
+        else language
+
     companion object {
+        val datepickerLocales = setOf("ar-DZ", "ar", "ar-TN", "az", "bg", "bm", "bn", "br", "bs", "ca", "cs", "cy", "da", "de", "el", "en-AU", "en-CA", "en-GB", "en-IE", "en-NZ", "en-ZA", "eo", "es", "et", "eu", "fa", "fi", "fo", "fr-CH", "fr", "gl", "he", "hi", "hr", "hu", "hy", "id", "is", "it-CH", "it", "ja", "ka", "kk", "km", "ko", "lt", "lv", "me", "mk", "mn", "mr", "ms", "nl-BE", "nl", "no", "oc", "pl", "pt-BR", "pt", "ro", "ru", "si", "sk", "sl", "sq", "sr", "sr-latn", "sv", "sw", "ta", "tg", "th", "tk", "tr", "uk", "uz-cyrl", "uz-latn", "vi", "zh-CN", "zh-TW")
         val translator = ThreadLocal<Translator>()
     }
 }

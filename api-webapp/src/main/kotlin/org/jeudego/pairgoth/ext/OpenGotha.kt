@@ -151,6 +151,7 @@ object OpenGotha {
             it.value.map { game ->
                 Game(
                     id = Store.nextGameId,
+                    table = game.tableNumber,
                     black = canonicMap[game.blackPlayer] ?: throw Error("player not found: ${game.blackPlayer}"),
                     white = canonicMap[game.whitePlayer] ?: throw Error("player not found: ${game.whitePlayer}"),
                     handicap = game.handicap,

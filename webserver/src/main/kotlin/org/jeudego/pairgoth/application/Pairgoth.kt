@@ -117,7 +117,7 @@ private fun getResourceProperty(key: String) = serverProps.getProperty(key)?.let
 private fun launchServer() {
     // create webapps contexts
     val webAppContexts = mutableListOf<WebAppContext>()
-    val mode = serverProps["mode"] ?: throw Error("missing property: mode")
+    val mode = serverProps["mode"] ?: "standalone"
     if (mode == "server" || mode == "standalone") webAppContexts.add(createContext("api", "/api"))
     if (mode == "client" || mode == "standalone") webAppContexts.add(createContext("view", "/"))
 

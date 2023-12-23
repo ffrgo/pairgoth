@@ -1,7 +1,7 @@
 package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.web.ApiException
+import org.jeudego.pairgoth.server.ApiException
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse

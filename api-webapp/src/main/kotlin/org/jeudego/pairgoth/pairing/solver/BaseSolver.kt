@@ -28,7 +28,7 @@ sealed class BaseSolver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
-        val DEBUG_EXPORT_WEIGHT = true
+        val DEBUG_EXPORT_WEIGHT = false
         var byePlayers: MutableList<Pairable> = mutableListOf()
     }
 
@@ -123,7 +123,7 @@ sealed class BaseSolver(
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
-        if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
+        if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         if (DEBUG_EXPORT_WEIGHT) {
             //println("DUDD debug")
@@ -535,7 +535,9 @@ sealed class BaseSolver(
 
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
-
-        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white), drawnUpDown = white.group-black.group))
+        val usedTables = tables.getOrNull(round - 1) ?: BitSet().also { tables.add(it) }
+        val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
+        usedTables.set(table)
+        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = pairing.handicap.handicap(white, black), drawnUpDown = white.group-black.group))
     }
 }

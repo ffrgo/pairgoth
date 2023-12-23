@@ -84,8 +84,8 @@ function exportCSV(filename, content) {
   document.body.removeChild(link);
 }
 
-/* modals */
-
+/* modals
+  NOT IN USE, see popup-related code.
 NodeList.prototype.modal = function(show) {
   this.item(0).modal(show);
   return this;
@@ -101,21 +101,127 @@ Element.prototype.modal = function(show) {
   }
   return this;
 }
+ */
 
+/* DOM helpers */
+
+HTMLFormElement.prototype.val = function(name, value) {
+  let hasValue = typeof(value) !== 'undefined';
+  let ctl = this.find(`[name="${name}"]`)[0];
+  if (!ctl) {
+    console.error(`unknown input name: ${name}`)
+  }
+  let tag = ctl.tagName;
+  let type = tag === 'INPUT' ? ctl.attr('type') : undefined;
+  if (
+    (tag === 'INPUT' && ['text', 'number', 'hidden'].includes(ctl.attr('type'))) ||
+    tag === 'SELECT'
+  ) {
+    if (hasValue) {
+      ctl.value = value;
+      return;
+    }
+    else return ctl.value;
+  } else if (tag === 'INPUT' && ctl.attr('type') === 'radio') {
+    if (hasValue) {
+      ctl = $(`input[name="${name}"][value="${value}"]`);
+      if (ctl) ctl.checked = true;
+      return;
+    } else {
+      ctl = $(`input[name="${name}"]:checked`);
+      if (ctl) return ctl[0].value;
+      else return null;
+    }
+  } else if (tag === 'INPUT' && ctl.attr('type') === 'checkbox') {
+    if (hasValue) {
+      ctl.checked = value !== 'false' && Boolean(value);
+      return;
+    }
+    else return ctl.checked && ctl.value ? ctl.value : ctl.checked;
+  }
+  console.error(`unhandled input tag or type for input ${name} (tag: ${tag}, type:${type}`);
+  return null;
+};
+
+function msg(id) {
+  let ctl = $(`#${id}`)[0];
+  return ctl.textContent;
+}
+
+function spinner(show) {
+  if (show) $('#backdrop').addClass('active');
+  else $('#backdrop').removeClass('active');
+}
+
+function modal(id) {
+  $('body').addClass('dimmed');
+  $(`#${id}.popup`).addClass('shown');
+}
+
+function close_modal() {
+  $('body').removeClass('dimmed');
+  $(`.popup`).removeClass('shown');
+}
 
 onLoad(() => {
-  /*
-  document.on('click', e => {
-    if (!e.target.closest('.modal')) $('.modal').hide();
-  })
+  $('button.close').on('click', e => {
+    let modal = e.target.closest('.popup');
+    if (modal) {
+      modal.removeClass('shown');
+      $('body').removeClass('dimmed');
+    }
+  });
+
+  /* commented for now - do we want this?
+  $('#dimmer').on('click', e => $('.popup').removeClass('shown');
    */
-  $('i.close.icon').on('click', e => {
-    let modal = e.target.closest('.modal');
-    if (modal) modal.modal(false);
+
+  // keyboard handling
+  document.on('keyup', e => {
+    switch (e.key) {
+      case 'Escape': {
+        if ($('#player').hasClass('shown')) {
+          if ($('#needle')[0].value) {
+            $('#needle')[0].value = '';
+            initSearch();
+          } else {
+            close_modal();
+          }
+        }
+        break;
+      }
+      case 'ArrowDown': {
+        if (searchResultShown()) {
+          let lines = $('.result-line');
+          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+          else ++searchHighlight;
+          searchHighlight = Math.min(searchHighlight, lines.length - 1);
+          lines.removeClass('highlighted');
+          lines[searchHighlight].addClass('highlighted');
+        }
+        break;
+      }
+      case 'ArrowUp': {
+        if (searchResultShown()) {
+          let lines = $('.result-line');
+          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+          else --searchHighlight;
+          searchHighlight = Math.max(searchHighlight, 0);
+          lines.removeClass('highlighted');
+          lines[searchHighlight].addClass('highlighted');
+        }
+        break;
+      }
+      case 'Enter': {
+        if (searchResultShown()) {
+          fillPlayer(searchResult[searchHighlight]);
+        } else {
+          $('#register')[0].click();
+        }
+        break;
+      }
+    }
   });
-  $('.modal .actions .cancel').on('click', e => {
-    e.target.closest('.modal').modal(false);
-  });
-  $('#dimmer').on('click', e => $('.modal').modal(false));
+
 });
 

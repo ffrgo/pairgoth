@@ -1,0 +1,179 @@
+<div class="tab-content" id="registration">
+  <div id="reg-view">
+    <div id="players-list" class="roundbox">
+#set($parts = $api.get("tour/${params.id}/part"))
+#set($pmap = $utils.toMap($parts))
+      <table id="players" class="ui celled selectable striped table">
+        <thead>
+          <th>name</th>
+          <th>first name</th>
+          <th>country</th>
+          <th>club</th>
+          <th>rank</th>
+          <th>rating</th>
+          <th>participation</th>
+        </thead>
+        <tbody>
+#foreach($part in $parts)
+          <tr data-id="$part.id">
+            <td>$part.name</td>
+            <td>$part.firstname</td>
+            <td>$part.country</td>
+            <td>$part.club</td>
+            <td data-sort="$part.rank">#rank($part.rank)</td>
+            <td>$part.rating</td>
+            <td>
+  #foreach($round in [1..$tour.rounds])
+    ## CB TODO - upstream json parsing should not give longs here, should it?
+    #if($part.skip && $part.skip.contains($round.longValue()))
+              <label class="ui red circular label">$round</label>
+    #else
+              <label class="ui green circular label">$round</label>
+    #end
+  #end
+            </td>
+          </tr>
+#end
+        </tbody>
+      </table>
+    </div>
+    <div class="form-actions">
+      <button id="add" class="ui blue right labeled icon floating info button">
+        <i class="plus icon"></i>
+        Add player
+      </button>
+    </div>
+  </div>
+</div>
+<div id="player" class="popup">
+  <div class="popup-body">
+    <form id="player-form" class="ui form edit">
+      <input type="hidden" name="id"/>
+      <div class="popup-content">
+        <div id="search-form" class="five stackable fields">
+          <div class="two wide field">
+            <div class="toggle">
+              <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>$tour.country.toUpperCase()</label>
+            </div>
+          </div>
+          <div class="ten wide field">
+            <div class="ui icon input">
+              <input id="needle" name="needle" type="text" placeholder="Search...">
+              <i id="clear-search" class="clickable close icon"></i>
+            </div>
+          </div>
+          <div class="two wide field">
+            <div class="toggle">
+              <input id="aga" name="aga" type="checkbox" value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>AGA</label>
+            </div>
+          </div>
+          <div class="two wide field">
+            <div class="toggle">
+              <input id="egf" name="egf" type="checkbox" checked value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>EGF</label>
+            </div>
+          </div>
+          <div class="two wide field">
+            <div class="toggle">
+              <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
+              <div class="search-param checkbox">
+                <div class="circle"></div>
+              </div>
+              <label>FFG</label>
+            </div>
+          </div>
+          <div id="search-result"></div>
+        </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
+            <label>Family name</label>
+            <span class="info"></span>
+            <input type="text" name="name" placeholder="last name"/>
+          </div>
+          <div class="eight wide field">
+            <label>Given name</label>
+            <span class="info"></span>
+            <input type="text" name="firstname" placeholder="first name"/>
+          </div>
+        </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
+            <label>Country</label>
+            <span class="info"></span>
+            <select name="country">
+              <option></option>
+#set($defaultCountry = $translate.defaultCountry[$request.lang])
+#foreach($country in $countries.countries)
+              <option value="$country.key">$country.value</option>
+#end
+            </select>
+          </div>
+          <div class="eight wide field">
+            <label>Club</label>
+            <span class="info"></span>
+            <input type="text" name="club" placeholder="club"/>
+          </div>
+        </div>
+        <div class="two stackable fields">
+          <div class="eight wide field">
+            <label>Rank</label>
+            <span class="info"></span>
+            <select name="rank">
+              <option></option>
+#levels()
+            </select>
+          </div>
+          <div class="eight wide field">
+            <label>Rating</label>
+            <span class="info"></span>
+            <input name="rating" type="text" class="numeric"/>
+          </div>
+        </div>
+        <div class="inline fields">
+          <label>Participation</label>
+#foreach($r in [1..$tour.rounds])
+          <div class="centered field">
+            <label>R${r}</label>
+            <input name="r${r}" type="checkbox" checked="checked" class="participation"/>
+          </div>
+#end
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button id="cancel-register" type="button" class="ui gray right labeled icon floating close button">
+          <i class="times icon"></i>
+          <span class="edition">Close</span>
+          <span class="creation">Cancel</span>
+        </button>
+        <button id="unregister" type="button" class="ui red right labeled icon floating button">
+          <i class="trash icon"></i>
+          Unregister
+        </button>
+        <button id="register" type="button" class="ui green right labeled icon floating button">
+          <i class="plus icon"></i>
+          <span class="edition">Update</span>
+          <span class="creation">Register</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+#[[
+<script id="result" type="text/template">
+  {{for #data}}
+    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}})</div>
+  {{/for}}
+</script>
+<script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>
+]]#

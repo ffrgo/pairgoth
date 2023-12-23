@@ -1,0 +1,42 @@
+@font-face {
+    font-family: Hornbill;
+    font-style: normal;
+    font-weight: 400;
+    src: url(Hornbill-Regular.otf) format("opentype");
+}
+
+@font-face {
+    font-family: Hornbill;
+    font-style: italic;
+    font-weight: 400;
+    src: url(Hornbill-Italic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: Hornbill;
+    font-style: normal;
+    font-weight: 700;
+    src: url(Hornbill-Bold.otf) format("opentype");
+}
+
+@font-face {
+    font-family: Hornbill;
+    font-style: italic;
+    font-weight: 700;
+    src: url(Hornbill-BoldItalic.otf) format("opentype");
+}
+
+@font-face {
+    font-family: Hornbill;
+    font-style: normal;
+    font-weight: 900;
+    src: url(Hornbill-Black.otf) format("opentype");
+}
+
+@font-face {
+    font-family: Hornbill;
+    font-style: italic;
+    font-weight: 900;
+    src: url(Hornbill-BlackItalic.otf) format("opentype");
+}
+

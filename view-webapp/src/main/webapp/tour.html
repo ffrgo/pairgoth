@@ -1,0 +1,183 @@
+#macro(twoDigits $value)$strings.leftPad($value, 2, '0')#end
+#macro(toHMS $value)#if($value)#set($hh = $value / 3600)#set($mm = ($value % 3600) / 60)#set($ss = $value % 60)#twoDigits($hh):#twoDigits($mm):#twoDigits($ss)#end#end
+#macro(levels $sel)
+  #foreach($d in [8..0])
+    #set($dan = $d + 1)
+    #set($disp = "${dan}d")
+    <option value="$d" #if("$!sel" != "" && $sel == $d)selected#end>$disp</option>
+  #end
+  #foreach($k in [-1..-30])
+    #set($disp = "${math.abs($k)}k")
+    <option value="$k" #if($sel && $sel == $k)selected#end>$disp</option>
+  #end
+#end
+#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
+#if($params.id)
+  #set($tour = $api.get("tour/${params.id}"))
+  #if (!$tour)
+<div class="section">
+  <h2 class="error">Invalid tournament id</h2>
+</div>
+  #end
+#end
+## set up some global context templating variables
+#if($tour)
+  #set($round = $math.toInteger($!params.round))
+  #if(!$round)
+    #set($round = 1)
+  #else
+    #set($round = $math.min($math.max($round, 1), $tour.rounds))
+  #end
+#end
+<div class="section">
+  <h1 class="centered title">#if($tour)$tour.name#{else}New Tournament#end</h1>
+#if($tour)
+  <div class="ui ordered centered steps">
+    <div class="step" data-step="information">
+      <div class="content">
+        <div class="title">Information</div>
+      </div>
+    </div>
+    <div class="step" data-step="registration">
+      <div class="content">
+        <div class="title">Registration</div>
+      </div>
+    </div>
+    <div class="step" data-step="pairing">
+      <div class="content">
+        <div class="title">Pairing</div>
+      </div>
+    </div>
+    <div class="step" data-step="results">
+      <div class="content">
+        <div class="title">Results</div>
+      </div>
+    </div>
+    <div class="step" data-step="standings">
+      <div class="content">
+        <div class="title">Standings</div>
+      </div>
+    </div>
+  </div>
+#end
+#translate('tour-information.inc.html')
+#if($tour)
+  #translate('tour-registration.inc.html')
+  #translate('tour-pairing.inc.html')
+  #translate('tour-results.inc.html')
+  #translate('tour-standings.inc.html')
+#end
+</div>
+<!-- error messages included as html elements so that they are translated -->
+<div id="required_field" class="hidden">Required field</div>
+<script type="text/javascript">
+#if($tour)
+  const tour_id = ${tour.id};
+  const tour_rounds = ${tour.rounds};
+  let activeRound = ${round};
+  // $params
+#end
+#set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
+  const datepickerLocale = '$datepickerLocale';
+  // #[[
+  const safeRegex = /^[-a-zA-Z0-9_.]+$/;
+
+  function parseDate(value) {
+    let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
+    let date = Datepicker.parseDate(value, format, datepickerLocale);
+    return Datepicker.formatDate(date, 'yyyy-mm-dd')
+  }
+  function formatDate(value) {
+    let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
+    let date = Datepicker.parseDate(value, 'yyyy-mm-dd', datepickerLocale);
+    return Datepicker.formatDate(date, format)
+  }
+  function fromHMS(value) {$('.step').map(item => item.data('step')).forEach(i => console.log(i))
+    if (value && /\d+:\d+:\d+/.test(value)) {
+      let parts = value.split(':');
+      let seconds = parts[0] * 3600 + parts[1] * 60 + parts[2] * 1;
+      console.log(`${value} => ${seconds}`);
+      return seconds;
+    }
+    console.log(`invalid hh:mm:ss value: ${value}`);
+    return 0;
+  }
+  function chooseStep(step) {
+    $('.tab-content').removeClass('active');
+    $('.step').removeClass('active');
+    $(`.step[data-step="${step}"], #${step}`).addClass('active');
+    window.location.hash = `#${step}`;
+  }
+
+  onLoad(() => {
+
+    if (!window.location.hash && window.location.search) {
+      window.location.hash = '#information'
+    }
+    if (window.location.hash) {
+      let step = window.location.hash.substring(1);
+      chooseStep(step);
+    }
+
+    $('.step').on('click', e => {
+      let tab = e.target.closest('.step');
+      if (tab.classList.contains('active')) return;
+      let step = tab.attr('data-step');
+      chooseStep(step);
+    });
+
+    $('input,select').forEach(input => {
+      let info = input.previousElementSibling;
+      if (info && info.classList.contains('info')) {
+        if (input.tagName === 'SELECT') {
+          let sel = input.selectedOptions;
+          if (sel && sel.length === 1) {
+            info.textContent = sel[0].textContent;
+          }
+        } else {
+          if (input.attr('name') === 'location' && $('input[name="online"]')[0].checked) {
+            info.textContent = 'online';
+          } else {
+            info.textContent = input.value;
+          }
+        }
+      }
+    });
+
+    // prev/next round buttons
+    if (activeRound === 1) {
+      $('.prev-round').addClass('disabled');
+    }
+    if (activeRound === tour_rounds) {
+      $('.next-round').addClass('disabled');
+    }
+    $('.prev-round').on('click', e => {
+      let round = activeRound - 1;
+      if (round > 0) {
+        window.location.search = `id=${tour_id}&round=${round}`
+      }
+    });
+    $('.next-round').on('click', e => {
+      let round = activeRound + 1;
+      if (round <= tour_rounds) {
+        window.location.search = `id=${tour_id}&round=${round}`
+      }
+    });
+  });
+  // ]]#
+#include('/js/tour-information.inc.js')
+#include('/js/tour-registration.inc.js')
+#include('/js/tour-pairing.inc.js')
+#include('/js/tour-results.inc.js')
+</script>
+<div id="invalid_character" class="hidden">Invalid character</div>
+<script type="text/javascript" src="/lib/datepicker-1.3.4/datepicker-full.min.js"></script>
+#if($datepickerLocale != 'en')
+<script type="text/javascript" src="/lib/datepicker-1.3.4/locales/${datepickerLocale}.js"></script>
+#end
+<link rel="stylesheet" href="/lib/datepicker-1.3.4/datepicker.min.css">
+<style type="text/css">
+    .ui.form input[type=checkbox][name=online] {
+        vertical-align: initial;
+    }
+</style>

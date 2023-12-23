@@ -6,6 +6,7 @@ import java.util.*
 
 data class Game(
     val id: ID,
+    var table: Int,
     var white: ID,
     var black: ID,
     var handicap: Int = 0,
@@ -33,6 +34,7 @@ data class Game(
 
 fun Game.toJson() = Json.Object(
     "id" to id,
+    "t" to table,
     "w" to white,
     "b" to black,
     "h" to handicap,
@@ -42,6 +44,7 @@ fun Game.toJson() = Json.Object(
 
 fun Game.Companion.fromJson(json: Json.Object) = Game(
     id = json.getID("id") ?: throw Error("missing game id"),
+    table = json.getInt("t") ?: throw Error("missing game table"),
     white = json.getID("w") ?: throw Error("missing white player"),
     black = json.getID("b") ?: throw Error("missing black player"),
     handicap = json.getInt("h") ?: 0,

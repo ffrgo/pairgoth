@@ -59,6 +59,18 @@
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>
+  <servlet>
+    <servlet-name>api</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.ApiServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
+  <servlet>
+    <servlet-name>search</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.SearchServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
@@ -69,10 +81,30 @@
     <servlet-name>sse</servlet-name>
     <url-pattern>/events/*</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>api</servlet-name>
+    <url-pattern>/api/tour/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>search</servlet-name>
+    <url-pattern>/api/search/*</url-pattern>
+  </servlet-mapping>
 
   <!-- context params -->
   <context-param>
     <param-name>webapp-slf4j-logger.format</param-name>
     <param-value>%logger [%level] [%ip] %message @%file:%line:%column</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.apache.velocity.tools.loadDefaults</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.apache.velocity.tools.cleanConfiguration</param-name>
+    <param-value>true</param-value>
+  </context-param>
+  <context-param>
+    <param-name>org.apache.velocity.tools.userCanOverwriteTools</param-name>
+    <param-value>false</param-value>
   </context-param>
 </web-app>
