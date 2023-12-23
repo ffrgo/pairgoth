@@ -81,7 +81,7 @@ class BasicTests: TestBase() {
     val aPlayer = Json.Object(
         "name" to "Burma",
         "firstname" to "Nestor",
-        "rating" to 1600,
+        "rating" to -500,
         "rank" to -5,
         "country" to "FR",
         "club" to "13Ma"
@@ -90,11 +90,35 @@ class BasicTests: TestBase() {
     val anotherPlayer = Json.Object(
         "name" to "Poirot",
         "firstname" to "Hercule",
-        "rating" to 1700,
+        "rating" to -100,
         "rank" to -1,
         "country" to "FR",
         "club" to "75Op"
     )
+
+    val aMMTournament = Json.Object(
+        "type" to "INDIVIDUAL",
+        "name" to "Mon Tournoi",
+        "shortName" to "mon-tournoi",
+        "startDate" to "2023-05-10",
+        "endDate" to "2023-05-12",
+        "country" to "FR",
+        "location" to "Marseille",
+        "online" to false,
+        "timeSystem" to Json.Object(
+            "type" to "FISCHER",
+            "mainTime" to 1200,
+            "increment" to 10
+        ),
+        "rounds" to 2,
+        "pairing" to Json.Object(
+            "type" to "MAC_MAHON",
+            "handicap" to Json.Object(
+                "correction" to 1
+            )
+        )
+    )
+
 
     var aTournamentID: ID? = null
     var aTeamTournamentID: ID? = null
@@ -174,7 +198,21 @@ class BasicTests: TestBase() {
     }
 
     @Test
-    fun `007 team tournament, MacMahon`() {
+    fun `007 Mac Mahon handicap`() {
+        var resp = TestAPI.post("/api/tour", aMMTournament).asObject()
+        val tourId = resp.getInt("id") ?: throw Error("tournament creation failed")
+        resp = TestAPI.post("/api/tour/$tourId/part", aPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        val p1 = resp.getInt("id")!!
+        resp = TestAPI.post("/api/tour/$tourId/part", anotherPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        val p2 = resp.getInt("id")!!
+        val game = TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray().getObject(0) ?: throw Error("pairing failed")
+        assertEquals(p2, game.getInt("w"))
+        assertEquals(p1, game.getInt("b"))
+        assertEquals(3, game.getInt("h"))
+    }
+
+    @Test
+    fun `008 team tournament, MacMahon`() {
         var resp = TestAPI.post("/api/tour", aTeamTournament).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         aTeamTournamentID = resp.getInt("id")
@@ -204,5 +242,4 @@ class BasicTests: TestBase() {
         // TODO check pairing
         // val expected = """"["id":1,"w":5,"b":6,"h":3,"r":"?"]"""
     }
-
 }

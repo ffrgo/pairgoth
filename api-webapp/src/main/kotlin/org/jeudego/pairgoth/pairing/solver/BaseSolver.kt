@@ -486,14 +486,14 @@ sealed class BaseSolver(
 
     // Handicap functions
     // Has to be overridden if handicap is not based on rank
-    open fun HandicapParams.handicap(p1: Pairable, p2: Pairable): Int {
+    open fun HandicapParams.handicap(white: Pairable, black: Pairable): Int {
         var hd = 0
-        var pseudoRank1: Int = p1.rank
-        var pseudoRank2: Int = p2.rank
+        var pseudoRankWhite: Int = white.rank
+        var pseudoRankBlack: Int = black.rank
 
-        pseudoRank1 = min(pseudoRank1, rankThreshold)
-        pseudoRank2 = min(pseudoRank2, rankThreshold)
-        hd = pseudoRank1 - pseudoRank2
+        pseudoRankWhite = min(pseudoRankWhite, rankThreshold)
+        pseudoRankBlack = min(pseudoRankBlack, rankThreshold)
+        hd = pseudoRankWhite - pseudoRankBlack
 
         return clamp(hd)
     }

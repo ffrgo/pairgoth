@@ -97,11 +97,17 @@ data class HandicapParams(
     val ceiling: Int = 9, // Possible values are between 0 and 9
 ) {
     companion object {
-        val default = HandicapParams(
-            weight = 0.0, // default disables handicap
+        val swissDefault = HandicapParams(
+            weight = 0.0, // TODO 'default disables handicap' => seems wrong, not used
             useMMS = false,
             rankThreshold = -30, // 30k
             ceiling = 0)
+        val mmDefault = HandicapParams(
+            weight = 0.0,
+            useMMS = true,
+            rankThreshold = 0, // 1D
+            ceiling = 9)
+        fun default(type: PairingType) = if (type == MAC_MAHON) mmDefault else swissDefault
     }
 }
 
@@ -154,7 +160,7 @@ class Swiss(
             defSecCrit = MainCritParams.MAX_CATEGORIES_WEIGHT
         ),
         geo = GeographicalParams.disabled,
-        handicap = HandicapParams.default
+        handicap = HandicapParams.default(SWISS)
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
@@ -176,7 +182,12 @@ class MacMahon(
         geo = GeographicalParams(
             avoidSameGeo = MainCritParams.MAX_SCORE_WEIGHT
         ),
-        handicap = HandicapParams()
+        handicap = HandicapParams(
+            weight = MainCritParams.MAX_SCORE_WEIGHT, // TODO - contradictory with the comment above (not used anyway ?!)
+            useMMS = true,
+            rankThreshold = 0,
+            ceiling = 9
+        )
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
@@ -247,16 +258,16 @@ fun MainCritParams.toJson() = Json.Object(
 )
 
 fun SecondaryCritParams.Companion.fromJson(json: Json.Object) = SecondaryCritParams(
-    barThresholdActive = json.getBoolean("barTreshold") ?: default.barThresholdActive,
-    rankThreshold = json.getInt("rankTreshold") ?: default.rankThreshold,
-    nbWinsThresholdActive = json.getBoolean("winsTreshold") ?: default.nbWinsThresholdActive,
+    barThresholdActive = json.getBoolean("barThreshold") ?: default.barThresholdActive,
+    rankThreshold = json.getInt("rankThreshold") ?: default.rankThreshold,
+    nbWinsThresholdActive = json.getBoolean("winsThreshold") ?: default.nbWinsThresholdActive,
     defSecCrit = json.getDouble("secWeight") ?: default.defSecCrit
 )
 
 fun SecondaryCritParams.toJson() = Json.Object(
-    "barTreshold" to barThresholdActive,
-    "rankTreshold" to rankThreshold,
-    "winsTreshold" to nbWinsThresholdActive,
+    "barThreshold" to barThresholdActive,
+    "rankThreshold" to rankThreshold,
+    "winsThreshold" to nbWinsThresholdActive,
     "secWeight" to defSecCrit
 )
 
@@ -274,18 +285,18 @@ fun GeographicalParams.toJson() = Json.Object(
     "mmsDiffClub" to preferMMSDiffRatherThanSameClub
 )
 
-fun HandicapParams.Companion.fromJson(json: Json.Object) = HandicapParams(
-    weight = json.getDouble("weight") ?: default.weight,
-    useMMS = json.getBoolean("useMMS") ?: default.useMMS,
-    rankThreshold = json.getInt("treshold") ?: default.rankThreshold,
-    correction = json.getInt("correction") ?: default.correction,
-    ceiling = json.getInt("ceiling") ?: default.ceiling
+fun HandicapParams.Companion.fromJson(json: Json.Object, type: PairingType) = HandicapParams(
+    weight = json.getDouble("weight") ?: default(type).weight,
+    useMMS = json.getBoolean("useMMS") ?: default(type).useMMS,
+    rankThreshold = json.getInt("threshold") ?: default(type).rankThreshold,
+    correction = json.getInt("correction") ?: default(type).correction,
+    ceiling = json.getInt("ceiling") ?: default(type).ceiling
 )
 
 fun HandicapParams.toJson() = Json.Object(
     "weight" to weight,
     "useMMS" to useMMS,
-    "treshold" to rankThreshold,
+    "threshold" to rankThreshold,
     "correction" to correction,
     "ceiling" to ceiling
 )
@@ -302,7 +313,7 @@ fun Pairing.Companion.fromJson(json: Json.Object): Pairing {
     val main = json.getObject("main")?.let { MainCritParams.fromJson(it) } ?: defaultParams.pairingParams.main
     val secondary = json.getObject("secondary")?.let { SecondaryCritParams.fromJson(it) } ?: defaultParams.pairingParams.secondary
     val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it) } ?: defaultParams.pairingParams.geo
-    val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it) } ?: defaultParams.pairingParams.handicap
+    val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it, type) } ?: defaultParams.pairingParams.handicap
     val pairingParams = PairingParams(base, main, secondary, geo, hd)
     val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: defaultParams.placementParams
     return when (type) {
@@ -319,7 +330,7 @@ fun Pairing.toJson(): Json.Object = Json.MutableObject(
     "type" to type.name,
     "base" to pairingParams.base.toJson(),
     "main" to pairingParams.main.toJson(),
-    "secondary" to pairingParams.main.toJson(),
+    "secondary" to pairingParams.secondary.toJson(),
     "geo" to pairingParams.geo.toJson(),
     "handicap" to pairingParams.handicap.toJson(),
     "placement" to placementParams.toJson()
