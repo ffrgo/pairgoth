@@ -132,7 +132,11 @@
         if (input.tagName === 'SELECT') {
           let sel = input.selectedOptions;
           if (sel && sel.length === 1) {
-            info.textContent = sel[0].textContent;
+            let txt = sel[0].textContent
+            if (input.hasClass('short-value')) {
+              txt = txt.replace(/ - .*$/, '');
+            }
+            info.textContent = txt;
           }
         } else {
           if (input.attr('name') === 'location' && $('input[name="online"]')[0].checked) {
@@ -169,6 +173,7 @@
 #include('/js/tour-registration.inc.js')
 #include('/js/tour-pairing.inc.js')
 #include('/js/tour-results.inc.js')
+#include('/js/tour-standings.inc.js')
 </script>
 <div id="invalid_character" class="hidden">Invalid character</div>
 <script type="text/javascript" src="/lib/datepicker-1.3.4/datepicker-full.min.js"></script>

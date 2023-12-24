@@ -13,6 +13,7 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
         val MAX_RANK: Int = 8 // 9D
     }
     abstract fun toJson(): Json.Object
+    abstract fun toMutableJson(): Json.MutableObject
     abstract val club: String?
     abstract val country: String?
     open fun nameSeed(separator: String =" "): String {
@@ -27,6 +28,9 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
 
 object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
     override fun toJson(): Json.Object {
+        throw Error("bye player should never be serialized")
+    }
+    override fun toMutableJson(): Json.MutableObject {
         throw Error("bye player should never be serialized")
     }
 
@@ -71,7 +75,7 @@ class Player(
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)
     val externalIds = mutableMapOf<DatabaseId, String>()
-    override fun toJson(): Json.Object = Json.MutableObject(
+    override fun toMutableJson() = Json.MutableObject(
         "id" to id,
         "name" to name,
         "firstname" to firstname,
@@ -85,6 +89,8 @@ class Player(
             json[dbid.key] = id
         }
     }
+
+    override fun toJson(): Json.Object = toMutableJson()
     override fun nameSeed(separator: String): String {
         return name + separator + firstname
     }

@@ -1,3 +1,52 @@
+#macro(placement $i, $p)
+  <span class="info"></span>
+  <select name="crit-$i" data-initial="$p" class="short-value">
+  #foreach($crit in $$utils.criteria.entrySet())
+    <option value="$crit.key" data-tooltip="$crit.value" #if($p == $crit.key)selected#end>$crit.key - $crit.value</option>
+  #end
+  </select>
+#end
 <div class="tab-content" id="standings">
-  Standings...
+  <div id="standings-round" class="active-round-box">
+    Standings after round
+    <button class="ui floating choose-round prev-round button">&laquo;</button>
+    <span class="active-round">$round</span>
+    <button class="ui floating choose-round next-round button">&raquo;</button>
+  </div>
+  <div id="standings-params" class="roundbox">
+    <form id="params-form" class="ui form">
+      <div class="inline fields">
+#foreach($placement in $tour.pairing.placement)
+        <div class="criterium field">
+  #set($num = $foreach.index + 1)
+          <label>Criterium #$num</label>
+  #placement($num $placement)
+        </div>
+#end
+      </div>
+      <div id="params-submit" class="hidden centered inline fields">
+        <button type="button" class="ui gray floating cancel button">Cancel</button>
+        <button type="submit" class="ui blue floating button">Change</button>
+      </div>
+    </form>
+  </div>
+  <div id="standings-container" class="roundbox">
+#set($standings = $api.get("tour/${params.id}/standings/$round"))
+#if($standings.isObject() && ($standings.error || $standings.message))
+  #if($standings.error)
+    #set($error = $standings.error)
+  #else
+    #set($error = $standings.message)
+  #end
+    <script type="text/javascript">
+      onLoad(() => {
+        showError("$error")
+      });
+    </script>
+  #set($standings = [])
+#end
+#foreach($line in $standings)
+    <div class="standings-line">$line</div>
+#end
+  </div>
 </div>

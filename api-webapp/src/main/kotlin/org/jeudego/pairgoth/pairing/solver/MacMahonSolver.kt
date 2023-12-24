@@ -13,9 +13,11 @@ class MacMahonSolver(round: Int,
     BaseSolver(round, history, pairables, pairingParams, placementParams) {
 
     override val scores: Map<ID, Double> by lazy {
-        pairablesMap.mapValues { it.value.let {
-            pairable -> pairable.mmBase + pairable.nbW // TODO take tournament parameter into account
-        } }
+        pairablesMap.mapValues {
+            it.value.let {
+                pairable -> pairable.mmBase + pairable.nbW // TODO take tournament parameter into account
+            }
+        }
     }
 
     override fun debug(p: Pairable) {

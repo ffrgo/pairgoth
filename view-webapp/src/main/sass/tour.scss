@@ -11,6 +11,11 @@
     }
   }
 
+  .active-round-box {
+    padding: 1em;
+    font-weight: bold;
+  }
+
   /* information section */
 
   form {
@@ -232,4 +237,32 @@
     }
   }
 
+  /* standings section */
+
+  #standings-params {
+    display: inline-flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    background-color: #eeeeee;
+    margin-left: auto;
+    margin-right: auto;
+
+    .criterium {
+      position: relative;
+      cursor: pointer;
+      select {
+        position: absolute;
+        top: 100%;
+        z-index: 2;
+        &.active {
+          display: initial;
+        }
+      }
+      select.active {
+      }
+    }
+    #params-submit {
+      justify-content: space-around;
+    }
+  }
 }

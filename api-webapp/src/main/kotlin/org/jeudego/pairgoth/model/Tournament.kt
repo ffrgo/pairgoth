@@ -117,11 +117,12 @@ class TeamTournament(
         override val rank: Int get() = if (teamPlayers.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
         override val club: String? get() = teamPlayers.map { club }.distinct().let { if (it.size == 1) it[0] else null }
         override val country: String? get() = teamPlayers.map { country }.distinct().let { if (it.size == 1) it[0] else null }
-        override fun toJson() = Json.Object(
+        override fun toMutableJson() = Json.MutableObject(
             "id" to id,
             "name" to name,
             "players" to playerIds.toList().toJsonArray()
         )
+        override fun toJson(): Json.Object = toMutableJson()
         val teamOfIndividuals: Boolean get() = type.individual
     }
 
@@ -160,7 +161,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
             )
         else
             TeamTournament(
@@ -178,7 +179,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
             )
     json["pairables"]?.let { pairables ->
 

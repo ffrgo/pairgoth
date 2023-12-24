@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
+import org.jeudego.pairgoth.api.StandingsHandler
 import org.jeudego.pairgoth.api.TeamHandler
 import org.jeudego.pairgoth.api.TournamentHandler
 import org.jeudego.pairgoth.util.Colorizer.blue
@@ -87,6 +88,7 @@ class ApiServlet: HttpServlet() {
                         "part" -> PlayerHandler
                         "pair" -> PairingHandler
                         "res" -> ResultsHandler
+                        "standings" -> StandingsHandler
                         "team" -> TeamHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
