@@ -64,7 +64,7 @@ Node.prototype.offset = function() {
   return { top: _y, left: _x };
 }
 NodeList.prototype.offset = function() {
-  this.item(0).offset();
+  return this.item(0).offset();
 }
 Element.prototype.attr = function (key, value) {
   if (typeof(value) === 'undefined') {
@@ -94,7 +94,7 @@ Element.prototype.data = function (key, value) {
 }
 NodeList.prototype.data = function(key, value) {
   if (typeof(value) === 'undefined') {
-    this.item(0).data(key);
+    return this.item(0).data(key);
   } else {
     this.forEach(elem => {
       elem.data(key, value);
@@ -108,6 +108,7 @@ NodeList.prototype.show = function() {
 }
 Element.prototype.show = function() {
   this.style.display = 'block';
+  return this;
 }
 NodeList.prototype.hide = function() {
   this.item(0).hide();
@@ -115,15 +116,18 @@ NodeList.prototype.hide = function() {
 }
 Element.prototype.hide = function() {
   this.style.display = 'none';
+  return this;
 }
 NodeList.prototype.text = function(txt) {
   this.item(0).text(txt);
+  return this;
 }
 Element.prototype.text = function(txt) {
   if (typeof(txt) === 'undefined') {
     return this.textContent;
   } else {
     this.textContent = txt;
+    return this;
   }
 }
 NodeList.prototype.item = function (i) {
@@ -170,6 +174,7 @@ Element.prototype.val = function(value) {
 NodeList.prototype.focus = function() {
   let first = this.item(0);
   if (first) first.focus();
+  return this;
 }
 
 Element.prototype.index = function(selector) {

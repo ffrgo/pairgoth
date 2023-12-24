@@ -212,6 +212,7 @@ object OpenGotha {
             }
             </Players>
             <Games>
+            // TODO - table number is not any more kinda random like this
             ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
                     games.values.mapIndexed { table, game ->
                         Triple(index + 1, table , game)

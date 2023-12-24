@@ -1,4 +1,10 @@
 <div class="tab-content" id="results">
+  <div id="results-round">
+    Results for round
+    <button class="ui floating choose-round prev-round button">&laquo;</button>
+    <span class="active-round">$round</span>
+    <button class="ui floating choose-round next-round button">&raquo;</button>
+  </div>
   <div id="results-list" class="roundbox">
     <table id="results-table" class="ui celled striped table">
       <thead class="centered">
@@ -8,15 +14,16 @@
         <th>result</th>
       </thead>
       <tbody>
+#set($dispRst = {'?':'?', 'w':'w+', 'b':'b+', '=':'=', 'X':'X', '#':'1-1', '0':'0-0'})
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
   #if($black && $white)
-        <tr data-id="$game.id">
+        <tr id="result-$game.id" data-id="$game.id">
           <td>#$game.t</td>
-          <td class="player" data-id="$white.id" data-sort="$white.name $white.firstname"><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span></td>
-          <td class="player" data-id="$black.id" data-sort="$black.name $black.firstname"><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span></td>
-          <td class="result centered">$game.r</td>
+          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name $white.firstname"><span>#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span></td>
+          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name $black.firstname"><span>#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span></td>
+          <td class="result centered" data-result="$game.r">$dispRst[$game.r]</td>
         </tr>
   #end
 #end

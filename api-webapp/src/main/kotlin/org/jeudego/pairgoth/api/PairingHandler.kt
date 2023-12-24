@@ -33,6 +33,7 @@ object PairingHandler: PairgothApiHandler {
     override fun post(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
+        if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
         //if (!allPlayers && tournament.pairing.type == PairingType.SWISS) badRequest("Swiss pairing requires all pairable players")

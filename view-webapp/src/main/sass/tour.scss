@@ -214,10 +214,20 @@
   #results-list {
     text-align: center;
     .player, .result {
+      background-color: white;
+      color: black;
       cursor: pointer;
       &:hover {
         background: rgba(0,0,0,.05);
         color: rgba(0,0,0,.95);
+      }
+    }
+    .player {
+      &.winner {
+        font-weight: bold;
+      }
+      &.looser {
+        font-style: italic;
       }
     }
   }
