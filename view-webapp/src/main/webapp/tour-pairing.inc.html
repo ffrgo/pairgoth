@@ -15,7 +15,7 @@
 #end
 <div class="tab-content" id="pairing">
   <div id="pairing-content">
-    <div id="pairing-round" class="active-round"-box>
+    <div id="pairing-round" class="active-round-box">
       Pairings for round
       <button class="ui floating choose-round prev-round button">&laquo;</button>
       <span class="active-round">$round</span>
@@ -42,7 +42,7 @@
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
-        <div class="listitem game" data-id="$game.id"><span class="table">#$game.t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span><span class="handicap">$game.h</span></div>
+        <div class="listitem game" data-id="$game.id"><span class="table">#$game.t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span>#if($game.h)<span class="handicap">h$game.h</span>#end</div>
 #end
       </div>
     </div>
