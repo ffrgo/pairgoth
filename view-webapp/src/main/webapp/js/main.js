@@ -253,7 +253,6 @@ onLoad(() => {
 
   // disable hash scrolling
   if (window.location.hash) {
-    console.log("lkhjqlksjdhflkqsjhfd")
     setTimeout(function() {
       window.scrollTo(0, 0);
     }, 1);
