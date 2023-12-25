@@ -190,7 +190,7 @@ class MacMahon(
         )
     ),
     placementParams: PlacementParams = PlacementParams(
-        Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
+        Criterion.MMS, Criterion.SOSM, Criterion.SOSOSM
     ),
     var mmFloor: Int = -20, // 20k
     var mmBar: Int = 0 // 1D

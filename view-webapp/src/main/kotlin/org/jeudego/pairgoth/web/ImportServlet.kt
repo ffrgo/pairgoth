@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse
 
 class ImportServlet: HttpServlet() {
 
-    private val api = ApiTool()
+    private val api by lazy { ApiTool() }
 
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
         val uploads = Upload.handleFileUpload(req)

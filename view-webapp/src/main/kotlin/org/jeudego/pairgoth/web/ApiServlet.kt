@@ -19,7 +19,9 @@ class ApiServlet : AsyncProxyServlet() {
     }
 
     companion object {
-        private val apiRoot = System.getProperty("pairgoth.api.external.url")?.let { "${it.removeSuffix("/")}" }
-            ?: throw Error("no configured API url")
+        private val apiRoot by lazy {
+            WebappManager.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}" }
+                ?: throw Error("no configured API url")
+        }
     }
 }

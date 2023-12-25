@@ -6,14 +6,17 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
+import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
 
 class ApiTool {
     companion object {
         const val JSON = "application/json"
         const val XML = "application/xml"
-        val apiRoot = System.getProperty("pairgoth.api.external.url")?.let { "${it.removeSuffix("/")}/" }
-            ?: throw Error("no configured API url")
+        val apiRoot by lazy {
+            WebappManager.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}/" }
+                ?: throw Error("no configured API url")
+        }
         val logger = LoggerFactory.getLogger("api")
     }
     private val client = OkHttpClient()

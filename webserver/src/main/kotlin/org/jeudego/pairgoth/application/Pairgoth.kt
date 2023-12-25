@@ -32,7 +32,6 @@ import java.util.*
 import java.util.jar.JarFile
 import java.util.regex.Pattern
 
-
 fun main(vararg args: String) {
     try {
         // register a shutdown hook for any global necessary cleanup
@@ -67,13 +66,13 @@ private fun readProperties() {
     val properties = File("./pairgoth.properties")
     if (properties.exists()) {
         serverProps.load(FileReader(properties))
-        serverProps.entries.forEach { entry ->
-            val property = entry.key as String
-            val value = entry.value as String
-            if (!property.startsWith("webapp.ssl.")) {
-                // do not propagate ssl properties further
-                System.setProperty("pairgoth.$property", value)
-            }
+    }
+    serverProps.entries.forEach { entry ->
+        val property = entry.key as String
+        val value = entry.value as String
+        if (!property.startsWith("webapp.ssl.")) {
+            // do not propagate ssl properties further
+            System.setProperty("pairgoth.$property", value)
         }
     }
     // we want colorized output on linux
@@ -118,7 +117,7 @@ private fun launchServer() {
     // create webapps contexts
     val webAppContexts = mutableListOf<WebAppContext>()
     val mode = serverProps["mode"] ?: "standalone"
-    if (mode == "server" || mode == "standalone") webAppContexts.add(createContext("api", "/api"))
+    if (mode == "server" || mode == "standalone") webAppContexts.add(createContext("api", "/api/tour"))
     if (mode == "client" || mode == "standalone") webAppContexts.add(createContext("view", "/"))
 
     // special handling for logger properties
@@ -132,7 +131,12 @@ private fun launchServer() {
         }
     }
 
-    val webappUrl = serverProps.getProperty("webapp.url")?.let { URL(it) } ?: throw Error("missing property webapp.url")
+    val webappUrl = URL(
+        serverProps.getProperty("webapp.protocol") ?: throw Error("missing property webapp.protocol"),
+        serverProps.getProperty("webapp.protocol") ?: throw Error("missing property webapp.protocol"),
+        serverProps.getProperty("webapp.port")?.toInt() ?: 80,
+        "/"
+    )
     val secure = webappUrl.protocol == "https"
 
     // create server
@@ -156,6 +160,9 @@ private fun launchServer() {
 private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
     context.war = "$tmp/pairgoth/webapps/$webapp-webapp-$version.war"
     context.contextPath = contextPath
+    if (webapp == "api") {
+        context.allowNullPathInfo = true
+    }
 }
 
 private fun buildSecureConnector(server: Server, port: Int): ServerConnector {
