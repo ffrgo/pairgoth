@@ -54,7 +54,8 @@ class LanguageFilter : Filter {
             } else {
                 // the request must be redirected
                 val destination = if (askedLanguage != null) target else uri
-                response.sendRedirect("/${preferredLanguage}${destination}")
+                val query = request.queryString ?: ""
+                response.sendRedirect("/${preferredLanguage}${destination}${if (query.isEmpty()) "" else "?$query"}")
             }
         }
     }

@@ -142,7 +142,10 @@ object OpenGotha {
                 country = player.country,
                 club = player.club
             ).also {
-                canonicMap.put("${player.name}${player.firstName}".uppercase(Locale.ENGLISH), it.id)
+                player.participating.toString().forEachIndexed { i,c ->
+                    if (c == '0') it.skip.add(i + 1)
+                }
+                canonicMap.put("${player.name.replace(" ", "")}${player.firstName.replace(" ", "")}".uppercase(Locale.ENGLISH), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
         val gamesPerRound = ogTournament.games.game.groupBy {
@@ -155,7 +158,7 @@ object OpenGotha {
                     black = canonicMap[game.blackPlayer] ?: throw Error("player not found: ${game.blackPlayer}"),
                     white = canonicMap[game.whitePlayer] ?: throw Error("player not found: ${game.whitePlayer}"),
                     handicap = game.handicap,
-                    result = when (game.result) {
+                    result = when (game.result.removeSuffix("_BYDEF")) {
                         "RESULT_UNKNOWN" -> Game.Result.UNKNOWN
                         "RESULT_WHITEWINS" -> Game.Result.WHITE
                         "RESULT_BLACKWINS" -> Game.Result.BLACK

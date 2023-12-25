@@ -163,6 +163,34 @@ function close_modal() {
   $(`.popup`).removeClass('shown');
 }
 
+function screenshot() {
+  const bodyContent = document.body.innerHTML;
+
+  // Create an SVG element
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('width', window.innerWidth);
+  svg.setAttribute('height', window.innerHeight);
+
+  // Create a foreignObject element
+  const foreignObject = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
+  foreignObject.setAttribute('width', '100%');
+  foreignObject.setAttribute('height', '100%');
+
+  // Append the body content to foreignObject
+  foreignObject.innerHTML = bodyContent;
+
+  // Append foreignObject to the SVG
+  svg.appendChild(foreignObject);
+
+  // Create a data URL from the SVG
+  const dataUrl = 'data:image/svg+xml,' + encodeURIComponent(new XMLSerializer().serializeToString(svg));
+
+  // Open the screenshot in a new window/tab (optional)
+  const screenshotWindow = window.open();
+  screenshotWindow.document.write('<img src="' + dataUrl + '" alt="Screenshot">');
+}
+
+
 onLoad(() => {
   $('button.close').on('click', e => {
     let modal = e.target.closest('.popup');
@@ -222,6 +250,14 @@ onLoad(() => {
       }
     }
   });
+
+  // disable hash scrolling
+  if (window.location.hash) {
+    console.log("lkhjqlksjdhflkqsjhfd")
+    setTimeout(function() {
+      window.scrollTo(0, 0);
+    }, 1);
+  }
 
 });
 

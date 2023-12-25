@@ -81,6 +81,7 @@
     position: relative;
     .toggle {
       cursor: pointer;
+      text-align: center;
       input {
         display: none;
       }
@@ -94,7 +95,7 @@
         height: 26px;
         border-radius: 18px;
         background-color: #F7D6A3;
-        display: flex;
+        display: inline-flex;
         align-items: center;
         padding-left: 5px;
         padding-right: 5px;

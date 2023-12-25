@@ -15,7 +15,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         else -> 0.0
     }
 
-    val scores by lazy {
+    private val scores by lazy {
         scoresGetter()
     }
 
@@ -75,6 +75,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             }
         }
     }
+
+    // define mms to be a synonym of scores
+    val mms by lazy { scores }
 
     // SOS related functions given a score function
     val sos by lazy {

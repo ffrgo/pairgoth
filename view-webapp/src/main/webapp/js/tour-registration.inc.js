@@ -44,7 +44,7 @@ function search(needle) {
           let html = resultTemplate.render(result);
           $('#search-result')[0].innerHTML = html;
         } else console.log(result);
-      })
+      });
   } else {
     $('#search-result').clear();
     searchTimer = undefined;

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory
 class ApiTool {
     companion object {
         const val JSON = "application/json"
+        const val XML = "application/xml"
         val apiRoot = System.getProperty("pairgoth.api.external.url")?.let { "${it.removeSuffix("/")}/" }
             ?: throw Error("no configured API url")
         val logger = LoggerFactory.getLogger("api")
@@ -50,4 +51,7 @@ class ApiTool {
     fun delete(url: String, payload: Json? = null) = prepare(url)
         .delete(payload?.toRequestBody() ?: EMPTY_REQUEST)
         .process()
+
+    fun post(url: String, xml: String) =
+        prepare(url).post(xml.toRequestBody(XML.toMediaType())).process()
 }

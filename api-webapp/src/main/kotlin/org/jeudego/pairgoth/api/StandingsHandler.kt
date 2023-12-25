@@ -46,7 +46,7 @@ object StandingsHandler: PairgothApiHandler {
                 RANK -> tournament.pairables.mapValues { it.value.rank }
                 RATING -> tournament.pairables.mapValues { it.value.rating }
                 NBW -> historyHelper.wins
-                MMS -> historyHelper.scores
+                MMS -> historyHelper.mms
                 STS -> nullMap
                 CPS -> nullMap
 

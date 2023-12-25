@@ -1,15 +1,79 @@
-<div class="section">
+<div class="actions section">
   <a href="tour" class="ui blue icon floating button">
     <i class="fa fa-plus-square-o"></i>
     New tournament
   </a>
-</div>
-#foreach($tour in $api.get('tour').entrySet())
-<div class="section">
-  $tour
-  <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button">
-    <i class="fa fa-folder-open-o"></i>
-    Open
+  <a id="import-tournament" class="ui orange icon floating button">
+    <i class="fa fa-upload"></i>
+    Import tournament
   </a>
 </div>
+<div class="tournaments section">
+#foreach($tour in $api.get('tour').entrySet())
+  <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button">
+    <i class="fa fa-folder-open-o"></i>
+    $tour.value
+  </a>
 #end
+</div>
+<div id="import-popup" class="popup">
+  <div class="popup-body">
+    <form id="import-form" class="ui form">
+      <div class="popup-content">
+        <div class="field">
+          <label>OpenGotha file</label>
+          <input type="file" name="file" accept=".xml"/>
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button id="cancel-import" type="button" class="ui gray right labeled icon floating close button">
+          <i class="times icon"></i>
+          Cancel
+        </button>
+        <button id="import" type="button" class="ui green right labeled icon floating button">
+          <i class="plus icon"></i>
+          Import
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<script type="text/javascript">
+  // #[[
+  function doImport() {
+    let form = $('#import-form')[0];
+    let formData = new FormData(form);
+    fetch('/api/import', {
+      method: 'POST',
+      body: formData
+    }).then(resp => {
+      if (resp.ok)  return resp.json();
+      else throw resp;
+    }).then(json => {
+      if (json.success) {
+        console.log(`/tour?id=${json.id}`)
+        document.location.href = `/tour?id=${json.id}`
+      } else {
+        showError(json.error || 'unknown error')
+      }
+    }).catch(err => {
+      error(err);
+    });
+  }
+
+  onLoad(()=>{
+    $('#import-tournament').on('click', e => {
+      modal('import-popup');
+      e.preventDefault();
+      return false;
+    });
+    $('#import').on('click', e => {
+      let files = $('#import-form input')[0].files;
+      if (files.length > 0) {
+        doImport();
+      } else showError('no file choosen');
+      close_modal();
+    });
+  });
+  // ]]#
+</script>

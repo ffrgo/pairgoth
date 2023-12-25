@@ -320,6 +320,7 @@
         max-height: inherit;
       }
       .popup-footer {
+        margin-top: 1em;
         position: relative;
         text-align: justify;
         display: flex;
@@ -342,5 +343,10 @@
   .clickable {
     pointer-events: all;
     cursor: pointer;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
   }
 }

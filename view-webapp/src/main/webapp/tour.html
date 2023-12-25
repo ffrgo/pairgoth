@@ -149,31 +149,35 @@
     });
 
     // prev/next round buttons
-    if (activeRound === 1) {
-      $('.prev-round').addClass('disabled');
-    }
-    if (activeRound === tour_rounds) {
-      $('.next-round').addClass('disabled');
-    }
-    $('.prev-round').on('click', e => {
-      let round = activeRound - 1;
-      if (round > 0) {
-        window.location.search = `id=${tour_id}&round=${round}`
+    if (typeof(activeRound) !== 'undefined') {
+      if (activeRound === 1) {
+        $('.prev-round').addClass('disabled');
       }
-    });
-    $('.next-round').on('click', e => {
-      let round = activeRound + 1;
-      if (round <= tour_rounds) {
-        window.location.search = `id=${tour_id}&round=${round}`
+      if (activeRound === tour_rounds) {
+        $('.next-round').addClass('disabled');
       }
-    });
+      $('.prev-round').on('click', e => {
+        let round = activeRound - 1;
+        if (round > 0) {
+          window.location.search = `id=${tour_id}&round=${round}`
+        }
+      });
+      $('.next-round').on('click', e => {
+        let round = activeRound + 1;
+        if (round <= tour_rounds) {
+          window.location.search = `id=${tour_id}&round=${round}`
+        }
+      });
+    }
   });
   // ]]#
 #include('/js/tour-information.inc.js')
-#include('/js/tour-registration.inc.js')
-#include('/js/tour-pairing.inc.js')
-#include('/js/tour-results.inc.js')
-#include('/js/tour-standings.inc.js')
+#if($tour)
+  #include('/js/tour-registration.inc.js')
+  #include('/js/tour-pairing.inc.js')
+  #include('/js/tour-results.inc.js')
+  #include('/js/tour-standings.inc.js')
+#end
 </script>
 <div id="invalid_character" class="hidden">Invalid character</div>
 <script type="text/javascript" src="/lib/datepicker-1.3.4/datepicker-full.min.js"></script>
