@@ -88,6 +88,12 @@
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>
+  <servlet>
+    <servlet-name>login</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.LoginServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
@@ -109,6 +115,10 @@
   <servlet-mapping>
     <servlet-name>import</servlet-name>
     <url-pattern>/api/import/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>login</servlet-name>
+    <url-pattern>/api/login</url-pattern>
   </servlet-mapping>
 
   <!-- context params -->

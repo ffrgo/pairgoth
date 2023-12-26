@@ -1,8 +1,8 @@
 <div id="login" class="section">
-  <form id="login-form" class="ui form">
+  <form id="login-form" class="ui form" autocomplete="off">
     <div class="field">
       <label>Enter the magic word</label>
-      <input type="text" name="sesame"/>
+      <input type="text" name="sesame" autocomplete="false"/>
       <button type="submit" class="ui green floating button">Log in</button>
     </div>
   </form>
@@ -10,9 +10,9 @@
 <script type="text/javascript">
   onLoad(()=>{
     $('#login-form').on('submit', e => {
-      api.postJson('login', { sesame: $('input[name="sesame"]').val() })
+      api.postJson('login', { sesame: $('input[name="sesame"]')[0].value })
         .then(resp => {
-          if (resp !== 'error') {
+          if (resp !== 'error' && resp.status === 'ok') {
             document.location.href = '/index'
           }
         });

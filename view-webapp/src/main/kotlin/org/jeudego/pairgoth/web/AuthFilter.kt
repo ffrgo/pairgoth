@@ -29,22 +29,31 @@ class AuthFilter: Filter {
         val session: HttpSession? = request.getSession(false)
         val auth = WebappManager.getProperty("auth") ?: throw Error("authentication not configured")
 
-        if (auth == "none" || whitelist.contains(uri) || uri.contains(Regex("\\.(?!html)")) || session?.getAttribute("logged") != null) {
+        if (auth == "none" || whitelisted(uri) || session?.getAttribute("logged") != null) {
             chain.doFilter(req, resp)
         } else {
             // TODO - configure if unauth requests are redirected and/or forwarded
             // TODO - protection against brute force attacks
-            if (uri == "/index") {
+            if (uri.endsWith("/index")) {
                 request.getRequestDispatcher("/index-ffg").forward(req, resp)
             } else {
                 response.sendRedirect("/login")
             }
         }
     }
+
     companion object {
         private val whitelist = setOf(
             "/index-ffg",
-            "/login"
+            "/login",
+            "/api/login"
         )
+
+        fun whitelisted(uri: String): Boolean {
+            if (uri.contains(Regex("\\.(?!html)"))) return true
+            val nolangUri = uri.replace(Regex("^/../"), "/")
+            return whitelist.contains(nolangUri)
+        }
+
     }
 }

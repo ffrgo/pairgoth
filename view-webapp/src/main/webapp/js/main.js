@@ -219,7 +219,7 @@ onLoad(() => {
         break;
       }
       case 'ArrowDown': {
-        if (searchResultShown()) {
+        if (typeof(searchResultShown) === 'function' && searchResultShown()) {
           let lines = $('.result-line');
           if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
           else ++searchHighlight;
@@ -230,7 +230,7 @@ onLoad(() => {
         break;
       }
       case 'ArrowUp': {
-        if (searchResultShown()) {
+        if (typeof(searchResultShown) === 'function' && searchResultShown()) {
           let lines = $('.result-line');
           if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
           else --searchHighlight;
@@ -241,10 +241,12 @@ onLoad(() => {
         break;
       }
       case 'Enter': {
-        if (searchResultShown()) {
-          fillPlayer(searchResult[searchHighlight]);
-        } else {
-          $('#register')[0].click();
+        if (typeof(searchResultShown) === 'function') {
+          if (searchResultShown()) {
+            fillPlayer(searchResult[searchHighlight]);
+          } else {
+            $('#register')[0].click();
+          }
         }
         break;
       }
