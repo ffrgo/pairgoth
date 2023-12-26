@@ -349,4 +349,12 @@
     position: sticky;
     top: 0;
   }
+
+  #landing {
+    text-align: justify;
+  }
+
+  a.disabled {
+    color: darkgray;
+  }
 }

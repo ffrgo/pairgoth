@@ -18,6 +18,11 @@
     <async-supported>true</async-supported>
   </filter>
   <filter>
+    <filter-name>auth-filter</filter-name>
+    <filter-class>org.jeudego.pairgoth.web.AuthFilter</filter-class>
+    <async-supported>true</async-supported>
+  </filter>
+  <filter>
     <filter-name>dispatching-filter</filter-name>
     <filter-class>org.jeudego.pairgoth.web.DispatchingFilter</filter-class>
     <async-supported>true</async-supported>
@@ -31,6 +36,12 @@
   <!-- filters mapping -->
   <filter-mapping>
     <filter-name>webapp-slf4j-logger-ip-tag-filter</filter-name>
+    <url-pattern>/*</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>auth-filter</filter-name>
     <url-pattern>/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>

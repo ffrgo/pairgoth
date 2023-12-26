@@ -1,0 +1,23 @@
+<div id="login" class="section">
+  <form id="login-form" class="ui form">
+    <div class="field">
+      <label>Enter the magic word</label>
+      <input type="text" name="sesame"/>
+      <button type="submit" class="ui green floating button">Log in</button>
+    </div>
+  </form>
+</div>
+<script type="text/javascript">
+  onLoad(()=>{
+    $('#login-form').on('submit', e => {
+      api.postJson('login', { sesame: $('input[name="sesame"]').val() })
+        .then(resp => {
+          if (resp !== 'error') {
+            document.location.href = '/index'
+          }
+        });
+      e.preventDefault();
+      return false;
+    });
+  });
+</script>

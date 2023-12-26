@@ -31,40 +31,6 @@
       </snapshots>
     </repository>
   </repositories>
-
-  <profiles>
-    <profile>
-      <id>manual-properties</id>
-      <activation>
-        <file>
-          <exists>pairgoth.properties</exists>
-        </file>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>properties-maven-plugin</artifactId>
-            <version>1.2.0</version>
-            <executions>
-              <execution>
-                <phase>initialize</phase>
-                <goals>
-                  <goal>read-project-properties</goal>
-                </goals>
-                <configuration>
-                  <files>
-                    <file>pairgoth.properties</file>
-                  </files>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>11</maven.compiler.source>
@@ -76,6 +42,7 @@
     <maven.dependency.plugin.version>3.5.0</maven.dependency.plugin.version>
     <maven.deploy.plugin.version>3.1.1</maven.deploy.plugin.version>
     <maven.enforcer.plugin.version>3.3.0</maven.enforcer.plugin.version>
+    <maven.failsafe.plugin.version>3.2.3</maven.failsafe.plugin.version>
     <maven.install.plugin.version>3.1.1</maven.install.plugin.version>
     <maven.jar.plugin.version>3.3.0</maven.jar.plugin.version>
     <maven.javadoc.plugin.version>3.5.0</maven.javadoc.plugin.version>
@@ -103,14 +70,15 @@
     <pairgoth.webapp.host>localhost</pairgoth.webapp.host>
     <pairgoth.webapp.port>8080</pairgoth.webapp.port>
     <pairgoth.webapp.context>/</pairgoth.webapp.context>
-    <pairgoth.webapp.external.url>http://localhost:8080</pairgoth.webapp.external.url>
+    <pairgoth.webapp.external.url>${pairgoth.webapp.protocol}://${pairgoth.webapp.host}:${pairgoth.webapp.port}/${pairgoth.webapp.context}</pairgoth.webapp.external.url>
     <pairgoth.api.protocol>http</pairgoth.api.protocol>
     <pairgoth.api.host>localhost</pairgoth.api.host>
     <pairgoth.api.port>8085</pairgoth.api.port>
     <pairgoth.api.context>/api</pairgoth.api.context>
-    <pairgoth.api.external.url>http://localhost:8085/api</pairgoth.api.external.url>
+    <pairgoth.api.external.url>${pairgoth.api.protocol}://${pairgoth.api.host}:${pairgoth.api.port}${pairgoth.api.context}</pairgoth.api.external.url>
     <pairgoth.store>file</pairgoth.store>
     <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
+    <pairgoth.auth>none</pairgoth.auth>
     <pairgoth.smtp.sender></pairgoth.smtp.sender>
     <pairgoth.smtp.host></pairgoth.smtp.host>
     <pairgoth.smtp.port>587</pairgoth.smtp.port>
@@ -162,6 +130,11 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>${maven.failsafe.plugin.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
           <version>${maven.install.plugin.version}</version>
         </plugin>
@@ -202,46 +175,6 @@
         </plugin>
 
         <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>3.4.0</version>
-          <executions>
-            <execution>
-              <id>regex-property</id>
-              <goals>
-                <goal>regex-property</goal>
-              </goals>
-              <configuration>
-                <name>webapp.port</name>
-                <value>${webapp.url}</value>
-                <regex>^.*:(\d+).*$</regex>
-                <replacement>$1</replacement>
-                <failIfNoMatch>true</failIfNoMatch>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-antrun-plugin</artifactId>
-          <version>3.1.0</version>
-          <executions>
-            <execution>
-              <id>echo-property</id>
-              <goals>
-                <goal>run</goal>
-              </goals>
-              <configuration>
-                <tasks>
-                  <echo>----------------- webapp.port=${webapp.port}</echo>
-                </tasks>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
           <groupId>com.mycila</groupId>
           <artifactId>license-maven-plugin</artifactId>
           <version>${license.plugin.version}</version>
@@ -250,6 +183,11 @@
           <groupId>org.jetbrains.kotlin</groupId>
           <artifactId>kotlin-maven-plugin</artifactId>
           <version>${kotlin.version}</version>
+        </plugin>
+        <plugin>
+          <artifactId>properties-maven-plugin</artifactId>
+          <groupId>org.codehaus.mojo</groupId>
+          <version>1.2.1</version>
         </plugin>
       </plugins>
     </pluginManagement>

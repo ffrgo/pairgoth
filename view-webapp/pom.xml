@@ -91,6 +91,7 @@
                         <pairgoth.logger.level>${pairgoth.logger.level}</pairgoth.logger.level>
                         <pairgoth.logger.format>${pairgoth.logger.format}</pairgoth.logger.format>
                         <pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>debug</pairgoth.logger.level.org.jeudego.pairgoth.web.ApiServlet.api>
+                        <pairgoth.auth>${pairgoth.auth}</pairgoth.auth>
                         <org.slf4j.simpleLogger.defaultLogLevel>debug</org.slf4j.simpleLogger.defaultLogLevel>
                     </systemProperties>
                     <webApp>
