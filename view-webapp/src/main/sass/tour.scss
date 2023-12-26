@@ -34,7 +34,7 @@
   div.field:not(.hidden) {
     display: flex;
     flex-flow: column nowrap;
-    justify-content: space-around;
+    justify-content: space-between;
     margin: 1px;
     background-color: #eeeeee;
     &.centered {

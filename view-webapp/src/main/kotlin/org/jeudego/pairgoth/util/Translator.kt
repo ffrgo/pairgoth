@@ -85,7 +85,7 @@ class Translator private constructor(private val iso: String) {
                 // See how it impacts the remaining.
 
                 var token: String = capture // StringEscapeUtils.unescapeHtml4(capture)
-                if (StringUtils.containsOnly(token, "\r\n\t -;:.'\"/<>\u00A00123456789€[]!")) output.print(capture) else {
+                if (StringUtils.containsOnly(token, "\r\n\t -;:.'\"/<>\u00A00123456789€[]!?")) output.print(capture) else {
                     token = normalize(token)
                     token = translate(token)
                     output.print(token) // (StringEscapeUtils.escapeHtml4(token))
@@ -136,7 +136,7 @@ class Translator private constructor(private val iso: String) {
         get() = textAccessor[this] as String
         set(value: String) { textAccessor[this] = value }
 
-    private val saveMissingTranslations = System.getProperty("pairgoth.webapp.env") == "dev"
+    private val saveMissingTranslations = WebappManager.getProperty("env") == "dev"
     private val missingTranslations: MutableSet<String> = ConcurrentSkipListSet()
 
     private fun reportMissingTranslation(enText: String) {
@@ -148,8 +148,12 @@ class Translator private constructor(private val iso: String) {
         private val textAccessor = ASTText::class.java.getDeclaredField("ctext").apply { isAccessible = true }
         private val logger = LoggerFactory.getLogger("translation")
         private val translatedTemplates: MutableMap<Pair<String, String>, Template> = ConcurrentHashMap<Pair<String, String>, Template>()
+        private val punctuation = "[ \\r\\n\\t /–-]|&nbsp;|&dash;|&laquo;|&raquo;:,"
         private val textExtractor = Pattern.compile(
-            "<[^>]+\\s(?:placeholder|title)=\"(?<placeholder>[^\"]*)\"[^>]*>|(?<=>)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<|$)|(?<=>|^)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?<text2>[^<>]+?)(?:[ \\r\\n\\t\u00A0/–-]|&nbsp;|&dash;)*(?=<)|^(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?<text3>[^<>]+?)(?:[ \\r\\n\\t /–-]|&nbsp;|&dash;)*(?=$)",
+            "<[^>]+\\s(?:placeholder|title)=\"(?<placeholder>[^\"]*)\"[^>]*>|" + // text inside placeholder or title attribute
+            "(?<=>)(?:${punctuation})*(?<text>[^<>]+?)(?:${punctuation})*(?=<|$)|" + // text between a tag and another tag or the end
+            "(?<=>|^)(?:${punctuation})*(?<text2>[^<>]+?)(?:${punctuation})*(?=<)|" + // text between a tag or the beginning and another tag
+            "^(?:${punctuation})*(?<text3>[^<>]+?)(?:${punctuation})*(?=$)", // text between beginning and end
             Pattern.DOTALL
         )
         private val ignoredTags = setOf("head", "script", "style")

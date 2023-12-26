@@ -1,28 +1,168 @@
-New tournament	Nouveau tournoi
-Open	Ouvrir
+(docker required)	(docker requis)
+(java required)	(java requis)
+(not yet available)	(pas encore disponible)
+, allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	, vous permettant de complètement le modifier. N’oubliez pas de partager vos améliorations !
+, the well known pairing system software developed by	, le logiciel d’appariement très connu développé par
+, your Go Pairing Engine!	, votre logiciel d’appariement de Go !
+.ui.form input[type=checkbox][name=online] { vertical-align: initial; }	
+13x13	
+19x19	
+1st round seeding	méthode 1è ronde
+9x9	
+: If you prefer convenience, you can simply use the	: Si vous préférez la commodité, vous pouvez simplement utiliser l’instance
+: This mode allows you to run	: Ce mode vous permet de lancer
+: This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: Ce mode est le plus adapté pour de grands événements de Go comme les congrès, il permet d’enregistrer les joueurs, d’entrer les résultats et de gérer les appariements depuis plusieurs postes à la fois.
+: the	: le projet
+?	
+AGA	
+Add player	Ajouter
+At its core,	&nbsp;
+BIP	
+Browse	Parcourir les sources de
+Byo-yomi periods	Périodes de byo-yomi
+Byo-yomi stones	Pierres de byo-yomi
+Byo-yomi time	Durée du byo-yomi
+Canadian byo-yomi	Byo-yomi canadien
 Cancel	Annuler
-Infos	Infos
-Next	Suivant
-Pairing	Appariement
-Type	Type
-(pairgo / rengo)	(pairgo / rengo)
-(teams of individual players)	(équipes de joueurs individuels)
+Change	Mettre à jour
+Chinese rules	Règles chinoises
+Close	Fermer
+Club	Club
+Compile from the sources	Compiler depuis les sources
+Country	Pays
+Create	Créer
+Crit	Crit
+Ctr	Pays
+Dates	Dates
+Download	Télécharger
+Download the standalone web interface module which suits your need, then follow	Télécharger le module d’interface web qui correspond à vos besoins, puis suivez
+EGF	
+Edit	Éditer
+Enter the magic word	Entrer le mot magique
+FFG	
+Family name	Nom de famille
+First name	Prénom
+Fischer timing	Cadence Fisher
+French rules	Règles françaises
+Given name	Prénom
+Goban	Goban
+Hd correction	Correction hd
+Hd treshold	Seuil hd
+How to use	Comment utiliser
+Import	Importer
+Import tournament	Importer un tournoi
+Increment	Incrément
+Individual players	Joueurs individuels
+Information	Information
+Invalid tournament id	Identifiant de tournoi invalide
+Japanese rules	Règles japonaises
+Komi	Komi
+Launch	Lancer
+Launch a pairing server	Lancer un serveur d’appariement
+Launch a standalone instance	Lancer une instance indépendante
+Location	Lieu
+Log in	Se connecter
+Luc Vannier	Luc Vannier
+MM bar	Barre MM
+Mac Mahon	Mac Mahon
 MacMahon	MacMahon
-Number of rounds	Nombre de rondes
-Partner teams tournament of	Tournoi d'équipes partenaires de
-Standard tournament of individual players	Tournoi standard de joueurs individuels
+Main time	Temps principal
+Max time	Temps max
+Name	Nom
+Nbw	Nbv
+New Tournament	Nouveau Tournoi
+New tournament	Nouveau tournoi
+Next rounds seeding	Méthode rondes suivantes
+Num	Num
+OpenGotha file	Fichier OpenGotha
+Pair	Apparier
+Pair-go tournament	Tournoi de pair-go
+Pairing	Appariement
+Pairings for round	Appariement pour la ronde
+Participation	Participation
+Plc	Plc
+R	R
+Rank	Niveau
+Rating	Classement
+Register	Inscrire
+Registration	Inscriptions
+Rengo with 2 players teams	Rengo par équipes de 2
+Rengo with 3 players team	Rengo par équipes de 3
+Required field	Champs requis
+Results	Résultats
+Results for round	Résultats pour la ronde
+Round-robin	Toutes rondes
+Rounds	Rondes
+Rules	Règles
+Search...	Chercher…
+Short name	Nom de code
+Since the project is still in alpha, the sources are only available to FFG actors. If that's your case, you can access the sources here:	Comme le projet est encore en « alpha », les sources sont seulement accessibles aux acteurs FFG. Si c’est votre cas, vous pouvez accéder aux sources ici :
+Split and fold	Couper-plier
+Split and random	Couper-aléatoire
+Split and slip	Couper-glisser
+Standard byo-yomi	Buo-yomi standard
+Standings	Classement
+Standings after round	Classement après la ronde
+Stay in the browser	Rester dans le navigateur
+Sudden death	Mort subite
 Swiss	Suisse
-Teams tournament of	Tournoi par équipes de
-Tournament dates	Dates du tournoi
-Tournament name	Nom du tournoi
-Tournament pairing	Appariement du tournoi
-Tournament short name	Nom abbrégé du tournoi
+Team of 2 individual players	Équipe de 2 joueurs individuels
+Team of 3 individual players	Équipe de 3 joueurs individuels
+Team of 4 individual players	Équipe de 4 joueurs individuels
+Team of 5 individual players	Équipe de 5 joueurs individuels
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. You can choose to use either the standard interface (which is meant to look a lot like opengotha) and the web interface (by launching the engine and connecting to it using a browser).	C’est la meilleure option si vous préférer le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Vous pouvez choisir d’utiliser soit l’interface standard (qui est conçue pour beaucoup ressembler à OpenGotha) soit l’interface web (en lançant le moteur et en s’y connectant avec un navigateur).
+Time system	Temps
 Tournament type	Type de tournoi
-end date	date de fin
-from	du
-players	joueurs
-rounds	rondes
-short_name	nom_tournoi
-start date	date de début
-to	au
-
+Unpair	Désapparier
+Unregister	Désinscrire
+Update	Mettre à jour
+We offer you the flexibility to use	Nous vous offrons la flexibilité d’utiliser
+Welcome to	Bienvenue sur
+What is	Qu’est-ce que
+Your feedback is most welcome!	Vos retours sont les bienvenus !
+and uses the same algorithm internally, as well as import and export features towards its format.	et utilise le même algorithme en interne, ainsi que des fonctionnalités d’import et d’export vers et depuis son format.
+apache licence	licence Apache
+black	noir
+checked	
+"class=""tab-content"""	
+club	club
+country	pays
+d	d
+edit	
+first name	prénom
+from	de
+h	h
+hidden	
+in a way that best suits your needs. Here are your options:	de la manière qui répond le mieux à vos besoin. Voici vos options :
+instance graciously hosted by the French Go Federation.	gracieusement hébergée par la Fédération Française de Go
+is a Go tournament pairing engine designed to make your tournament experience effortless.	est un logiciel d’appariement conçu pour faciliter l’organisation de tournoi.
+is the successor of	est le successeur d'
+k	k
+last name	nom de famille
+looser	perdant
+on your local computer.	sur votre ordinateur local.
+online tournament	tournoi en ligne
+opengotha	OpenGotha
+or	ou
+pairable players	joueurs disponibles
+pairgoth	pairgoth
+pairing system, ideal for championships with no handicap games, as well as the	, idéal pour les championnats sans handicap, ainsi que le système d’appariement
+pairing system, more suited for classical tournaments and cups. It is still in an alpha stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il est encore à une phase « alpha ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
+project is fully open source, and under the very permissive	est un logiciel libre, et sous la très permissive
+result	résultat
+selected	
+sources	sources
+sources on FFG's gitlab	sur le serveur gitab de la FFG
+standalone, standard interface	indépendant, interface standard
+standalone, web interface	indépendant, interface web
+standalone, web interface, via docker	indépendant, interface web, via docker
+table	table
+the configuration guide	le guide de configuration
+to	à
+unpairable players	joueurs non disponibles
+"value="""	
+version 0.1 supports the	version 0.1 supporte le système d’appariement
+white	blanc
+white vs. black	blanc vs. Noir
+winner	gagnant
+{	
