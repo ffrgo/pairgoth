@@ -61,11 +61,13 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     }
 
     // Set of all implied players for each round
-    val playersPerRound = history.map {
-        it.fold(mutableSetOf<ID>()) { acc, next ->
-            acc.add(next.white)
-            acc.add(next.black)
-            acc
+    val playersPerRound: List<Set<ID>> by lazy {
+        history.map {
+            it.fold(mutableSetOf<ID>()) { acc, next ->
+                acc.add(next.white)
+                acc.add(next.black)
+                acc
+            }
         }
     }
 

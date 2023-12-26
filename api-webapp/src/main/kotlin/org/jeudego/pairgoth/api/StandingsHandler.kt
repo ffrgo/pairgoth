@@ -29,11 +29,17 @@ object StandingsHandler: PairgothApiHandler {
             return min(max(pairable.rank, tournament.pairing.mmFloor), tournament.pairing.mmBar) + MacMahonSolver.mmsZero
         }
 
-        val historyHelper = HistoryHelper(tournament.historyBefore(round)) {
+        //  CB avoid code redundancy with solvers
+        val historyHelper = HistoryHelper(tournament.historyBefore(round + 1)) {
             if (tournament.pairing.type == PairingType.SWISS) wins
             else tournament.pairables.mapValues {
                 it.value.let {
-                    pairable -> mmBase(pairable) + ( nbW(pairable) ?: 0.0) // TODO take tournament parameter into account
+                    pairable ->
+                        mmBase(pairable) +
+                        (nbW(pairable) ?: 0.0) + // TODO take tournament parameter into account
+                        (1..round).map { round ->
+                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
+                        }.sum() * tournament.pairing.pairingParams.main.mmsValueAbsent
                 }
             }
         }
