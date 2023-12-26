@@ -10,6 +10,7 @@ import org.jeudego.pairgoth.store.Store
 import org.w3c.dom.Element
 import java.util.*
 import javax.xml.datatype.XMLGregorianCalendar
+import kotlin.math.roundToInt
 
 private const val MILLISECONDS_PER_DAY = 86400000
 fun XMLGregorianCalendar.toLocalDate() = LocalDate(year, month, day)
@@ -67,7 +68,11 @@ object OpenGotha {
                 seedSystem1 = parseSeedSystem(pairParams.paiMaSeedSystem1),
                 seedSystem2 = parseSeedSystem(pairParams.paiMaSeedSystem2 ?: "SPLITANDSLIP"),
                 additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
-                additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE"))
+                additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE")),
+                nbwValueAbsent = genParams.genNBW2ValueAbsent.toDouble() / 2.0,
+                nbwValueBye = genParams.genNBW2ValueBye.toDouble() / 2.0,
+                mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0,
+                mmsValueBye = genParams.genMMS2ValueBye.toDouble() / 2.0,
             ),
             secondary = SecondaryCritParams(
                 barThresholdActive = pairParams.paiSeBarThresholdActive.toBoolean(),
@@ -262,7 +267,15 @@ object OpenGotha {
                 displayRank(
                     if (tournament.pairing is MacMahon) tournament.pairing.mmFloor else -30
                 ).uppercase(Locale.ROOT)
-            }" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
+            }" genMMS2ValueAbsent="${
+            (tournament.pairing.pairingParams.main.mmsValueAbsent * 2).roundToInt()
+            }" genMMS2ValueBye="${
+            (tournament.pairing.pairingParams.main.mmsValueBye * 2).roundToInt()
+            }" genMMZero="30K" genNBW2ValueAbsent="${
+            (tournament.pairing.pairingParams.main.nbwValueAbsent * 2).roundToInt()
+            }" genNBW2ValueBye="${
+            (tournament.pairing.pairingParams.main.nbwValueBye * 2).roundToInt()
+            }" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
             <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
             <PlacementParameterSet>
             <PlacementCriteria>

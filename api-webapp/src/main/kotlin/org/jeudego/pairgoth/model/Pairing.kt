@@ -48,6 +48,10 @@ data class MainCritParams(
     val seedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
     val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
     val additionalPlacementCritSystem2: Criterion = Criterion.NONE,
+    val nbwValueAbsent: Double = 0.0,
+    val nbwValueBye: Double = 1.0,
+    val mmsValueAbsent: Double = 0.5,
+    val mmsValueBye: Double = 1.0
 ) {
     enum class DrawUpDown { TOP, MIDDLE, BOTTOM }
     enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
@@ -239,8 +243,12 @@ fun MainCritParams.Companion.fromJson(json: Json.Object, localDefault: MainCritP
     seedSystem1 = json.getString("firstSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: localDefault?.seedSystem1 ?: default.seedSystem1,
     seedSystem2 = json.getString("secondSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: localDefault?.seedSystem2 ?: default.seedSystem2,
     additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem1 ?: default.additionalPlacementCritSystem1,
-    additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem2 ?: default.additionalPlacementCritSystem2
-)
+    additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem2 ?: default.additionalPlacementCritSystem2,
+    nbwValueAbsent = json.getDouble("nbwValueAbsent") ?: localDefault?.nbwValueAbsent ?: default.nbwValueAbsent,
+    nbwValueBye = json.getDouble("nbwValueBye") ?: localDefault?.nbwValueBye ?: default.nbwValueBye,
+    mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: localDefault?.mmsValueAbsent ?: default.mmsValueAbsent,
+    mmsValueBye = json.getDouble("mmsValueBye") ?: localDefault?.mmsValueBye ?: default.mmsValueBye
+    )
 
 fun MainCritParams.toJson() = Json.Object(
     "catWeight" to categoriesWeight,
