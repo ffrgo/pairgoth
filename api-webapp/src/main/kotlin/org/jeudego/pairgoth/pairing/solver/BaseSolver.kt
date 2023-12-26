@@ -187,13 +187,19 @@ sealed class BaseSolver(
         // This cost is never applied if potential Handicap != 0
         // It is fully applied if wbBalance(sP1) and wbBalance(sP2) are strictly of different signs
         // It is half applied if one of wbBalance is 0 and the other is >=2
-        val potentialHd: Int = pairing.handicap.handicap(p1, p2)
+        val hd1 = pairing.handicap.handicap(p1, p2)
+        val hd2 = pairing.handicap.handicap(p2, p1)
+        val potentialHd: Int = max(hd1, hd2)
         val score = if (potentialHd == 0) {
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
             if (wb1 * wb2 < 0) colorBalanceWeight
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
-        } else 0.0
+        } else {
+            // apply a *big* score to let the stronger player have white
+            if (hd2 == 0) colorBalanceWeight * 10
+            else 0.0
+        }
         return score
     }
 
