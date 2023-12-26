@@ -79,6 +79,7 @@
     <pairgoth.store>file</pairgoth.store>
     <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
     <pairgoth.auth>none</pairgoth.auth>
+    <pairgoth.auth.sesame></pairgoth.auth.sesame>
     <pairgoth.smtp.sender></pairgoth.smtp.sender>
     <pairgoth.smtp.host></pairgoth.smtp.host>
     <pairgoth.smtp.port>587</pairgoth.smtp.port>

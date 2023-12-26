@@ -82,6 +82,8 @@ object TestAPI {
 
 // Get a list of resources
 
-fun getTestResources(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path").listFiles()
+fun getTestResources(path: String) = getTestFile(path).listFiles()
 
 fun getTestFile(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path")
+
+fun getOutputFile(path: String) = File("${System.getProperty("test.build.dir")}/$path")

@@ -50,6 +50,9 @@
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>com.republicate:webapp-slf4j-logger</classpathDependencyExclude>
                     </classpathDependencyExcludes>
+                    <systemPropertyVariables>
+                        <test.build.dir>${project.build.testOutputDirectory}</test.build.dir>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>

@@ -176,13 +176,13 @@ class BasicTests: TestBase() {
         var games = TestAPI.post("/api/tour/$aTournamentID/pair/1", Json.Array("all")).asArray()
         aTournamentGameID = (games[0] as Json.Object).getInt("id")
         val possibleResults = setOf(
-            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"?","dd":0}]""",
-            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"?","dd":0}]"""
+            """[{"id":$aTournamentGameID,"t":1,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"?","dd":0}]""",
+            """[{"id":$aTournamentGameID,"t":1,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"?","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "pairing differs")
-        games = TestAPI.get("/api/tour/$aTournamentID/res/1").asObject().getArray("games")!!
+        games = TestAPI.get("/api/tour/$aTournamentID/res/1").asArray()!!
         assertTrue(possibleResults.contains(games.toString()), "results differs")
-        val empty = TestAPI.get("/api/tour/$aTournamentID/pair/1").asArray()
+        val empty = TestAPI.get("/api/tour/$aTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[]", empty.toString(), "no more pairables for round 1")
     }
 
@@ -192,8 +192,8 @@ class BasicTests: TestBase() {
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val games = TestAPI.get("/api/tour/$aTournamentID/res/1")
         val possibleResults = setOf(
-            """[{"id":$aTournamentGameID,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"b","dd":0}]""",
-            """[{"id":$aTournamentGameID,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"b","dd":0}]"""
+            """[{"id":$aTournamentGameID,"t":1,"w":$aPlayerID,"b":$anotherPlayerID,"h":0,"r":"b","dd":0}]""",
+            """[{"id":$aTournamentGameID,"t":1,"w":$anotherPlayerID,"b":$aPlayerID,"h":0,"r":"b","dd":0}]"""
         )
         assertTrue(possibleResults.contains(games.toString()), "results differ")
     }

@@ -12,6 +12,8 @@ import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 import java.io.File
+import java.io.OutputStream
+import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.abs
@@ -28,8 +30,8 @@ sealed class BaseSolver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
-        val DEBUG_EXPORT_WEIGHT = false
         var byePlayers: MutableList<Pairable> = mutableListOf()
+        var weightsLogger: PrintWriter? = null
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -53,11 +55,9 @@ sealed class BaseSolver(
         val WEIGHTS_FILE = "src/test/resources/weights.txt"
         val dec = DecimalFormat("#.#")
 
-        if (DEBUG_EXPORT_WEIGHT){
-            File(WEIGHTS_FILE).writeText("Round "+round.toString()+"\n")
-            //else File(WEIGHTS_FILE).appendText("Round "+round.toString()+"\n")
-            File(WEIGHTS_FILE).appendText("Costs\n")
-            // println("placement criteria" + placement.criteria.toString())
+        weightsLogger?.apply {
+            this.println("Round $round")
+            this.println("Costs")
         }
 
         var chosenByePlayer: Pairable = ByePlayer
@@ -84,26 +84,24 @@ sealed class BaseSolver(
         }
 
         for (i in nameSortedPairables.indices) {
-            // println(nameSortedPairables[i].nameSeed() + " id="+nameSortedPairables[i].id.toString()+" clasmt="+nameSortedPairables[i].placeInGroup.toString())
             for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
-                if (DEBUG_EXPORT_WEIGHT)
-                {
-                    File(WEIGHTS_FILE).appendText("Player1Name="+p.nameSeed()+"\n")
-                    File(WEIGHTS_FILE).appendText("Player2Name="+q.nameSeed()+"\n")
-                    File(WEIGHTS_FILE).appendText("baseDuplicateGameCost="+dec.format(pairing.base.avoidDuplicatingGames(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("baseRandomCost="+dec.format(pairing.base.applyRandom(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("baseBWBalanceCost="+dec.format(pairing.base.applyColorBalance(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("mainCategoryCost="+dec.format(pairing.main.avoidMixingCategory(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("mainScoreDiffCost="+dec.format(pairing.main.minimizeScoreDifference(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("mainDUDDCost="+dec.format(pairing.main.applyDUDD(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("mainSeedCost="+dec.format(pairing.main.applySeeding(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("secHandiCost="+dec.format(pairing.handicap.handicap(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("secGeoCost="+dec.format(pairing.geo.apply(p, q))+"\n")
-                    File(WEIGHTS_FILE).appendText("totalCost="+dec.format(openGothaWeight(p,q))+"\n")
+                weightsLogger?.apply {
+                    this.println("Player1Name=${p.nameSeed()}")
+                    this.println("Player2Name=${q.nameSeed()}")
+                    this.println("baseDuplicateGameCost=${dec.format(pairing.base.avoidDuplicatingGames(p, q))}")
+                    this.println("baseRandomCost=${dec.format(pairing.base.applyRandom(p, q))}")
+                    this.println("baseBWBalanceCost=${dec.format(pairing.base.applyColorBalance(p, q))}")
+                    this.println("mainCategoryCost=${dec.format(pairing.main.avoidMixingCategory(p, q))}")
+                    this.println("mainScoreDiffCost=${dec.format(pairing.main.minimizeScoreDifference(p, q))}")
+                    this.println("mainDUDDCost=${dec.format(pairing.main.applyDUDD(p, q))}")
+                    this.println("mainSeedCost=${dec.format(pairing.main.applySeeding(p, q))}")
+                    this.println("secHandiCost=${dec.format(pairing.handicap.handicap(p, q))}")
+                    this.println("secGeoCost=${dec.format(pairing.geo.apply(p, q))}")
+                    this.println("totalCost=${dec.format(openGothaWeight(p,q))}")
                     //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
 
                 }
@@ -117,14 +115,11 @@ sealed class BaseSolver(
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
 
-/*        println(sorted.size)
-        if (chosenByePlayer != ByePlayer) sorted.add(listOf(chosenByePlayer, ByePlayer))
-        println(sorted.size)*/
-
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
+        /*
         if (DEBUG_EXPORT_WEIGHT) {
             //println("DUDD debug")
             //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
@@ -152,6 +147,7 @@ sealed class BaseSolver(
             val dec = DecimalFormat("#.#")
             println("sumOfWeights = " + dec.format(sumOfWeights))
         }
+         */
 
         return result
     }
@@ -243,20 +239,9 @@ sealed class BaseSolver(
 
         return score
     }
-    open fun debug(p: Pairable) {
-
-    }
     open fun MainCritParams.minimizeScoreDifference(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         val scoreRange: Int = groupsCount
-        if (p1.name == "Lefebvre" && p2.name == "Bonjean") {
-            println("p1 ${p1.name} ${p1.group} ${p1.nbW}")
-            debug(p1)
-
-            println("p2 ${p2.name} ${p2.group} ${p2.nbW}")
-            debug(p2)
-
-        }
         if (scoreRange != 0){
             val x = abs(p1.group - p2.group).toDouble() / scoreRange.toDouble()
             score = concavityFunction(x, scoreWeight)
@@ -265,7 +250,7 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
@@ -346,6 +331,7 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
+            /*
             if(debug){
                 println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
@@ -354,6 +340,7 @@ sealed class BaseSolver(
                 println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
                 println("score = " + score.toString())
             }
+             */
 
         }
 
@@ -367,7 +354,7 @@ sealed class BaseSolver(
         return score
     }
 
-    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
+    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         // Apply seeding for players in the same group
         if (p1.group == p2.group) {
@@ -403,6 +390,7 @@ sealed class BaseSolver(
                 }
             }
 
+            /*
             if(debug){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
                 println("Seed Sytem = " + currentSeedSystem.toString())
@@ -410,6 +398,7 @@ sealed class BaseSolver(
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
             }
+             */
         }
         return Math.round(score).toDouble()
     }
@@ -446,7 +435,6 @@ sealed class BaseSolver(
         } else {
             0.0
         }
-        //println("countryRatio="+countryRatio.toString())
 
         // Same club and club group (TODO club group)
         var clubRatio = 0.0
