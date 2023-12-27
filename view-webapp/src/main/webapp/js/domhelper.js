@@ -47,6 +47,7 @@ Element.prototype.toggleClass = function(className) {
   return this;
 }
 NodeList.prototype.hasClass = function(className) {
+  if (this.length === 0) return false;
   return this.item(0).classList.contains(className);
 }
 Element.prototype.hasClass = function(className) {
