@@ -139,11 +139,7 @@
             info.textContent = txt;
           }
         } else {
-          if (input.attr('name') === 'location' && $('input[name="online"]')[0].checked) {
-            info.textContent = 'online';
-          } else {
-            info.textContent = input.value;
-          }
+          info.textContent = input.value;
         }
       }
     });

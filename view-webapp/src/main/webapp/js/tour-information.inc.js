@@ -112,7 +112,7 @@ onLoad(() => {
       rounds: form.val('rounds'),
       country: form.val('country'),
       online: form.val('online'),
-      location: form.val('online') ? "" : form.val('location'),
+      location: form.val('location'),
       pairing: {
         type: form.val('pairing'),
         // mmFloor: form.val('mmFloor'),
