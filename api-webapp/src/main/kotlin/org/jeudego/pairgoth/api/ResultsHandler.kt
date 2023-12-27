@@ -21,7 +21,6 @@ object ResultsHandler: PairgothApiHandler {
     override fun put(request: HttpServletRequest): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        if (round != tournament.lastRound()) badRequest("cannot enter results in other rounds but the last")
         val payload = getObjectPayload(request)
         val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
         game.result = Game.Result.fromSymbol(payload.getChar("result") ?: badRequest("missing result"))

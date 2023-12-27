@@ -42,10 +42,17 @@ onLoad(()=>{
   });
   $('#pair').on('click', e => {
     let parts = $('#pairables')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    if (parts.length == 0) {
+      $('#pairables .listitem').addClass('selected');
+      parts = $('#pairables')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    }
     pair(parts);
   });
   $('#unpair').on('click', e => {
     let games = $('#paired')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    if (games.length == 0) {
+      games = $('#paired')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
+    }
     unpair(games);
   });
 });
