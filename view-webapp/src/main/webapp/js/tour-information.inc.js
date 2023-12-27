@@ -99,6 +99,22 @@ onLoad(() => {
     overwrite: true
   });
 
+  $('#export').on('click', e => {
+    let form = $('#tournament-infos')[0];
+    let shortName = form.val('shortName');
+    let headers = headers();
+    headers['Accept'] = 'application/xml';
+    fetch(`${base}tour/${tour_id}`, {
+      headers: headers
+    }).then(resp => {
+      if (resp.ok) return resp.text()
+      else throw "export error"
+    }).then(txt => {
+      let blob = new Blob(['\uFEFF', txt], {type: 'application/xml;charset=utf-8'});
+      downloadFile(blob, `${shortName}.xml`);
+    }).catch(err => showError(err));
+  });
+
   $('#tournament-infos').on('submit', e => {
     e.preventDefault();
     let form = e.target;
