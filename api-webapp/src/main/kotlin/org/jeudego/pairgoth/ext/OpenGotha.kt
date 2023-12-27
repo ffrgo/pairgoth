@@ -222,13 +222,14 @@ object OpenGotha {
             <Games>
             // TODO - table number is not any more kinda random like this
             ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
-                    games.values.mapIndexed { table, game ->
-                        Triple(index + 1, table , game)
+                    games.values.mapIndexedNotNull { table, game ->
+                        if (game.black == 0 || game.white == 0) null
+                        else Triple(index + 1, table , game)
                     }
                 }.joinToString("\n") { (round, table, game) ->
                     """<Game blackPlayer="${
                         (tournament.pairables[game.black]!! as Player).let { black ->
-                            "${black.name}${black.firstname}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
+                            "${black.name.replace(" ", "")}${black.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
                         }
                     }" handicap="0" knownColor="true" result="${
                         when (game.result) {
@@ -252,6 +253,20 @@ object OpenGotha {
             }
             </Games>
             <ByePlayer>
+            ${
+                (1..tournament.lastRound()).map { round ->
+                    tournament.games(round).values.firstNotNullOfOrNull { g -> 
+                        if (g.black == 0 || g.white == 0) g else null
+                    }?.let {
+                        tournament.pairables[
+                            if (it.black == 0) it.white
+                            else it.black
+                        ] as Player
+                    }?.let { p ->
+                        "<ByePlayer player=\"${p.name.replace(" ", "")}${p.firstname.replace(" ", "")}\" roundNumber=\"${round}\"/>"
+                    }
+                }.joinToString("\n")
+            }
             </ByePlayer>
             <TournamentParameterSet>
             <GeneralParameterSet bInternet="${tournament.online}" basicTime="${tournament.timeSystem.mainTime}" beginDate="${tournament.startDate}" canByoYomiTime="${tournament.timeSystem.byoyomi}" complementaryTimeSystem="${when(tournament.timeSystem.type) {

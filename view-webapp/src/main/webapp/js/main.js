@@ -165,6 +165,7 @@ function close_modal() {
 
 function downloadFile(blob, filename) {
   let url = URL.createObjectURL(blob);
+  let link = document.createElement("a");
   link.setAttribute("href", url);
   link.setAttribute("download", filename);
   link.style.visibility = 'hidden';

@@ -102,15 +102,15 @@ onLoad(() => {
   $('#export').on('click', e => {
     let form = $('#tournament-infos')[0];
     let shortName = form.val('shortName');
-    let headers = headers();
-    headers['Accept'] = 'application/xml';
+    let hdrs = headers();
+    hdrs['Accept'] = 'application/xml';
     fetch(`${base}tour/${tour_id}`, {
-      headers: headers
+      headers: hdrs
     }).then(resp => {
       if (resp.ok) return resp.text()
       else throw "export error"
     }).then(txt => {
-      let blob = new Blob(['\uFEFF', txt], {type: 'application/xml;charset=utf-8'});
+      let blob = new Blob(['\uFEFF', txt.trim()], {type: 'application/xml;charset=utf-8'});
       downloadFile(blob, `${shortName}.xml`);
     }).catch(err => showError(err));
   });
