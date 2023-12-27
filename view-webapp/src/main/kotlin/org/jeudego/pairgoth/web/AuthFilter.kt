@@ -46,7 +46,8 @@ class AuthFilter: Filter {
         private val whitelist = setOf(
             "/index-ffg",
             "/login",
-            "/api/login"
+            "/api/login",
+            "api/logout"
         )
 
         fun whitelisted(uri: String): Boolean {

@@ -94,6 +94,12 @@
     <load-on-startup>1</load-on-startup>
     <async-supported>true</async-supported>
   </servlet>
+  <servlet>
+    <servlet-name>logout</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.LogoutServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
@@ -119,6 +125,10 @@
   <servlet-mapping>
     <servlet-name>login</servlet-name>
     <url-pattern>/api/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>logout</servlet-name>
+    <url-pattern>/api/logout</url-pattern>
   </servlet-mapping>
 
   <!-- context params -->

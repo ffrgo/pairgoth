@@ -43,8 +43,15 @@
     <h1 id="title">
       #if($tour)$esc.html($tour.name)#end
     </h1>
-    <div id="lang">
-      <i class="$translate.flags[$request.lang] flag"></i>
+    <div id="header-right">
+      <div id="lang">
+        <i class="$translate.flags[$request.lang] flag"></i>
+      </div>
+#if($session.logged)
+      <div id="logout">
+        <i class="fa fa-sign-out"></i>
+      </div>
+#end
     </div>
   </div>
   <div id="center">
@@ -107,6 +114,14 @@
           popup.classList.remove('shown');
           $('body').removeClass('dimmed');
         }
+      });
+      $('#logout').on('click', e => {
+        api.postJson('logout', {})
+          .then(ret => {
+            if (ret !== 'error') {
+              document.location.href = '/index';
+          }
+        });
       });
     });
 

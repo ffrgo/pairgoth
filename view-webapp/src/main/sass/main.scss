@@ -54,6 +54,12 @@
         max-height: 100%;
       }
     }
+    #header-right {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 0.5em;
+      padding-right: 0.5em;
+    }
   }
 
   #center {
