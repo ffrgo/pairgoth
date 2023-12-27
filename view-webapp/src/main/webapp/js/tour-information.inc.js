@@ -102,6 +102,7 @@ onLoad(() => {
   $('#tournament-infos').on('submit', e => {
     e.preventDefault();
     let form = e.target;
+    console.log(form.val('country'));
     let tour = {
       name: form.val('name'),
       shortName: form.val('shortName'),

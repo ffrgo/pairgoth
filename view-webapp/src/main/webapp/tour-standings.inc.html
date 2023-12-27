@@ -68,10 +68,16 @@
           <td>$part.name $part.firstname</td>
           <td>#rank($part.rank)</td>
           <td>$part.country</td>
-          <td>$part.NBW</td>
+          <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
   #foreach($r in [0..$mx])
-          <td class="nobreak">$part.results[$r]</td>
+    #set($rst = $part.results[$r])
+    #if($rst.contains('+'))
+      #set($rst = "<b>$rst</b>")
+    #elseif($rst.contains('-'))
+      #set($rst = "<i>$rst</i>")
+    #end
+          <td class="nobreak">$rst</td>
   #end
   #foreach($crit in $tour.pairing.placement)
           <td>$number.format('0.#', $part[$crit])</td>

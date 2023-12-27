@@ -112,10 +112,13 @@ class FileStore(pathStr: String): StoreImplementation {
 
     override fun replaceTournament(tournament: Tournament<*>) {
         val filename = tournament.filename()
-        val file = path.resolve(filename).toFile()
-        if (file.exists()) {
-            file.renameTo(path.resolve(filename + "-${timestamp}").toFile())
-        }
+        // short name may have changed
+        path.useDirectoryEntries("${tournament.id.toString().padStart(LEFT_PAD, '0')}-*.tour") { entries ->
+            entries.mapNotNull { entry ->
+                entry.toFile()
+            }.firstOrNull()
+        }?.renameTo(path.resolve(filename + "-${timestamp}").toFile())
+
         addTournament(tournament)
     }
 
