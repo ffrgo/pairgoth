@@ -11,8 +11,6 @@ import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
-import java.io.File
-import java.io.OutputStream
 import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
@@ -81,6 +79,9 @@ sealed class BaseSolver(
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
+            println("a bit of debug")
+            println(pairingSortedPairables.size)
+            println(chosenByePlayer.placeInGroup)
         }
 
         for (i in nameSortedPairables.indices) {
@@ -119,14 +120,14 @@ sealed class BaseSolver(
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
-        /*
+        val DEBUG_EXPORT_WEIGHT = true
         if (DEBUG_EXPORT_WEIGHT) {
             //println("DUDD debug")
             //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
             //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
             println("Seeding debug")
-            //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
-            //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
+            pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
+            pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
             println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
@@ -147,7 +148,6 @@ sealed class BaseSolver(
             val dec = DecimalFormat("#.#")
             println("sumOfWeights = " + dec.format(sumOfWeights))
         }
-         */
 
         return result
     }
@@ -354,7 +354,7 @@ sealed class BaseSolver(
         return score
     }
 
-    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable): Double {
+    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
         var score = 0.0
         // Apply seeding for players in the same group
         if (p1.group == p2.group) {
@@ -390,7 +390,6 @@ sealed class BaseSolver(
                 }
             }
 
-            /*
             if(debug){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
                 println("Seed Sytem = " + currentSeedSystem.toString())
@@ -398,7 +397,6 @@ sealed class BaseSolver(
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
             }
-             */
         }
         return Math.round(score).toDouble()
     }
@@ -422,8 +420,8 @@ sealed class BaseSolver(
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = groupsCount
 
-        //val geoMaxCost = avoidSameGeo
-        val geoMaxCost = 100000000000.0
+        val geoMaxCost = pairing.geo.avoidSameGeo
+        //val geoMaxCost = 100000000000.0
 
         val countryFactor = preferMMSDiffRatherThanSameCountry
         val clubFactor: Int = preferMMSDiffRatherThanSameClub
