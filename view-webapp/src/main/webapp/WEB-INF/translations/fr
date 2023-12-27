@@ -28,7 +28,7 @@ Change	Mettre à jour
 Chinese rules	Règles chinoises
 Close	Fermer
 Club	Club
-Compile from the sources	Compiler depuis les sources
+Compile from the sources	Compiler depuis les sources&nbsp;
 Country	Pays
 Create	Créer
 Crit	Crit
@@ -58,8 +58,8 @@ Invalid tournament id	Identifiant de tournoi invalide
 Japanese rules	Règles japonaises
 Komi	Komi
 Launch	Lancer
-Launch a pairing server	Lancer un serveur d’appariement
-Launch a standalone instance	Lancer une instance indépendante
+Launch a pairing server	Lancer un serveur d’appariement&nbsp;
+Launch a standalone instance	Lancer une instance indépendante&nbsp;
 Location	Lieu
 Log in	Se connecter
 Luc Vannier	Luc Vannier
@@ -103,14 +103,14 @@ Split and slip	Couper-glisser
 Standard byo-yomi	Buo-yomi standard
 Standings	Classement
 Standings after round	Classement après la ronde
-Stay in the browser	Rester dans le navigateur
+Stay in the browser	Rester dans le navigateur&nbsp;
 Sudden death	Mort subite
 Swiss	Suisse
 Team of 2 individual players	Équipe de 2 joueurs individuels
 Team of 3 individual players	Équipe de 3 joueurs individuels
 Team of 4 individual players	Équipe de 4 joueurs individuels
 Team of 5 individual players	Équipe de 5 joueurs individuels
-That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. You can choose to use either the standard interface (which is meant to look a lot like opengotha) and the web interface (by launching the engine and connecting to it using a browser).	C’est la meilleure option si vous préférer le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Vous pouvez choisir d’utiliser soit l’interface standard (qui est conçue pour beaucoup ressembler à OpenGotha) soit l’interface web (en lançant le moteur et en s’y connectant avec un navigateur).
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. You can choose to use either the standard interface (which is meant to look a lot like opengotha) and the web interface (by launching the engine and connecting to it using a browser).	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Vous pouvez choisir d’utiliser soit l’interface standard (qui est conçue pour beaucoup ressembler à OpenGotha) soit l’interface web (en lançant le moteur et en s’y connectant avec un navigateur).
 Time system	Temps
 Tournament type	Type de tournoi
 Unpair	Désapparier
@@ -147,7 +147,7 @@ or	ou
 pairable players	joueurs disponibles
 pairgoth	pairgoth
 pairing system, ideal for championships with no handicap games, as well as the	, idéal pour les championnats sans handicap, ainsi que le système d’appariement
-pairing system, more suited for classical tournaments and cups. It is still in an alpha stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il est encore à une phase « alpha ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
+pairing system, more suited for classical tournaments and cups. It is still in an alpha stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « alpha ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
 project is fully open source, and under the very permissive	est un logiciel libre, et sous la très permissive
 result	résultat
 selected	
