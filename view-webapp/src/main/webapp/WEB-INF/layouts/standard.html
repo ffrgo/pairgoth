@@ -33,12 +33,16 @@
 #end
 </blockquote>
 *#
+#if($params.id)
+  #set($tour = $api.get("tour/${params.id}"))
+#end
   <div id="header" class="horz flex">
     <div id="logo">
       <a href="/"><img src="/img/logov2.svg"/></a>
     </div>
-    <div id="title">
-    </div>
+    <h1 id="title">
+      #if($tour)$esc.html($tour.name)#end
+    </h1>
     <div id="lang">
       <i class="$translate.flags[$request.lang] flag"></i>
     </div>

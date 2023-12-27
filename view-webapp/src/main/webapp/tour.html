@@ -13,7 +13,6 @@
 #end
 #macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
 #if($params.id)
-  #set($tour = $api.get("tour/${params.id}"))
   #if (!$tour)
 <div class="section">
   <h2 class="error">Invalid tournament id</h2>
@@ -30,7 +29,6 @@
   #end
 #end
 <div class="section">
-  <h1 class="centered title">#if($tour)$tour.name#{else}New Tournament#end</h1>
 #if($tour)
   <div class="ui ordered centered steps">
     <div class="step" data-step="information">
