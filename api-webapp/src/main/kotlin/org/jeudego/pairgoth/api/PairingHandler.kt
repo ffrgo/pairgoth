@@ -73,6 +73,8 @@ object PairingHandler: PairgothApiHandler {
         }.toSet()
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
+        // temporary
+        payload.getInt("dudd")?.let { game.drawnUpDown = it }
         val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
         val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
         if (black.skip.contains(round)) badRequest("black is not playing this round")
