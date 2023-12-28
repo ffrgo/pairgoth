@@ -51,6 +51,7 @@ onLoad(()=>{
   $('#unpair').on('click', e => {
     let games = $('#paired')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
     if (games.length == 0) {
+      $('#paired .listitem').addClass('selected');
       games = $('#paired')[0].childNodes.filter('.selected.listitem').map(item => parseInt(item.data("id")));
     }
     unpair(games);

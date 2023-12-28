@@ -39,4 +39,10 @@ onLoad(() => {
     e.preventDefault();
     return false;
   });
+  $('#publish').on('click', e => {
+    modal('publish-modal');
+  });
+  $('#publish-modal').on('click', e => {
+    close_modal();
+  });
 });

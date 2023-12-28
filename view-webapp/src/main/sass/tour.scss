@@ -209,8 +209,14 @@
     flex-flow: column nowrap;
     min-height: 10vh;
     max-height: 30vh;
-    min-width: 50vw;
   }
+
+  #pairing-right {
+    display: inline-flex;
+    flex-flow: row wrap;
+    gap: 1em;
+  }
+
   .choose-round.button {
     padding: 0.2em 0.8em;
   }

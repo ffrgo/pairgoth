@@ -191,13 +191,11 @@ onLoad(() => {
   document.on('keyup', e => {
     switch (e.key) {
       case 'Escape': {
-        if ($('#player').hasClass('shown')) {
-          if ($('#needle')[0].value) {
+        if ($('#player').hasClass('shown') && $('#needle')[0].value) {
             $('#needle')[0].value = '';
             initSearch();
-          } else {
-            close_modal();
-          }
+        } else {
+          close_modal();
         }
         break;
       }

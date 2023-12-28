@@ -22,35 +22,39 @@
       <button class="ui floating choose-round next-round button">&raquo;</button>
     </div>
     <div id="pairing-lists">
-      <div id="pairables" class="multi-select" title="pairable players">
+      <div id="pairing-left">
+        <div id="pairables" class="multi-select" title="pairable players">
 #foreach($p in $pairables)
   #set($part = $pmap[$p])
-        <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
 #end
-      </div>
-      <div id="pairing-buttons">
-        <button id="pair" class="ui blue right labeled icon floating button">
-          <i class="angle double right icon"></i>
-          Pair
-        </button>
-        <button id="unpair" class="ui orange right labeled icon floating button">
-          <i class="angle double left icon"></i>
-          Unpair
-        </button>
-      </div>
-      <div id="paired" class="multi-select" title="white vs. black">
-#foreach($game in $games)
-  #set($white = $pmap[$game.w])
-  #set($black = $pmap[$game.b])
-        <div class="listitem game" data-id="$game.id"><span class="table">#$game.t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span>#if($game.h)<span class="handicap">h$game.h</span>#end</div>
-#end
-      </div>
-    </div>
-    <div id="unpairables" class="multi-select" title="unpairable players">
+        </div>
+        <div id="unpairables" class="multi-select" title="unpairable players">
 #foreach($p in $unpairables)
   #set($part = $pmap[$p])
-      <div class="listitem unpairable" data-id="$part.id"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div class="listitem unpairable" data-id="$part.id"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
 #end
+        </div>
+      </div>
+      <div id="pairing-right">
+        <div id="pairing-buttons">
+          <button id="pair" class="ui blue right labeled icon floating button">
+            <i class="angle double right icon"></i>
+            Pair
+          </button>
+          <button id="unpair" class="ui orange right labeled icon floating button">
+            <i class="angle double left icon"></i>
+            Unpair
+          </button>
+        </div>
+        <div id="paired" class="multi-select" title="white vs. black">
+          #foreach($game in $games)
+          #set($white = $pmap[$game.w])
+          #set($black = $pmap[$game.b])
+          <div class="listitem game" data-id="$game.id"><span class="table">#$game.t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span>#if($game.h)<span class="handicap">h$game.h</span>#end</div>
+          #end
+        </div>
+      </div>
     </div>
   </div>
 </div>

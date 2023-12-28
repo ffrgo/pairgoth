@@ -216,6 +216,9 @@
     display: flex;
     flex-flow: row wrap;
     justify-content: space-between;
+    &.right {
+      justify-content: flex-end;
+    }
   }
 
   input[type="number"] {
@@ -317,6 +320,11 @@
       border-radius: 5px;
       overflow-x: hidden;
       overflow-y: auto;
+      .popup-header {
+        text-align: center;
+        font-size: 1.5em;
+        margin-bottom: 1em;
+      }
       .popup-content {
         display: flex;
         flex-direction: column;
