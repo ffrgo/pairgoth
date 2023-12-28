@@ -79,9 +79,6 @@ sealed class BaseSolver(
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
-            println("a bit of debug")
-            println(pairingSortedPairables.size)
-            println(chosenByePlayer.placeInGroup)
         }
 
         for (i in nameSortedPairables.indices) {
@@ -125,6 +122,10 @@ sealed class BaseSolver(
             //println("DUDD debug")
             //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
             //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
+            println("Standings debug: place Name group score ranking rating")
+            for (p in pairingSortedPairables){
+                println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.displayRank() + "   " + p.rating)
+            }
             println("Seeding debug")
             pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
             pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
@@ -396,6 +397,7 @@ sealed class BaseSolver(
                 println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
+                println("detrandom(p1,p2) = " + (maxSeedingWeight-detRandom(seedingWeight*0.2, p1, p2)).toString())
             }
         }
         return Math.round(score).toDouble()

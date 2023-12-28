@@ -40,6 +40,8 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     private val colorBalance: Map<ID, Int> by lazy {
         history.flatten().filter { game ->
             game.handicap == 0
+        }.filter { game ->
+            game.white != 0
         }.flatMap { game ->
             listOf(Pair(game.white, +1), Pair(game.black, -1))
         }.groupingBy {
