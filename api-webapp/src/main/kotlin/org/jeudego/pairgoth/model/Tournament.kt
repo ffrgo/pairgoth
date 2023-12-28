@@ -4,6 +4,8 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import kotlinx.datetime.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.Store
 import kotlin.math.roundToInt
 
@@ -65,6 +67,22 @@ sealed class Tournament <P: Pairable>(
         if (round > games.size + 1) throw Error("invalid round")
         else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = games.size
+
+    fun recomputeDUDD(round: Int, gameID: ID) {
+        // Instantiate solver with game history
+        // TODO cleaner solver instantiation
+        val history = games.map { games -> games.values.toList() }
+        val solver = when (pairing.type) {
+            PairingType.SWISS -> SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams)
+            PairingType.MAC_MAHON -> MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, mmBar = 3, mmFloor = -20)
+            else -> throw Exception("Invalid tournament type")
+        }
+        // Recomputes DUDD
+        val game = games(round)[gameID]!!
+        val whiteplayer = solver.pairables.find { p-> p.id == game.white }!!
+        val blackplayer = solver.pairables.find { p-> p.id == game.black }!!
+        game.drawnUpDown = solver.dudd(blackplayer, whiteplayer)
+    }
 }
 
 // standard tournament of individuals

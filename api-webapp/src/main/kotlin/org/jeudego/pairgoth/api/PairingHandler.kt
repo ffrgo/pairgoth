@@ -57,6 +57,7 @@ object PairingHandler: PairgothApiHandler {
         val game = tournament.games(round)[payload.getInt("id")] ?: badRequest("invalid game id")
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
+        tournament.recomputeDUDD(round, game.id)
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
         tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
         return Json.Object("success" to true)

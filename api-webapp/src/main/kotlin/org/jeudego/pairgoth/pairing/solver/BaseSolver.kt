@@ -428,7 +428,12 @@ sealed class BaseSolver(
         val placementScoreRange = groupsCount
 
         //val geoMaxCost = avoidSameGeo
-        val geoMaxCost = 100000000000.0
+        // TODO Fix import of avoidSameGeo in opengotha so this is not needed
+        val geoMaxCost = if (avoidSameGeo == 0.0) {
+            0.0
+        } else {
+            100000000000.0
+        }
 
         val countryFactor = preferMMSDiffRatherThanSameCountry
         val clubFactor: Int = preferMMSDiffRatherThanSameClub
@@ -533,9 +538,13 @@ sealed class BaseSolver(
         return scale * (1.0 - x) * (1.0 + k * x)
     }
 
+    fun dudd(black: Pairable, white: Pairable) : Int {
+        return white.group - black.group
+    }
+
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
 
-        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white), drawnUpDown = white.group-black.group))
+        return listOf(Game(id = Store.nextGameId, black = black.id, white = white.id, handicap = pairing.handicap.handicap(black, white), drawnUpDown = dudd(black, white)))
     }
 }
