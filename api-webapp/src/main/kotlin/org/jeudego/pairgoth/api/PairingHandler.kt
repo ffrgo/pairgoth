@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
@@ -87,7 +88,8 @@ object PairingHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
-        if (round != tournament.lastRound()) badRequest("cannot delete games in other rounds but the last")
+        // Nope
+        // if (round != tournament.lastRound()) badRequest("cannot delete games in other rounds but the last")
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
         if (allPlayers) {
@@ -95,7 +97,14 @@ object PairingHandler: PairgothApiHandler {
         } else {
             payload.forEach {
                 val id = (it as Number).toInt()
-                tournament.games(round).remove(id)
+                val game = tournament.games(round)[id] ?: throw Error("invalid game id")
+                if (game.result != Game.Result.UNKNOWN) {
+                    ApiHandler.logger.error("cannot unpair game id ${game.id}: it has a result")
+                    // we'll only skip it
+                    // throw Error("cannot unpair ")
+                } else {
+                    tournament.games(round).remove(id)
+                }
             }
         }
         tournament.dispatchEvent(gamesDeleted, Json.Object("round" to round, "games" to payload))
