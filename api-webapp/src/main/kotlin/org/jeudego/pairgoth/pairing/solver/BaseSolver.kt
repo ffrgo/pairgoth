@@ -11,8 +11,6 @@ import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
-import java.io.File
-import java.io.OutputStream
 import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
@@ -68,13 +66,13 @@ sealed class BaseSolver(
             var weightForBye : Double
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
-                weightForBye = p.rank + 2*p.main
+                weightForBye = p.rank + 2*(p.main + p.rank)
                 if (p in byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
                     chosenByePlayer = p
                 }
-                println("choose Bye: " + p.nameSeed() + " " + weightForBye)
+                println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
             println("Bye player : " + chosenByePlayer.nameSeed())
             byePlayers.add(chosenByePlayer)
@@ -119,12 +117,16 @@ sealed class BaseSolver(
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
-        /*
+        val DEBUG_EXPORT_WEIGHT = false
         if (DEBUG_EXPORT_WEIGHT) {
-            //println("DUDD debug")
-            //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
-            //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
-            println("Seeding debug")
+            /*println("DUDD debug")
+            println(nameSortedPairables[4].nameSeed() + "   " + nameSortedPairables[25].nameSeed())
+            pairing.main.applyDUDD(nameSortedPairables[25],nameSortedPairables[4], debug=true)
+            println("Standings debug: place Name group score sos sosos ranking rating")
+            for (p in pairingSortedPairables){
+                println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.sos.toString() + "   " + p.sosos.toString() + "   " + p.displayRank() + "   " + p.rating)
+            }*/
+            //println("Seeding debug")
             //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
             //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
@@ -147,7 +149,6 @@ sealed class BaseSolver(
             val dec = DecimalFormat("#.#")
             println("sumOfWeights = " + dec.format(sumOfWeights))
         }
-         */
 
         return result
     }
@@ -331,16 +332,15 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
-            /*
-            if(debug){
+            /*if(debug){
+                println("Names DU DD "+p1.nameSeed()+" "+p1_DU+" "+p1_DD+" "+p2.nameSeed()+" "+p2_DU+" "+p2_DD)
                 println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
                 println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
                 println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
                 println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
                 println("score = " + score.toString())
-            }
-             */
+            }*/
 
         }
 
@@ -390,15 +390,14 @@ sealed class BaseSolver(
                 }
             }
 
-            /*
-            if(debug){
+            /*if(debug){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
                 println("Seed Sytem = " + currentSeedSystem.toString())
                 println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
-            }
-             */
+                println("detrandom(p1,p2) = " + (maxSeedingWeight-detRandom(seedingWeight*0.2, p1, p2)).toString())
+            }*/
         }
         return Math.round(score).toDouble()
     }
@@ -422,8 +421,8 @@ sealed class BaseSolver(
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = groupsCount
 
-        //val geoMaxCost = avoidSameGeo
-        val geoMaxCost = 100000000000.0
+        val geoMaxCost = pairing.geo.avoidSameGeo
+        //val geoMaxCost = 100000000000.0
 
         val countryFactor = preferMMSDiffRatherThanSameCountry
         val clubFactor: Int = preferMMSDiffRatherThanSameClub

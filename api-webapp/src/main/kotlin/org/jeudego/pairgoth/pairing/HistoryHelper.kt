@@ -40,6 +40,8 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     private val colorBalance: Map<ID, Int> by lazy {
         history.flatten().filter { game ->
             game.handicap == 0
+        }.filter { game ->
+            game.white != 0 // Remove games against byePlayer
         }.flatMap { game ->
             listOf(Pair(game.white, +1), Pair(game.black, -1))
         }.groupingBy {
@@ -131,9 +133,13 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
 
     // sodos
     val sodos by lazy {
-        (history.flatten().map { game ->
+        (history.flatten().filter { game ->
+            game.white != 0 // Remove games against byePlayer
+        }.map { game ->
             Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white] ?: 0.0 else 0.0)
-        } + history.flatten().map { game ->
+        } + history.flatten().filter { game ->
+            game.white != 0 // Remove games against byePlayer
+        }.map { game ->
             Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black] ?: 0.0 else 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
@@ -142,9 +148,13 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
 
     // sosos
     val sosos by lazy {
-        (history.flatten().map { game ->
+        (history.flatten().filter { game ->
+            game.white != 0 // Remove games against byePlayer
+        }.map { game ->
             Pair(game.black, sos[game.white] ?: 0.0)
-        } + history.flatten().map { game ->
+        } + history.flatten().filter { game ->
+            game.white != 0 // Remove games against byePlayer
+        }.map { game ->
             Pair(game.white, sos[game.black] ?: 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
