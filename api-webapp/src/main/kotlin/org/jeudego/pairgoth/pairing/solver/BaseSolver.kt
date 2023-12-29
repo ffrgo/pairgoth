@@ -119,16 +119,16 @@ sealed class BaseSolver(
 
         val DEBUG_EXPORT_WEIGHT = true
         if (DEBUG_EXPORT_WEIGHT) {
-            //println("DUDD debug")
-            //println(nameSortedPairables[2].nameSeed() + "   " + nameSortedPairables[6].nameSeed())
-            //pairing.main.applyDUDD(nameSortedPairables[2],nameSortedPairables[6], debug=true)
-            println("Standings debug: place Name group score ranking rating")
+            println("DUDD debug")
+            println(nameSortedPairables[4].nameSeed() + "   " + nameSortedPairables[25].nameSeed())
+            pairing.main.applyDUDD(nameSortedPairables[25],nameSortedPairables[4], debug=true)
+            println("Standings debug: place Name group score sos sosos ranking rating")
             for (p in pairingSortedPairables){
-                println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.displayRank() + "   " + p.rating)
+                println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.sos.toString() + "   " + p.sosos.toString() + "   " + p.displayRank() + "   " + p.rating)
             }
-            println("Seeding debug")
-            pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
-            pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
+            //println("Seeding debug")
+            //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
+            //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
             println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
@@ -251,7 +251,7 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
@@ -332,8 +332,8 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
-            /*
             if(debug){
+                println("Names DU DD "+p1.nameSeed()+" "+p1_DU+" "+p1_DD+" "+p2.nameSeed()+" "+p2_DU+" "+p2_DD)
                 println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
                 println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
@@ -341,7 +341,6 @@ sealed class BaseSolver(
                 println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
                 println("score = " + score.toString())
             }
-             */
 
         }
 
