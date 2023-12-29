@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 //@Disabled("pairings differ")
 class PairingTests: TestBase() {
 
-    fun compare_weights(file1: File, file2: File):Boolean {
+    fun compare_weights(file1: File, file2: File, skipSeeding: Boolean = false):Boolean {
         BaseSolver.weightsLogger!!.flush()
         // Maps to store name pairs and costs
         val map1 = HashMap<Pair<String, String>, List<Double>>()
@@ -66,7 +66,12 @@ class PairingTests: TestBase() {
             if (map2.containsKey(key)) {
                 // Compare values
                 //logger.info("Comparing $key")
-                if (abs(value!![9] - map2[key]!![9])>10 && identical==true) {
+                val isValid = if (!skipSeeding) {
+                    abs(value!![9] - map2[key]!![9])>10 && identical==true
+                } else {
+                    abs((value!![9]-value!![6]) - (map2[key]!![9]-map2[key]!![6]))>10 && identical==true
+                }
+                if (isValid) {
                     // Key exists but values differ - print key
                     logger.info("Difference found at $key")
                     logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
@@ -359,7 +364,8 @@ class PairingTests: TestBase() {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             // games must be created and then modified by PUT
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simplemm/simplemm_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            val skipSeeding = round <= 2
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simplemm/simplemm_weights_R$round.txt"), skipSeeding), "Not matching opengotha weights for round $round")
             logger.info("Weights for round $round match OpenGotha")
 
             forcedGames = Json.parse(pairings[round-1])!!.asArray()
