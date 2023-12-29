@@ -117,15 +117,15 @@ sealed class BaseSolver(
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
-        val DEBUG_EXPORT_WEIGHT = true
+        val DEBUG_EXPORT_WEIGHT = false
         if (DEBUG_EXPORT_WEIGHT) {
-            println("DUDD debug")
+            /*println("DUDD debug")
             println(nameSortedPairables[4].nameSeed() + "   " + nameSortedPairables[25].nameSeed())
             pairing.main.applyDUDD(nameSortedPairables[25],nameSortedPairables[4], debug=true)
             println("Standings debug: place Name group score sos sosos ranking rating")
             for (p in pairingSortedPairables){
                 println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.sos.toString() + "   " + p.sosos.toString() + "   " + p.displayRank() + "   " + p.rating)
-            }
+            }*/
             //println("Seeding debug")
             //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
             //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
@@ -251,7 +251,7 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
+    open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
 
         // TODO apply Drawn-Up/Drawn-Down if needed
@@ -332,7 +332,7 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
-            if(debug){
+            /*if(debug){
                 println("Names DU DD "+p1.nameSeed()+" "+p1_DU+" "+p1_DD+" "+p2.nameSeed()+" "+p2_DU+" "+p2_DD)
                 println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
@@ -340,7 +340,7 @@ sealed class BaseSolver(
                 println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
                 println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
                 println("score = " + score.toString())
-            }
+            }*/
 
         }
 
@@ -354,7 +354,7 @@ sealed class BaseSolver(
         return score
     }
 
-    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable, debug: Boolean =false): Double {
+    fun MainCritParams.applySeeding(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         // Apply seeding for players in the same group
         if (p1.group == p2.group) {
@@ -390,14 +390,14 @@ sealed class BaseSolver(
                 }
             }
 
-            if(debug){
+            /*if(debug){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
                 println("Seed Sytem = " + currentSeedSystem.toString())
                 println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
                 println("detrandom(p1,p2) = " + (maxSeedingWeight-detRandom(seedingWeight*0.2, p1, p2)).toString())
-            }
+            }*/
         }
         return Math.round(score).toDouble()
     }

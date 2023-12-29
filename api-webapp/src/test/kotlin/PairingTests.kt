@@ -267,7 +267,7 @@ class PairingTests: TestBase() {
 
         val byePlayerList = mutableListOf<Long>(354, 359, 356, 357, 345, 339, 368, 344, 349, 341)
 
-        for (round in 1..7) {
+        for (round in 1..10) {
             //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             if (round in forcedPairingList){
@@ -301,6 +301,7 @@ class PairingTests: TestBase() {
         }
 
     }
+
     @Test
     fun `testSimpleMM`() {
         /*
