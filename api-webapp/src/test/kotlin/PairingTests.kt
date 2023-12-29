@@ -255,41 +255,23 @@ class PairingTests: TestBase() {
         var games: Json.Array
         var firstGameID: Int
         var playersList = mutableListOf<Long>()
-        
-        var forcedPairingList = mutableListOf<Int>()
-        var forcedPairing = mutableListOf<Json>()
-        var forcedGames: Json.Array
-        var game: Json
 
         for (i in 0..34){
             playersList.add(players.getJson(i)!!.asObject()["id"] as Long)
         }
 
-        val byePlayerList = mutableListOf<Long>(354, 359, 356, 357, 345, 339, 368, 344, 349, 341)
-
         for (round in 1..10) {
             //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            if (round in forcedPairingList){
-                // games must be created and then modified by PUT
-                games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-                forcedPairing = mutableListOf<Json>()
-                forcedGames = Json.parse(pairingsR1)!!.asArray()
-                for (j in 0..forcedGames.size-1) {
-                    game = forcedGames.getJson(j)!!.asObject()
-                    TestAPI.put("/api/tour/$id/pair/$round", game)
-                }
-                games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            }
-            else {
-                //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
-                games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-                logger.info("games for round $round: {}", games.toString())
 
-                assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/notsosimpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-                assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray()),"pairings for round $round differ")
-                logger.info("Pairings for round $round match OpenGotha")
-            }
+            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info("games for round $round: {}", games.toString())
+
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/notsosimpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray()),"pairings for round $round differ")
+            logger.info("Pairings for round $round match OpenGotha")
+
             logger.info("games for round $round: {}", games.toString())
 
             firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
