@@ -66,13 +66,13 @@ sealed class BaseSolver(
             var weightForBye : Double
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
-                weightForBye = p.rank + 2*p.main
+                weightForBye = p.rank + 2*(p.main + p.rank)
                 if (p in byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
                     chosenByePlayer = p
                 }
-                println("choose Bye: " + p.nameSeed() + " " + weightForBye)
+                println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
             println("Bye player : " + chosenByePlayer.nameSeed())
             byePlayers.add(chosenByePlayer)
