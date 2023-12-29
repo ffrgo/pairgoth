@@ -194,8 +194,9 @@ sealed class BaseSolver(
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else {
             // apply a *big* score to let the stronger player have white
-            if (hd2 == 0) colorBalanceWeight * 10
-            else 0.0
+            //if (hd2 == 0) colorBalanceWeight * 10
+            //else 0.0
+            0.0
         }
         return score
     }
@@ -304,8 +305,6 @@ sealed class BaseSolver(
             val lSPgroupSize = lowerSP.placeInGroup.second
 
 
-
-
             if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
                 score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
             } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.MIDDLE) {
@@ -332,7 +331,7 @@ sealed class BaseSolver(
                 score += 4 * duddWeight
             }
 
-            /*if(debug){
+            /*if(true) {
                 println("Names DU DD "+p1.nameSeed()+" "+p1_DU+" "+p1_DD+" "+p2.nameSeed()+" "+p2_DU+" "+p2_DD)
                 println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
                 println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
@@ -421,8 +420,8 @@ sealed class BaseSolver(
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = groupsCount
 
-        val geoMaxCost = pairing.geo.avoidSameGeo
-        //val geoMaxCost = 100000000000.0
+        //val geoMaxCost = pairing.geo.avoidSameGeo
+        val geoMaxCost = 100000000000.0
 
         val countryFactor = preferMMSDiffRatherThanSameCountry
         val clubFactor: Int = preferMMSDiffRatherThanSameClub

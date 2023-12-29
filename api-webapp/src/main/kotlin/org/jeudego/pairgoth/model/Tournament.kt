@@ -74,11 +74,11 @@ sealed class Tournament <P: Pairable>(
     fun recomputeDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
         // TODO cleaner solver instantiation
-        val history = games.map { games -> games.values.toList() }
+        val history = historyBefore(round)
         val solver = if (pairing is Swiss) {
             SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams)
         } else if (pairing is MacMahon) {
-            MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, pairing.mmBar, pairing.mmFloor)
+            MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, pairing.mmFloor, pairing.mmBar)
         } else throw Exception("Invalid tournament type")
 
         // Recomputes DUDD
