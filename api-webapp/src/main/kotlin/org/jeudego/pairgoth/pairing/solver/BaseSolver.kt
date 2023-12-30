@@ -527,11 +527,14 @@ sealed class BaseSolver(
         return scale * (1.0 - x) * (1.0 + k * x)
     }
 
+    fun dudd(black: Pairable, white: Pairable): Int {
+        return white.group - black.group
+    }
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
         val usedTables = tables.getOrNull(round - 1) ?: BitSet().also { tables.add(it) }
         val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
         usedTables.set(table)
-        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = pairing.handicap.handicap(white, black), drawnUpDown = white.group-black.group))
+        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = pairing.handicap.handicap(white, black), drawnUpDown = dudd(black, white)))
     }
 }
