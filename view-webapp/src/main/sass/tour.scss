@@ -167,7 +167,7 @@
     min-height: 30vh;
     max-height: 60vh;
     min-width: 20vw;
-    max-width: 40vw;
+    max-width: max(30vw, 15em);
     border: solid 2px darkgray;
     border-radius: 5px;
     padding: 1em 0.5em;
@@ -203,6 +203,7 @@
     justify-content: start;
     align-items: stretch;
     gap: 1em;
+    max-width: max(10em, 20vw);
   }
   #unpairables {
     display: flex;
@@ -215,6 +216,13 @@
     display: inline-flex;
     flex-flow: row wrap;
     gap: 1em;
+    flex-shrink: 1;
+    max-width: max(300px, 60vw);
+    justify-content: center;
+  }
+
+  #paired {
+    max-width: max(50vw, 20em);
   }
 
   .choose-round.button {

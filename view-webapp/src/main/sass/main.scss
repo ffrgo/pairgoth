@@ -67,7 +67,7 @@
     flex: 1;
     overflow: auto;
     #inner {
-      max-width: clamp(800px, 80vw, 100vw);
+      /* max-width: clamp(800px, 80vw, 100vw); */
       display: flex;
       flex-flow: column nowrap;
       align-items: center;
