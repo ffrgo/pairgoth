@@ -11,6 +11,8 @@ import java.io.FileWriter
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -93,7 +95,7 @@ class PairingTests: TestBase() {
         return identical
     }
 
-    fun compare_games(games:Json.Array, opengotha:Json.Array): Boolean{
+    fun compare_games(games:Json.Array, opengotha:Json.Array, skipColor: Boolean = false): Boolean{
         if (games.size != opengotha.size) {
             val tmp = Game.fromJson(games.getJson(games.size-1)!!.asObject())
             if ((tmp.white != 0) and (tmp.black != 0)) {return false}
@@ -104,11 +106,16 @@ class PairingTests: TestBase() {
             val tmp = Game.fromJson(games.getJson(i)!!.asObject().let {
                 Json.MutableObject(it).set("t", 0) // hack to fill the table to make fromJson() happy
             })
-            gamesPair.add(Pair(tmp.white, tmp.black))
             val tmpOG = Game.fromJson(opengotha.getJson(i)!!.asObject().let {
                 Json.MutableObject(it).set("t", 0) // hack to fill the table to make fromJson() happy
             })
-            openGothaPair.add(Pair(tmpOG.white, tmpOG.black))
+            if (skipColor) {
+                gamesPair.add(Pair(min(tmp.white, tmp.black), max(tmp.white, tmp.black)))
+                openGothaPair.add(Pair(min(tmpOG.white, tmpOG.black), max(tmpOG.white, tmpOG.black)))
+            } else {
+                gamesPair.add(Pair(tmp.white, tmp.black))
+                openGothaPair.add(Pair(tmpOG.white, tmpOG.black))
+            }
         }
         return gamesPair==openGothaPair
     }
@@ -300,17 +307,20 @@ class PairingTests: TestBase() {
         val respOG = TestAPI.post("/api/tour", resourceOG)
         val idOG = respOG.asObject().getInt("id")
         val tournamentOG = TestAPI.get("/api/tour/$idOG").asObject()
-        logger.info(tournamentOG.toString().slice(0..50) + "...")
+        //logger.info(tournamentOG.toString().slice(0..50) + "...")
         val playersOG = TestAPI.get("/api/tour/$idOG/part").asArray()
         //logger.info(players.toString().slice(0..50) + "...")
-        //logger.info(playersOG.toString())
+        logger.info(playersOG.toString())
 
-        val pairingsOG = mutableListOf<String>()
+        val pairingsOG = mutableListOf<Json.Array>()
         for (round in 1..tournamentOG.getInt("rounds")!!) {
             val games = TestAPI.get("/api/tour/$idOG/res/$round").asArray()
             logger.info("games for round $round: {}", games.toString())
-            pairingsOG.add(games.toString())
-        }*/
+            pairingsOG.add(games)
+        }
+        */
+
+        //assert(false)
 
 
         val pairingsR1 = """[{"id":1,"w":3,"b":5,"h":0,"r":"w","dd":0},{"id":2,"w":12,"b":10,"h":0,"r":"b","dd":0},{"id":3,"w":9,"b":14,"h":0,"r":"b","dd":0},{"id":4,"w":11,"b":6,"h":0,"r":"b","dd":0},{"id":5,"w":13,"b":15,"h":0,"r":"b","dd":0},{"id":6,"w":2,"b":16,"h":1,"r":"w","dd":0},{"id":7,"w":8,"b":4,"h":5,"r":"b","dd":0},{"id":8,"w":7,"b":1,"h":2,"r":"w","dd":0}]"""
@@ -346,15 +356,21 @@ class PairingTests: TestBase() {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             // games must be created and then modified by PUT
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info(games.toString())
             val skipSeeding = round <= 2
             assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simplemm/simplemm_weights_R$round.txt"), skipSeeding), "Not matching opengotha weights for round $round")
             logger.info("Weights for round $round match OpenGotha")
+            assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray(), skipColor=true),"pairings for round $round differ")
+            logger.info("Pairing for round $round match OpenGotha")
 
             forcedGames = Json.parse(pairings[round-1])!!.asArray()
+            //forcedGames = pairingsOG[round-1]
+
             for (j in 0..forcedGames.size-1) {
                 game = forcedGames.getJson(j)!!.asObject()
                 TestAPI.put("/api/tour/$id/pair/$round", game)
             }
+
 
             // Enter results
             firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()

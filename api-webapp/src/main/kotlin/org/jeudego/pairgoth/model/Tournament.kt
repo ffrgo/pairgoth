@@ -71,7 +71,7 @@ sealed class Tournament <P: Pairable>(
         else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = games.size
 
-    fun recomputeDUDD(round: Int, gameID: ID) {
+    fun recomputeHdAndDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
         // TODO cleaner solver instantiation
         val history = historyBefore(round)
@@ -81,11 +81,12 @@ sealed class Tournament <P: Pairable>(
             MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, pairing.mmFloor, pairing.mmBar)
         } else throw Exception("Invalid tournament type")
 
-        // Recomputes DUDD
+        // Recomputes DUDD and hd
         val game = games(round)[gameID]!!
-        val whiteplayer = solver.pairables.find { p-> p.id == game.white }!!
-        val blackplayer = solver.pairables.find { p-> p.id == game.black }!!
-        game.drawnUpDown = solver.dudd(blackplayer, whiteplayer)
+        val white = solver.pairables.find { p-> p.id == game.white }!!
+        val black = solver.pairables.find { p-> p.id == game.black }!!
+        game.drawnUpDown = solver.dudd(black, white)
+        game.handicap = solver.hd(black, white)
     }
 }
 

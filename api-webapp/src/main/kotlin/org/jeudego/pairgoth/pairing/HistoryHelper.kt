@@ -41,7 +41,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         history.flatten().filter { game ->
             game.handicap == 0
         }.filter { game ->
-            game.white != 0 // Remove games against byePlayer
+            game.white != ByePlayer.id // Remove games against byePlayer
         }.flatMap { game ->
             listOf(Pair(game.white, +1), Pair(game.black, -1))
         }.groupingBy {
