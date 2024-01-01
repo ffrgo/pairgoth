@@ -54,6 +54,11 @@
 
   /* registration section */
 
+  #players-list {
+    max-width: 95vw;
+    overflow-x: auto;
+  }
+
   #player {
     &.create {
       .edition {
@@ -279,5 +284,9 @@
     #params-submit {
       justify-content: space-around;
     }
+  }
+  #standings-container {
+    max-width: 95vw;
+    overflow-x: auto;
   }
 }

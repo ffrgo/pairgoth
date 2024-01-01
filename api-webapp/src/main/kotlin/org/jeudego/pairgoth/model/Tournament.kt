@@ -2,7 +2,7 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
@@ -169,8 +169,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
-                startDate = json.getLocalDate("startDate") ?: default?.startDate ?: badRequest("missing startDate"),
-                endDate = json.getLocalDate("endDate") ?: default?.endDate ?: badRequest("missing endDate"),
+                startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
+                endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
                 country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
@@ -187,8 +187,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
-                startDate = json.getLocalDate("startDate") ?: default?.startDate ?: badRequest("missing startDate"),
-                endDate = json.getLocalDate("endDate") ?: default?.endDate ?: badRequest("missing endDate"),
+                startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
+                endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
                 country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,

@@ -218,8 +218,12 @@ class ApiServlet: HttpServlet() {
                 "Missing 'Accept' header"
             )
         // CB TODO 1) a reference to a specific API call at this point is a code smell.
-        //         2) there will e other content types: .tou, .h9, .html
-        if (!isJson(accept) && (!isXml(accept) || !request.requestURI.matches(Regex("/api/tour/\\d+")))) throw ApiException(
+        //         2) there will be other content types: .tou, .h9, .html
+        if (!isJson(accept) &&
+            (!isXml(accept) || !request.requestURI.matches(Regex("/api/tour/\\d+"))) &&
+            (accept != "application/ffg" && accept != "application/egf" || !request.requestURI.matches(Regex("/api/tour/\\d+/standings/\\d+")))
+
+        ) throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
             "Invalid 'Accept' header"
         )

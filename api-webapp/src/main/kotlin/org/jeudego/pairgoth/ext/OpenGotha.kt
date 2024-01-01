@@ -2,7 +2,7 @@ package org.jeudego.pairgoth.ext
 
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.JAXBElement
-import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.opengotha.TournamentType
 import org.jeudego.pairgoth.opengotha.ObjectFactory
@@ -13,7 +13,7 @@ import javax.xml.datatype.XMLGregorianCalendar
 import kotlin.math.roundToInt
 
 private const val MILLISECONDS_PER_DAY = 86400000
-fun XMLGregorianCalendar.toLocalDate() = LocalDate(year, month, day)
+fun XMLGregorianCalendar.toLocalDate() = LocalDate.of(year, month, day)
 
 object OpenGotha {
 
@@ -114,10 +114,10 @@ object OpenGotha {
             location = genParams.location,
             online = genParams.isBInternet ?: false,
             timeSystem = when (genParams.complementaryTimeSystem) {
-                "SUDDENDEATH" -> SuddenDeath(genParams.basicTime)
-                "STDBYOYOMI" -> StandardByoyomi(genParams.basicTime, genParams.stdByoYomiTime, 1) // no periods?
-                "CANBYOYOMI" -> CanadianByoyomi(genParams.basicTime, genParams.canByoYomiTime, genParams.nbMovesCanTime)
-                "FISCHER" -> FischerTime(genParams.basicTime, genParams.fischerTime)
+                "SUDDENDEATH" -> SuddenDeath(genParams.basicTime * 60)
+                "STDBYOYOMI" -> StandardByoyomi(genParams.basicTime * 60, genParams.stdByoYomiTime, 1) // no periods?
+                "CANBYOYOMI" -> CanadianByoyomi(genParams.basicTime * 60, genParams.canByoYomiTime, genParams.nbMovesCanTime)
+                "FISCHER" -> FischerTime(genParams.basicTime * 60, genParams.fischerTime)
                 else -> throw Error("missing byoyomi type")
             },
             pairing = when (handParams.hdCeiling) {
@@ -269,9 +269,9 @@ object OpenGotha {
             }
             </ByePlayer>
             <TournamentParameterSet>
-            <GeneralParameterSet bInternet="${tournament.online}" basicTime="${tournament.timeSystem.mainTime}" beginDate="${tournament.startDate}" canByoYomiTime="${tournament.timeSystem.byoyomi}" complementaryTimeSystem="${when(tournament.timeSystem.type) {
+            <GeneralParameterSet bInternet="${tournament.online}" basicTime="${tournament.timeSystem.mainTime / 60}" beginDate="${tournament.startDate}" canByoYomiTime="${tournament.timeSystem.byoyomi}" complementaryTimeSystem="${when(tournament.timeSystem.type) {
                 TimeSystem.TimeSystemType.SUDDEN_DEATH -> "SUDDENDEATH"
-                TimeSystem.TimeSystemType.STANDARD -> "STDBYOYOMI"
+                TimeSystem.TimeSystemType.JAPANESE -> "STDBYOYOMI"
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
             } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${

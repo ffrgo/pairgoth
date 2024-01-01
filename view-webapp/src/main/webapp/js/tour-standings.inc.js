@@ -1,3 +1,20 @@
+function publish(format, extension) {
+  let form = $('#tournament-infos')[0];
+  let shortName = form.val('shortName');
+  let hdrs = headers();
+  hdrs['Accept'] = `application/${format}`
+  fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
+    headers: hdrs
+  }).then(resp => {
+    if (resp.ok) return resp.text()
+    else throw "publish error"
+  }).then(txt => {
+    let blob = new Blob(['\uFEFF', txt.trim()], {type: 'plain/text;charset=utf-8'});
+    downloadFile(blob, `${shortName}.${extension}`);
+    close_modal();
+  }).catch(err => showError(err));
+}
+
 onLoad(() => {
   $('.criterium').on('click', e => {
     let alreadyOpen = e.target.closest('select');
@@ -44,5 +61,11 @@ onLoad(() => {
   });
   $('#publish-modal').on('click', e => {
     close_modal();
+  });
+  $('.publish-ffg').on('click', e => {
+    publish('ffg', 'tou');
+  });
+  $('.publish-egf').on('click', e => {
+    publish('egf', 'h9');
   });
 });

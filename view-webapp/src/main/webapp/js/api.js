@@ -9,13 +9,16 @@ const apiVersion = '1.0';
 //     .catch(err => { ... });
 
 const base = '/api/';
-let headers = function() {
+let  headers = function(withJson) {
     let ret = {
-        "Content-Type": "application/json; charset=utf-8",
-        "Accept-Version": apiVersion,
-        "Accept": "application/json",
-        "X-Browser-Key": store('browserKey')
+        'Accept-Version': apiVersion,
+        'Accept': 'application/json',
+        'X-Browser-Key': store('browserKey')
     };
+    if (typeof(withJson) === 'undefined') withJson = true;
+    if (withJson) {
+      ret['Content-Type'] = 'application/json';
+    }
     let accessToken = store('accessToken');
     if (accessToken) {
         ret['Authorization'] = `Bearer ${accessToken}`;

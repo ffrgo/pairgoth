@@ -1,7 +1,6 @@
 package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
 
@@ -15,7 +14,7 @@ data class TimeSystem(
     val stones: Int
 ) {
     companion object {}
-    enum class TimeSystemType { CANADIAN, STANDARD, FISCHER, SUDDEN_DEATH }
+    enum class TimeSystemType { CANADIAN, JAPANESE, FISCHER, SUDDEN_DEATH }
 }
 
 fun CanadianByoyomi(mainTime: Int, byoyomi: Int, stones: Int) =
@@ -30,7 +29,7 @@ fun CanadianByoyomi(mainTime: Int, byoyomi: Int, stones: Int) =
 
 fun StandardByoyomi(mainTime: Int, byoyomi: Int, periods: Int) =
         TimeSystem(
-            type = STANDARD,
+            type = JAPANESE,
             mainTime = mainTime,
             increment = 0,
             byoyomi = byoyomi,
@@ -86,9 +85,16 @@ fun TimeSystem.Companion.fromJson(json: Json.Object) =
 
 fun TimeSystem.toJson() = when (type) {
     TimeSystem.TimeSystemType.CANADIAN -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "stones" to stones)
-    TimeSystem.TimeSystemType.STANDARD -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "periods" to periods)
+    TimeSystem.TimeSystemType.JAPANESE -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "periods" to periods)
     TimeSystem.TimeSystemType.FISCHER ->
         if (maxTime == Int.MAX_VALUE) Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment)
         else Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment, "maxTime" to maxTime)
     TimeSystem.TimeSystemType.SUDDEN_DEATH -> Json.Object("type" to type.name, "mainTime" to mainTime)
+}
+
+fun TimeSystem.adjustedTime() = when (type) {
+    TimeSystem.TimeSystemType.CANADIAN -> mainTime + 60 * byoyomi / stones
+    TimeSystem.TimeSystemType.JAPANESE -> mainTime + 45 * byoyomi
+    TimeSystem.TimeSystemType.FISCHER -> mainTime + 120 * increment
+    TimeSystem.TimeSystemType.SUDDEN_DEATH -> mainTime
 }
