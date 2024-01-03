@@ -385,4 +385,93 @@ class PairingTests: TestBase() {
         }
     }
 
+    @Test
+    fun `testNotSimpleMM`() {
+        /*
+        // read tournament with pairing
+        var fileOG = getTestFile("opengotha/pairings/notsimplemm.xml")
+
+        logger.info("read from file $fileOG")
+        val resourceOG = fileOG.readText(StandardCharsets.UTF_8)
+        val respOG = TestAPI.post("/api/tour", resourceOG)
+        val idOG = respOG.asObject().getInt("id")
+        val tournamentOG = TestAPI.get("/api/tour/$idOG").asObject()
+        //logger.info(tournamentOG.toString().slice(0..50) + "...")
+        val playersOG = TestAPI.get("/api/tour/$idOG/part").asArray()
+        //logger.info(players.toString().slice(0..50) + "...")
+        logger.info(playersOG.toString())
+
+        val pairingsOG = mutableListOf<Json.Array>()
+        for (round in 1..tournamentOG.getInt("rounds")!!) {
+            val games = TestAPI.get("/api/tour/$idOG/res/$round").asArray()
+            logger.info("games for round $round: {}", games.toString())
+            pairingsOG.add(games)
+        }
+        */
+
+        //assert(false)
+
+
+        val pairingsR1 = """[{"id":1,"t":1,"w":8,"b":1,"h":0,"r":"b","dd":0},{"id":2,"t":2,"w":3,"b":6,"h":0,"r":"b","dd":0},{"id":3,"t":3,"w":5,"b":2,"h":5,"r":"w","dd":0},{"id":4,"t":4,"w":9,"b":7,"h":1,"r":"b","dd":0}]"""
+        val pairingsR2 = """[{"id":5,"t":1,"w":6,"b":5,"h":0,"r":"w","dd":0},{"id":6,"t":2,"w":3,"b":8,"h":0,"r":"w","dd":0},{"id":7,"t":3,"w":9,"b":2,"h":0,"r":"w","dd":0},{"id":8,"t":4,"w":7,"b":4,"h":3,"r":"w","dd":0}]"""
+        val pairingsR3 = """[{"id":9,"t":1,"w":5,"b":3,"h":0,"r":"w","dd":0},{"id":10,"t":2,"w":1,"b":6,"h":0,"r":"w","dd":0},{"id":11,"t":3,"w":9,"b":4,"h":5,"r":"b","dd":0}]"""
+        val pairingsR4 = """[{"id":12,"t":1,"w":5,"b":1,"h":0,"r":"w","dd":0},{"id":13,"t":2,"w":6,"b":9,"h":3,"r":"w","dd":0},{"id":14,"t":3,"w":3,"b":7,"h":3,"r":"b","dd":0},{"id":15,"t":4,"w":2,"b":4,"h":2,"r":"w","dd":0}]"""
+        val pairingsR5 = """[{"id":16,"t":1,"w":6,"b":8,"h":0,"r":"w","dd":0},{"id":17,"t":2,"w":5,"b":7,"h":2,"r":"w","dd":0},{"id":18,"t":3,"w":1,"b":9,"h":3,"r":"w","dd":0},{"id":19,"t":4,"w":3,"b":4,"h":8,"r":"b","dd":0}]"""
+        val pairings = mutableListOf<String>()
+        pairings.add(pairingsR1)
+        pairings.add(pairingsR2)
+        pairings.add(pairingsR3)
+        pairings.add(pairingsR4)
+        pairings.add(pairingsR5)
+
+        // read tournament without pairings
+        var file = getTestFile("opengotha/pairings/notsimplemm_nopairings.xml")
+        logger.info("read from file $file")
+        val resource = file.readText(StandardCharsets.UTF_8)
+        var resp = TestAPI.post("/api/tour", resource)
+        val id = resp.asObject().getInt("id")
+        assertNotNull(id)
+        val tournament = TestAPI.get("/api/tour/$id").asObject()
+        logger.info(tournament.toString().slice(0..50) + "...")
+        val players = TestAPI.get("/api/tour/$id/part").asArray()
+        logger.info(players.toString().slice(0..50) + "...")
+
+        var games: Json.Array
+        var firstGameID: Int
+        var forcedGames: Json.Array
+        var game: Json
+
+        for (round in 1..5) {
+            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            // games must be created and then modified by PUT
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info(games.toString())
+            logger.info(pairings[round-1])
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/notsimplemm/notsimplemm_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            logger.info("Weights for round $round match OpenGotha")
+            assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray(), skipColor=true),"pairings for round $round differ")
+            logger.info("Pairing for round $round match OpenGotha")
+
+            forcedGames = Json.parse(pairings[round-1])!!.asArray()
+            //forcedGames = pairingsOG[round-1]
+
+            for (j in 0..forcedGames.size-1) {
+                game = forcedGames.getJson(j)!!.asObject()
+                TestAPI.put("/api/tour/$id/pair/$round", game)
+            }
+
+
+            // Enter results
+            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+            // Extract results
+            val results = forcedGames.map { game -> game.toString().split("r\":\"")[1][0] }
+            for (j in 0 .. forcedGames.size-1) {
+                resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":${firstGameID + j},"result":"${results[j]}"}""")).asObject()
+                assertTrue(resp.getBoolean("success") == true, "expecting success")
+            }
+
+            logger.info("Results succesfully entered for round $round")
+        }
+    }
+
 }

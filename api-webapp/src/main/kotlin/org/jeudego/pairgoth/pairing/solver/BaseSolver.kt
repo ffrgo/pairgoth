@@ -392,14 +392,15 @@ sealed class BaseSolver(
                 }
             }
 
-            /*if(debug){
+            if(true){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
+                println(p1.rating)
                 println("Seed Sytem = " + currentSeedSystem.toString())
                 println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
                 println("score = " + Math.round(score).toString())
                 println("detrandom(p1,p2) = " + (maxSeedingWeight-detRandom(seedingWeight*0.2, p1, p2)).toString())
-            }*/
+            }
         }
         return Math.round(score).toDouble()
     }

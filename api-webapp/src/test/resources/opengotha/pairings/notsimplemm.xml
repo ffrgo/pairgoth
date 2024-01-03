@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Tournament dataVersion="201" externalIPAddress="77.128.107.78" gothaMinorVersion="5" gothaVersion="348" saveDT="20191119110542">
+    <Players>
+        <Player agaExpirationDate="" agaId="" club="00St" country="FR" egfPin="" ffgLicence="1600310" ffgLicenceStatus="L" firstName="Robin" grade="3D" name="Bonjean" participating="10111111111111111111" rank="3D" rating="2352" ratingOrigin="FFG : 302" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="13Ma" country="FR" egfPin="" ffgLicence="1700003" ffgLicenceStatus="L" firstName="Morgane" grade="6K" name="Marechal" participating="11011111111111111111" rank="6K" rating="1350" ratingOrigin="FFG : -700" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="38Gr" country="FR" egfPin="" ffgLicence="1000005" ffgLicenceStatus="L" firstName="Quentin" grade="1D" name="Rendu" participating="11111111111111111111" rank="1D" rating="2155" ratingOrigin="FFG : 105" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="13Ma" country="FR" egfPin="" ffgLicence="2200056" ffgLicenceStatus="L" firstName="Clé" grade="11K" name="Robin" participating="11111111111111111111" rank="11K" rating="1129" ratingOrigin="FFG : -921" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="38Gr" country="FR" egfPin="" ffgLicence="0280000" ffgLicenceStatus="L" firstName="Motoki" grade="7D" name="Noguchi" participating="11111111111111111111" rank="7D" rating="2674" ratingOrigin="FFG : 624" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="00St" country="FR" egfPin="" ffgLicence="2200080" ffgLicenceStatus="L" firstName="Robin" grade="1D" name="Bacardatz" participating="11111111111111111111" rank="1D" rating="2120" ratingOrigin="FFG : 70" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="13Ma" country="FR" egfPin="" ffgLicence="1000392" ffgLicenceStatus="L" firstName="Alexandra" grade="7K" name="Goloubkov" participating="11111111111111111111" rank="7K" rating="1350" ratingOrigin="FFG : -700" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="38Gr" country="FR" egfPin="" ffgLicence="1800061" ffgLicenceStatus="L" firstName="Camille" grade="2D" name="Leveque" participating="11001111111111111111" rank="2D" rating="2150" ratingOrigin="FFG : 100" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="38Gr" country="FR" egfPin="" ffgLicence="2100064" ffgLicenceStatus="L" firstName="Romain" grade="5K" name="Durand" participating="11111111111111111111" rank="5K" rating="1835" ratingOrigin="FFG : -215" registeringStatus="FIN" smmsCorrection="0"/>
+    </Players>
+    <Games>
+        <Game blackPlayer="BONJEANROBIN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="1" whitePlayer="LEVEQUECAMILLE"/>
+        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="1" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="2" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="2" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="MARECHALMORGANE" handicap="5" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="DURANDROMAIN" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="3" whitePlayer="BONJEANROBIN"/>
+        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="1" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="DURANDROMAIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="8" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="4" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="NOGUCHIMOTOKI" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="1" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="MARECHALMORGANE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="3" whitePlayer="DURANDROMAIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="4" whitePlayer="GOLOUBKOVALEXANDRA"/>
+        <Game blackPlayer="RENDUQUENTIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="3" tableNumber="1" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="3" tableNumber="2" whitePlayer="BONJEANROBIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="5" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="3" whitePlayer="DURANDROMAIN"/>
+        <Game blackPlayer="BONJEANROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="1" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="DURANDROMAIN" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="2" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="3" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="3" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="2" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="4" whitePlayer="MARECHALMORGANE"/>
+    </Games>
+    <ByePlayers>
+        <ByePlayer player="ROBINCLÉ" roundNumber="1"/>
+        <ByePlayer player="GOLOUBKOVALEXANDRA" roundNumber="3"/>
+        <ByePlayer player="MARECHALMORGANE" roundNumber="5"/>
+    </ByePlayers>
+    <TournamentParameterSet>
+        <GeneralParameterSet bInternet="false" basicTime="5" beginDate="2024-01-02" canByoYomiTime="300" complementaryTimeSystem="SUDDENDEATH" director="Theo" endDate="2024-01-02" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="1D" genMMFloor="20K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Marseillebb" name="Not so simple MM" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="5" shortName="notsimplemm" size="19" stdByoYomiTime="30"/>
+        <HandicapParameterSet hdBasedOnMMS="true" hdCeiling="9" hdCorrection="1" hdNoHdRankThreshold="1D"/>
+        <PlacementParameterSet>
+            <PlacementCriteria>
+                <PlacementCriterion name="MMS" number="1"/>
+                <PlacementCriterion name="SOSM" number="2"/>
+                <PlacementCriterion name="SOSOSM" number="3"/>
+                <PlacementCriterion name="NULL" number="4"/>
+                <PlacementCriterion name="NULL" number="5"/>
+                <PlacementCriterion name="NULL" number="6"/>
+            </PlacementCriteria>
+        </PlacementParameterSet>
+        <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="NULL" paiMaAvoidMixingCategories="0" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="2" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="100000000000" paiSeBarThresholdActive="true" paiSeDefSecCrit="100000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="false" paiSePreferMMSDiffRatherThanSameClub="3" paiSePreferMMSDiffRatherThanSameCountry="1" paiSeRankThreshold="1D" paiStandardNX1Factor="0.5"/>
+        <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="full" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
+        <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="true"/>
+    </TournamentParameterSet>
+    <TeamTournamentParameterSet>
+        <TeamGeneralParameterSet teamSize="4"/>
+        <TeamPlacementParameterSet>
+            <PlacementCriteria>
+                <PlacementCriterion name="TEAMP" number="1"/>
+                <PlacementCriterion name="BDW" number="2"/>
+                <PlacementCriterion name="BDW3U" number="3"/>
+                <PlacementCriterion name="BDW2U" number="4"/>
+                <PlacementCriterion name="BDW1U" number="5"/>
+                <PlacementCriterion name="MNR" number="6"/>
+            </PlacementCriteria>
+        </TeamPlacementParameterSet>
+    </TeamTournamentParameterSet>
+</Tournament>
