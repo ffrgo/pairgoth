@@ -24,6 +24,14 @@ class MacMahonSolver(round: Int,
         }
     }
 
+    override fun HandicapParams.pseudoRank(pairable: Pairable): Int {
+        if (useMMS) {
+            return (pairable.mms / 2 + Pairable.MIN_RANK).toInt()
+        } else {
+            return pairable.rank
+        }
+    }
+
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 

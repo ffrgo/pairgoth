@@ -14,6 +14,8 @@ abstract class BasePairingHelper(
     val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
     else HistoryHelper(history) { scores }
 
+    // Extend pairables with members from all rounds
+
     // The main criterion that will be used to define the groups should be defined by subclasses
     // SOS and variants will be computed based on this score
     val Pairable.main: Double get() = scores[id] ?: 0.0

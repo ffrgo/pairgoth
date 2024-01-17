@@ -394,7 +394,6 @@ sealed class BaseSolver(
 
             if(true){
                 println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
-                println(p1.rating)
                 println("Seed Sytem = " + currentSeedSystem.toString())
                 println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
                 println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
@@ -481,17 +480,18 @@ sealed class BaseSolver(
     }
 
     // Handicap functions
-    // Has to be overridden if handicap is not based on rank
-    open fun HandicapParams.handicap(white: Pairable, black: Pairable): Int {
-        var hd = 0
-        var pseudoRankWhite: Int = white.rank
-        var pseudoRankBlack: Int = black.rank
+    fun HandicapParams.handicap(white: Pairable, black: Pairable): Int {
+        var pseudoRankWhite: Int = pseudoRank(white)
+        var pseudoRankBlack: Int = pseudoRank(black)
 
         pseudoRankWhite = min(pseudoRankWhite, rankThreshold)
         pseudoRankBlack = min(pseudoRankBlack, rankThreshold)
-        hd = pseudoRankWhite - pseudoRankBlack
+        return clamp(pseudoRankWhite - pseudoRankBlack)
+    }
 
-        return clamp(hd)
+    // Has to be overridden if handicap is not based on rank
+    open fun HandicapParams.pseudoRank(pairable: Pairable): Int {
+        return pairable.rank
     }
 
     open fun HandicapParams.clamp(input: Int): Int {
