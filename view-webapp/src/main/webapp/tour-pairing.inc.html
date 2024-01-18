@@ -48,11 +48,17 @@
           </button>
         </div>
         <div id="paired" class="multi-select" title="white vs. black">
-          #foreach($game in $games)
-          #set($white = $pmap[$game.w])
-          #set($black = $pmap[$game.b])
-          <div class="listitem game" data-id="$game.id"><span class="table">#$game.t</span><span class="white">#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span><span>&nbsp;</span><span class="black">#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span>#if($game.h)<span class="handicap">h$game.h</span>#end</div>
-          #end
+#foreach($game in $games)
+  #set($white = $pmap[$game.w])
+  #set($black = $pmap[$game.b])
+          <div class="listitem game" data-id="$game.id">
+            <div class="table">#$game.t</div>
+            <div class="white">#if($white)$white.name $white.firstname#{else}BIP#end</div>
+            <div class="levels">#if($white)#rank($white.rank)#end&nbsp;/&nbsp;#if($black)#rank($black.rank)#end</div>
+            <div class="black">#if($black)$black.name $black.firstname#{else}BIP#end</div>
+            <div class="handicap">#if($game.h)h$game.h#{else}&nbsp;#end</div>
+          </div>
+#end
         </div>
       </div>
     </div>

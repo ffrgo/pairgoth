@@ -202,6 +202,22 @@
       }
     }
   }
+  #paired {
+    .listitem {
+      position: relative;
+      gap: 0;
+      .table, .handicap {
+        width: 3em;
+      }
+      .black, .white {
+        width: 45%;
+      }
+      .levels {
+        width: 6em;
+      }
+    }
+
+  }
   #pairing-buttons {
     display: flex;
     flex-flow: column nowrap;
