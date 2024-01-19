@@ -9,9 +9,9 @@ function setResult(id, result) {
         let dispResult = result;
         switch (result) {
           case '?': break;
-          case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = 'w+'; break;
-          case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = 'b+'; break;
-          case '=': break;
+          case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = '1-0'; break;
+          case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = '0-1'; break;
+          case '=': dispResult = '½-½'; break;
           case 'X': break;
           case '#': white.addClass('winner'); black.addClass('winner'); dispResult = '1-1'; break;
           case '0': white.addClass('looser'); black.addClass('looser'); dispResult = '0-0'; break;

@@ -122,7 +122,6 @@ onLoad(() => {
     $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
   $('#player-form').on('submit', e => {
-    ("submitting!!")
     e.preventDefault();
     let form = $('#player-form')[0];
     let player = {
