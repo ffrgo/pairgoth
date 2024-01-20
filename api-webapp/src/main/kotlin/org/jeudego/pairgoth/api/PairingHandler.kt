@@ -89,6 +89,10 @@ object PairingHandler: PairgothApiHandler {
         if (playing.contains(black.id)) badRequest("black is already in another game")
         if (playing.contains(white.id)) badRequest("white is already in another game")
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
+        if (payload.containsKey("t")) {
+            // TODO CB - update *all* tables numbers accordingly
+            game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
+        }
         tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
         return Json.Object("success" to true)
     }
