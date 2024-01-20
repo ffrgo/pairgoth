@@ -84,7 +84,7 @@ object StandingsHandler: PairgothApiHandler {
                 DC -> nullMap
             }
         }
-        val pairables = tournament.pairables.values.map { it.toMutableJson() }
+        val pairables = tournament.pairables.values.filter { it.final }.map { it.toMutableJson() }
         pairables.forEach { player ->
             for (crit in criteria) {
                 player[crit.first] = crit.second[player.getID()] ?: 0.0
