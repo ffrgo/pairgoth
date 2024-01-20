@@ -288,6 +288,8 @@ onLoad(() => {
     }).then(player => {
         if (player !== 'error') {
           cell.toggleClass('final');
+          standingsUpToDate = false;
+          pairablesUpToDate = false;
         }
       });
     e.preventDefault();

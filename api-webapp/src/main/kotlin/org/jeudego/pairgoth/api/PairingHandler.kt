@@ -21,8 +21,8 @@ object PairingHandler: PairgothApiHandler {
         val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        val unpairables = tournament.pairables.values.filter { it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val pairables = tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val unpairables = tournament.pairables.values.filter { !it.final || it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val pairables = tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val games = tournament.games(round).values
         return Json.Object(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
@@ -44,12 +44,13 @@ object PairingHandler: PairgothApiHandler {
         }.toSet()
         val pairables =
             if (allPlayers)
-                tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }
+                tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }
             else payload.map {
                 // CB - because of the '["all"]' map, conversion to int lands here... Better API syntax for 'all players'?
                 if (it is Number) it.toID() else badRequest("invalid pairable id: #$it")
             }.map { id ->
                 tournament.pairables[id]?.also {
+                    if (!it.final) badRequest("pairable #$id registration status is not final")
                     if (it.skip.contains(round)) badRequest("pairable #$id does not play round $round")
                     if (playing.contains(it.id)) badRequest("pairable #$id already plays round $round")
                 } ?: badRequest("invalid pairable id: #$id")
@@ -79,6 +80,8 @@ object PairingHandler: PairgothApiHandler {
         payload.getInt("dudd")?.let { game.drawnUpDown = it }
         val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
         val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
+        if (!black.final) badRequest("black registration status is not final")
+        if (!white.final) badRequest("white registration status is not final")
         if (black.skip.contains(round)) badRequest("black is not playing this round")
         if (white.skip.contains(round)) badRequest("white is not playing this round")
         if (playing.contains(black.id)) badRequest("black is already in another game")

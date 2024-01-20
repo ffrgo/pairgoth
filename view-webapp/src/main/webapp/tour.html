@@ -74,6 +74,7 @@
   const tour_rounds = ${tour.rounds};
   let activeRound = ${round};
   let standingsUpToDate = true;
+  let pairablesUpToDate = true;
   // $params
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
@@ -107,6 +108,8 @@
     $(`.step[data-step="${step}"], #${step}-tab`).addClass('active');
     window.location.hash = `#${step}`;
     if (step === 'standings' && !standingsUpToDate) {
+      window.location.reload();
+    } else if (step === 'pairing' && !pairablesUpToDate) {
       window.location.reload();
     }
   }
