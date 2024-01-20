@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.Store
+import java.util.*
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -68,13 +69,19 @@ sealed class Tournament <P: Pairable>(
         else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = games.size
 
+    fun usedTables(round: Int): BitSet =
+        games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
+            acc.set(table)
+            acc
+        }
+
     fun recomputeDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
         // TODO cleaner solver instantiation
         val history = games.map { games -> games.values.toList() }
         val solver = when (pairing.type) {
-            PairingType.SWISS -> SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams)
-            PairingType.MAC_MAHON -> MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, mmBar = 3, mmFloor = -20)
+            PairingType.SWISS -> SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round))
+            PairingType.MAC_MAHON -> MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round), mmBar = 3, mmFloor = -20)
             else -> throw Exception("Invalid tournament type")
         }
         // Recomputes DUDD

@@ -23,7 +23,9 @@ object PairingHandler: PairgothApiHandler {
         }.toSet()
         val unpairables = tournament.pairables.values.filter { !it.final || it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val pairables = tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val games = tournament.games(round).values
+        val games = tournament.games(round).values.sortedBy {
+            if (it.table == 0) Int.MAX_VALUE else it.table
+        }
         return Json.Object(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
             "pairables" to pairables,

@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -9,8 +10,9 @@ class MacMahonSolver(round: Int,
                      pairables: List<Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
+                     usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int):
-    BaseSolver(round, history, pairables, pairingParams, placementParams) {
+    BaseSolver(round, history, pairables, pairingParams, placementParams, usedTables) {
 
     override val scores: Map<ID, Double> by lazy {
         pairablesMap.mapValues {

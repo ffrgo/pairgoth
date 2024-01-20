@@ -26,6 +26,7 @@ sealed class BaseSolver(
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     pairing: PairingParams,
     placement: PlacementParams,
+    val usedTables: BitSet
     ) : BasePairingHelper(history, pairables, pairing, placement) {
 
     companion object {
@@ -532,7 +533,6 @@ sealed class BaseSolver(
     }
     open fun games(black: Pairable, white: Pairable): List<Game> {
         // CB TODO team of individuals pairing
-        val usedTables = tables.getOrNull(round - 1) ?: BitSet().also { tables.add(it) }
         val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
         usedTables.set(table)
         return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = pairing.handicap.handicap(white, black), drawnUpDown = dudd(black, white)))
