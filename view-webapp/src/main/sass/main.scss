@@ -371,4 +371,35 @@
   a.disabled {
     color: darkgray;
   }
+
+  @media print {
+
+    body {
+      width: unset;
+      height: unset;
+      font-size: 0.65em;
+    }
+
+    .roundbox {
+      border: none;
+    }
+
+    #title {
+      font-size: 1rem;
+      margin-top: 0;
+    }
+
+    #logo, #lang, .steps, #filter-box, #footer, #pairing-left, #pairing-buttons, button, #standings-params {
+      display: none !important;
+    }
+
+    .circular.label {
+      transform: scale(0.7);
+    }
+
+    #paired {
+      max-height: unset;
+    }
+
+  }
 }
