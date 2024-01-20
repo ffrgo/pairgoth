@@ -73,6 +73,7 @@ function fillPlayer(player) {
   let form = $('#player-form')[0];
   form.val('name', player.name);
   form.val('firstname', player.firstname);
+  console.log(country);
   form.val('country', country);
   form.val('club', player.club);
   form.val('rank', parseRank(player.rank));
@@ -83,6 +84,8 @@ function fillPlayer(player) {
   $('#register').focus();
 }
 
+let tableSort;
+
 onLoad(() => {
   $('input.numeric').imask({
     mask: Number,
@@ -90,7 +93,37 @@ onLoad(() => {
     min: 0,
     max: 4000
   });
-  new Tablesort($('#players')[0]);
+
+  let prevSort = store('registrationSort');
+  if (prevSort) {
+    let columns = $('#players thead th');
+    columns.forEach(th => {
+      th.removeAttribute('data-sort-default');
+      th.removeAttribute('aria-sort');
+    })
+    prevSort.forEach(i => {
+      let col = columns[Math.abs(i)];
+      col.setAttribute('data-sort-default', '1');
+      if (i < 0) {
+        // take into account TableSort initiailization bug
+        col.setAttribute('aria-sort', 'ascending');
+      }
+    });
+  }
+  tableSort = new Tablesort($('#players')[0]);
+  $('#players').on('afterSort', e => {
+    let sort = [];
+    $('#players thead th').forEach((th, i) => {
+      let attr = th.attr('aria-sort');
+      if (attr) {
+        let dir = i;
+        if (attr === 'descending') dir = -dir;
+        sort.push(dir);
+      }
+    });
+    store('registrationSort', sort);
+  });
+
   $('#add').on('click', e => {
     let form = $('#player-form')[0];
     form.addClass('add');
@@ -110,6 +143,7 @@ onLoad(() => {
   });
 
   $('#register').on('click', e => {
+    console.log("clicked")
     let form = e.target.closest('form');
     let valid = true;
     let required = ['name', 'firstname', 'country', 'club', 'rank', 'rating'];
@@ -128,6 +162,7 @@ onLoad(() => {
     $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
   $('#player-form').on('submit', e => {
+    console.log("submit")
     e.preventDefault();
     let form = $('#player-form')[0];
     let player = {
@@ -143,6 +178,7 @@ onLoad(() => {
     if (form.hasClass('add')) {
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
+          console.log(player)
           if (player !== 'error') {
             window.location.reload();
           }
@@ -152,6 +188,7 @@ onLoad(() => {
       player['id'] = id;
       api.putJson(`tour/${tour_id}/part/${id}`, player)
         .then(player => {
+          console.log(player)
           if (player !== 'error') {
             window.location.reload();
           }
@@ -171,7 +208,7 @@ onLoad(() => {
           form.val('firstname', player.firstname);
           form.val('rating', player.rating);
           form.val('rank', player.rank);
-          form.val('country', player.country);
+          form.val('country', player.country.toLowerCase());
           form.val('club', player.club);
           form.val('final', player.final);
           if (player.final) $('#final-reg').addClass('final');

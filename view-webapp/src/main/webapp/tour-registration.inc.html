@@ -18,8 +18,9 @@
           <th>Country</th>
           <th>Club</th>
           <th>Rank</th>
-          <th>Rating</th>
-          <th>Participation</th>
+          ## TableSort bug which inverts specified sort...
+          <th data-sort-default="1" aria-sort="ascending">Rating</th>
+          <th data-sort-method="none">Participation</th>
         </thead>
         <tbody>
 #foreach($part in $parts)

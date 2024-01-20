@@ -38,9 +38,7 @@ onLoad(()=>{
     let gameId = e.target.closest('tr').data('id');
     let result = cell.data('result');
     let index = results.indexOf(result);
-    console.log(index)
     result = results[(index + 1)%results.length];
-    console.log(result)
     setResult(gameId, result);
   });
 });

@@ -200,7 +200,6 @@ onLoad(() => {
             close_modal();
           }
         } else if (tab === '#pairing') {
-          console.log('here')
           $('#pairing-lists .selected.listitem').removeClass('selected');
         }
         break;
