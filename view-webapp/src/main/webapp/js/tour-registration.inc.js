@@ -130,6 +130,13 @@ onLoad(() => {
     // keep preliminary/final status
     let status = form.val('final') || false;
     form.reset();
+    // initial search checkboxes position
+    ['countryFilter', 'aga', 'egf', 'ffg'].forEach(id => {
+      let value = store(id);
+      if (value !== null && typeof(value) !== 'undefined') {
+        $(`#${id}`)[0].checked = value;
+      }
+    });
     form.val('final', status);
     $('#player').removeClass('edit').addClass('create');
     modal('player');
@@ -143,7 +150,6 @@ onLoad(() => {
   });
 
   $('#register').on('click', e => {
-    console.log("clicked")
     let form = e.target.closest('form');
     let valid = true;
     let required = ['name', 'firstname', 'country', 'club', 'rank', 'rating'];
@@ -162,7 +168,6 @@ onLoad(() => {
     $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
   $('#player-form').on('submit', e => {
-    console.log("submit")
     e.preventDefault();
     let form = $('#player-form')[0];
     let player = {
@@ -240,6 +245,9 @@ onLoad(() => {
     let chk = e.target.closest('.toggle');
     let checkbox = chk.find('input')[0];
     checkbox.checked = !checkbox.checked;
+    let id = checkbox.getAttribute('id');
+    let value = checkbox.checked;
+    store(id, value);
     initSearch();
   });
   document.on('click', e => {

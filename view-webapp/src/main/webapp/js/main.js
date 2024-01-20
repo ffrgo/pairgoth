@@ -255,17 +255,13 @@ onLoad(() => {
   // persistent scroll
   $('#center').on('scroll', e => {
     let scroll = $('#center')[0].scrollTop;
-    console.log(`scroll=${scroll}`);
     store('scroll', scroll);
   });
   let persistentScroll = store('scroll');
   if (persistentScroll) {
     setTimeout(() => {
-      console.log(`scrollHeight = ${$('#center')[0].scrollHeight}`);
-      console.log(`scrolling to ${persistentScroll}`);
       $('#center')[0].scrollTop = persistentScroll;
       let scroll = $('#center')[0].scrollTop;
-      console.log(`scrolled to ${scroll}`);
     }, 200);
   }
 
