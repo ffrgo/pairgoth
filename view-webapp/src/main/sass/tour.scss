@@ -143,6 +143,35 @@
 
   #player.popup {
     min-width: 65vw;
+    #final-reg {
+      .final {
+        color: green;
+        display: none;
+      }
+      &.final {
+        .preliminary {
+          display: none;
+        }
+        .final {
+          display: initial;
+        }
+      }
+    }
+  }
+
+  td.reg-status {
+    .final {
+      color: green;
+      display: none;
+    }
+    &.final {
+      .final {
+        display: initial;
+      }
+      .preliminary {
+        display: none;
+      }
+    }
   }
 
   /* pairing section */

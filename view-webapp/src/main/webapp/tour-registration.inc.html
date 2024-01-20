@@ -1,10 +1,18 @@
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
+    <div>
+      <div id="filter-box" class="ui icon input">
+        <input type="text" id="filter" placeholder="Search..."/>
+        <i class="circular times link icon"></i>
+      </div>
+    </div>
+
     <div id="players-list" class="roundbox">
 #set($parts = $api.get("tour/${params.id}/part"))
 #set($pmap = $utils.toMap($parts))
       <table id="players" class="ui celled selectable striped table">
         <thead>
+          <th>Reg</th>
           <th>Name</th>
           <th>First name</th>
           <th>Country</th>
@@ -15,10 +23,14 @@
         </thead>
         <tbody>
 #foreach($part in $parts)
-          <tr data-id="$part.id">
+          <tr data-id="$part.id" data-text="$esc.html("$part.name.toUpperCase() $part.firstname.toUpperCase() $part.club.toUpperCase()")">
+            <td class="centered reg-status #if($part.final)final#end">
+              <span class="preliminary"><i class="fa fa-question"></i></span>
+              <span class="final"><i class="fa fa-check"></i></span>
+            </td>
             <td>$part.name</td>
             <td>$part.firstname</td>
-            <td>$part.country</td>
+            <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
             <td data-sort="$part.rank">#rank($part.rank)</td>
             <td>$part.rating</td>
@@ -141,6 +153,14 @@
           </div>
         </div>
         <div class="inline fields">
+          <label>Final ?</label>
+          <div id="final-reg" class="field">
+            <input name="final" type="hidden"/>
+            <button id="reg-status" type="button" class="ui icon roundedremove mini button">
+              <span class="final"><i class="fa fa-check"></i></span>
+              <span class="preliminary"><i class="fa fa-question"></i></span>
+            </button>
+          </div>
           <label>Participation</label>
 #foreach($r in [1..$tour.rounds])
           <div class="centered field">

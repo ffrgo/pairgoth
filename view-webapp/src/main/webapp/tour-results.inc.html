@@ -14,7 +14,7 @@
         <th>result</th>
       </thead>
       <tbody>
-#set($dispRst = {'?':'?', 'w':'w+', 'b':'b+', '=':'=', 'X':'X', '#':'1-1', '0':'0-0'})
+#set($dispRst = {'?':'?', 'w':'1-0', 'b':'0-1', '=':'½-½', 'X':'X', '#':'1-1', '0':'0-0'})
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])

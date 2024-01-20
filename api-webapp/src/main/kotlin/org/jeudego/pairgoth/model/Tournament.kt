@@ -128,7 +128,7 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
-    inner class Team(id: ID, name: String): Pairable(id, name, 0, 0) {
+    inner class Team(id: ID, name: String, final: Boolean): Pairable(id, name, 0, 0, final) {
         val playerIds = mutableSetOf<ID>()
         val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
         override val rating: Int get() = if (teamPlayers.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
@@ -146,7 +146,8 @@ class TeamTournament(
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(
         id = json.getInt("id") ?: default?.id ?: Store.nextPlayerId,
-        name = json.getString("name") ?: default?.name ?: badRequest("missing name")
+        name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
+        final = json.getBoolean("final") ?: default?.final ?: badRequest("missing final")
     ).apply {
         json.getArray("players")?.let { arr ->
             arr.mapTo(playerIds) {

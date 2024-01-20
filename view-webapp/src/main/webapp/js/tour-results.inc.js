@@ -18,6 +18,7 @@ function setResult(id, result) {
         }
         let resultCell = row.find('td.result');
         resultCell.text(dispResult).data('result', result);
+        standingsUpToDate = false;
       }
     })
 }

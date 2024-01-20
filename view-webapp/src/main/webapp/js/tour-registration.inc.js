@@ -67,13 +67,17 @@ function parseRank(rank) {
 }
 
 function fillPlayer(player) {
+  // hack UK / GB
+  let country = player.country.toLowerCase();
+  if ('uk' === country) country = 'gb';
   let form = $('#player-form')[0];
   form.val('name', player.name);
   form.val('firstname', player.firstname);
-  form.val('country', player.country.toLowerCase());
+  form.val('country', country);
   form.val('club', player.club);
   form.val('rank', parseRank(player.rank));
   form.val('rating', player.rating);
+  form.val('final', false);
   $('#needle')[0].value = '';
   initSearch();
   $('#register').focus();
@@ -90,8 +94,10 @@ onLoad(() => {
   $('#add').on('click', e => {
     let form = $('#player-form')[0];
     form.addClass('add');
-    // $('#player-form input.participation').forEach(chk => chk.checked = true);
+    // keep preliminary/final status
+    let status = form.val('final') || false;
     form.reset();
+    form.val('final', status);
     $('#player').removeClass('edit').addClass('create');
     modal('player');
     $('#needle').focus();
@@ -131,7 +137,8 @@ onLoad(() => {
       rank: form.val('rank'),
       country: form.val('country'),
       club: form.val('club'),
-      skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0])
+      skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0]),
+      final: form.val('final')
     }
     if (form.hasClass('add')) {
       api.postJson(`tour/${tour_id}/part`, player)
@@ -152,6 +159,8 @@ onLoad(() => {
     }
   });
   $('#players > tbody > tr').on('click', e => {
+    let regStatus = e.target.closest('td.reg-status');
+    if (regStatus) return;
     let id = e.target.closest('tr').attr('data-id');
     api.getJson(`tour/${tour_id}/part/${id}`)
       .then(player => {
@@ -164,6 +173,9 @@ onLoad(() => {
           form.val('rank', player.rank);
           form.val('country', player.country);
           form.val('club', player.club);
+          form.val('final', player.final);
+          if (player.final) $('#final-reg').addClass('final');
+          else $('#final-reg').removeClass('final');
           for (r = 1; r <= tour_rounds; ++r) {
             form.val(`r${r}`, !(player.skip && player.skip.includes(r)));
           }
@@ -209,5 +221,45 @@ onLoad(() => {
           window.location.reload();
         }
     });
+  });
+  $('#reg-status').on('click', e => {
+    let current = $('#final-reg').hasClass('final');
+    if (current) {
+      $('input[name="final"]')[0].value = false;
+      $('#final-reg').removeClass('final');
+    } else {
+      $('input[name="final"]')[0].value = true;
+      $('#final-reg').addClass('final');
+    }
+  });
+  $('.reg-status').on('click', e => {
+    let cell = e.target.closest('td');
+    let tr = e.target.closest('tr');
+    let id = tr.data('id');
+    let newStatus = !cell.hasClass('final');
+    api.putJson(`tour/${tour_id}/part/${id}`, {
+      id: id,
+      final: newStatus
+    }).then(player => {
+        if (player !== 'error') {
+          cell.toggleClass('final');
+        }
+      });
+    e.preventDefault();
+    return false;
+  });
+  $('#filter').on('input', (e) => {
+    let input = e.target;
+    let value = input.value.toUpperCase();
+    if (value === '') $('tbody > tr').removeClass('hidden');
+    else $('tbody > tr').forEach(tr => {
+      let txt = tr.data('text');
+      if (txt && txt.indexOf(value) === -1) tr.addClass('hidden');
+      else tr.removeClass('hidden');
+    });
+  });
+  $('#filter-box i').on('click', e => {
+    $('#filter')[0].value = '';
+    $('tbody > tr').removeClass('hidden');
   });
 });

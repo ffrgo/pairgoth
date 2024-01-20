@@ -7,10 +7,10 @@ import java.util.*
 
 // Pairable
 
-sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int) {
+sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int, val final: Boolean) {
     companion object {
-        val MIN_RANK: Int = -30 // 30k
-        val MAX_RANK: Int = 8 // 9D
+        const val MIN_RANK: Int = -30 // 30k
+        const val MAX_RANK: Int = 8 // 9D
     }
     abstract fun toJson(): Json.Object
     abstract fun toMutableJson(): Json.MutableObject
@@ -26,7 +26,7 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
     }
 }
 
-object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE) {
+object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE, true) {
     override fun toJson(): Json.Object {
         throw Error("bye player should never be serialized")
     }
@@ -70,8 +70,9 @@ class Player(
     rating: Int,
     rank: Int,
     override var country: String,
-    override var club: String
-): Pairable(id, name, rating, rank) {
+    override var club: String,
+    final: Boolean
+): Pairable(id, name, rating, rank, final) {
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)
     val externalIds = mutableMapOf<DatabaseId, String>()
@@ -82,7 +83,8 @@ class Player(
         "rating" to rating,
         "rank" to rank,
         "country" to country,
-        "club" to club
+        "club" to club,
+        "final" to final
     ).also { json ->
         if (skip.isNotEmpty()) json["skip"] = Json.Array(skip)
         externalIds.forEach { (dbid, id) ->
@@ -103,7 +105,8 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     rating = json.getInt("rating") ?: default?.rating ?: badRequest("missing rating"),
     rank = json.getInt("rank") ?: default?.rank ?: badRequest("missing rank"),
     country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
-    club = json.getString("club") ?: default?.club ?: badRequest("missing club")
+    club = json.getString("club") ?: default?.club ?: badRequest("missing club"),
+    final = json.getBoolean("final") ?: default?.final ?: true
 ).also { player ->
     player.skip.clear()
     json.getArray("skip")?.let {
