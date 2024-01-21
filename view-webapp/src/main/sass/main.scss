@@ -210,6 +210,24 @@
     text-align: center;
   }
 
+  .ui.form .field :invalid {
+    color: #9f3a38;
+    background: #fff6f6;
+    background-image: initial;
+    background-position-x: initial;
+    background-position-y: initial;
+    background-size: initial;
+    background-repeat-x: initial;
+    background-repeat-y: initial;
+    background-attachment: initial;
+    background-origin: initial;
+    background-clip: initial;
+  }
+
+  .ui.striped.table>tbody>tr:nth-child(2n),.ui.striped.table>tr:nth-child(2n) {
+    background-color: rgba(0,0,50,.1)
+  }
+
   .form-actions {
     position: sticky;
     bottom: 1em;
@@ -385,11 +403,11 @@
     }
 
     #title {
-      font-size: 1rem;
-      margin-top: 0;
+      font-size: 1rem !important;
+      margin-top: 0.1em !important;
     }
 
-    #logo, #lang, .steps, #filter-box, #footer, #pairing-left, #pairing-buttons, button, #standings-params {
+    #logo, #lang, .steps, #filter-box, #footer, #pairing-left, #pairing-buttons, button, #standings-params, #logout {
       display: none !important;
     }
 
@@ -397,8 +415,16 @@
       transform: scale(0.7);
     }
 
+    #pairing-right {
+      max-width: unset !important;
+    }
+
     #paired {
-      max-height: unset;
+      max-height: unset !important;
+      max-width: unset !important;
+      font-size: 1rem !important;
+      line-height: 1.1rem !important;
+      min-width: 60vw;
     }
 
   }

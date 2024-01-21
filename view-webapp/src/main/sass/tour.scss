@@ -54,6 +54,13 @@
 
   /* registration section */
 
+  #list-header {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin: 0 1em;
+  }
+
   #players-list {
     max-width: 95vw;
     overflow-x: auto;
@@ -228,6 +235,9 @@
       &.selected {
         background-color: rgba(100,200,255,200);
         cursor: grab;
+      }
+      &:not(.selected):nth-child(2n) {
+        background-color: rgba(0,0,50,.1)
       }
     }
   }

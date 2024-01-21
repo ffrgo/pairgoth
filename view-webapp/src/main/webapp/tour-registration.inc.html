@@ -1,15 +1,18 @@
+#set($parts = $api.get("tour/${params.id}/part"))
+#set($pmap = $utils.toMap($parts))
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
-    <div>
+    <div id="list-header">
       <div id="filter-box" class="ui icon input">
         <input type="text" id="filter" placeholder="Search..."/>
         <i class="circular times link icon"></i>
       </div>
+      <div>
+        $parts.size() participants, $utils.countFinals($parts) confirmed.
+      </div>
     </div>
 
     <div id="players-list" class="roundbox">
-#set($parts = $api.get("tour/${params.id}/part"))
-#set($pmap = $utils.toMap($parts))
       <table id="players" class="ui celled selectable striped table">
         <thead>
           <th>Reg</th>
@@ -175,7 +178,7 @@
         <button id="cancel-register" type="button" class="ui gray right labeled icon floating close button">
           <i class="times icon"></i>
           <span class="edition">Close</span>
-          <span class="creation">Cancel</span>
+          <span class="creation">Close</span>
         </button>
         <button id="unregister" type="button" class="ui red right labeled icon floating button">
           <i class="trash icon"></i>

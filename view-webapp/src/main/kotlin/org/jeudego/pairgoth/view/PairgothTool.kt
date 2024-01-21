@@ -9,6 +9,8 @@ import com.republicate.kson.Json
 class PairgothTool {
     fun toMap(array: Json.Array) = array.map { ser -> ser as Json.Object }.associateBy { it.getLong("id")!! }
 
+    fun countFinals(array: Json.Array) = array.map { ser -> ser as Json.Object }.count { it.getBoolean("final") ?: false }
+
     fun getCriteria() = mapOf(
         "NONE" to "No tie break", // No ranking / tie-break
 

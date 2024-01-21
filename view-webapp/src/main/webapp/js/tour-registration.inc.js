@@ -84,6 +84,26 @@ function fillPlayer(player) {
   $('#register').focus();
 }
 
+function addPlayers() {
+  let form = $('#player-form')[0];
+  form.addClass('add');
+  // keep preliminary/final status
+  let status = form.val('final') || false;
+  form.reset();
+  // initial search checkboxes position
+  ['countryFilter', 'aga', 'egf', 'ffg'].forEach(id => {
+    let value = store(id);
+    if (value !== null && typeof(value) !== 'undefined') {
+      $(`#${id}`)[0].checked = value;
+    }
+  });
+  form.val('final', status);
+  $('#player').removeClass('edit').addClass('create');
+  modal('player');
+  $('#needle').focus();
+  store('addingPlayers', true);
+}
+
 let tableSort;
 
 onLoad(() => {
@@ -125,22 +145,7 @@ onLoad(() => {
   });
 
   $('#add').on('click', e => {
-    let form = $('#player-form')[0];
-    form.addClass('add');
-    // keep preliminary/final status
-    let status = form.val('final') || false;
-    form.reset();
-    // initial search checkboxes position
-    ['countryFilter', 'aga', 'egf', 'ffg'].forEach(id => {
-      let value = store(id);
-      if (value !== null && typeof(value) !== 'undefined') {
-        $(`#${id}`)[0].checked = value;
-      }
-    });
-    form.val('final', status);
-    $('#player').removeClass('edit').addClass('create');
-    modal('player');
-    $('#needle').focus();
+    addPlayers();
   });
   $('#cancel-register').on('click', e => {
     e.preventDefault();
@@ -309,4 +314,7 @@ onLoad(() => {
     $('#filter')[0].value = '';
     $('tbody > tr').removeClass('hidden');
   });
+  if (store('addingPlayers')) {
+    addPlayers();
+  }
 });

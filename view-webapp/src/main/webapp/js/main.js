@@ -161,6 +161,7 @@ function modal(id) {
 function close_modal() {
   $('body').removeClass('dimmed');
   $(`.popup`).removeClass('shown');
+  store('addingPlayers', false);
 }
 
 function downloadFile(blob, filename) {
