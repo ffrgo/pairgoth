@@ -5,6 +5,11 @@ import org.jeudego.pairgoth.model.Game.Result.*
 
 open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: HistoryHelper.()-> Map<ID, Double>) {
 
+    // List of all the pairables ID present in the history
+    val allPairables = history.flatten()
+        .map { game -> listOf(game.white, game.black) }
+        .flatten().distinct()
+
     private val Game.blackScore get() = when (result) {
         BLACK, BOTHWIN -> 1.0
         else -> 0.0

@@ -40,8 +40,8 @@ data class MainCritParams(
     val scoreWeight: Double = MAX_SCORE_WEIGHT, // opengotha minimizeScoreDifference
     val drawUpDownWeight: Double = MAX_DRAW_UP_DOWN_WEIGHT, // opengotha DUDDWeight
     val compensateDrawUpDown: Boolean = true,
-    val drawUpDownUpperMode: DrawUpDown = DrawUpDown.MIDDLE,
-    val drawUpDownLowerMode: DrawUpDown = DrawUpDown.MIDDLE,
+    val drawUpDownUpperMode: DrawUpDown = DrawUpDown.BOTTOM,
+    val drawUpDownLowerMode: DrawUpDown = DrawUpDown.TOP,
     val seedingWeight: Double = MAX_SEEDING_WEIGHT, // 5 *10^6, opengotha maximizeSeeding
     val lastRoundForSeedSystem1: Int = 1,
     val seedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,

@@ -28,6 +28,10 @@ data class Game(
             fun fromSymbol(c: Char) = byChar[c] ?: throw Error("unknown result symbol: $c")
         }
     }
+
+    fun bipPlayed(): Boolean {
+        return white == ByePlayer.id ||black == ByePlayer.id
+    }
 }
 
 // serialization
