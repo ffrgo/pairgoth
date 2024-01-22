@@ -4,7 +4,6 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.TeamTournament
-import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -26,7 +25,7 @@ object TeamHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val team = tournament.teamFromJson(payload)
         tournament.teams[team.id] = team
-        tournament.dispatchEvent(teamAdded, team.toJson())
+        tournament.dispatchEvent(TeamAdded, team.toJson())
         return Json.Object("success" to true, "id" to team.id)
     }
 
@@ -38,7 +37,7 @@ object TeamHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val updated = tournament.teamFromJson(payload, team)
         tournament.teams[updated.id] = updated
-        tournament.dispatchEvent(teamUpdated, team.toJson())
+        tournament.dispatchEvent(TeamUpdated, team.toJson())
         return Json.Object("success" to true)
     }
 
@@ -47,7 +46,7 @@ object TeamHandler: PairgothApiHandler {
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid team selector")
         tournament.teams.remove(id) ?: badRequest("invalid team id")
-        tournament.dispatchEvent(teamDeleted, Json.Object("id" to id))
+        tournament.dispatchEvent(TeamDeleted, Json.Object("id" to id))
         return Json.Object("success" to true)
     }
 }

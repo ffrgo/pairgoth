@@ -4,6 +4,8 @@
     <button class="ui floating choose-round prev-round button">&laquo;</button>
     <span class="active-round">$round</span>
     <button class="ui floating choose-round next-round button">&raquo;</button>
+#set($stats = $utils.getResultsStats($games))
+    <span class="norbeak"><span id="known">$stats.known</span> / $stats.total</span>
   </div>
   <div id="results-list" class="roundbox">
     <table id="results-table" class="ui celled striped table">
@@ -23,7 +25,7 @@
           <td>#$game.t</td>
           <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name $white.firstname"><span>#if($white)$white.name $white.firstname #rank($white.rank)#{else}BIP#end</span></td>
           <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name $black.firstname"><span>#if($black)$black.name $black.firstname #rank($black.rank)#{else}BIP#end</span></td>
-          <td class="result centered" data-result="$game.r">$dispRst[$game.r]</td>
+          <td class="result centered" data-sort="$game.r" data-result="$game.r">$dispRst[$game.r]</td>
         </tr>
   #end
 #end

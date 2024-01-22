@@ -425,6 +425,9 @@
       font-size: 1rem !important;
       line-height: 1.1rem !important;
       min-width: 60vw;
+      &::before {
+        top: 0;
+      }
     }
 
   }

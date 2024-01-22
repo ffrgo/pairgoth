@@ -1,4 +1,4 @@
-function setResult(id, result) {
+function setResult(id, result, previous) {
   api.putJson(`tour/${tour_id}/res/${activeRound}`, { id: id, result: result })
     .then(res => {
       if (res !== 'error') {
@@ -19,6 +19,16 @@ function setResult(id, result) {
         let resultCell = row.find('td.result');
         resultCell.text(dispResult).data('result', result);
         standingsUpToDate = false;
+
+        if (previous === '?') {
+          let indicator = $('#known')[0];
+          let known = parseInt(indicator.innerText);
+          indicator.innerText = ++known;
+        } else if (result === '?') {
+          let indicator = $('#known')[0];
+          let known = parseInt(indicator.innerText);
+          indicator.innerText = --known;
+        }
       }
     })
 }
@@ -36,9 +46,9 @@ onLoad(()=>{
   $('#results-table .result').on('click', e => {
     let cell = e.target.closest('.result');
     let gameId = e.target.closest('tr').data('id');
-    let result = cell.data('result');
-    let index = results.indexOf(result);
-    result = results[(index + 1)%results.length];
-    setResult(gameId, result);
+    let oldResult = cell.data('result');
+    let index = results.indexOf(oldResult);
+    let newResult = results[(index + 1)%results.length];
+    setResult(gameId, newResult, oldResult);
   });
 });

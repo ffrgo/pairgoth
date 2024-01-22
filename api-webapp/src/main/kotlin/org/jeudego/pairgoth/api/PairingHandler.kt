@@ -7,7 +7,6 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -59,7 +58,7 @@ object PairingHandler: PairgothApiHandler {
             }
         val games = tournament.pair(round, pairables)
         val ret = games.map { it.toJson() }.toJsonArray()
-        tournament.dispatchEvent(gamesAdded, Json.Object("round" to round, "games" to ret))
+        tournament.dispatchEvent(GamesAdded, Json.Object("round" to round, "games" to ret))
         return ret
     }
 
@@ -78,6 +77,7 @@ object PairingHandler: PairgothApiHandler {
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
         tournament.recomputeDUDD(round, game.id)
+        val previousTable = game.table;
         // temporary
         payload.getInt("dudd")?.let { game.drawnUpDown = it }
         val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
@@ -90,10 +90,15 @@ object PairingHandler: PairgothApiHandler {
         if (playing.contains(white.id)) badRequest("white is already in another game")
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
         if (payload.containsKey("t")) {
-            // TODO CB - update *all* tables numbers accordingly
             game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
         }
-        tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+        tournament.dispatchEvent(GameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+        if (game.table != previousTable && tournament.renumberTables(round, game)) {
+            val games = tournament.games(round).values.sortedBy {
+                if (it.table == 0) Int.MAX_VALUE else it.table
+            }
+            tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+        }
         return Json.Object("success" to true)
     }
 
@@ -111,7 +116,7 @@ object PairingHandler: PairgothApiHandler {
             payload.forEach {
                 val id = (it as Number).toInt()
                 val game = tournament.games(round)[id] ?: throw Error("invalid game id")
-                if (game.result != Game.Result.UNKNOWN) {
+                if (game.result != Game.Result.UNKNOWN && game.black != 0 && game.white != 0) {
                     ApiHandler.logger.error("cannot unpair game id ${game.id}: it has a result")
                     // we'll only skip it
                     // throw Error("cannot unpair ")
@@ -120,7 +125,7 @@ object PairingHandler: PairgothApiHandler {
                 }
             }
         }
-        tournament.dispatchEvent(gamesDeleted, Json.Object("round" to round, "games" to payload))
+        tournament.dispatchEvent(GamesDeleted, Json.Object("round" to round, "games" to payload))
         return Json.Object("success" to true)
     }
 }

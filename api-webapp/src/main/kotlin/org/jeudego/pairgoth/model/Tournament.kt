@@ -90,6 +90,23 @@ sealed class Tournament <P: Pairable>(
         val blackplayer = solver.pairables.find { p-> p.id == game.black }!!
         game.drawnUpDown = solver.dudd(blackplayer, whiteplayer)
     }
+
+    fun renumberTables(round: Int, pivot: Game? = null): Boolean {
+        var changed = false
+        var nextTable = 1
+        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy { game ->
+            val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE
+            val blackRank = pairables[game.black]?.rating ?: Int.MIN_VALUE
+            -(2 * whiteRank + 2 * blackRank) / 2
+        }.forEach { game ->
+            if (pivot != null && nextTable == pivot.table) {
+                ++nextTable
+            }
+            changed = changed || game.table != nextTable
+            game.table = nextTable++
+        }
+        return changed
+    }
 }
 
 // standard tournament of individuals

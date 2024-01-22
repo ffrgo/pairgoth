@@ -45,4 +45,17 @@ class PairgothTool {
         "SDC" to "Simplified direct confrontation", // Simplified direct confrontation
         "DC" to "Direct confrontation", // Direct confrontation
     )
+
+    fun getResultsStats(games: Collection<Json.Object>): Json.Object {
+        var total = 0
+        var known = 0
+        games
+            .filter{ it.getInt("b")!! != 0 && it.getInt("w")!! != 0 }
+            .map { it -> it.getString("r") }
+            .forEach {
+                ++total
+                if ("?" != it) ++known
+            }
+        return Json.Object("total" to total, "known" to known)
+    }
 }
