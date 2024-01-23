@@ -51,7 +51,6 @@ sealed class BaseSolver(
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 
-        val WEIGHTS_FILE = "src/test/resources/weights.txt"
         val dec = DecimalFormat("#.#")
 
         weightsLogger?.apply {
@@ -73,7 +72,7 @@ sealed class BaseSolver(
                     minWeight = weightForBye
                     chosenByePlayer = p
                 }
-                println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
+                // println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
             println("Bye player : " + chosenByePlayer.nameSeed())
             byePlayers.add(chosenByePlayer)
@@ -112,7 +111,7 @@ sealed class BaseSolver(
 
         val sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
-        }.sortedWith(compareBy({ min(it[0].place, it[1].place) }))
+        }.sortedWith(compareBy { min(it[0].place, it[1].place) })
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
@@ -131,8 +130,9 @@ sealed class BaseSolver(
             //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
             //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
             var sumOfWeights = 0.0
-            println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
+            //println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
+                /*
                 println(it[0].nameSeed() + " " + it[0].place.toString()
                                          + " " + it[0].id.toString()
                                          + " " + it[0].colorBalance.toString()
@@ -145,10 +145,11 @@ sealed class BaseSolver(
                                          + " " + it[1].group.toString()
                                          + " " + it[1].drawnUpDown.toString()
                 )
+                 */
                 sumOfWeights += weight(it[0], it[1])
             }
             val dec = DecimalFormat("#.#")
-            println("sumOfWeights = " + dec.format(sumOfWeights))
+            // println("sumOfWeights = " + dec.format(sumOfWeights))
         }
 
         return result
