@@ -24,7 +24,7 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
                     it["origin"] = "FFG"
                     val rating = it["rating"]?.toString()?.toIntOrNull()
                     if (rating != null) {
-                        it["rank"] = (rating/100).let { if (it < 0) "${-it}k" else "${it+1}d" }
+                        it["rank"] = (rating/100).let { if (rating < 0) "${-it+1}k" else "${it+1}d" }
                         // then adjust to match EGF ratings
                         it["rating"] = rating + 2050
                     }
