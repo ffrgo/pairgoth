@@ -7,7 +7,7 @@ import java.util.*
 
 // Pairable
 
-sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int, val final: Boolean) {
+sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
     companion object {
         const val MIN_RANK: Int = -30 // 30k
         const val MAX_RANK: Int = 8 // 9D
@@ -71,8 +71,9 @@ class Player(
     rank: Int,
     override var country: String,
     override var club: String,
-    final: Boolean
-): Pairable(id, name, rating, rank, final) {
+    final: Boolean,
+    mmsCorrection: Int = 0
+): Pairable(id, name, rating, rank, final, mmsCorrection) {
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)
     val externalIds = mutableMapOf<DatabaseId, String>()
@@ -87,6 +88,7 @@ class Player(
         "final" to final
     ).also { json ->
         if (skip.isNotEmpty()) json["skip"] = Json.Array(skip)
+        if (mmsCorrection != 0) json["mmsCorrection"] = mmsCorrection
         externalIds.forEach { (dbid, id) ->
             json[dbid.key] = id
         }
@@ -106,7 +108,8 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     rank = json.getInt("rank") ?: default?.rank ?: badRequest("missing rank"),
     country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
     club = json.getString("club") ?: default?.club ?: badRequest("missing club"),
-    final = json.getBoolean("final") ?: default?.final ?: true
+    final = json.getBoolean("final") ?: default?.final ?: true,
+    mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
 ).also { player ->
     player.skip.clear()
     json.getArray("skip")?.let {

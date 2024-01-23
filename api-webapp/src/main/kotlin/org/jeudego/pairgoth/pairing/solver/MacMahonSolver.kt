@@ -24,7 +24,7 @@ class MacMahonSolver(round: Int,
         }
     }
 
-    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
+    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria
