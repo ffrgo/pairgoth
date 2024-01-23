@@ -73,7 +73,11 @@ object PairingHandler: PairgothApiHandler {
         val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        if (game.result != Game.Result.UNKNOWN) badRequest("Game already has a result");
+        if (game.result != Game.Result.UNKNOWN && (
+                    game.black != payload.getInt("b") ||
+                    game.white != payload.getInt("w") ||
+                    game.handicap != payload.getInt("h")
+            )) badRequest("Game already has a result")
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
         tournament.recomputeDUDD(round, game.id)
