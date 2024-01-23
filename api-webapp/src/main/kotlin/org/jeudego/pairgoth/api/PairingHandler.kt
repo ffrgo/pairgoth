@@ -7,7 +7,6 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -21,9 +20,11 @@ object PairingHandler: PairgothApiHandler {
         val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        val unpairables = tournament.pairables.values.filter { it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val pairables = tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val games = tournament.games(round).values
+        val unpairables = tournament.pairables.values.filter { !it.final || it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val pairables = tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val games = tournament.games(round).values.sortedBy {
+            if (it.table == 0) Int.MAX_VALUE else it.table
+        }
         return Json.Object(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
             "pairables" to pairables,
@@ -44,19 +45,20 @@ object PairingHandler: PairgothApiHandler {
         }.toSet()
         val pairables =
             if (allPlayers)
-                tournament.pairables.values.filter { !it.skip.contains(round) && !playing.contains(it.id) }
+                tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }
             else payload.map {
                 // CB - because of the '["all"]' map, conversion to int lands here... Better API syntax for 'all players'?
                 if (it is Number) it.toID() else badRequest("invalid pairable id: #$it")
             }.map { id ->
                 tournament.pairables[id]?.also {
+                    if (!it.final) badRequest("pairable #$id registration status is not final")
                     if (it.skip.contains(round)) badRequest("pairable #$id does not play round $round")
                     if (playing.contains(it.id)) badRequest("pairable #$id already plays round $round")
                 } ?: badRequest("invalid pairable id: #$id")
             }
         val games = tournament.pair(round, pairables)
         val ret = games.map { it.toJson() }.toJsonArray()
-        tournament.dispatchEvent(gamesAdded, Json.Object("round" to round, "games" to ret))
+        tournament.dispatchEvent(GamesAdded, Json.Object("round" to round, "games" to ret))
         return ret
     }
 
@@ -71,20 +73,37 @@ object PairingHandler: PairgothApiHandler {
         val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
             listOf(it.black, it.white)
         }.toSet()
+        if (game.result != Game.Result.UNKNOWN && (
+                    game.black != payload.getInt("b") ||
+                    game.white != payload.getInt("w") ||
+                    game.handicap != payload.getInt("h")
+            )) badRequest("Game already has a result")
         game.black = payload.getID("b") ?: badRequest("missing black player id")
         game.white = payload.getID("w") ?: badRequest("missing white player id")
 
         tournament.recomputeHdAndDUDD(round, game.id)
+        val previousTable = game.table;
         // temporary
         //payload.getInt("dudd")?.let { game.drawnUpDown = it }
         val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
         val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
+        if (!black.final) badRequest("black registration status is not final")
+        if (!white.final) badRequest("white registration status is not final")
         if (black.skip.contains(round)) badRequest("black is not playing this round")
         if (white.skip.contains(round)) badRequest("white is not playing this round")
         if (playing.contains(black.id)) badRequest("black is already in another game")
         if (playing.contains(white.id)) badRequest("white is already in another game")
         if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
-        tournament.dispatchEvent(gameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+        if (payload.containsKey("t")) {
+            game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
+        }
+        tournament.dispatchEvent(GameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+        if (game.table != previousTable && tournament.renumberTables(round, game)) {
+            val games = tournament.games(round).values.sortedBy {
+                if (it.table == 0) Int.MAX_VALUE else it.table
+            }
+            tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+        }
         return Json.Object("success" to true)
     }
 
@@ -102,7 +121,7 @@ object PairingHandler: PairgothApiHandler {
             payload.forEach {
                 val id = (it as Number).toInt()
                 val game = tournament.games(round)[id] ?: throw Error("invalid game id")
-                if (game.result != Game.Result.UNKNOWN) {
+                if (game.result != Game.Result.UNKNOWN && game.black != 0 && game.white != 0) {
                     ApiHandler.logger.error("cannot unpair game id ${game.id}: it has a result")
                     // we'll only skip it
                     // throw Error("cannot unpair ")
@@ -111,7 +130,7 @@ object PairingHandler: PairgothApiHandler {
                 }
             }
         }
-        tournament.dispatchEvent(gamesDeleted, Json.Object("round" to round, "games" to payload))
+        tournament.dispatchEvent(GamesDeleted, Json.Object("round" to round, "games" to payload))
         return Json.Object("success" to true)
     }
 }

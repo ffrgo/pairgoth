@@ -54,6 +54,18 @@
 
   /* registration section */
 
+  #list-header {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    margin: 0 1em;
+  }
+
+  #players-list {
+    max-width: 95vw;
+    overflow-x: auto;
+  }
+
   #player {
     &.create {
       .edition {
@@ -138,6 +150,35 @@
 
   #player.popup {
     min-width: 65vw;
+    #final-reg {
+      .final {
+        color: green;
+        display: none;
+      }
+      &.final {
+        .preliminary {
+          display: none;
+        }
+        .final {
+          display: initial;
+        }
+      }
+    }
+  }
+
+  td.reg-status {
+    .final {
+      color: green;
+      display: none;
+    }
+    &.final {
+      .final {
+        display: initial;
+      }
+      .preliminary {
+        display: none;
+      }
+    }
   }
 
   /* pairing section */
@@ -195,7 +236,29 @@
         background-color: rgba(100,200,255,200);
         cursor: grab;
       }
+      &:not(.selected):nth-child(2n) {
+        background-color: rgba(0,0,50,.1)
+      }
     }
+  }
+  #pairables {
+    margin-bottom: 1em;
+  }
+  #paired {
+    .listitem {
+      position: relative;
+      gap: 0;
+      .table, .handicap {
+        width: 3em;
+      }
+      .black, .white {
+        width: 45%;
+      }
+      .levels {
+        width: 6em;
+      }
+    }
+
   }
   #pairing-buttons {
     display: flex;
@@ -279,5 +342,9 @@
     #params-submit {
       justify-content: space-around;
     }
+  }
+  #standings-container {
+    max-width: 95vw;
+    overflow-x: auto;
   }
 }

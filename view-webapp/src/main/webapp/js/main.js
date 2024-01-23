@@ -161,6 +161,7 @@ function modal(id) {
 function close_modal() {
   $('body').removeClass('dimmed');
   $(`.popup`).removeClass('shown');
+  store('addingPlayers', false);
 }
 
 function downloadFile(blob, filename) {
@@ -189,44 +190,55 @@ onLoad(() => {
 
   // keyboard handling
   document.on('keyup', e => {
+    let tab = document.location.hash;
     switch (e.key) {
       case 'Escape': {
-        if ($('#player').hasClass('shown') && $('#needle')[0].value) {
+        if (tab === '#registration') {
+          if ($('#player').hasClass('shown') && $('#needle')[0].value) {
             $('#needle')[0].value = '';
             initSearch();
-        } else {
-          close_modal();
+          } else {
+            close_modal();
+          }
+        } else if (tab === '#pairing') {
+          $('#pairing-lists .selected.listitem').removeClass('selected');
         }
         break;
       }
       case 'ArrowDown': {
-        if (typeof(searchResultShown) === 'function' && searchResultShown()) {
-          let lines = $('.result-line');
-          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
-          else ++searchHighlight;
-          searchHighlight = Math.min(searchHighlight, lines.length - 1);
-          lines.removeClass('highlighted');
-          lines[searchHighlight].addClass('highlighted');
+        if (tab === '#registration') {
+          if (typeof(searchResultShown) === 'function' && searchResultShown()) {
+            let lines = $('.result-line');
+            if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+            else ++searchHighlight;
+            searchHighlight = Math.min(searchHighlight, lines.length - 1);
+            lines.removeClass('highlighted');
+            lines[searchHighlight].addClass('highlighted');
+          }
         }
         break;
       }
       case 'ArrowUp': {
-        if (typeof(searchResultShown) === 'function' && searchResultShown()) {
-          let lines = $('.result-line');
-          if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
-          else --searchHighlight;
-          searchHighlight = Math.max(searchHighlight, 0);
-          lines.removeClass('highlighted');
-          lines[searchHighlight].addClass('highlighted');
+        if (tab === '#registration') {
+          if (typeof(searchResultShown) === 'function' && searchResultShown()) {
+            let lines = $('.result-line');
+            if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+            else --searchHighlight;
+            searchHighlight = Math.max(searchHighlight, 0);
+            lines.removeClass('highlighted');
+            lines[searchHighlight].addClass('highlighted');
+          }
         }
         break;
       }
       case 'Enter': {
-        if (typeof(searchResultShown) === 'function') {
-          if (searchResultShown()) {
-            fillPlayer(searchResult[searchHighlight]);
-          } else {
-            $('#register')[0].click();
+        if (tab === '#registration') {
+          if (typeof(searchResultShown) === 'function') {
+            if (searchResultShown()) {
+              fillPlayer(searchResult[searchHighlight]);
+            } else {
+              $('#register')[0].click();
+            }
           }
         }
         break;
@@ -239,6 +251,19 @@ onLoad(() => {
     setTimeout(function() {
       window.scrollTo(0, 0);
     }, 1);
+  }
+
+  // persistent scroll
+  $('#center').on('scroll', e => {
+    let scroll = $('#center')[0].scrollTop;
+    store('scroll', scroll);
+  });
+  let persistentScroll = store('scroll');
+  if (persistentScroll) {
+    setTimeout(() => {
+      $('#center')[0].scrollTop = persistentScroll;
+      let scroll = $('#center')[0].scrollTop;
+    }, 200);
   }
 
 });

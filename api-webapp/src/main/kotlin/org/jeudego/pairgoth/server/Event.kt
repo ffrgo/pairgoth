@@ -4,19 +4,20 @@ import info.macias.sse.events.MessageEvent
 import java.util.concurrent.atomic.AtomicLong
 
 enum class Event {
-    tournamentAdded,
-    tournamentUpdated,
-    tournamentDeleted,
-    playerAdded,
-    playerUpdated,
-    playerDeleted,
-    teamAdded,
-    teamUpdated,
-    teamDeleted,
-    gamesAdded,
-    gamesDeleted,
-    gameUpdated,
-    resultUpdated,
+    TournamentAdded,
+    TournamentUpdated,
+    TournamentDeleted,
+    PlayerAdded,
+    PlayerUpdated,
+    PlayerDeleted,
+    TeamAdded,
+    TeamUpdated,
+    TeamDeleted,
+    GamesAdded,
+    GamesDeleted,
+    GameUpdated,
+    ResultUpdated,
+    TablesRenumbered
     ;
 
     companion object {

@@ -1,13 +1,16 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import java.util.*
 
 class SwissSolver(round: Int,
                   history: List<List<Game>>,
                   pairables: List<Pairable>,
                   pairingParams: PairingParams,
-                  placementParams: PlacementParams):
-        BaseSolver(round, history, pairables, pairingParams, placementParams) {
+                  placementParams: PlacementParams,
+                  usedTables: BitSet
+):
+        BaseSolver(round, history, pairables, pairingParams, placementParams, usedTables) {
 
     // In a Swiss tournament the main criterion is the number of wins and already computed
 

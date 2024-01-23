@@ -16,7 +16,7 @@ interface PairgothApiHandler: ApiHandler {
     fun Tournament<*>.dispatchEvent(event: Event, data: Json? = null) {
         Event.dispatch(event, Json.Object("tournament" to id, "data" to data))
         // when storage is not in memory, the tournament has to be persisted
-        if (event != Event.tournamentAdded && event != Event.tournamentDeleted && event != Event.gameUpdated)
+        if (event != Event.TournamentAdded && event != Event.TournamentDeleted)
             Store.replaceTournament(this)
     }
 

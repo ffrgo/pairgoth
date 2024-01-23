@@ -1,4 +1,4 @@
-function setResult(id, result) {
+function setResult(id, result, previous) {
   api.putJson(`tour/${tour_id}/res/${activeRound}`, { id: id, result: result })
     .then(res => {
       if (res !== 'error') {
@@ -9,15 +9,26 @@ function setResult(id, result) {
         let dispResult = result;
         switch (result) {
           case '?': break;
-          case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = 'w+'; break;
-          case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = 'b+'; break;
-          case '=': break;
+          case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = '1-0'; break;
+          case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = '0-1'; break;
+          case '=': dispResult = '½-½'; break;
           case 'X': break;
           case '#': white.addClass('winner'); black.addClass('winner'); dispResult = '1-1'; break;
           case '0': white.addClass('looser'); black.addClass('looser'); dispResult = '0-0'; break;
         }
         let resultCell = row.find('td.result');
         resultCell.text(dispResult).data('result', result);
+        standingsUpToDate = false;
+
+        if (previous === '?') {
+          let indicator = $('#known')[0];
+          let known = parseInt(indicator.innerText);
+          indicator.innerText = ++known;
+        } else if (result === '?') {
+          let indicator = $('#known')[0];
+          let known = parseInt(indicator.innerText);
+          indicator.innerText = --known;
+        }
       }
     })
 }
@@ -35,11 +46,9 @@ onLoad(()=>{
   $('#results-table .result').on('click', e => {
     let cell = e.target.closest('.result');
     let gameId = e.target.closest('tr').data('id');
-    let result = cell.data('result');
-    let index = results.indexOf(result);
-    console.log(index)
-    result = results[(index + 1)%results.length];
-    console.log(result)
-    setResult(gameId, result);
+    let oldResult = cell.data('result');
+    let index = results.indexOf(oldResult);
+    let newResult = results[(index + 1)%results.length];
+    setResult(gameId, newResult, oldResult);
   });
 });

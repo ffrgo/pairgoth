@@ -120,8 +120,14 @@ Element.prototype.hide = function() {
   return this;
 }
 NodeList.prototype.text = function(txt) {
-  this.item(0).text(txt);
-  return this;
+  if (typeof(txt) === 'undefined') {
+    return this.item(0).text();
+  } else {
+    this.forEach(elem => {
+      elem.text(txt);
+    });
+    return this;
+  }
 }
 Element.prototype.text = function(txt) {
   if (typeof(txt) === 'undefined') {

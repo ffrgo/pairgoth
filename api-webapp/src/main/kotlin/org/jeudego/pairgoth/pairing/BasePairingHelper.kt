@@ -136,11 +136,4 @@ abstract class BasePairingHelper(
     open fun nameSort(p: Pairable, q: Pairable): Int {
         return if (p.name > q.name) 1 else -1
     }
-
-    val tables = history.mapTo(mutableListOf()) { games ->
-        games.map { it.table }.fold(BitSet()) { acc, table ->
-            acc.set(table)
-            acc
-        }
-    }
 }

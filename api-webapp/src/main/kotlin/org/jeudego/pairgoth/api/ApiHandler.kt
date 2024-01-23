@@ -13,7 +13,7 @@ interface ApiHandler {
         when (request.method) {
             "GET" -> get(request, response)
             "POST" -> post(request)
-            "PUT" -> put(request)
+             "PUT" -> put(request)
             "DELETE" -> delete(request)
             else -> notImplemented()
         }

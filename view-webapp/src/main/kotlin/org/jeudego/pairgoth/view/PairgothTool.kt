@@ -9,6 +9,8 @@ import com.republicate.kson.Json
 class PairgothTool {
     fun toMap(array: Json.Array) = array.map { ser -> ser as Json.Object }.associateBy { it.getLong("id")!! }
 
+    fun countFinals(array: Json.Array) = array.map { ser -> ser as Json.Object }.count { it.getBoolean("final") ?: false }
+
     fun getCriteria() = mapOf(
         "NONE" to "No tie break", // No ranking / tie-break
 
@@ -43,4 +45,17 @@ class PairgothTool {
         "SDC" to "Simplified direct confrontation", // Simplified direct confrontation
         "DC" to "Direct confrontation", // Direct confrontation
     )
+
+    fun getResultsStats(games: Collection<Json.Object>): Json.Object {
+        var total = 0
+        var known = 0
+        games
+            .filter{ it.getInt("b")!! != 0 && it.getInt("w")!! != 0 }
+            .map { it -> it.getString("r") }
+            .forEach {
+                ++total
+                if ("?" != it) ++known
+            }
+        return Json.Object("total" to total, "known" to known)
+    }
 }

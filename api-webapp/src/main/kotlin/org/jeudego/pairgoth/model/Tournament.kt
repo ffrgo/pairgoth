@@ -2,7 +2,9 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
-import kotlinx.datetime.LocalDate
+// CB TODO - review
+//import kotlinx.datetime.LocalDate
+import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
@@ -10,6 +12,7 @@ import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.Store
 import kotlin.math.max
 import kotlin.math.min
+import java.util.*
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -76,9 +79,9 @@ sealed class Tournament <P: Pairable>(
         // TODO cleaner solver instantiation
         val history = historyBefore(round)
         val solver = if (pairing is Swiss) {
-            SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams)
+            SwissSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round))
         } else if (pairing is MacMahon) {
-            MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, pairing.mmFloor, pairing.mmBar)
+            MacMahonSolver(round, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round), pairing.mmFloor, pairing.mmBar)
         } else throw Exception("Invalid tournament type")
 
         // Recomputes DUDD and hd
@@ -87,6 +90,29 @@ sealed class Tournament <P: Pairable>(
         val black = solver.pairables.find { p-> p.id == game.black }!!
         game.drawnUpDown = solver.dudd(black, white)
         game.handicap = solver.hd(black, white)
+    }
+
+    fun usedTables(round: Int): BitSet =
+        games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
+            acc.set(table)
+            acc
+        }
+
+    fun renumberTables(round: Int, pivot: Game? = null): Boolean {
+        var changed = false
+        var nextTable = 1
+        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy { game ->
+            val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE
+            val blackRank = pairables[game.black]?.rating ?: Int.MIN_VALUE
+            -(2 * whiteRank + 2 * blackRank) / 2
+        }.forEach { game ->
+            if (pivot != null && nextTable == pivot.table) {
+                ++nextTable
+            }
+            changed = changed || game.table != nextTable
+            game.table = nextTable++
+        }
+        return changed
     }
 }
 
@@ -133,7 +159,7 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
-    inner class Team(id: ID, name: String): Pairable(id, name, 0, 0) {
+    inner class Team(id: ID, name: String, final: Boolean): Pairable(id, name, 0, 0, final) {
         val playerIds = mutableSetOf<ID>()
         val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
         override val rating: Int get() = if (teamPlayers.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
@@ -151,7 +177,8 @@ class TeamTournament(
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(
         id = json.getInt("id") ?: default?.id ?: Store.nextPlayerId,
-        name = json.getString("name") ?: default?.name ?: badRequest("missing name")
+        name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
+        final = json.getBoolean("final") ?: default?.final ?: badRequest("missing final")
     ).apply {
         json.getArray("players")?.let { arr ->
             arr.mapTo(playerIds) {
@@ -174,8 +201,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
-                startDate = json.getLocalDate("startDate") ?: default?.startDate ?: badRequest("missing startDate"),
-                endDate = json.getLocalDate("endDate") ?: default?.endDate ?: badRequest("missing endDate"),
+                startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
+                endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
                 country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
@@ -192,8 +219,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
-                startDate = json.getLocalDate("startDate") ?: default?.startDate ?: badRequest("missing startDate"),
-                endDate = json.getLocalDate("endDate") ?: default?.endDate ?: badRequest("missing endDate"),
+                startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
+                endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
                 country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,

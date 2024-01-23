@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import java.util.*
 import kotlin.math.max
 import kotlin.math.min
 
@@ -9,9 +10,9 @@ class MacMahonSolver(round: Int,
                      pairables: List<Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
+                     usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int):
-    BaseSolver(round, history, pairables, pairingParams, placementParams) {
-
+    BaseSolver(round, history, pairables, pairingParams, placementParams, usedTables) {
 
     override val scores: Map<ID, Double> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
@@ -32,7 +33,7 @@ class MacMahonSolver(round: Int,
         }
     }
 
-    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero
+    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
     val Pairable.mms: Double get() = scores[id] ?: 0.0
 
     // CB TODO - configurable criteria

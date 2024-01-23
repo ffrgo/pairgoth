@@ -66,7 +66,7 @@
           <td>$part.num</td>
           <td>$part.place</td>
           <td>$part.name $part.firstname</td>
-          <td>#rank($part.rank)</td>
+          <td data-sort="$part.rank">#rank($part.rank)</td>
           <td>$part.country</td>
           <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
@@ -101,9 +101,9 @@
     </div>
     <div class="popup-footer">
       <div class="form-actions">
-        <button class="ui gray floating cancel button">Cancel</button>
-        <button class="ui blue floating button">EGF</button>
-        <button class="ui blue floating button">FFG</button>
+        <button type="button" class="ui gray floating cancel button">Cancel</button>
+        <button type="button" class="ui blue floating publish-egf button">EGF</button>
+        <button type="button" class="ui blue floating publish-ffg button">FFG</button>
       </div>
     </div>
   </div>

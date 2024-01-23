@@ -67,6 +67,7 @@
                     </httpConnector>
                     <systemProperties>
                         <pairgoth.env>${pairgoth.env}</pairgoth.env>
+                        <pairgoth.version>${project.version}</pairgoth.version>
                         <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
                         <pairgoth.webapp.external.url>${pairgoth.webapp.external.url}</pairgoth.webapp.external.url>
                         <pairgoth.store>${pairgoth.store}</pairgoth.store>
