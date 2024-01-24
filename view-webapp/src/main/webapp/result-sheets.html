@@ -1,0 +1,73 @@
+#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
+#if (!$tour)
+<div class="section">
+  <h2 class="error">Invalid tournament id</h2>
+</div>
+#end
+#set($round = $math.toInteger($!params.round))
+#if(!$round)
+  #set($round = 1)
+#else
+  #set($round = $math.min($math.max($round, 1), $tour.rounds))
+#end
+<div class="section">
+#set($parts = $api.get("tour/${params.id}/part"))
+#set($pmap = $utils.toMap($parts))
+#set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
+#if($roundPairing.error)
+  <script type="text/javascript">
+    onLoad(() => {
+      showError("$roundPairing.error")
+    });
+  </script>
+  #stop
+#end
+#set($games = $roundPairing.games)
+#foreach($game in $games)
+  #set($white = $pmap[$game.w])
+  #set($black = $pmap[$game.b])
+  #if($foreach.index % 4 == 0)
+  <div class="page">
+  #end
+
+    <div class="page-item">
+      <div class="title">$tour.name</div>
+      <div class="subtitle">Result sheet</div>
+      <div class="details">
+        <div>Table $game.t</div>
+        <div>Hd $game.h</div>
+        <div>Round $round</div>
+      </div>
+      <div class="instructions">
+        Surround winner's name or ½-½
+      </div>
+      <div class="players">
+        <div class="white player">
+          <div class="color">White</div>
+          <div class="name">$white.name $white.firstname #rank($white.rank)<br/>($white.country, $white.club)</div>
+##          <div class="pin">$white.egf</div>
+        </div>
+        <div class="equal">½-½</div>
+        <div class="black player">
+          <div class="color">Black</div>
+          <div class="name">$black.name $black.firstname #rank($black.rank)<br/>($black.country, $black.club)</div>
+##          <div class="pin">$black.egf</div>
+        </div>
+      </div>
+      <div class="signatures">
+        <div class="signature">Signature:</div>
+        <div class="equal">&nbsp;&nbsp;&nbsp;</div>
+        <div class="signature">Signature:</div>
+      </div>
+    </div>
+
+  #if($foreach.index % 4 == 3)
+  </div>
+  #end
+#end
+</div>
+<script type="text/javascript">
+  onLoad(() => {
+    window.print();
+  });
+</script>

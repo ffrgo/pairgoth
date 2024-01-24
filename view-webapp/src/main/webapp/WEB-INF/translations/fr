@@ -113,6 +113,7 @@ Your feedback is most welcome!	Vos retours sont les bienvenus !
 and uses the same algorithm internally, as well as import and export features towards its format.	et utilise le même algorithme en interne, ainsi que des fonctionnalités d’import et d’export vers et depuis son format.
 apache licence	licence Apache
 black	noir
+Black	Noir
 club	club
 country	pays
 d	d
@@ -135,6 +136,7 @@ pairing system, ideal for championships with no handicap games, as well as the	,
 pairing system, more suited for classical tournaments and cups. It is still in an alpha stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « alpha ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
 project is fully open source, and under the very permissive	est un logiciel libre, et sous la très permissive
 result	résultat
+result sheets	feuilles de résultat
 sources	sources
 sources on FFG's gitlab	sur le serveur gitab de la FFG
 standalone, standard interface	indépendant, interface standard
@@ -146,5 +148,6 @@ to	à
 unpairable players	joueurs non disponibles
 version 0.1 supports the	version 0.1 supporte le système d’appariement
 white	blanc
+White	Blanc
 white vs. black	blanc vs. Noir
 confirmed.	confirmé(s).
