@@ -146,7 +146,8 @@ object OpenGotha {
                 rank = Pairable.parseRank(player.rank),
                 country = player.country,
                 club = player.club,
-                final = "FIN" == player.registeringStatus
+                final = "FIN" == player.registeringStatus,
+                mmsCorrection = player.smmsCorrection
             ).also {
                 player.participating.toString().forEachIndexed { i,c ->
                     if (c == '0') it.skip.add(i + 1)
@@ -218,7 +219,9 @@ object OpenGotha {
                         player.rating
                     }" ratingOrigin="" registeringStatus="${
                         if (player.final) "FIN" else "PRE"
-                    }" smmsCorrection="0"/>"""
+                    }" smmsCorrection="${
+                        player.mmsCorrection
+                    }"/>"""
                 }
             }
             </Players>
