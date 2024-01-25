@@ -89,7 +89,7 @@ sealed class Tournament <P: Pairable>(
         val white = solver.pairables.find { p-> p.id == game.white }!!
         val black = solver.pairables.find { p-> p.id == game.black }!!
         game.drawnUpDown = solver.dudd(black, white)
-        game.handicap = solver.hd(black, white)
+        game.handicap = solver.hd(white = white, black = black)
     }
 
     fun usedTables(round: Int): BitSet =

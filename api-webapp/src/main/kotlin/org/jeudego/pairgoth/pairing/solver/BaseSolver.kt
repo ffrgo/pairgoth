@@ -186,8 +186,8 @@ sealed class BaseSolver(
         // This cost is never applied if potential Handicap != 0
         // It is fully applied if wbBalance(sP1) and wbBalance(sP2) are strictly of different signs
         // It is half applied if one of wbBalance is 0 and the other is >=2
-        val hd1 = pairing.handicap.handicap(p1, p2)
-        val hd2 = pairing.handicap.handicap(p2, p1)
+        val hd1 = pairing.handicap.handicap(white = p1, black = p2)
+        val hd2 = pairing.handicap.handicap(white = p2, black = p1)
         val potentialHd: Int = max(hd1, hd2)
         val score = if (potentialHd == 0) {
             val wb1: Int = p1.colorBalance
@@ -505,7 +505,7 @@ sealed class BaseSolver(
 
     open fun HandicapParams.color(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
-        val hd = pairing.handicap.handicap(p1,p2)
+        val hd = pairing.handicap.handicap(white = p1, black = p2)
         if(hd==0){
             if (p1.colorBalance > p2.colorBalance) {
                 score = - 1.0
@@ -537,13 +537,13 @@ sealed class BaseSolver(
         }
         //return white.group - black.group
     }
-    fun hd(black: Pairable, white: Pairable): Int {
-        return pairing.handicap.handicap(white, black)
+    fun hd(white: Pairable, black: Pairable): Int {
+        return pairing.handicap.handicap(white = white, black = black)
     }
-    open fun games(black: Pairable, white: Pairable): List<Game> {
+    open fun games(white: Pairable, black: Pairable): List<Game> {
         // CB TODO team of individuals pairing
         val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
         usedTables.set(table)
-        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = hd(white, black), drawnUpDown = dudd(black, white)))
+        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = hd(white = white, black = black), drawnUpDown = dudd(black, white)))
     }
 }
