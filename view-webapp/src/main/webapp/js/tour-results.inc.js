@@ -39,9 +39,11 @@ onLoad(()=>{
   new Tablesort($('#results-table')[0]);
   $('#results-table .player').on('click', e => {
     let cell = e.target.closest('.player');
+    let resultCell = cell.closest('tr').find('.result');
+    let oldResult = resultCell.data('result');
     let gameId = e.target.closest('tr').data('id');
     let result = cell.hasClass('white') ? 'w' : 'b';
-    setResult(gameId, result);
+    setResult(gameId, result, oldResult);
   });
   $('#results-table .result').on('click', e => {
     let cell = e.target.closest('.result');
