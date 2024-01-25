@@ -108,11 +108,11 @@
           </select>
         </div>
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>Hd treshold</label>
+          <label>Hd threshold</label>
           <span class="info"></span>
-          <select name="treshold">
+          <select name="threshold">
 #set($limit = 0)
-#if($tour && "$!tour.pairing.handicap.treshold" != "") #set($limit = $tour.pairing.handicap.treshold) #end
+#if($tour && "$!tour.pairing.handicap.threshold" != "") #set($limit = $tour.pairing.handicap.threshold) #end
 #levels($limit)
           </select>
         </div>

@@ -138,7 +138,7 @@ onLoad(() => {
         },
         handicap: {
           correction: -form.val('correction'),
-          treshold: form.val('treshold')
+          threshold: form.val('threshold')
         }
       },
       timeSystem: {
