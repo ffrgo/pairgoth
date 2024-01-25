@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.server
 
 import com.republicate.kson.Json
+import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
@@ -17,6 +18,7 @@ import org.jeudego.pairgoth.util.toString
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Element
 import java.io.IOException
+import java.io.InputStreamReader
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -194,7 +196,7 @@ class ApiServlet: HttpServlet() {
             // some API calls like opengotha import accept xml docs as body
             // CB TODO - limit to those calls
             try {
-                XmlUtils.parse(request.reader).let { payload: Element ->
+                XmlUtils.parse(InputStreamReader(BOMInputStream(request.inputStream))).let { payload: Element ->
                     request.setAttribute(ApiHandler.PAYLOAD_KEY, payload)
                     logger.info(blue("<<     (xml document)"))
 
