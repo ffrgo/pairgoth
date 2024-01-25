@@ -32,7 +32,7 @@ object StandingsHandler: PairgothApiHandler {
 
         fun mmBase(pairable: Pairable): Double {
             if (tournament.pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
-            return min(max(pairable.rank, tournament.pairing.mmFloor), tournament.pairing.mmBar) + MacMahonSolver.mmsZero
+            return min(max(pairable.rank, tournament.pairing.mmFloor), tournament.pairing.mmBar) + MacMahonSolver.mmsZero + pairable.mmsCorrection
         }
 
         //  CB avoid code redundancy with solvers

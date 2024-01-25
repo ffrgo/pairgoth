@@ -162,6 +162,7 @@ function close_modal() {
   $('body').removeClass('dimmed');
   $(`.popup`).removeClass('shown');
   store('addingPlayers', false);
+  store('macmahonGroups', false);
 }
 
 function downloadFile(blob, filename) {
@@ -177,11 +178,14 @@ function downloadFile(blob, filename) {
 
 onLoad(() => {
   $('button.close').on('click', e => {
+    close_modal();
+    /* no need to be specific...
     let modal = e.target.closest('.popup');
     if (modal) {
       modal.removeClass('shown');
       $('body').removeClass('dimmed');
     }
+     */
   });
 
   /* commented for now - do we want this?
@@ -267,4 +271,3 @@ onLoad(() => {
   }
 
 });
-

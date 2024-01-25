@@ -36,7 +36,7 @@
             <td>$part.firstname</td>
             <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
-            <td data-sort="$part.rank">#rank($part.rank)</td>
+            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) ($part.mmsCorrection)#end</td>
             <td>$part.rating</td>
             <td>
   #foreach($round in [1..$tour.rounds])
@@ -58,6 +58,12 @@
         <i class="plus icon"></i>
         Add player
       </button>
+#if($tour.pairing.type == 'MAC_MAHON')
+      <button id="edit-macmahon-groups" class="ui right labeled icon floating button">
+        <i class="pencil icon"></i>
+        Mac Mahon groups
+      </button>
+#end
     </div>
   </div>
 </div>
@@ -193,10 +199,66 @@
     </form>
   </div>
 </div>
+#if($tour.pairing.type == 'MAC_MAHON')
+  #set($mmbase = $api.get("tour/${params.id}/standings/0"))
+  #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
+    #if($mmbase.error)
+      #set($error = $mmbase.error)
+    #else
+      #set($error = $mmbase.message)
+    #end
+<script type="text/javascript">
+  onLoad(() => {
+    showError("$error")
+  });
+</script>
+    #set($mmbase = [])
+  #end
+  #set($mmsMap = $utils.getMmsMap($mmbase))
+<div id="macmahon-groups" class="popup">
+  <div class="popup-body">
+    <div class="popup-content">
+      <div id="under-group" class="multi-select" title="bar-1">
+  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar - 1))
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #end
+      </div>
+      <div class="pairing-buttons">
+        <button id="under-to-top" class="ui blue icon floating button"><i class="angle double right icon"></i></button>
+        <button id="top-to-under" class="ui orange icon floating button"><i class="angle double left icon"></i></button>
+      </div>
+      <div id="top-group" class="multi-select" title="top group">
+  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar))
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #end
+      </div>
+      <div class="pairing-buttons">
+        <button id="top-to-super" class="ui blue icon floating button"><i class="angle double right icon"></i></button>
+        <button id="super-to-top" class="ui orange icon floating button"><i class="angle double left icon"></i></button>
+      </div>
+      <div id="super-group" class="multi-select" title="super group">
+  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar + 1))
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #end
+      </div>
+    </div>
+    <div class="popup-footer">
+      <button id="close-macmahon-groups" type="button" class="ui gray right labeled icon floating close button">
+        <i class="times icon"></i>
+        Close
+      </button>
+      <button id="reset-macmahon-groups" type="button" class="ui orange right labeled icon floating button">
+        <i class="trash icon"></i>
+        Reset Mac Mahon groups
+      </button>
+    </div>
+  </div>
+</div>
+#end
 #[[
 <script id="result" type="text/template">
   {{for #data}}
-    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if origin === 'FFG' && country === 'FR' license !== 'L'}}<span class="red">non licencié</span>{{/if}}</div>
+    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if origin === 'FFG' && country === 'FR' license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
   {{/for}}
 </script>
 <script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>

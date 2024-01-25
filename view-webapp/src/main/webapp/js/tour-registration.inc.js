@@ -104,6 +104,11 @@ function addPlayers() {
   store('addingPlayers', true);
 }
 
+function bulkUpdate(players) {
+  Promise.all(players.map(p => api.putJson(`tour/${tour_id}/part/${p.id}`, p)))
+    .then((values) => window.location.reload());
+}
+
 let tableSort;
 
 onLoad(() => {
@@ -314,7 +319,56 @@ onLoad(() => {
     $('#filter')[0].value = '';
     $('tbody > tr').removeClass('hidden');
   });
+  $('#edit-macmahon-groups').on('click', e => {
+    modal('macmahon-groups');
+    store('macmahonGroups', true);
+  });
   if (store('addingPlayers')) {
     addPlayers();
   }
+  if (store('macmahonGroups')) {
+    modal('macmahon-groups');
+  }
+
+  // mac mahon groups...
+  $('#under-to-top').on('click', e => {
+    let players = $('#under-group .selected').map(item => (
+    {
+      id: parseInt(item.data("id")),
+      mmsCorrection: parseInt(item.data("correction")) + 1
+    }));
+    bulkUpdate(players);
+  });
+  $('#top-to-under').on('click', e => {
+    let players = $('#top-group .selected').map(item => (
+      {
+        id: parseInt(item.data("id")),
+        mmsCorrection: parseInt(item.data("correction")) - 1
+      }));
+    bulkUpdate(players);
+  });
+  $('#top-to-super').on('click', e => {
+    let players = $('#top-group .selected').map(item => (
+      {
+        id: parseInt(item.data("id")),
+        mmsCorrection: parseInt(item.data("correction")) + 1
+      }));
+    bulkUpdate(players);
+  });
+  $('#super-to-top').on('click', e => {
+    let players = $('#super-group .selected').map(item => (
+      {
+        id: parseInt(item.data("id")),
+        mmsCorrection: parseInt(item.data("correction")) - 1
+      }));
+    bulkUpdate(players);
+  });
+  $('#reset-macmahon-groups').on('click', e => {
+    let players = $('#macmahon-groups .listitem').map(item => (
+      {
+        id: parseInt(item.data("id")),
+        mmsCorrection: 0
+      }));
+    bulkUpdate(players);
+  });
 });
