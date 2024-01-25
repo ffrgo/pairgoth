@@ -66,4 +66,9 @@ class PairgothTool {
                 pairable.getInt("rank")
             }
         }
+
+    fun removeBye(games: Collection<Json.Object>) =
+        games.filter {
+            it.getInt("b")!! != 0 && it.getInt("w")!! != 0
+        }
 }

@@ -22,7 +22,7 @@
   </script>
   #stop
 #end
-#set($games = $roundPairing.games)
+#set($games = $utils.removeBye($roundPairing.games))
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
