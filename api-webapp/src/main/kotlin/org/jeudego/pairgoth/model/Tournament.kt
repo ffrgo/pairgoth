@@ -72,7 +72,7 @@ sealed class Tournament <P: Pairable>(
     fun games(round: Int) = games.getOrNull(round - 1) ?:
         if (round > games.size + 1) throw Error("invalid round")
         else mutableMapOf<ID, Game>().also { games.add(it) }
-    fun lastRound() = games.size
+    fun lastRound() = max(1, games.size)
 
     fun recomputeHdAndDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history

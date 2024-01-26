@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.model.PairingType.*
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import java.util.*
+import kotlin.math.min
 
 // base pairing parameters
 data class BaseCritParams(
@@ -135,8 +136,7 @@ sealed class Pairing(
 }
 
 internal fun Tournament<*>.historyBefore(round: Int) =
-    if (lastRound() == 1) emptyList()
-    else (1 until round).map { games(it).values.toList() }
+    (1 until min(round, lastRound() + 1)).map { games(it).values.toList() }
 
 /*private fun Tournament<*>.historyBefore(round: Int) : List<List<Game>> {
     println("Welcome to tournament.historyBefore !")

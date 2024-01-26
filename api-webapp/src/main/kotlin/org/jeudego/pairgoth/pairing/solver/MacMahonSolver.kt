@@ -16,11 +16,12 @@ class MacMahonSolver(round: Int,
 
     override val scores: Map<ID, Double> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
+        val pairing = pairables.map { it.id }.toSet()
         pairablesMap.mapValues {
             it.value.let { pairable ->
                 pairable.mmBase +
                         pairable.nbW + // TODO take tournament parameter into account
-                        pairable.missedRounds(round) * pairingParams.main.mmsValueAbsent
+                        pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent
             }
         }
     }
