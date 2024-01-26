@@ -100,6 +100,28 @@ onLoad(() => {
   });
 
   $('#export').on('click', e => {
+    modal('export-modal');
+  });
+
+  $('#export-pairgoth').on('click', e => {
+    close_modal();
+    let form = $('#tournament-infos')[0];
+    let shortName = form.val('shortName');
+    let hdrs = headers();
+    hdrs['Accept'] = 'application/json';
+    fetch(`${base}tour/${tour_id}`, {
+      headers: hdrs
+    }).then(resp => {
+      if (resp.ok) return resp.text()
+      else throw "export error"
+    }).then(txt => {
+      let blob = new Blob(['\uFEFF', txt.trim()], {type: 'application/json;charset=utf-8'});
+      downloadFile(blob, `${shortName}.tour`);
+    }).catch(err => showError(err));
+  });
+
+  $('#export-opengotha').on('click', e => {
+    close_modal();
     let form = $('#tournament-infos')[0];
     let shortName = form.val('shortName');
     let hdrs = headers();

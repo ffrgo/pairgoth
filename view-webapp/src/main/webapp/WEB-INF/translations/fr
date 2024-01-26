@@ -20,6 +20,7 @@ Canadian byo-yomi	Byo-yomi canadien
 Cancel	Annuler
 Change	Mettre à jour
 Chinese rules	Règles chinoises
+Choose format	Choix du format
 Close	Fermer
 Club	Club
 Compile from the sources	Compiler depuis les sources&nbsp;
@@ -33,6 +34,7 @@ Download the standalone web interface module which suits your need, then follow	
 Edit	Éditer
 Enter the magic word	Entrer le mot magique
 Export	Exporter
+Export tournament	Exporter le tournoi
 Family name	Nom de famille
 First name	Prénom
 Fischer timing	Cadence Fisher
@@ -73,6 +75,8 @@ Pair-go tournament	Tournoi de pair-go
 Pairing	Appariement
 Pairings for round	Appariement pour la ronde
 Participation	Participation
+Publish	Publier
+Publish standings	Publier le classement
 Rank	Niveau
 Rating	Classement
 Register	Inscrire
@@ -80,6 +84,7 @@ Registration	Inscriptions
 Rengo with 2 players teams	Rengo par équipes de 2
 Rengo with 3 players team	Rengo par équipes de 3
 Required field	Champs requis
+Reset Mac Mahon groups	Réinitialiser les groupes Mac Mahon
 Results	Résultats
 Results for round	Résultats pour la ronde
 Round-robin	Toutes rondes
