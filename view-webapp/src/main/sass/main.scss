@@ -228,6 +228,11 @@
     background-clip: initial;
   }
 
+  .ui.form label input[type="checkbox"] {
+    margin-left: 1em;
+    vertical-align: baseline;
+  }
+
   .ui.striped.table>tbody>tr:nth-child(2n),.ui.striped.table>tr:nth-child(2n) {
     background-color: rgba(0,0,50,.1)
   }

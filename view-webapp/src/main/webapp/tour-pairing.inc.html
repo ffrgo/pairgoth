@@ -26,13 +26,13 @@
         <div id="pairables" class="multi-select" title="pairable players">
 #foreach($p in $pairables)
   #set($part = $pmap[$p])
-          <div data-id="$part.id" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" class="listitem pairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
 #end
         </div>
         <div id="unpairables" class="multi-select" title="unpairable players">
 #foreach($p in $unpairables)
   #set($part = $pmap[$p])
-          <div class="listitem unpairable" data-id="$part.id"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
 #end
         </div>
       </div>
@@ -107,6 +107,35 @@
           Cancel
         </button>
         <button id="update-pairing" type="button" class="ui green right labeled icon floating button">
+          <i class="check icon"></i>
+          Update
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="edit-pairable" class="popup">
+  <div class="popup-body">
+    <form id="pairable-form" class="ui form edit">
+      <input type="hidden" name="id"/>
+      <div class="popup-content">
+        <div id="edit-pairable-disp"></div>
+        <div class="inline fields">
+          <div class="field">
+            <label>
+              Pairable for round $round?
+              <input type="checkbox" name="pairable"/>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button id="cancel-edit-pairable" type="button" class="ui gray right labeled icon floating close button">
+          <i class="times icon"></i>
+          Cancel
+        </button>
+        <button id="update-pairable" type="button" class="ui green right labeled icon floating button">
           <i class="check icon"></i>
           Update
         </button>

@@ -38,6 +38,39 @@ function editGame(game) {
   modal('edit-pairing');
 }
 
+function editPairable(pairable) {
+  let id = pairable.data('id');
+  let form = $('#pairable-form')[0];
+  form.val('id', id);
+  let name = pairable.find('.name')[0].textContent;
+  $('#edit-pairable-disp')[0].textContent = name;
+  let box = pairable.closest('.multi-select');
+  let state = box.attr('id') === 'pairables';
+  form.val('pairable', state);
+  modal('edit-pairable');
+}
+
+function updatePairable() {
+  let form = $('#pairable-form')[0];
+  let id = form.val('id');
+  let status = form.val('pairable');
+  let origSkip = $(`#players tr[data-id="${id}"] td.participating label`)
+    .map(disk => disk.hasClass('red'));
+  let skip = status ? [] : [ activeRound ];
+  for (let i = 0; i < origSkip.length; ++i) {
+    let round = i + 1;
+    if (round !== activeRound && origSkip[i]) skip.push(round);
+  }
+  api.putJson(`tour/${tour_id}/part/${id}`, {
+    id: id,
+    skip: skip
+  }).then(player => {
+      if (player !== 'error') {
+        window.location.reload();
+      }
+    });
+}
+
 onLoad(()=>{
   $('.listitem').on('click', e => {
     if (e.shiftKey && typeof(focused) !== 'undefined') {
@@ -58,9 +91,11 @@ onLoad(()=>{
       let target = e.target.closest('.listitem');
       if (e.detail === 1) {
         focused = target.toggleClass('selected').attr('draggable', target.hasClass('selected'));
-      } else {
+      } else if (target.closest('#paired')) {
         focused = target.attr('draggable', target.hasClass('selected'));
         editGame(focused);
+      } else {
+        editPairable(focused);
       }
     }
   });
@@ -114,5 +149,14 @@ onLoad(()=>{
           document.location.reload();
         }
       });
+  });
+  $('.multi-select').on('dblclick', e => {
+    let box = e.target.closest('.multi-select');
+    if (!e.target.closest('.listitem')) {
+      box.find('.listitem').removeClass('selected');
+    }
+  });
+  $('#update-pairable').on('click', e => {
+    updatePairable();
   });
 });

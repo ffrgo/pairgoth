@@ -38,7 +38,7 @@
             <td>$part.club</td>
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) ($part.mmsCorrection)#end</td>
             <td>$part.rating</td>
-            <td>
+            <td class="participating">
   #foreach($round in [1..$tour.rounds])
     ## CB TODO - upstream json parsing should not give longs here, should it?
     #if($part.skip && $part.skip.contains($round.longValue()))
