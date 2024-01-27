@@ -62,8 +62,7 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
                 properties[(key as String).removePrefix(PAIRGOTH_PROPERTIES_PREFIX)] = value
             }
 
-            val env = properties.getProperty("env")
-            logger.info("Using profile $env", )
+            logger.info("pairgoth server ${properties["version"]} with profile ${properties["env"]}")
 
             // set system user agent string to empty string
             System.setProperty("http.agent", "")

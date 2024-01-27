@@ -43,6 +43,8 @@ fun main(vararg args: String) {
         readProperties()
         // extract war files from main archive
         extractWarFiles()
+        // publish properties as system properties
+        publishProperties()
         // launch web server
         launchServer()
     } catch (t: Throwable) {
@@ -52,7 +54,6 @@ fun main(vararg args: String) {
 
 private val tmp = System.getProperty("java.io.tmpdir")
 private val webapps = Path.of("${tmp}/pairgoth/webapps")
-private val version = "1.0-SNAPSHOT" // TODO CB
 
 private fun cleanup() {
     FileUtils.deleteDirectory(webapps.toFile())
@@ -67,6 +68,9 @@ private fun readProperties() {
     if (properties.exists()) {
         serverProps.load(FileReader(properties))
     }
+}
+
+private fun publishProperties() {
     serverProps.entries.forEach { entry ->
         val property = entry.key as String
         val value = entry.value as String
@@ -92,12 +96,24 @@ private fun extractWarFiles() {
     val webappsFolderURL = getResource("/META-INF/webapps") ?: throw Error("webapps not found")
     val jarConnection = webappsFolderURL.openConnection() as JarURLConnection
     val jarFile: JarFile = jarConnection.jarFile
+    val extractVersion = Regex(".*?-(\\d+\\.\\d+(?:-[^.-]+)?).war")
+    var version: String? = null
     jarFile.entries().toList().filter { entry ->
         entry.name.startsWith(jarConnection.entryName)
     }.forEach { entry ->
         if (!entry.isDirectory) {
+            val filename = entry.name.removePrefix("META-INF/webapps/")
+            val versionMatch = extractVersion.matchEntire(filename)
+                ?: throw Error("Could not extract version from filename: $filename")
+            val entryVersion = versionMatch.groupValues[1]
+            if (version == null) {
+                version = entryVersion
+                serverProps["version"] = version
+            } else if (version != entryVersion) {
+                throw Error("Inconsistent versions found: $version and $entryVersion")
+            }
             jarFile.getInputStream(entry).use { entryInputStream ->
-                Files.copy(entryInputStream, webapps.resolve(entry.name.removePrefix("META-INF/webapps/")))
+                Files.copy(entryInputStream, webapps.resolve(filename))
             }
         }
     }
@@ -158,6 +174,7 @@ private fun launchServer() {
 }
 
 private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
+    val version = serverProps["version"] ?: throw Error("version not found")
     context.war = "$tmp/pairgoth/webapps/$webapp-webapp-$version.war"
     context.contextPath = contextPath
     if (webapp == "api") {

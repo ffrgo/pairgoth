@@ -64,11 +64,11 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
                 properties[(key as String).removePrefix(PAIRGOTH_PROPERTIES_PREFIX)] = value
             }
 
-            val env = properties.getProperty("env")
-            logger.info("Using profile {}", )
+            logger.info("pairgoth server ${properties["version"]} with profile ${properties["env"]}")
 
-            // let the view be aware of the environment
-            context.setAttribute("env", env)
+            // publish some properties to the webapp context; for easy access from the template
+            context.setAttribute("env", properties["env"])
+            context.setAttribute("version", properties["version"] ?: "?")
 
             // set system user agent string to empty string
             System.setProperty("http.agent", "")
