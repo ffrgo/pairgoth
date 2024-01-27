@@ -68,6 +68,8 @@ private fun readProperties() {
     if (properties.exists()) {
         serverProps.load(FileReader(properties))
     }
+    val env = if (File("./pom.xml").exists()) "dev" else "prod"
+    serverProps["env"] = env
 }
 
 private fun publishProperties() {
