@@ -8,6 +8,8 @@ import org.jeudego.pairgoth.opengotha.TournamentType
 import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.Store
 import org.w3c.dom.Element
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.xml.datatype.XMLGregorianCalendar
 import kotlin.math.roundToInt
@@ -192,9 +194,10 @@ object OpenGotha {
         // ...
         //
         // method 2 (quick and dirty) is to rely on templating:
+        val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <Tournament dataVersion="201" externalIPAddress="127.0.0.1" fullVersionNumber="3.51" runningMode="SAL" saveDT="20210111180800">
+            <Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="$now">
             <Players>
             ${tournament.pairables.values.map { player ->
                     player as Player
