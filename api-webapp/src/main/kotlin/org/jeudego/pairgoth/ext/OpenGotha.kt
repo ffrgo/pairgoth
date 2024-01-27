@@ -50,6 +50,20 @@ object OpenGotha {
         val placmtParams = ogTournament.tournamentParameterSet.placementParameterSet
         val pairParams = ogTournament.tournamentParameterSet.pairingParameterSet
 
+        // some checks
+
+        if (genParams.genNBW2ValueAbsent.toDouble() != 0.0) {
+            throw Error("Pairgoth only support 0 for 'NBW for Absent player'")
+        }
+
+        if (genParams.genNBW2ValueBye.toDouble() != 2.0) {
+            throw Error("Pairgoth only support 1 for 'NBW for Bye player'")
+        }
+
+        if (genParams.genMMS2ValueBye.toDouble() != 2.0) {
+            throw Error("Pairgoth only support 1 for 'MMS for Bye player'")
+        }
+
         val pairgothPairingParams = PairingParams(
             base = BaseCritParams(
                 nx1 = pairParams.paiStandardNX1Factor.toDouble(),
@@ -71,10 +85,7 @@ object OpenGotha {
                 seedSystem2 = parseSeedSystem(pairParams.paiMaSeedSystem2 ?: "SPLITANDSLIP"),
                 additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
                 additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE")),
-                nbwValueAbsent = genParams.genNBW2ValueAbsent.toDouble() / 2.0,
-                nbwValueBye = genParams.genNBW2ValueBye.toDouble() / 2.0,
-                mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0,
-                mmsValueBye = genParams.genMMS2ValueBye.toDouble() / 2.0,
+                mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0
             ),
             secondary = SecondaryCritParams(
                 barThresholdActive = pairParams.paiSeBarThresholdActive.toBoolean(),
@@ -293,13 +304,7 @@ object OpenGotha {
                 ).uppercase(Locale.ROOT)
             }" genMMS2ValueAbsent="${
             (tournament.pairing.pairingParams.main.mmsValueAbsent * 2).roundToInt()
-            }" genMMS2ValueBye="${
-            (tournament.pairing.pairingParams.main.mmsValueBye * 2).roundToInt()
-            }" genMMZero="30K" genNBW2ValueAbsent="${
-            (tournament.pairing.pairingParams.main.nbwValueAbsent * 2).roundToInt()
-            }" genNBW2ValueBye="${
-            (tournament.pairing.pairingParams.main.nbwValueBye * 2).roundToInt()
-            }" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
+            }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
             <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
             <PlacementParameterSet>
             <PlacementCriteria>
