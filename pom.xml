@@ -5,7 +5,7 @@
 
   <groupId>org.jeudego.pairgoth</groupId>
   <artifactId>engine-parent</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.2</version>
   <packaging>pom</packaging>
 
   <!-- CB: Temporary add my repository, while waiting for SSE Java server module author to incorporate my PR or for me to fork it -->
