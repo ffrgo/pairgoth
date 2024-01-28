@@ -223,7 +223,7 @@
     transition: all 0.5s ease-out;
     &.active {
       padding: 0.5em 1em 0.5em 2em;
-      max-height: 600px;
+      max-height: 150vh;
     }
   }
 
@@ -385,7 +385,6 @@
         align-items: stretch;
         justify-content: start;
         text-align: justify;
-        max-height: inherit;
       }
       .popup-footer {
         margin-top: 1em;

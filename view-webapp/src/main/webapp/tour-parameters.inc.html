@@ -1,9 +1,6 @@
 <form id="parameters-form" class="ui edit form">
   <div class="ui fluid styled accordion">
-    <div class="title">
-      <i class="dropdown icon"></i>
-      Base parameters
-    </div>
+    <div class="title"><i class="dropdown icon"></i>Base parameters</div>
     <div class="content">
       <div class="field">
         <label><input type="checkbox" name="deterministic" value="true" #if($tour.pairing.base.deterministic) checked #end>&nbsp;deterministic randomness</label>
@@ -12,10 +9,7 @@
         <label><input type="checkbox" name="colorBalance" value="true" #if($tour.pairing.base.colorBalanceWeight) checked #end>&nbsp;balance white and black</label>
       </div>
     </div>
-    <div class="title">
-      <i class="dropdown icon"></i>
-      Main parameters
-    </div>
+    <div class="title"><i class="dropdown icon"></i>Main parameters</div>
     <div class="content">
 #if($tour.pairing.type == 'MAC_MAHON')
       <div class="inline fields">
@@ -32,10 +26,7 @@
       </div>
 #end
       <div class="ui fluid styled accordion">
-        <div class="title">
-          <i class="dropdown icon"></i>
-          Seeding methods inside groups of same score
-        </div>
+        <div class="title"><i class="dropdown icon"></i>Seeding methods inside groups of same score</div>
         <div class="content">
           <div class="field">
             <label>Apply first seeding method up to round <input name="firstSeedLastRound" type="number" min="1" value="$tour.pairing.main.firstSeedLastRound"/></label>
@@ -61,10 +52,7 @@
             </div>
           </div>
         </div>
-        <div class="title">
-          <i class="dropdown icon"></i>
-          Draw-up / draw-down between groups of same score
-        </div>
+        <div class="title"><i class="dropdown icon"></i>Draw-up / draw-down between groups of same score</div>
         <div class="content">
           <div class="inline fields">
             <label><input type="checkbox" name="upDownCompensate" value="true" #if($tour.pairing.main.upDownCompensate) checked #end/> try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then</label>
@@ -89,10 +77,7 @@
         </div>
       </div>
     </div>
-    <div class="title">
-      <i class="dropdown icon"></i>
-      Secondary parameters
-    </div>
+    <div class="title"><i class="dropdown icon"></i>Secondary parameters</div>
     <div class="content">
       <div class="field">
         <label>Do not apply secondary criteria for:</label>
@@ -113,30 +98,24 @@
         </label>
       </div>
     </div>
-    <div class="title">
-      <i class="dropdown icon"></i>
-      Geographical parameters
-    </div>
+    <div class="title"><i class="dropdown icon"></i>Geographical parameters</div>
     <div class="content">
       <div class="field">
         <label>
           Prefer a score gap of
-          <input type="number" min="0" value="$tour.pairing.geo.mmsDiffCountry"/>
+          <input type="number" name="mmsDiffCountry" min="0" value="$tour.pairing.geo.mmsDiffCountry"/>
           rather than pairing players of the same country.
         </label>
       </div>
       <div class="field">
         <label>
           Prefer a score gap of
-          <input type="number" min="0" value="$tour.pairing.geo.mmsDiffClub"/>
+          <input type="number" name="mmsDiffClub" min="0" value="$tour.pairing.geo.mmsDiffClub"/>
           rather than pairing players of the same club.
         </label>
       </div>
     </div>
-    <div class="title">
-      <i class="dropdown icon"></i>
-      Handicap parameters
-    </div>
+    <div class="title"><i class="dropdown icon"></i>Handicap parameters</div>
     <div class="content">
       <div class="field">
         <label>

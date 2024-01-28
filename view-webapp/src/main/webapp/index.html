@@ -9,11 +9,27 @@
   </a>
 </div>
 <div class="tournaments section">
-#foreach($tour in $api.get('tour').entrySet())
+#set($files = $api.get('tour'))
+$log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+$log.info($files)
+#if($files.containsKey('error'))
+  #set($error = $files.error)
+#elseif($files.containsKey('message'))
+  #set($error = $files.message)
+#end
+#if($error)
+  <script type="text/javascript">
+    onLoad(()=>{
+      showError("$esc.html($error)");
+    });
+  </script>
+#else
+  #foreach($tour in $files.entrySet())
   <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button">
     <i class="fa fa-folder-open-o"></i>
     $tour.value
   </a>
+  #end
 #end
 </div>
 <div id="import-popup" class="popup">
