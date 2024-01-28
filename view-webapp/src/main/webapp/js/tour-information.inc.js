@@ -209,7 +209,7 @@ onLoad(() => {
           firstSeed: form.val('firstSeed'),
           secondSeedAddCrit: form.val('secondSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
           secondSeed: form.val('secondSeed'),
-          upDownCompensate: form.val('upDownCompoensate'),
+          upDownCompensate: form.val('upDownCompensate'),
           upDownUpperMode: form.val('upDownUpperMode'),
           upDownLowerMode: form.val('upDownLowerMode')
         },
