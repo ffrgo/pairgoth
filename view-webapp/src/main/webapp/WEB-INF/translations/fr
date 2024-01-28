@@ -1,6 +1,5 @@
 (docker required)	(docker requis)
 (java required)	(java requis)
-(not yet available)	(pas encore disponible)
 , allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	, vous permettant de complètement le modifier. N’oubliez pas de partager vos améliorations !
 , the well known pairing system software developed by	, le logiciel d’appariement très connu développé par
 , your Go Pairing Engine!	, votre logiciel d’appariement de Go !
@@ -94,7 +93,7 @@ Rounds	Rondes
 Rules	Règles
 Search...	Chercher…
 Short name	Nom de code
-Since the project is still in alpha, the sources are only available to FFG actors. If that's your case, you can access the sources here:	Comme le projet est encore en « alpha », les sources sont seulement accessibles aux acteurs FFG. Si c’est votre cas, vous pouvez accéder aux sources ici :
+Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	Comme le projet est encore en beta, les sources sont seulement accessibles aux acteurs FFG. Si c’est votre cas, vous pouvez accéder aux sources ici :
 Split and fold	Couper-plier
 Split and random	Couper-aléatoire
 Split and slip	Couper-glisser
@@ -108,7 +107,7 @@ Team of 2 individual players	Équipe de 2 joueurs individuels
 Team of 3 individual players	Équipe de 3 joueurs individuels
 Team of 4 individual players	Équipe de 4 joueurs individuels
 Team of 5 individual players	Équipe de 5 joueurs individuels
-That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. You can choose to use either the standard interface (which is meant to look a lot like opengotha) and the web interface (by launching the engine and connecting to it using a browser).	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Vous pouvez choisir d’utiliser soit l’interface standard (qui est conçue pour beaucoup ressembler à OpenGotha) soit l’interface web (en lançant le moteur et en s’y connectant avec un navigateur).
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server to which you can connect using a browser.	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Pairgoth lancera un serveur web local auquel vous pourrez vous connecter depuis un navigateur.
 Time system	Temps
 Tournament type	Type de tournoi
 Unpair	Désapparier
@@ -141,13 +140,12 @@ or	ou
 pairable players	joueurs disponibles
 pairgoth	pairgoth
 pairing system, ideal for championships with no handicap games, as well as the	, idéal pour les championnats sans handicap, ainsi que le système d’appariement
-pairing system, more suited for classical tournaments and cups. It is still in an alpha stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « alpha ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
+pairing system, more suited for classical tournaments and cups. It is still in a beta stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « beta ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
 project is fully open source, and under the very permissive	est un logiciel libre, et sous la très permissive
 result	résultat
 result sheets	feuilles de résultat
 sources	sources
 sources on FFG's gitlab	sur le serveur gitab de la FFG
-standalone, standard interface	indépendant, interface standard
 standalone, web interface	indépendant, interface web
 standalone, web interface, via docker	indépendant, interface web, via docker
 table	table
