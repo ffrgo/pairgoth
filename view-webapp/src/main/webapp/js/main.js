@@ -269,5 +269,15 @@ onLoad(() => {
       let scroll = $('#center')[0].scrollTop;
     }, 200);
   }
+  $('.accordion .title').on('click', e => {
+    let accordion = e.target.closest('.accordion');
+    let title = e.target.closest('.title');
+    let content = title.nextElementSibling;
 
+    if (!title.hasClass('active')) {
+      accordion.find('.active').removeClass('active');
+    }
+    title.toggleClass('active');
+    content.toggleClass('active');
+  });
 });

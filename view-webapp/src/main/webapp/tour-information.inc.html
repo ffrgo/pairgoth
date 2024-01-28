@@ -44,7 +44,7 @@
           <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
           <div class="edit online">
             <label>
-              <input name="online" type="checkbox" #if($tour && $tour.online) checked #end style="vertical-align: baseline;" value="true"/>&nbsp;<b>online tournament</b>
+              <input name="online" type="checkbox" #if($tour && $tour.online) checked #end value="true"/>&nbsp;<b>online tournament</b>
             </label>
           </div>
         </div>
@@ -82,21 +82,19 @@
             <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') selected #end>Round-robin</option>
           </select>
         </div>
-#* MM floor parameter not shown on creation page
-        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>MM floor</label>
-          <span class="info"></span>
-          <select name="mmFloor">
-#set($floor = -20)
-#if($tour) #set($floor = $tour.pairing.mmFloor) #end
-#levels($floor)
-          </select>
-        </div>
-*#
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
           <label>Hd correction</label>
           <span class="info"></span>
           <input name="correction" type="number" min="-9" max="0" value="#if($tour && "$!tour.pairing.handicap.correction" != "")-$tour.pairing.handicap.correction#{else}-1#end"/>
+        </div>
+        <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
+          <label>MM floor</label>
+          <span class="info"></span>
+          <select name="mmFloor">
+            #set($floor = -20)
+            #if($tour) #set($floor = $tour.pairing.mmFloor) #end
+            #levels($floor)
+          </select>
         </div>
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
           <label>MM bar</label>
@@ -215,7 +213,11 @@
         <i class="times icon"></i>
         Close
       </button>
-      <button id="export" type="button" class="ui yellow right labeled icon floating button">
+      <button id="parameters" type="button" class="ui orange right labeled icon floating edit button">
+        <i class="cogs icon"></i>
+        Advanced parameters
+      </button>
+      <button id="export" type="button" class="ui yellow right labeled icon floating info button">
         <i class="download icon"></i>
         Export
       </button>
@@ -249,8 +251,28 @@
     </div>
     <div class="popup-footer">
       <div class="form-actions">
-        <button type="button" class="ui gray floating cancel button">Cancel</button>
+        <button type="button" class="ui gray floating close button">Cancel</button>
       </div>
     </div>
   </div>
 </div>
+#if($tour)
+<div id="parameters-modal" class="wide popup">
+  <div class="popup-body">
+    <div class="popup-header">
+      Advanced parameters
+    </div>
+    <div class="popup-content">
+#parse('tour-parameters.inc.html')
+    </div>
+    <div class="popup-footer">
+      <div class="form-actions">
+        <button type="button" class="ui gray floating close button">Cancel</button>
+      </div>
+      <div class="form-actions">
+        <button id="update-parameters" type="button" class="ui green floating button">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+#end

@@ -207,6 +207,26 @@
   .step:last-child { padding-right: 1em; }
   .step .description { display: none; }
 
+  label input[type="checkbox"] {
+    vertical-align: baseline;
+  }
+
+  .ui.form .inline.fields select, .ui.form label select {
+    width: initial;
+  }
+
+  .ui.accordion .content {
+    display: block;
+    max-height: 0;
+    overflow-y: hidden;
+    padding: 0 1em 0 2em;
+    transition: all 0.5s ease-out;
+    &.active {
+      padding: 0.5em 1em 0.5em 2em;
+      max-height: 600px;
+    }
+  }
+
   .ui.form input[type=text], .ui.form input[type="number"], .ui.form select {
     padding: 0.4em 0.2em;
   }
@@ -228,7 +248,7 @@
     background-clip: initial;
   }
 
-  .ui.form label input[type="checkbox"] {
+  .ui.form label input[type="checkbox"]:not(.inline) {
     margin-left: 1em;
     vertical-align: baseline;
   }
@@ -325,6 +345,13 @@
     margin: auto;
     z-index: 100;
     pointer-events: none;
+    &.wide {
+      left: 0;
+      right: 0;
+      transform: initial;
+      max-width: max(90vw, 1200px);
+      width: 90vw;
+    }
     div.close {
       position: absolute;
       width: 30px;

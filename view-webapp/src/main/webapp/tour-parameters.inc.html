@@ -1,0 +1,155 @@
+<form id="parameters-form" class="ui edit form">
+  <div class="ui fluid styled accordion">
+    <div class="title">
+      <i class="dropdown icon"></i>
+      Base parameters
+    </div>
+    <div class="content">
+      <div class="field">
+        <label><input type="checkbox" name="deterministic" value="true" #if($tour.pairing.base.deterministic) checked #end>&nbsp;deterministic randomness</label>
+      </div>
+      <div class="field">
+        <label><input type="checkbox" name="colorBalance" value="true" #if($tour.pairing.base.colorBalanceWeight) checked #end>&nbsp;balance white and black</label>
+      </div>
+    </div>
+    <div class="title">
+      <i class="dropdown icon"></i>
+      Main parameters
+    </div>
+    <div class="content">
+#if($tour.pairing.type == 'MAC_MAHON')
+      <div class="inline fields">
+        <div class="field">
+          <label>
+            MMS score for non-played rounds
+            <select name="mmsValueAbsent">
+              <option value="0" #if($tour.pairing.main.mmsValueAbsent == 0) selected #end>0</option>
+              <option value="0.5" #if($tour.pairing.main.mmsValueAbsent == 0.5) selected #end>½</option>
+              <option value="1" #if($tour.pairing.main.mmsValueAbsent == 1) selected #end>1</option>
+            </select>
+          </label>
+        </div>
+      </div>
+#end
+      <div class="ui fluid styled accordion">
+        <div class="title">
+          <i class="dropdown icon"></i>
+          Seeding methods inside groups of same score
+        </div>
+        <div class="content">
+          <div class="field">
+            <label>Apply first seeding method up to round <input type="number" min="1" value="$tour.pairing.main.firstSeedLastRound"/></label>
+          </div>
+          <div class="inline fields">
+            <div class="roundbox field">
+              <label>First seeding method</label>
+              <label><input type="checkbox" name="firstSeedAddRating" value="true" #if($tour.pairing.main.firstSeedAddCrit == 'RATING') checked #end/> add a sorting on rating</label>
+              <select name="firstSeed">
+                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
+                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
+                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
+              </select>
+            </div>
+            <div class="roundbox field">
+              <label>Second seeding method</label>
+              <label><input type="checkbox" name="secondSeedAddRating" value="true" #if($tour.pairing.main.secondSeedAddCrit == 'RATING') checked #end/> add a sorting on rating</label>
+              <select name="secondSeed">
+                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
+                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
+                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="title">
+          <i class="dropdown icon"></i>
+          Draw-up / draw-down between groups of same score
+        </div>
+        <div class="content">
+          <div class="inline fields">
+            <label><input type="checkbox" name="upDownCompensate" value="true" #if($tour.pairing.main.upDownCompensate) checked #end/> try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then</label>
+          </div>
+          <div class="inline fields">
+            <label>
+              pair a player in the
+              <select name="upDownUpperMode">
+                <option value="TOP" #if($tour.pairing.main.upDownUpperMode == 'TOP') selected #end>top</option>
+                <option value="MIDDLE" #if($tour.pairing.main.upDownUpperMode == 'MIDDLE') selected #end>middle</option>
+                <option value="BOTTOM" #if($tour.pairing.main.upDownUpperMode == 'BOTTOM') selected #end>bottom</option>
+              </select>
+              of the upper group with a player in the
+              <select name="upDownLowerMode">
+                <option value="TOP" #if($tour.pairing.main.upDownLowerMode == 'TOP') selected #end>top</option>
+                <option value="MIDDLE" #if($tour.pairing.main.upDownLowerMode == 'MIDDLE') selected #end>middle</option>
+                <option value="BOTTOM" #if($tour.pairing.main.upDownLowerMode == 'BOTTOM') selected #end>bottom</option>
+              </select>
+              of the lower group
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="title">
+      <i class="dropdown icon"></i>
+      Secondary parameters
+    </div>
+    <div class="content">
+      <div class="field">
+        <label>Do not apply secondary criteria for:</label>
+        <label>
+          •&nbsp;players with a MMS equal to or stronger than
+          <select name="rankThreshold">
+#set($rankThreshold = $tour.pairing.secondary.rankThreshold)
+#levels($rankThreshold)
+          </select>
+        </label>
+        <label>
+          •&nbsp;<input name="winsThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.winsThreshold) checked #end/>
+          players who won at least half of their games
+        </label>
+        <label>
+          •&nbsp;<input name="barThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.barThreshold) checked #end/>
+          players above the Mac Mahon bar
+        </label>
+      </div>
+    </div>
+    <div class="title">
+      <i class="dropdown icon"></i>
+      Geographical parameters
+    </div>
+    <div class="content">
+      <div class="field">
+        <label>
+          Prefer a score gap of
+          <input type="number" min="0" value="$tour.pairing.geo.mmsDiffCountry"/>
+          rather than pairing players of the same country.
+        </label>
+      </div>
+      <div class="field">
+        <label>
+          Prefer a score gap of
+          <input type="number" min="0" value="$tour.pairing.geo.mmsDiffClub"/>
+          rather than pairing players of the same club.
+        </label>
+      </div>
+    </div>
+    <div class="title">
+      <i class="dropdown icon"></i>
+      Handicap parameters
+    </div>
+    <div class="content">
+      <div class="field">
+        <label>
+          <input type="checkbox" name="useMMS" value="true" #if($tour.pairing.handicap.useMMS) checked #end/>
+          use MMS rather than rank for handicap
+        </label>
+      </div>
+      <div class="field">
+        <label>
+          Handicap ceiling:
+          <input name="ceiling" type="number" min="0" class="inline" value="$tour.pairing.handicap.ceiling"/>
+        </label>
+      </div>
+    </div>
+  </div>
+</form>

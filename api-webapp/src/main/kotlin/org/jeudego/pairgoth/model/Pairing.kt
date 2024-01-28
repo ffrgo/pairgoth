@@ -45,7 +45,7 @@ data class MainCritParams(
     val drawUpDownUpperMode: DrawUpDown = DrawUpDown.BOTTOM,
     val drawUpDownLowerMode: DrawUpDown = DrawUpDown.TOP,
     val seedingWeight: Double = MAX_SEEDING_WEIGHT, // 5 *10^6, opengotha maximizeSeeding
-    val lastRoundForSeedSystem1: Int = 1,
+    val lastRoundForSeedSystem1: Int = 2,
     val seedSystem1: SeedMethod = SeedMethod.SPLIT_AND_RANDOM,
     val seedSystem2: SeedMethod = SeedMethod.SPLIT_AND_FOLD,
     val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
@@ -226,6 +226,7 @@ fun BaseCritParams.toJson() = Json.Object(
     "nx1" to nx1,
     "dupWeight" to dupWeight,
     "random" to random,
+    "deterministic" to deterministic,
     "colorBalanceWeight" to colorBalanceWeight
 )
 

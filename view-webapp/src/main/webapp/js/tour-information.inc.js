@@ -15,6 +15,10 @@ onLoad(() => {
     return false;
   });
 
+  $('#parameters').on('click', e => {
+    modal('parameters-modal');
+  });
+
   $('#validate').on('click', e => {
     let form = e.target.closest('form');
     let valid = true;
@@ -177,13 +181,59 @@ onLoad(() => {
     if (typeof(tour_id) !== 'undefined') {
       api.putJson(`tour/${tour_id}`, tour)
         .then(tour => {
-          window.location.reload();
+          if (tour !== 'error') {
+            window.location.reload();
+          }
         });
     } else {
       api.postJson('tour', tour)
         .then(tour => {
-          window.location.href += `?id=${tour.id}`;
+          if (tour !== 'error') {
+            window.location.href += `?id=${tour.id}`;
+          }
         });
     }
+  });
+  $('#update-parameters').on('click', e => {
+    let form = $('#parameters-form')[0];
+    let tour = {
+      pairing: {
+        base: {
+          deterministic: form.val('deterministic'),
+          colorBalanceWeight: form.val('colorBalance') ? 1000000.0 : 0.0 // TODO use client side boolean
+        },
+        main: {
+          mmsValueAbsent: form.val('mmsValueAbsent'),
+          firstSeedLastRound: form.val('firstSeedLastRound'),
+          firstSeedAddCrit: form.val('firstSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
+          firstSeed: form.val('firstSeed'),
+          secondSeedAddCrit: form.val('secondSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
+          secondSeed: form.val('secondSeed'),
+          upDownCompensate: form.val('upDownCompoensate'),
+          upDownUpperMode: form.val('upDownUpperMode'),
+          upDownLowerMode: form.val('upDownLowerMode')
+        },
+        secondary: {
+          rankThreshold: form.val('rankThreshold'),
+          winsThreshold: form.val('winsThreshold'),
+          barThreshold: form.val('barThreshold')
+        },
+        geo: {
+          mmsDiffCountry: form.val('mmsDiffCountry'),
+          mmsDiffClub: form.val('mmsDiffClub')
+        },
+        handicap: {
+          useMMS: form.val('useMMS'),
+          ceiling: form.val('ceiling')
+        }
+      }
+    }
+    console.log(tour);
+    api.putJson(`tour/${tour_id}`, tour)
+      .then(tour => {
+        if (tour !== 'error') {
+          window.location.reload();
+        }
+      });
   });
 });

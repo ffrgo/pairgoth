@@ -11,6 +11,7 @@
 : This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: Ce mode est le plus adapté pour de grands événements de Go comme les congrès, il permet d’enregistrer les joueurs, d’entrer les résultats et de gérer les appariements depuis plusieurs postes à la fois.
 : the	: le projet
 Add player	Ajouter
+Advanced parameters	Paramètres avancés
 At its core,	&nbsp;
 Browse	Parcourir les sources de
 Byo-yomi periods	Périodes de byo-yomi
@@ -64,6 +65,7 @@ Mac Mahon groups	Groupes Mac Mahon
 MacMahon	MacMahon
 Main time	Temps principal
 Max time	Temps max
+MM floor	Plancher MM
 Name	Nom
 Nbw	NbV
 New Tournament	Nouveau Tournoi
