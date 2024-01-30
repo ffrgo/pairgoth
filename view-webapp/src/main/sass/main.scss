@@ -442,8 +442,41 @@
       margin-top: 0.1em !important;
     }
 
-    #logo, #lang, .steps, #filter-box, #footer, #pairing-left, #pairing-buttons, button, #standings-params, #logout {
+    #logo, #lang, .steps, #filter-box, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets {
       display: none !important;
+    }
+
+    body {
+      &.nogame {
+        #pairables {
+          max-height: unset !important;
+          max-width: unset !important;
+          font-size: 1rem !important;
+          line-height: 1.1rem !important;
+          min-width: 60vw;
+          &::before {
+            top: 0;
+          }
+        }
+        #paired {
+          display: none !important;
+        }
+      }
+      &:not(.nogame) {
+        #paired {
+          max-height: unset !important;
+          max-width: unset !important;
+          font-size: 1rem !important;
+          line-height: 1.1rem !important;
+          min-width: 60vw;
+          &::before {
+            top: 0;
+          }
+        }
+        #pairables {
+          display: none !important;
+        }
+      }
     }
 
     .circular.label {
@@ -452,17 +485,6 @@
 
     #pairing-right {
       max-width: unset !important;
-    }
-
-    #paired {
-      max-height: unset !important;
-      max-width: unset !important;
-      font-size: 1rem !important;
-      line-height: 1.1rem !important;
-      min-width: 60vw;
-      &::before {
-        top: 0;
-      }
     }
 
   }

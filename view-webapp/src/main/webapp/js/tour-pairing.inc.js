@@ -169,4 +169,7 @@ onLoad(()=>{
     if (store.has('unpairablesScroll')) $('#unpairables')[0].scrollTop = store('unpairablesScroll');
     if (store.has('pairedScroll')) $('#paired')[0].scrollTop = store('pairedScroll');
   }, 0);
+  if ($('#paired .listitem').length === 0) {
+    $('body').addClass('nogame');
+  }
 });
