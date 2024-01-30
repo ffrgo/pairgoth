@@ -92,7 +92,7 @@ abstract class BasePairingHelper(
     val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
     val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
     fun Pairable.missedRounds(upToRound: Int, pairing: Set<ID>): Int = (1..upToRound).map { round ->
-        if (historyHelper.playersPerRound.getOrNull(round - 1)?.contains(id) == true || pairing.contains(id)) 0 else 1
+        if (historyHelper.playersPerRound.getOrNull(round - 1)?.contains(id) == true || round == upToRound && pairing.contains(id)) 0 else 1
     }.sum()
     fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
     open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {

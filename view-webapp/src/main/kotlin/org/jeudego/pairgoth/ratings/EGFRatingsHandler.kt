@@ -19,6 +19,8 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                 }.toTypedArray()
                 Json.MutableObject(*pairs).also {
                     it["origin"] = "EGF"
+                    // override rank with rating equivalent
+                    val rating = it["rating"]?.toString()?.toIntOrNull()
                 }
             }
         }

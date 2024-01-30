@@ -10,8 +10,6 @@
 </div>
 <div class="tournaments section">
 #set($files = $api.get('tour'))
-$log.info("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-$log.info($files)
 #if($files.containsKey('error'))
   #set($error = $files.error)
 #elseif($files.containsKey('message'))
