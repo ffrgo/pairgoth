@@ -3,6 +3,7 @@ let searchTimer = undefined;
 let resultTemplate;
 let searchResult;
 let searchHighlight;
+let manualRating;
 
 function initSearch() {
   let needle = $('#needle')[0].value.trim();
@@ -315,6 +316,17 @@ onLoad(() => {
       else tr.removeClass('hidden');
     });
   });
+  manualRating = ($('#player input[name="rating"]')[0].value !== '');
+  $('#player input[name="rating"]').on('input', e=>{
+    manualRating = true;
+  });
+  $('#player select[name="rank"]').on('input', e=>{
+    let rank = e.target.value;
+    let ratingCtl = $('#player input[name="rating"]')[0];
+    if (!manualRating) {
+      ratingCtl.value = 2050 + 100 * rank;
+    }
+  });
   $('#filter-box i').on('click', e => {
     $('#filter')[0].value = '';
     $('tbody > tr').removeClass('hidden');
@@ -329,7 +341,6 @@ onLoad(() => {
   if (store('macmahonGroups')) {
     modal('macmahon-groups');
   }
-
   // mac mahon groups...
   $('#under-to-top').on('click', e => {
     let players = $('#under-group .selected').map(item => (
