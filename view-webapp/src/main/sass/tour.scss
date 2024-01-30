@@ -91,43 +91,6 @@
   }
   #search-form {
     position: relative;
-    .toggle {
-      cursor: pointer;
-      text-align: center;
-      input {
-        display: none;
-      }
-      label {
-        display: block;
-        text-align: center;
-        cursor: pointer;
-      }
-      .checkbox {
-        width: 50px;
-        height: 26px;
-        border-radius: 18px;
-        background-color: #F7D6A3;
-        display: inline-flex;
-        align-items: center;
-        padding-left: 5px;
-        padding-right: 5px;
-        cursor: pointer;
-        .circle {
-          background-color: #6B5E8A;
-          transform: translateX(0px);
-          border-radius: 50%;
-          width: 20px;
-          height: 20px;
-          transition: 300ms;
-        }
-      }
-      input:checked + .checkbox {
-        background-color: rgb(218, 114, 80);
-        .circle {
-          transform: translateX(20px);
-        }
-      }
-    }
   }
   #search-result {
     position: absolute;
@@ -310,7 +273,7 @@
   #results-list {
     text-align: center;
     .player, .result {
-      background-color: white;
+      background-color: unset;
       color: black;
       cursor: pointer;
       &:hover {
@@ -324,6 +287,11 @@
       }
       &.looser {
         font-style: italic;
+      }
+    }
+    #results-table {
+      tr.filtered {
+        display: none;
       }
     }
   }

@@ -6,6 +6,13 @@
     <button class="ui floating choose-round next-round button">&raquo;</button>
 #set($stats = $utils.getResultsStats($games))
     <span class="norbeak">( <span id="known">$stats.known</span> / $stats.total )</span>
+    <div id="filter" class="toggle">
+      <input id="filter-results" type="checkbox" value="true"/>
+      <div class="filter-results checkbox">
+        <div class="circle"></div>
+      </div>
+      <label>Filter</label>
+    </div>
   </div>
   <div id="results-list" class="roundbox">
     <table id="results-table" class="ui celled striped table">
