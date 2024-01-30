@@ -159,4 +159,16 @@ onLoad(()=>{
   $('#update-pairable').on('click', e => {
     updatePairable();
   });
+  window.on('unload', e => {
+    console.log(store('unpairablesScroll'))
+    store('pairablesScroll', $('#pairables')[0].scrollTop);
+    store('unpairablesScroll', $('#unpairables')[0].scrollTop);
+    store('pairedScroll', $('#paired')[0].scrollTop);
+  });
+  console.log(store('unpairablesScroll'))
+  setTimeout(() => {
+    if (store.has('pairablesScroll')) $('#pairables')[0].scrollTop = store('pairablesScroll');
+    if (store.has('unpairablesScroll')) $('#unpairables')[0].scrollTop = store('unpairablesScroll');
+    if (store.has('pairedScroll')) $('#paired')[0].scrollTop = store('pairedScroll');
+  }, 0);
 });

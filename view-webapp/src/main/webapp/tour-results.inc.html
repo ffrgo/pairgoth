@@ -5,7 +5,7 @@
     <span class="active-round">$round</span>
     <button class="ui floating choose-round next-round button">&raquo;</button>
 #set($stats = $utils.getResultsStats($games))
-    <span class="norbeak"><span id="known">$stats.known</span> / $stats.total</span>
+    <span class="norbeak">( <span id="known">$stats.known</span> / $stats.total )</span>
   </div>
   <div id="results-list" class="roundbox">
     <table id="results-table" class="ui celled striped table">

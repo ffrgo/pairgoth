@@ -126,6 +126,7 @@ country	pays
 d	d
 first name	prénom
 from	de
+games )	parties )
 h	h
 in a way that best suits your needs. Here are your options:	de la manière qui répond le mieux à vos besoin. Voici vos options :
 instance graciously hosted by the French Go Federation.	gracieusement hébergée par la Fédération Française de Go
@@ -138,6 +139,7 @@ online tournament	tournoi en ligne
 opengotha	OpenGotha
 or	ou
 pairable players	joueurs disponibles
+pairable,	disponibles,
 pairgoth	pairgoth
 pairing system, ideal for championships with no handicap games, as well as the	, idéal pour les championnats sans handicap, ainsi que le système d’appariement
 pairing system, more suited for classical tournaments and cups. It is still in a beta stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « beta ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
@@ -152,6 +154,7 @@ table	table
 the configuration guide	le guide de configuration
 to	à
 unpairable players	joueurs non disponibles
+unpairable,	non disponibles,
 version 0.1 supports the	version 0.1 supporte le système d’appariement
 white	blanc
 White	Blanc
