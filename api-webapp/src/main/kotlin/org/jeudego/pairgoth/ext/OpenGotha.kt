@@ -242,11 +242,11 @@ object OpenGotha {
             <Games>
             // TODO - table number is not any more kinda random like this
             ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
-                    games.values.mapIndexedNotNull { table, game ->
+                    games.values.mapNotNull { game ->
                         if (game.black == 0 || game.white == 0) null
-                        else Triple(index + 1, table , game)
+                        else Pair(index + 1, game)
                     }
-                }.joinToString("\n") { (round, table, game) ->
+                }.joinToString("\n") { (round, game) ->
                     """<Game blackPlayer="${
                         (tournament.pairables[game.black]!! as Player).let { black ->
                             "${black.name.replace(" ", "")}${black.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
@@ -263,7 +263,7 @@ object OpenGotha {
                     }" roundNumber="${
                         round
                     }" tableNumber="${
-                        table + 1
+                        game.table
                     }" whitePlayer="${
                         (tournament.pairables[game.white]!! as Player).let { white ->
                             "${white.name}${white.firstname}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
