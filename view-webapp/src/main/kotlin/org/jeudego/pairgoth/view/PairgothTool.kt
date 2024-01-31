@@ -63,7 +63,7 @@ class PairgothTool {
         pairables.groupBy { pairable -> pairable.getDouble("MMS")?.toLong() }
         .mapValues { entry ->
             entry.value.sortedByDescending { pairable ->
-                pairable.getInt("rank")
+                pairable.getInt("rating")
             }
         }
 
