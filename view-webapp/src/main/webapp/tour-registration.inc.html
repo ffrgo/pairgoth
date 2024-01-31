@@ -36,7 +36,7 @@
             <td>$part.firstname</td>
             <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
-            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) ($part.mmsCorrection)#end</td>
+            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
             <td>$part.rating</td>
             <td class="participating">
   #foreach($round in [1..$tour.rounds])
