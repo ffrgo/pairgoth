@@ -493,14 +493,17 @@
           font-size: 1rem !important;
           line-height: 1.1rem !important;
           min-width: 60vw;
+
           &::before {
             top: 0;
           }
         }
+
         #paired {
           display: none !important;
         }
       }
+
       &:not(.nogame) {
         #paired {
           max-height: unset !important;
@@ -508,10 +511,12 @@
           font-size: 1rem !important;
           line-height: 1.1rem !important;
           min-width: 60vw;
+
           &::before {
             top: 0;
           }
         }
+
         #pairables {
           display: none !important;
         }
@@ -526,66 +531,87 @@
       max-width: unset !important;
     }
 
-  }
+    .page {
+      width: 96vw;
+      height: 96vh;
+      page-break-after: always;
 
-  .page {
-    width: 96vw;
-    height: 96vh;
-    page-break-after: always;
-    .page-item {
-      font-size: 1.4rem;
-      line-height: 1.5rem;
-      height: 24vh;
-      border-bottom: 1px dotted gray;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: space-evenly;
-      .title {
-        margin-top: 1vh;
-        font-weight: bold;
-        text-align: center;
-      }
-      .subtitle {
-        font-size: 1rem;
-        text-align: center;
-      }
-      .details {
-        margin: 1vh 1em;
+      .page-item {
+        font-size: 1.4rem;
+        line-height: 1.5rem;
+        height: 24vh;
+        border-bottom: 1px dotted gray;
         display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        line-height: 1.1rem;
-      }
-      .instructions {
-        text-align: center;
-        font-style: italic;
-      }
-      .players {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        gap: 1em;
-        .equal {
-          padding: 0.2em 1em;
-          border: solid 1px gray;
+        flex-flow: column nowrap;
+        justify-content: space-evenly;
+
+        .title {
+          margin-top: 1vh;
+          font-weight: bold;
+          text-align: center;
         }
-        .player {
-          padding: 0.2em 1em;
-          border: solid 1px gray;
-          flex: 1;
+
+        .subtitle {
+          font-size: 1rem;
+          text-align: center;
         }
-      }
-      .signatures {
-        height: 8vh;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        .signature {
+
+        .details {
+          margin: 1vh 1em;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+          line-height: 1.1rem;
+        }
+
+        .instructions {
+          text-align: center;
           font-style: italic;
-          text-align: left;
-          flex: 1;
+        }
+
+        .players {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+          gap: 1em;
+
+          .equal {
+            padding: 0.2em 1em;
+            border: solid 1px gray;
+          }
+
+          .player {
+            padding: 0.2em 1em;
+            border: solid 1px gray;
+            flex: 1;
+          }
+        }
+
+        .signatures {
+          height: 8vh;
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-between;
+
+          .signature {
+            font-style: italic;
+            text-align: left;
+            flex: 1;
+          }
         }
       }
+    }
+    .ui.red.circular.label {
+      background-color: white;
+      color: white;
+      border-color: black;
+      text-decoration: solid line-through black;
+    }
+    .ui.green.circular.label {
+      background-color: white;
+      color: black;
+      border-color: black;
+      font-weight: bold;
     }
   }
 }
