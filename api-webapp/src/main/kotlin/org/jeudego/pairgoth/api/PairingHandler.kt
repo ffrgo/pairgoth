@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Game
+import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
@@ -20,7 +21,7 @@ object PairingHandler: PairgothApiHandler {
         val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        val unpairables = tournament.pairables.values.filter { !it.final || it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val unpairables = tournament.pairables.values.filter { it.final && it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val pairables = tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val games = tournament.games(round).values.sortedBy {
             if (it.table == 0) Int.MAX_VALUE else it.table
@@ -68,43 +69,74 @@ object PairingHandler: PairgothApiHandler {
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
         if (round != tournament.lastRound()) badRequest("cannot edit pairings in other rounds but the last")
         val payload = getObjectPayload(request)
-        val gameId = payload.getInt("id") ?: badRequest("invalid game id")
-        val game = tournament.games(round)[gameId] ?: badRequest("invalid game id")
-        val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
-            listOf(it.black, it.white)
-        }.toSet()
-        if (game.result != Game.Result.UNKNOWN && (
-                    game.black != payload.getInt("b") ||
-                    game.white != payload.getInt("w") ||
-                    game.handicap != payload.getInt("h")
-            )) badRequest("Game already has a result")
-        game.black = payload.getID("b") ?: badRequest("missing black player id")
-        game.white = payload.getID("w") ?: badRequest("missing white player id")
+        if (payload.containsKey("id")) {
+            val gameId = payload.getInt("id") ?: badRequest("invalid game id")
+            val game = tournament.games(round)[gameId] ?: badRequest("invalid game id")
+            val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
+                listOf(it.black, it.white)
+            }.toSet()
+            if (game.result != Game.Result.UNKNOWN && (
+                        game.black != payload.getInt("b") ||
+                                game.white != payload.getInt("w") ||
+                                game.handicap != payload.getInt("h")
+                        )) badRequest("Game already has a result")
+            game.black = payload.getID("b") ?: badRequest("missing black player id")
+            game.white = payload.getID("w") ?: badRequest("missing white player id")
 
-        tournament.recomputeHdAndDUDD(round, game.id)
-        val previousTable = game.table;
-        // temporary
-        //payload.getInt("dudd")?.let { game.drawnUpDown = it }
-        val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
-        val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
-        if (!black.final) badRequest("black registration status is not final")
-        if (!white.final) badRequest("white registration status is not final")
-        if (black.skip.contains(round)) badRequest("black is not playing this round")
-        if (white.skip.contains(round)) badRequest("white is not playing this round")
-        if (playing.contains(black.id)) badRequest("black is already in another game")
-        if (playing.contains(white.id)) badRequest("white is already in another game")
-        if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
-        if (payload.containsKey("t")) {
-            game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
-        }
-        tournament.dispatchEvent(GameUpdated, Json.Object("round" to round, "game" to game.toJson()))
-        if (game.table != previousTable && tournament.renumberTables(round, game)) {
-            val games = tournament.games(round).values.sortedBy {
-                if (it.table == 0) Int.MAX_VALUE else it.table
+            tournament.recomputeHdAndDUDD(round, game.id)
+            val previousTable = game.table;
+            // temporary
+            //payload.getInt("dudd")?.let { game.drawnUpDown = it }
+            val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
+            val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
+            if (!black.final) badRequest("black registration status is not final")
+            if (!white.final) badRequest("white registration status is not final")
+            if (black.skip.contains(round)) badRequest("black is not playing this round")
+            if (white.skip.contains(round)) badRequest("white is not playing this round")
+            if (playing.contains(black.id)) badRequest("black is already in another game")
+            if (playing.contains(white.id)) badRequest("white is already in another game")
+            if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
+            if (payload.containsKey("t")) {
+                game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
             }
-            tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+            tournament.dispatchEvent(GameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+            if (game.table != previousTable) {
+                val sortedPairables = tournament.getSortedPairables(round)
+                val sortedMap = sortedPairables.associateBy {
+                    it.getID()!!
+                }
+                val changed = tournament.renumberTables(round, game) { game ->
+                    val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
+                    val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
+                    (whitePosition + blackPosition)
+                }
+                if (changed) {
+                    val games = tournament.games(round).values.sortedBy {
+                        if (it.table == 0) Int.MAX_VALUE else it.table
+                    }
+                    tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+                }
+            }
+            return Json.Object("success" to true)
+        } else {
+            // without id, it's a table renumbering
+            val sortedPairables = tournament.getSortedPairables(round)
+            val sortedMap = sortedPairables.associateBy {
+                it.getID()!!
+            }
+            val changed = tournament.renumberTables(round, null) { game ->
+                val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
+                val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
+                (whitePosition + blackPosition)
+            }
+            if (changed) {
+                val games = tournament.games(round).values.sortedBy {
+                    if (it.table == 0) Int.MAX_VALUE else it.table
+                }
+                tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+            }
+            return Json.Object("success" to true)
         }
-        return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest): Json {

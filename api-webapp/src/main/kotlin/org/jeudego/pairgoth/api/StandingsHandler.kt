@@ -30,88 +30,11 @@ object StandingsHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: ApiHandler.badRequest("invalid round number")
 
-        fun mmBase(pairable: Pairable): Double {
-            if (tournament.pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
-            return min(max(pairable.rank, tournament.pairing.mmFloor), tournament.pairing.mmBar) + MacMahonSolver.mmsZero + pairable.mmsCorrection
-        }
-
-        //  CB avoid code redundancy with solvers
-        val historyHelper = HistoryHelper(tournament.historyBefore(round + 1)) {
-            if (tournament.pairing.type == PairingType.SWISS) wins
-            else tournament.pairables.mapValues {
-                it.value.let {
-                    pairable ->
-                        mmBase(pairable) +
-                        (nbW(pairable) ?: 0.0) + // TODO take tournament parameter into account
-                        (1..round).map { round ->
-                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
-                        }.sum() * tournament.pairing.pairingParams.main.mmsValueAbsent
-                }
-            }
-        }
-        val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
-        if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
-        val criteria = neededCriteria.map { crit ->
-            crit.name to when (crit) {
-                NONE -> nullMap
-                CATEGORY -> nullMap
-                RANK -> tournament.pairables.mapValues { it.value.rank }
-                RATING -> tournament.pairables.mapValues { it.value.rating }
-                NBW -> historyHelper.wins
-                MMS -> historyHelper.mms
-                STS -> nullMap
-                CPS -> nullMap
-
-                SOSW -> historyHelper.sos
-                SOSWM1 -> historyHelper.sosm1
-                SOSWM2 -> historyHelper.sosm2
-                SODOSW -> historyHelper.sodos
-                SOSOSW -> historyHelper.sosos
-                CUSSW -> historyHelper.cumScore
-                SOSM -> historyHelper.sos
-                SOSMM1 -> historyHelper.sosm1
-                SOSMM2 -> historyHelper.sosm2
-                SODOSM -> historyHelper.sodos
-                SOSOSM -> historyHelper.sosos
-                CUSSM -> historyHelper.cumScore
-
-                SOSTS -> nullMap
-
-                EXT -> nullMap
-                EXR -> nullMap
-
-                SDC -> nullMap
-                DC -> nullMap
-            }
-        }
-        val pairables = tournament.pairables.values.filter { it.final }.map { it.toMutableJson() }
-        pairables.forEach { player ->
-            for (crit in criteria) {
-                player[crit.first] = crit.second[player.getID()] ?: 0.0
-            }
-            player["results"] = Json.MutableArray(List(round) { "0=" })
-        }
-        val sortedPairables = pairables.sortedWith { left, right ->
-            for (crit in criteria) {
-                val lval = left.getDouble(crit.first) ?: 0.0
-                val rval = right.getDouble(crit.first) ?: 0.0
-                val cmp = lval.compareTo(rval)
-                if (cmp != 0) return@sortedWith -cmp
-            }
-            return@sortedWith 0
-        }.mapIndexed() { i, obj ->
-            obj.set("num", i+1)
-        }
+        val sortedPairables = tournament.getSortedPairables(round)
         val sortedMap = sortedPairables.associateBy {
             it.getID()!!
         }
-        var place = 1
-        sortedPairables.groupBy { p ->
-            Triple(p.getDouble(criteria[0].first) ?: 0.0, p.getDouble(criteria[1].first)  ?: 0.0, p.getDouble(criteria[2].first)  ?: 0.0)
-        }.forEach {
-            it.value.forEach { p -> p["place"] = place }
-            place += it.value.size
-        }
+
         for (r in 1..round) {
             tournament.games(r).values.forEach { game ->
                 val white = if (game.white != 0) sortedMap[game.white] else null
@@ -152,6 +75,8 @@ object StandingsHandler: PairgothApiHandler {
         return when(accept) {
             "application/json" -> sortedPairables.toJsonArray()
             "application/egf" -> {
+                val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
+                if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
                 exportToEGFFormat(tournament, sortedPairables, neededCriteria, response.writer)
                 return null
             }

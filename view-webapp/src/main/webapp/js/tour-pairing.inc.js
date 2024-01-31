@@ -18,6 +18,15 @@ function unpair(games) {
     });
 }
 
+function renumberTables() {
+  api.putJson(`tour/${tour_id}/pair/${activeRound}`, {})
+    .then(rst => {
+      if (rst !== 'error') {
+        document.location.reload();
+      }
+    });
+}
+
 function editGame(game) {
   let t = game.find('.table');
   let w = game.find('.white');
@@ -114,6 +123,9 @@ onLoad(()=>{
       games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     }
     unpair(games);
+  });
+  $('#renumber-tables').on('click', e => {
+    renumberTables();
   });
   $('#pairing-form [name]').on('input', e => {
     $('#update-pairing').removeClass('disabled');

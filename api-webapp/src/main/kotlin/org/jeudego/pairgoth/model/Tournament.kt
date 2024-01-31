@@ -6,12 +6,10 @@ import com.republicate.kson.toJsonArray
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.Store
 import kotlin.math.max
-import kotlin.math.min
 import java.util.*
 import kotlin.math.roundToInt
 
@@ -98,14 +96,16 @@ sealed class Tournament <P: Pairable>(
             acc
         }
 
-    fun renumberTables(round: Int, pivot: Game? = null): Boolean {
+    private fun defaultGameOrderBy(game: Game): Int {
+        val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE
+        val blackRank = pairables[game.black]?.rating ?: Int.MIN_VALUE
+        return -(whiteRank + blackRank)
+    }
+
+    fun renumberTables(round: Int, pivot: Game? = null, orderBY: (Game) -> Int = ::defaultGameOrderBy): Boolean {
         var changed = false
         var nextTable = 1
-        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy { game ->
-            val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE
-            val blackRank = pairables[game.black]?.rating ?: Int.MIN_VALUE
-            -(2 * whiteRank + 2 * blackRank) / 2
-        }.forEach { game ->
+        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy(orderBY).forEach { game ->
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
             }
