@@ -30,33 +30,9 @@
 #end
 <div class="section">
 #if($tour)
-  <div class="ui ordered centered steps">
-    <div class="step" data-step="information">
-      <div class="content">
-        <div class="title">Information</div>
-      </div>
-    </div>
-    <div class="step" data-step="registration">
-      <div class="content">
-        <div class="title">Registration</div>
-      </div>
-    </div>
-    <div class="step" data-step="pairing">
-      <div class="content">
-        <div class="title">Pairing</div>
-      </div>
-    </div>
-    <div class="step" data-step="results">
-      <div class="content">
-        <div class="title">Results</div>
-      </div>
-    </div>
-    <div class="step" data-step="standings">
-      <div class="content">
-        <div class="title">Standings</div>
-      </div>
-    </div>
-  </div>
+  <h1 id="title">
+    $esc.html($tour.name)
+  </h1>
 #end
 #translate('tour-information.inc.html')
 #if($tour)
