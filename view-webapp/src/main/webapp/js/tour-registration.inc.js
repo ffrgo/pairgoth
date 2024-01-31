@@ -174,7 +174,10 @@ onLoad(() => {
         ctl.setCustomValidity(msg('required_field'));
       }
     }
-    if (!valid) return;
+    if (!valid) {
+      $('#player :invalid').forEach(elem => elem.reportValidity());
+      return;
+    }
     // $('#player-form')[0].requestSubmit() not working?!
     $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
@@ -196,6 +199,7 @@ onLoad(() => {
         .then(player => {
           console.log(player)
           if (player !== 'error') {
+            store('registrationSuccess', true);
             window.location.reload();
           }
         });
@@ -204,8 +208,8 @@ onLoad(() => {
       player['id'] = id;
       api.putJson(`tour/${tour_id}/part/${id}`, player)
         .then(player => {
-          console.log(player)
           if (player !== 'error') {
+            store('registrationSuccess', true);
             window.location.reload();
           }
         });
@@ -337,6 +341,11 @@ onLoad(() => {
   });
   if (store('addingPlayers')) {
     addPlayers();
+    if (store('registrationSuccess')) {
+      $('#player').addClass('successful');
+      setTimeout(() => $('#player .success-feedback').addClass('done'), 0);
+    }
+    store.remove('registrationSuccess');
   }
   if (store('macmahonGroups')) {
     modal('macmahon-groups');

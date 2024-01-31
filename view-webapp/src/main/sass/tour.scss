@@ -80,6 +80,20 @@
         display: none;
       }
     }
+    .success-feedback {
+      display: none;
+      position: absolute;
+      bottom: 1em;
+      right: 1em;
+      opacity: 1;
+      transition: opacity 2s ease-in;
+    }
+    &.successful .success-feedback {
+      display: block;
+      &.done {
+        opacity: 0;
+      }
+    }
   }
 
   #player-form {
