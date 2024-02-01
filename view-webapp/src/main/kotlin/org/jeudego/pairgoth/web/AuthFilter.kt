@@ -28,14 +28,15 @@ class AuthFilter: Filter {
         val uri = request.requestURI
         val session: HttpSession? = request.getSession(false)
         val auth = WebappManager.getProperty("auth") ?: throw Error("authentication not configured")
+        val forwarded = request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI) != null
 
-        if (auth == "none" || whitelisted(uri) || session?.getAttribute("logged") != null) {
+        if (auth == "none" || whitelisted(uri) || forwarded || session?.getAttribute("logged") != null) {
             chain.doFilter(req, resp)
         } else {
             // TODO - configure if unauth requests are redirected and/or forwarded
             // TODO - protection against brute force attacks
             if (uri.endsWith("/index")) {
-                request.getRequestDispatcher("/index-ffg").forward(req, resp)
+                response.sendRedirect("/index-ffg")
             } else {
                 response.sendRedirect("/login")
             }
@@ -44,8 +45,8 @@ class AuthFilter: Filter {
 
     companion object {
         private val whitelist = setOf(
-            "/index-ffg",
             "/login",
+            "/index-ffg",
             "/api/login",
             "api/logout"
         )
