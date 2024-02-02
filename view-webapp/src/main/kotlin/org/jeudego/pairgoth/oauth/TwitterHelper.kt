@@ -1,5 +1,7 @@
 package org.jeudego.pairgoth.oauth
 
+import org.apache.http.NameValuePair
+
 class TwitterHelper : OAuthHelper() {
     override val name: String
         get() = "twitter"
@@ -8,11 +10,11 @@ class TwitterHelper : OAuthHelper() {
         return ""
     }
 
-    override fun getAccessTokenURL(code: String): String? {
-        return null
+    override fun getAccessTokenURL(code: String): Pair<String, List<NameValuePair>> {
+        return Pair("", listOf())
     }
 
-    override fun getUserInfosURL(accessToken: String): String? {
-        return null
+    override fun getUserInfosURL(accessToken: String): Pair<String, List<NameValuePair>> {
+        return Pair("", listOf())
     }
 }

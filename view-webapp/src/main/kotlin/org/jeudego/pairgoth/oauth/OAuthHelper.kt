@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.web.WebappManager
 //import com.republicate.modality.util.AESCryptograph
 //import com.republicate.modality.util.Cryptograph
 import org.apache.commons.codec.binary.Base64
+import org.apache.http.NameValuePair
 import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.ApiClient.JsonApiClient
 import org.jeudego.pairgoth.util.Cryptograph
@@ -19,18 +20,12 @@ import java.net.URLEncoder
 abstract class OAuthHelper {
     abstract val name: String
     abstract fun getLoginURL(sessionId: String?): String
-    protected val clientId: String
-        protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".client_id")
+    protected open val clientId: String
+        get() = WebappManager.getMandatoryProperty("oauth.$name.client_id")
     protected val secret: String
-        protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".secret")
-    protected val redirectURI: String?
-        protected get() = try {
-            val uri: String = WebappManager.getMandatoryProperty("webapp.external.url") + "/oauth"
-            URLEncoder.encode(uri, "UTF-8")
-        } catch (uee: UnsupportedEncodingException) {
-            logger.error("could not encode redirect URI", uee)
-            null
-        }
+        get() = WebappManager.getMandatoryProperty("oauth.$name.secret")
+    protected open val redirectURI: String
+        get() = WebappManager.getMandatoryProperty("webapp.external.url").removeSuffix("/") + "/oauth/${name}"
 
     protected fun getState(sessionId: String): String {
         return name + ":" + encrypt(sessionId)
@@ -41,19 +36,21 @@ abstract class OAuthHelper {
         return expectedSessionId == foundSessionId
     }
 
-    protected abstract fun getAccessTokenURL(code: String): String?
+    protected abstract fun getAccessTokenURL(code: String): Pair<String, List<NameValuePair>>
+
     @Throws(IOException::class)
     fun getAccessToken(code: String): String {
-        val json: Json.Object = Json.Object() // TODO - apiClient.get(getAccessTokenURL(code))
-        return json.getString("access_token")!! // ?!
+        val (url, params) = getAccessTokenURL(code)
+        val json = JsonApiClient.post(url, null, *params.toTypedArray()).asObject()
+        return json.getString("access_token") ?: throw IOException("could not get access token")
     }
 
-    protected abstract fun getUserInfosURL(accessToken: String): String?
+    protected abstract fun getUserInfosURL(accessToken: String): Pair<String, List<NameValuePair>>
 
     @Throws(IOException::class)
-    fun getUserEmail(accessToken: String): String {
-        val json = getUserInfosURL(accessToken)?.let { JsonApiClient.get(it).asObject() }
-        return json?.getString("email") ?: throw IOException("could not fetch email")
+    fun getUserInfos(accessToken: String): Json {
+        val (url, params) = getUserInfosURL(accessToken)
+        return JsonApiClient.get(url, *params.toTypedArray()).asObject()
     }
 
     companion object {

@@ -10,6 +10,7 @@ import org.apache.http.client.config.RequestConfig
 import org.apache.http.client.entity.UrlEncodedFormEntity
 import org.apache.http.client.methods.*
 import org.apache.http.config.SocketConfig
+import org.apache.http.conn.ssl.NoopHostnameVerifier
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory
 import org.apache.http.entity.ContentType
 import org.apache.http.entity.EntityTemplate
@@ -54,7 +55,8 @@ private val client = HttpClients.custom()
         SSLConnectionSocketFactory(
             SSLContexts.createSystemDefault(), arrayOf("TLSv1.2"),
             null,
-            SSLConnectionSocketFactory.getDefaultHostnameVerifier()
+            NoopHostnameVerifier()
+            //SSLConnectionSocketFactory.getDefaultHostnameVerifier()
         )
     )
     .setConnectionTimeToLive(1, TimeUnit.MINUTES)

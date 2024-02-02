@@ -71,7 +71,8 @@
     <pairgoth.webapp.host>localhost</pairgoth.webapp.host>
     <pairgoth.webapp.port>8080</pairgoth.webapp.port>
     <pairgoth.webapp.context>/</pairgoth.webapp.context>
-    <pairgoth.webapp.external.url>${pairgoth.webapp.protocol}://${pairgoth.webapp.host}:${pairgoth.webapp.port}/${pairgoth.webapp.context}</pairgoth.webapp.external.url>
+    <!-- CB TODO - what if webapp context does not qtart with '/' ? -->
+    <pairgoth.webapp.external.url>${pairgoth.webapp.protocol}://${pairgoth.webapp.host}:${pairgoth.webapp.port}${pairgoth.webapp.context}</pairgoth.webapp.external.url>
     <pairgoth.api.protocol>http</pairgoth.api.protocol>
     <pairgoth.api.host>localhost</pairgoth.api.host>
     <pairgoth.api.port>8085</pairgoth.api.port>

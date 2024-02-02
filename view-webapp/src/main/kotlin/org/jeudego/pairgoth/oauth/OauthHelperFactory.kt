@@ -8,6 +8,7 @@ object OauthHelperFactory {
     private val twitter: OAuthHelper = TwitterHelper()
     fun getHelper(provider: String?): OAuthHelper {
         return when (provider) {
+            "ffg" -> ffg
             "facebook" -> facebook
             "google" -> google
             "instagram" -> instagram

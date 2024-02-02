@@ -1,5 +1,6 @@
 package org.jeudego.pairgoth.web
 
+import org.jeudego.pairgoth.oauth.OauthHelperFactory
 import javax.servlet.Filter
 import javax.servlet.FilterChain
 import javax.servlet.FilterConfig
@@ -30,10 +31,19 @@ class AuthFilter: Filter {
         val auth = WebappManager.getProperty("auth") ?: throw Error("authentication not configured")
         val forwarded = request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI) != null
 
+        if (auth == "oauth" && uri.startsWith("/oauth/")) {
+            val provider = uri.substring("/oauth/".length)
+            val helper = OauthHelperFactory.getHelper(provider)
+            val accessToken = helper.getAccessToken(request.getParameter("code") ?: "")
+            val user = helper.getUserInfos(accessToken)
+            request.session.setAttribute("logged", user)
+            response.sendRedirect("/index")
+            return
+        }
+
         if (auth == "none" || whitelisted(uri) || forwarded || session?.getAttribute("logged") != null) {
             chain.doFilter(req, resp)
         } else {
-            // TODO - configure if unauth requests are redirected and/or forwarded
             // TODO - protection against brute force attacks
             if (uri.endsWith("/index")) {
                 response.sendRedirect("/index-ffg")

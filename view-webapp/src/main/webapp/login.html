@@ -1,3 +1,5 @@
+#if($auth == 'sesame')
+
 <div id="login" class="section">
   <form id="login-form" class="ui form" autocomplete="off">
     <div class="field">
@@ -9,10 +11,10 @@
   </form>
 </div>
 <script type="text/javascript">
-  // #[[
-  onLoad(()=>{
+  onLoad(()=> {
+    // #[[
     $('#login-form').on('submit', e => {
-      api.postJson('login', { sesame: $('input[name="sesame"]')[0].value })
+      api.postJson('login', {sesame: $('input[name="sesame"]')[0].value})
         .then(resp => {
           if (resp !== 'error' && resp.status === 'ok') {
             document.location.href = '/index'
@@ -21,6 +23,38 @@
       e.preventDefault();
       return false;
     });
+    // ]]#
   });
-  // ]]#
 </script>
+
+#elseif($auth == 'oauth')
+
+<div id="login" class="section">
+  <div>Log in using</div>
+    <div id="oauth-buttons">
+  #foreach($provider in $oauthProviders)
+    <div>
+      <button id="login-$provider" class="ui floating basic button">$provider</button>
+    </div>
+  #end
+  </div>
+</div>
+
+<script type="text/javascript">
+
+  onLoad(()=> {
+  #foreach($provider in $oauthProviders)
+    let buttonId = '#login-$provider';
+    let loginURL= '$application.getAttribute("${provider}Provider").getLoginURL($session.id)';
+    // #[[
+    console.log(`buttonId = ${buttonId}`);
+    console.log(`loginURL = ${loginURL}`);
+    $(buttonId).on('click', e => {
+      document.location.href = loginURL;
+    });
+    // ]]#
+  #end
+  });
+</script>
+
+#end
