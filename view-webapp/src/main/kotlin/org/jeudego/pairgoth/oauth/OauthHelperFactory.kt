@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.oauth
 
 object OauthHelperFactory {
+    private val ffg: OAuthHelper = FFGHelper()
     private val facebook: OAuthHelper = FacebookHelper()
     private val google: OAuthHelper = GoogleHelper()
     private val instagram: OAuthHelper = InstagramHelper()

@@ -7,6 +7,10 @@ import org.jeudego.pairgoth.web.WebappManager
 //import com.republicate.modality.util.AESCryptograph
 //import com.republicate.modality.util.Cryptograph
 import org.apache.commons.codec.binary.Base64
+import org.jeudego.pairgoth.util.AESCryptograph
+import org.jeudego.pairgoth.util.ApiClient.JsonApiClient
+import org.jeudego.pairgoth.util.Cryptograph
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.io.UnsupportedEncodingException
@@ -21,7 +25,7 @@ abstract class OAuthHelper {
         protected get() = WebappManager.getMandatoryProperty("oauth." + name + ".secret")
     protected val redirectURI: String?
         protected get() = try {
-            val uri: String = WebappManager.Companion.getProperty("webapp.external.url") + "/oauth.html"
+            val uri: String = WebappManager.getMandatoryProperty("webapp.external.url") + "/oauth"
             URLEncoder.encode(uri, "UTF-8")
         } catch (uee: UnsupportedEncodingException) {
             logger.error("could not encode redirect URI", uee)
@@ -48,30 +52,23 @@ abstract class OAuthHelper {
 
     @Throws(IOException::class)
     fun getUserEmail(accessToken: String): String {
-        val json: Json.Object = Json.Object()
-            // TODO
-            // apiClient.get(getUserInfosURL(accessToken))
-        return json.getString("email") ?: throw IOException("could not fetch email")
+        val json = getUserInfosURL(accessToken)?.let { JsonApiClient.get(it).asObject() }
+        return json?.getString("email") ?: throw IOException("could not fetch email")
     }
 
     companion object {
-        protected var logger = LoggerFactory.getLogger("oauth")
+        protected var logger: Logger = LoggerFactory.getLogger("oauth")
         private const val salt = "0efd28fb53cbac42"
-//        private val sessionIdCrypto: Cryptograph = AESCryptograph().apply {
-//            init(salt)
-//        }
+        private val sessionIdCrypto: Cryptograph = AESCryptograph().apply {
+            init(salt)
+        }
 
         private fun encrypt(input: String): String {
-            return "TODO"
-//            return Base64.encodeBase64URLSafeString(sessionIdCrypto.encrypt(input))
+            return Base64.encodeBase64URLSafeString(sessionIdCrypto.encrypt(input))
         }
 
         private fun decrypt(input: String): String {
-            return "TODO"
-//            return sessionIdCrypto.decrypt(Base64.decodeBase64(input))
+            return sessionIdCrypto.decrypt(Base64.decodeBase64(input))
         }
-
-        // TODO
-        // private val apiClient: ApiClient = ApiClient()
     }
 }

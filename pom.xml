@@ -80,7 +80,8 @@
     <pairgoth.store>file</pairgoth.store>
     <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
     <pairgoth.auth>none</pairgoth.auth>
-    <pairgoth.auth.sesame></pairgoth.auth.sesame>
+    <pairgoth.auth.sesame>this_should_be_overriden_with_a_command_line_option</pairgoth.auth.sesame>
+    <pairgoth.oauth.ffg.client_id>pairtogh</pairgoth.oauth.ffg.client_id>
     <pairgoth.smtp.sender></pairgoth.smtp.sender>
     <pairgoth.smtp.host></pairgoth.smtp.host>
     <pairgoth.smtp.port>587</pairgoth.smtp.port>

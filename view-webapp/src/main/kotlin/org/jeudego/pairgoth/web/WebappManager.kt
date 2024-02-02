@@ -67,8 +67,14 @@ class WebappManager : ServletContextListener, ServletContextAttributeListener, H
             logger.info("pairgoth server ${properties["version"]} with profile ${properties["env"]}")
 
             // publish some properties to the webapp context; for easy access from the template
-            context.setAttribute("env", properties["env"])
-            context.setAttribute("version", properties["version"] ?: "?")
+            context.setAttribute("env", properties.getProperty("env") ?: "dev")
+            context.setAttribute("version", properties.getProperty("version") ?: "?")
+            properties.get("auth")?.let {
+
+            }
+            properties.getProperty("oauth.providers")?.let {
+                context.setAttribute("oauth.providers", it.split(Regex("\\s*,\\s*")))
+            }
 
             // set system user agent string to empty string
             System.setProperty("http.agent", "")
