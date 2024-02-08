@@ -85,7 +85,8 @@ object OpenGotha {
                 seedSystem2 = parseSeedSystem(pairParams.paiMaSeedSystem2 ?: "SPLITANDSLIP"),
                 additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
                 additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE")),
-                mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0
+                mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0,
+                roundDownScore = genParams.genRoundDownNBWMMS.toBoolean()
             ),
             secondary = SecondaryCritParams(
                 barThresholdActive = pairParams.paiSeBarThresholdActive.toBoolean(),
@@ -304,7 +305,9 @@ object OpenGotha {
                 ).uppercase(Locale.ROOT)
             }" genMMS2ValueAbsent="${
             (tournament.pairing.pairingParams.main.mmsValueAbsent * 2).roundToInt()
-            }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
+            }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="${
+                tournament.pairing.pairingParams.main.roundDownScore
+            }" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
             <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
             <PlacementParameterSet>
             <PlacementCriteria>

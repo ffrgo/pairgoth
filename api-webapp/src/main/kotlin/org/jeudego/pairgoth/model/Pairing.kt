@@ -51,6 +51,7 @@ data class MainCritParams(
     val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
     val additionalPlacementCritSystem2: Criterion = Criterion.NONE,
     val mmsValueAbsent: Double = 0.5,
+    val roundDownScore: Boolean = true
 ) {
     enum class DrawUpDown { TOP, MIDDLE, BOTTOM }
     enum class SeedMethod { SPLIT_AND_FOLD, SPLIT_AND_RANDOM, SPLIT_AND_SLIP }
@@ -243,7 +244,8 @@ fun MainCritParams.Companion.fromJson(json: Json.Object, localDefault: MainCritP
     seedSystem2 = json.getString("secondSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: localDefault?.seedSystem2 ?: default.seedSystem2,
     additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem1 ?: default.additionalPlacementCritSystem1,
     additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem2 ?: default.additionalPlacementCritSystem2,
-    mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: localDefault?.mmsValueAbsent ?: default.mmsValueAbsent
+    mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: localDefault?.mmsValueAbsent ?: default.mmsValueAbsent,
+    roundDownScore = json.getBoolean("roundDownScore") ?: localDefault?.roundDownScore ?: default.roundDownScore
     )
 
 fun MainCritParams.toJson() = Json.Object(
@@ -259,7 +261,8 @@ fun MainCritParams.toJson() = Json.Object(
     "secondSeed" to seedSystem2,
     "firstSeedAddCrit" to additionalPlacementCritSystem1,
     "secondSeedAddCrit" to additionalPlacementCritSystem2,
-    "mmsValueAbsent" to mmsValueAbsent
+    "mmsValueAbsent" to mmsValueAbsent,
+    "roundDownScore" to roundDownScore
 )
 
 fun SecondaryCritParams.Companion.fromJson(json: Json.Object, localDefault: SecondaryCritParams? = null) = SecondaryCritParams(

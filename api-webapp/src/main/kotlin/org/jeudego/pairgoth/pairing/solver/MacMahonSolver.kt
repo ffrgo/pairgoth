@@ -28,7 +28,7 @@ class MacMahonSolver(round: Int,
 
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {
         if (useMMS) {
-            return (pairable.mms + Pairable.MIN_RANK).toInt()
+            return roundScore(pairable.mms + Pairable.MIN_RANK)
         } else {
             return pairable.rank
         }

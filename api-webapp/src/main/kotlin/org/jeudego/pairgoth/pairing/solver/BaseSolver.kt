@@ -15,8 +15,11 @@ import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 sealed class BaseSolver(
     val round: Int, // Round number
@@ -490,6 +493,13 @@ sealed class BaseSolver(
     // Has to be overridden if handicap is not based on rank
     open fun HandicapParams.pseudoRank(pairable: Pairable): Int {
         return pairable.rank
+    }
+
+    fun roundScore(score: Double): Int {
+        val epsilon = 0.00001
+        // Note: this works for now because we only have .0 and .5 fractional parts
+        return if (pairing.main.roundDownScore) floor(score + epsilon).roundToInt()
+        else ceil(score - epsilon).roundToInt()
     }
 
     open fun HandicapParams.clamp(input: Int): Int {
