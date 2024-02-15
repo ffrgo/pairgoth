@@ -4,8 +4,8 @@ import org.jeudego.pairgoth.model.Pairable
 
 fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
     var inverse = false
-    var name1 = p1.nameSeed("")
-    var name2 = p2.nameSeed("")
+    var name1 = p1.fullName("")
+    var name2 = p2.fullName("")
     if (name1 > name2) {
         name1 = name2.also { name2 = name1 }
         inverse = true

@@ -22,13 +22,13 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 sealed class BaseSolver(
-    val round: Int, // Round number
+    round: Int,
     history: List<List<Game>>, // History of all games played for each round
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     pairing: PairingParams,
     placement: PlacementParams,
     val usedTables: BitSet
-    ) : BasePairingHelper(history, pairables, pairing, placement) {
+    ) : BasePairingHelper(round, history, pairables, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -77,7 +77,7 @@ sealed class BaseSolver(
                 }
                 // println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
-            println("Bye player : " + chosenByePlayer.nameSeed())
+            println("Bye player : " + chosenByePlayer.fullName())
             byePlayers.add(chosenByePlayer)
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
@@ -91,8 +91,8 @@ sealed class BaseSolver(
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
                 weightsLogger?.apply {
-                    this.println("Player1Name=${p.nameSeed()}")
-                    this.println("Player2Name=${q.nameSeed()}")
+                    this.println("Player1Name=${p.fullName()}")
+                    this.println("Player2Name=${q.fullName()}")
                     this.println("baseDuplicateGameCost=${dec.format(pairing.base.avoidDuplicatingGames(p, q))}")
                     this.println("baseRandomCost=${dec.format(pairing.base.applyRandom(p, q))}")
                     this.println("baseBWBalanceCost=${dec.format(pairing.base.applyColorBalance(p, q))}")
@@ -384,7 +384,7 @@ sealed class BaseSolver(
                     if ((2 * cla1 < groupSize && 2 * cla2 >= groupSize) || (2 * cla1 >= groupSize && 2 * cla2 < groupSize)) {
                         val randRange = maxSeedingWeight * 0.2
                         val rand: Double
-                        if (p1.nameSeed() > p2.nameSeed()) {rand = detRandom(randRange, p2, p1)}
+                        if (p1.fullName() > p2.fullName()) {rand = detRandom(randRange, p2, p1)}
                         else {rand = detRandom(randRange, p1, p2)}
                         maxSeedingWeight - rand
                     } else {

@@ -4,6 +4,7 @@ import org.jeudego.pairgoth.model.*
 import java.util.*
 
 abstract class BasePairingHelper(
+    val round: Int,
     history: List<List<Game>>, // History of all games played for each round
     var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     val pairing: PairingParams,
@@ -125,15 +126,22 @@ abstract class BasePairingHelper(
             val criterionP = p.eval(criterion)
             val criterionQ = q.eval(criterion)
             if (criterionP != criterionQ) {
-                return (criterionQ * 1e6 - criterionP * 1e6).toInt()
+                return -criterionP.compareTo(criterionQ)
             }
         }
-        if (p.rating == q.rating) {
-            return if (p.name > q.name) 1 else -1
+        val additionalCriterion =
+            if (round <= pairing.main.lastRoundForSeedSystem1) pairing.main.additionalPlacementCritSystem1
+            else pairing.main.additionalPlacementCritSystem2
+        if (additionalCriterion != Criterion.NONE) {
+            val criterionP = p.eval(additionalCriterion)
+            val criterionQ = q.eval(additionalCriterion)
+            if (criterionP != criterionQ) {
+                return -criterionP.compareTo(criterionQ)
+            }
         }
-        return q.rating - p.rating
+        return p.fullName().compareTo(q.fullName())
     }
     open fun nameSort(p: Pairable, q: Pairable): Int {
-        return if (p.name > q.name) 1 else -1
+        return p.fullName().compareTo(q.fullName())
     }
 }

@@ -16,7 +16,7 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
     abstract fun toMutableJson(): Json.MutableObject
     abstract val club: String?
     abstract val country: String?
-    open fun nameSeed(separator: String =" "): String {
+    open fun fullName(separator: String = " "): String {
         return name
     }
     val skip = mutableSetOf<Int>() // skipped rounds
@@ -95,7 +95,7 @@ class Player(
     }
 
     override fun toJson(): Json.Object = toMutableJson()
-    override fun nameSeed(separator: String): String {
+    override fun fullName(separator: String): String {
         return name + separator + firstname
     }
 }
