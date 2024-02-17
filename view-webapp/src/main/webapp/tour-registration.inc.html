@@ -23,7 +23,7 @@
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
-          <th data-sort-method="none">Participation</th>
+          <th>Participation</th>
         </thead>
         <tbody>
 #foreach($part in $parts)
@@ -38,7 +38,7 @@
             <td>$part.club</td>
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
             <td>$part.rating</td>
-            <td class="participating">
+            <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
   #foreach($round in [1..$tour.rounds])
     ## CB TODO - upstream json parsing should not give longs here, should it?
     #if($part.skip && $part.skip.contains($round.longValue()))
