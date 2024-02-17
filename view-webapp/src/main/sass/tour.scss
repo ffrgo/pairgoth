@@ -63,7 +63,6 @@
 
   #players-list {
     max-width: 95vw;
-    overflow-x: auto;
   }
 
   #player {
@@ -195,16 +194,17 @@
     max-width: max(30vw, 15em);
     border: solid 2px darkgray;
     border-radius: 5px;
-    padding: 1em 0.5em;
+    padding: 0 0.2em;
     &:before {
-      position: absolute;
+      position: sticky;
+      background-color: white;
+      width: 100%;
       content: attr(title);
-      top: -0.5em;
-      left: 50%;
-      transform: translate(-50%, 0px);
+      top: 0;
       white-space: nowrap;
       font-size: smaller;
       font-weight: bold;
+      z-index: 2;
     }
     .listitem {
       display: flex;
@@ -340,7 +340,6 @@
   }
   #standings-container {
     max-width: 95vw;
-    overflow-x: auto;
   }
 
   .ui.steps {
