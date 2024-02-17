@@ -277,9 +277,7 @@
   }
 
   .result-sheets {
-    position: absolute;
-    bottom: 1em;
-    left: 1em;
+    margin-top: 0.2em;
   }
 
   /* results section */
@@ -350,8 +348,8 @@
     }
   }
 
-  @media( max-width: 1400px) {
-    .ui.steps > .step {
+  @media(max-width: 1400px) {
+    .ui.steps > .step:not(.active) {
       padding-left: 1.2em;
       padding-right: 0.8em;
       &::before {
@@ -360,6 +358,12 @@
       .content > .title {
         display: none;
       }
+    }
+  }
+
+  @media(max-width: 750px) {
+    #logo {
+      display: none;
     }
   }
 }
