@@ -17,10 +17,12 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                 val pairs = groups.map {
                     Pair(it, match.groups[it]?.value)
                 }.toTypedArray()
-                Json.MutableObject(*pairs).also {
-                    it["origin"] = "EGF"
+                Json.MutableObject(*pairs).also { player ->
+                    player["origin"] = "EGF"
                     // override rank with rating equivalent
-                    val rating = it["rating"]?.toString()?.toIntOrNull()
+                    player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
+                        player["rank"] = ((rating - 2050)/100).let { if (rating < 0) "${-it+1}k" else "${it+1}d" }
+                    }
                 }
             }
         }

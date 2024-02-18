@@ -37,5 +37,5 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
 
     var linePattern =
         Regex("(?<name>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s(?<firstname>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s+(?<rating>-?[0-9]+)\\s(?<license>[-eCLX])\\s(?<ffg>(?:\\d|[A-Z]){7}|-------)\\s(?<club>xxxx|XXXX|\\d{2}[a-zA-Z0-9]{2})\\s(?<country>[A-Z]{2})")
-    val groups = arrayOf("name", "firstname", "rating", "license", "club", "country")
+    val groups = arrayOf("name", "firstname", "rating", "license", "ffg", "club", "country")
 }

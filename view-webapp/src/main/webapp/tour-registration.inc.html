@@ -259,7 +259,7 @@
 #[[
 <script id="result" type="text/template">
   {{for #data}}
-    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if origin === 'FFG' && country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
+    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
   {{/for}}
 </script>
 <script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>
