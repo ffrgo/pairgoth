@@ -114,7 +114,7 @@ HTMLFormElement.prototype.val = function(name, value) {
   let tag = ctl.tagName;
   let type = tag === 'INPUT' ? ctl.attr('type') : undefined;
   if (
-    (tag === 'INPUT' && ['text', 'number', 'hidden'].includes(ctl.attr('type'))) ||
+    (tag === 'INPUT' && ['text', 'number', 'hidden', 'password'].includes(ctl.attr('type'))) ||
     tag === 'SELECT'
   ) {
     if (hasValue) {

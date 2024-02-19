@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.web
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.util.CredentialsChecker
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -17,7 +18,7 @@ class LoginServlet: HttpServlet() {
             val payload = Json.Companion.parse(req.reader.readText())?.asObject() ?: throw Error("null json")
             val user = when (WebappManager.getProperty("auth")) {
                 "sesame" -> checkSesame(payload)
-                else -> null
+                else -> checkLoginPass(payload)
             } ?: throw Error("authentication failed")
             req.session.setAttribute("logged", user)
             val ret = Json.Object("status" to "ok")
@@ -25,7 +26,9 @@ class LoginServlet: HttpServlet() {
             resp.writer.println(ret.toString())
         } catch (t: Throwable) {
             logger.error("exception while logging in", t)
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
+            resp.contentType = "application/json"
+            resp.status = HttpServletResponse.SC_BAD_REQUEST
+            resp.writer.println(errorJson)
         }
     }
 
@@ -34,8 +37,15 @@ class LoginServlet: HttpServlet() {
         return if (payload.getString("sesame")?.equals(expected) == true) true else null
     }
 
+    fun checkLoginPass(payload: Json.Object): String? {
+        return CredentialsChecker.check(
+            payload.getString("email") ?: throw Error("Missing login field"),
+            payload.getString("password") ?: throw Error("missing password field"))
+    }
+
     companion object {
         fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
         val logger = LoggerFactory.getLogger("login")
+        private val errorJson = "{ \"status\": \"error\", \"error\": \"authentication failed\"}"
     }
 }

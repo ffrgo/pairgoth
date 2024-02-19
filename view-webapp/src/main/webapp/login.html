@@ -30,30 +30,71 @@
 #elseif($auth == 'oauth')
 
 <div id="login" class="section">
-  <div>Log in using</div>
-    <div id="oauth-buttons">
+  <div id="oauth-buttons" class="roundbox">
   #foreach($provider in $oauthProviders)
-    <div>
-      <button id="login-$provider" class="ui floating basic button">$provider</button>
-    </div>
+    <form>
+      <label>Log in using</label>
+      <button id="login-$provider" type="button" class="ui green floating button">$provider</button>
+    #if($provider == 'ffg')
+      (reserved to FFG actors)
+    #end
+    </form>
   #end
+  </div>
+  <div class="roundbox">
+    Log in using an email
+    <form id="login-form" class="ui form">
+      <div class="centered inline fields">
+        <div class="field">
+          <input name="email" type="text" placeholder="email"/>
+        </div>
+        <div class="field">
+          <input name="password" type="password" placeholder="password"/>
+        </div>
+        <button id="login-email" type="button" class="ui green floating button">Log in</button>
+      </div>
+    </form>
   </div>
 </div>
 
 <script type="text/javascript">
+
+  async function digestMessage(message) {
+    const msgUint8 = new TextEncoder().encode(message);                           // encode as (utf-8) Uint8Array
+    const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);           // hash the message
+    const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+    const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    return hashHex;
+  }
 
   onLoad(()=> {
   #foreach($provider in $oauthProviders)
     let buttonId = '#login-$provider';
     let loginURL= '$application.getAttribute("${provider}Provider").getLoginURL($session.id)';
     // #[[
-    console.log(`buttonId = ${buttonId}`);
-    console.log(`loginURL = ${loginURL}`);
     $(buttonId).on('click', e => {
       document.location.href = loginURL;
     });
     // ]]#
   #end
+    // #[[
+    $('#login-email').on('click', e => {
+      let form = $('#login-form')[0]
+      let password = form.val('password');
+      digestMessage(password).then(enc => {
+        let payload = {
+          'email': form.val('email'),
+          'password': enc
+        }
+        api.postJson('login', payload)
+          .then(resp => {
+            if (resp !== 'error' && resp.status === 'ok') {
+              document.location.href = '/index'
+            }
+          });
+      });
+    });
+    // ]]#
   });
 </script>
 

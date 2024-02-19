@@ -215,6 +215,10 @@
     width: initial;
   }
 
+  .ui.form .centered.inline.fields {
+    justify-content: center;
+  }
+
   .ui.accordion .content {
     display: block;
     max-height: 0;
