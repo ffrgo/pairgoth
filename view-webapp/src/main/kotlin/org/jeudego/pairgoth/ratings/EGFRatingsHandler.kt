@@ -21,7 +21,7 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                     player["origin"] = "EGF"
                     // override rank with rating equivalent
                     player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
-                        player["rank"] = ((rating - 2050)/100).let { if (rating < 0) "${-it+1}k" else "${it+1}d" }
+                        player["rank"] = ((rating - 2050)/100).let { if (it < 0) "${-it+1}k" else "${it+1}d" }
                     }
                 }
             }

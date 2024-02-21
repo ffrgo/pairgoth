@@ -21,9 +21,10 @@ import kotlin.io.path.useDirectoryEntries
 private const val LEFT_PAD = 6 // left padding of IDs with '0' in filename
 private fun Tournament<*>.filename() = "${id.toString().padStart(LEFT_PAD, '0')}-${shortName}.tour"
 
-class FileStore(pathStr: String): StoreImplementation {
+class FileStore(pathStr: String): IStore {
     companion object {
         private val filenameRegex = Regex("^(\\d+)-(.*)\\.tour$")
+        private val displayFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         private val timestampFormat: DateFormat = SimpleDateFormat("yyyyMMddHHmmss")
         private val timestamp: String get() = timestampFormat.format(Date())
     }
@@ -37,11 +38,17 @@ class FileStore(pathStr: String): StoreImplementation {
         _nextTournamentId.set(getTournaments().keys.maxOrNull() ?: 0.toID())
     }
 
-    override fun getTournaments(): Map<ID, String> {
+
+    private fun lastModified(path: Path) = displayFormat.format(Date(path.toFile().lastModified()))
+
+    override fun getTournaments(): Map<ID, Map<String, String>> {
         return path.useDirectoryEntries("*.tour") { entries ->
             entries.mapNotNull { entry ->
                 val match = filenameRegex.matchEntire(entry.fileName.toString())
-                match?.let { Pair(it.groupValues[1].toID(), it.groupValues[2]) }
+                match?.let { Pair(it.groupValues[1].toID(), mapOf(
+                    "name" to it.groupValues[2],
+                    "lastModified" to lastModified(entry))
+                ) }
             }.sortedBy { it.first }.toMap()
         }
     }

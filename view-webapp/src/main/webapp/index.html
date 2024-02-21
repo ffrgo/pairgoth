@@ -23,9 +23,9 @@
   </script>
 #else
   #foreach($tour in $files.entrySet())
-  <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button">
+  <a href="tour?id=${tour.key}" class="ui open basic secondary white icon floating button" title="id $tour.key, last modified $tour.value.lastModified">
     <i class="fa fa-folder-open-o"></i>
-    $tour.value
+    $tour.value.name
   </a>
   #end
 #end

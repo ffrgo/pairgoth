@@ -124,7 +124,7 @@ object OpenGotha {
             shortName = genParams.shortName,
             startDate = genParams.beginDate.toLocalDate(),
             endDate = genParams.endDate.toLocalDate(),
-            country = "FR", // no country in opengotha format
+            country = "fr", // no country in opengotha format
             location = genParams.location,
             online = genParams.isBInternet ?: false,
             timeSystem = when (genParams.complementaryTimeSystem) {

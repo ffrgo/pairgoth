@@ -3,7 +3,7 @@
 , allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	, vous permettant de complètement le modifier. N’oubliez pas de partager vos améliorations !
 , the well known pairing system software developed by	, le logiciel d’appariement très connu développé par
 , your Go Pairing Engine!	, votre logiciel d’appariement de Go !
-.ui.form input[type=checkbox][name=online] { vertical-align: initial; }	
+, last modified	, dernière modification :
 1st round seeding	méthode 1è ronde
 : If you prefer convenience, you can simply use the	: Si vous préférez la commodité, vous pouvez simplement utiliser l’instance
 : This mode allows you to run	: Ce mode vous permet de lancer
@@ -37,6 +37,7 @@ Export	Exporter
 Export tournament	Exporter le tournoi
 Family name	Nom de famille
 Filter	Filtrer
+Filter...	Filtrer…
 First name	Prénom
 Fischer timing	Cadence Fischer
 French rules	Règles françaises
@@ -93,7 +94,7 @@ Results for round	Résultats pour la ronde
 Round-robin	Toutes rondes
 Rounds	Rondes
 Rules	Règles
-Search...	Chercher…
+Search... Chercher…
 Short name	Nom de code
 Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	Comme le projet est encore en beta, les sources sont seulement accessibles aux acteurs FFG. Si c’est votre cas, vous pouvez accéder aux sources ici :
 Split and fold	Couper-plier

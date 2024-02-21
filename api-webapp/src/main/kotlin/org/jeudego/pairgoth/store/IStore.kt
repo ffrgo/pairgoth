@@ -8,13 +8,13 @@ internal val _nextTournamentId = AtomicInteger()
 internal val _nextPlayerId = AtomicInteger()
 internal val _nextGameId = AtomicInteger()
 
-interface StoreImplementation {
+interface IStore {
 
     val nextTournamentId get() = _nextTournamentId.incrementAndGet()
     val nextPlayerId get() = _nextPlayerId.incrementAndGet()
     val nextGameId get() = _nextGameId.incrementAndGet()
 
-    fun getTournaments(): Map<ID, String>
+    fun getTournaments(): Map<ID, Map<String, String>>
     fun addTournament(tournament: Tournament<*>)
     fun getTournament(id: ID): Tournament<*>?
     fun replaceTournament(tournament: Tournament<*>)

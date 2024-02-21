@@ -1,11 +1,8 @@
 package org.jeudego.pairgoth.store
 
-import org.jeudego.pairgoth.model.ID
-import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.server.WebappManager
-import java.util.concurrent.atomic.AtomicInteger
 
-private fun createStoreImplementation(): StoreImplementation {
+private fun createStoreImplementation(): IStore {
     return when (val storeProperty = WebappManager.getProperty("store") ?: "memory") {
         "memory" -> MemoryStore()
         "file" -> {
@@ -16,4 +13,4 @@ private fun createStoreImplementation(): StoreImplementation {
     }
 }
 
-object Store: StoreImplementation by createStoreImplementation()
+object Store: IStore by createStoreImplementation()

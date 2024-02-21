@@ -48,7 +48,7 @@ abstract class OAuthHelper {
     protected abstract fun getUserInfosURL(accessToken: String): Pair<String, List<NameValuePair>>
 
     @Throws(IOException::class)
-    fun getUserInfos(accessToken: String): Json {
+    fun getUserInfos(accessToken: String): Json.Object {
         val (url, params) = getUserInfosURL(accessToken)
         return JsonApiClient.get(url, *params.toTypedArray()).asObject()
     }

@@ -4,7 +4,7 @@
   <div id="reg-view">
     <div id="list-header">
       <div id="filter-box" class="ui icon input">
-        <input type="text" id="filter" placeholder="Search..."/>
+        <input type="text" id="filter" placeholder="Filter..."/>
         <i class="circular times link icon"></i>
       </div>
       <div>
@@ -73,6 +73,7 @@
       <input type="hidden" name="id"/>
       <div class="popup-content">
         <div id="search-form" class="five stackable fields">
+#if($tour.country)
           <div class="two wide field">
             <div class="toggle">
               <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
@@ -82,6 +83,7 @@
               <label>$tour.country.toUpperCase()</label>
             </div>
           </div>
+#end
           <div class="ten wide field">
             <div class="ui icon input">
               <input id="needle" name="needle" type="text" placeholder="Search...">

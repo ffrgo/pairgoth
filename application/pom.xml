@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.jeudego.pairgoth</groupId>
     <artifactId>engine-parent</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
   </parent>
   <artifactId>application</artifactId>
   <packaging>pom</packaging>

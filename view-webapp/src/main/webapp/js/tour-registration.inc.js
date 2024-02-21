@@ -40,6 +40,7 @@ function search(needle) {
     store('searchFormState', searchFormState);
     api.postJson('search', search)
       .then(result => {
+        console.log(result)
         if (Array.isArray(result)) {
           searchResult = result
           let html = resultTemplate.render(result);

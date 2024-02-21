@@ -32,12 +32,12 @@ class LoginServlet: HttpServlet() {
         }
     }
 
-    fun checkSesame(payload: Json.Object): Boolean? {
+    fun checkSesame(payload: Json.Object): Json.Object? {
         val expected = WebappManager.getProperty("auth.sesame") ?: throw Error("sesame wrongly configured")
-        return if (payload.getString("sesame")?.equals(expected) == true) true else null
+        return if (payload.getString("sesame")?.equals(expected) == true) Json.Object("logged" to true) else null
     }
 
-    fun checkLoginPass(payload: Json.Object): String? {
+    fun checkLoginPass(payload: Json.Object): Json.Object? {
         return CredentialsChecker.check(
             payload.getString("email") ?: throw Error("Missing login field"),
             payload.getString("password") ?: throw Error("missing password field"))
