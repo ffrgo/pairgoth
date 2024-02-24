@@ -55,7 +55,7 @@ abstract class OAuthHelper {
 
     companion object {
         protected var logger: Logger = LoggerFactory.getLogger("oauth")
-        private const val salt = "0efd28fb53cbac42"
+         private const val salt = "0efd28fb53cbac42"
         private val sessionIdCrypto: Cryptograph = AESCryptograph().apply {
             init(salt)
         }

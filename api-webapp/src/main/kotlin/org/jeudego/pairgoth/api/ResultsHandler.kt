@@ -18,7 +18,7 @@ object ResultsHandler: PairgothApiHandler {
         return games.map { it.toJson() }.toJsonArray()
     }
 
-    override fun put(request: HttpServletRequest): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val payload = getObjectPayload(request)

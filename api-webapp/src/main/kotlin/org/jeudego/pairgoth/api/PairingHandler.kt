@@ -4,7 +4,6 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
@@ -33,7 +32,7 @@ object PairingHandler: PairgothApiHandler {
         )
     }
 
-    override fun post(request: HttpServletRequest): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
@@ -63,7 +62,7 @@ object PairingHandler: PairgothApiHandler {
         return ret
     }
 
-    override fun put(request: HttpServletRequest): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
@@ -139,7 +138,7 @@ object PairingHandler: PairgothApiHandler {
         }
     }
 
-    override fun delete(request: HttpServletRequest): Json {
+    override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)

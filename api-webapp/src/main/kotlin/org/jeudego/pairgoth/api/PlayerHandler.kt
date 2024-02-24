@@ -19,7 +19,7 @@ object PlayerHandler: PairgothApiHandler {
         }
     }
 
-    override fun post(request: HttpServletRequest): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         val player = Player.fromJson(payload)
@@ -28,7 +28,7 @@ object PlayerHandler: PairgothApiHandler {
         return Json.Object("success" to true, "id" to player.id)
     }
 
-    override fun put(request: HttpServletRequest): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
         val player = tournament.players[id] ?: badRequest("invalid player id")
@@ -39,7 +39,7 @@ object PlayerHandler: PairgothApiHandler {
         return Json.Object("success" to true)
     }
 
-    override fun delete(request: HttpServletRequest): Json {
+    override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")
         tournament.players.remove(id) ?: badRequest("invalid player id")

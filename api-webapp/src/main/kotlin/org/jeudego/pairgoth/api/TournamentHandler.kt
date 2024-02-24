@@ -36,7 +36,7 @@ object TournamentHandler: PairgothApiHandler {
         }
     }
 
-    override fun post(request: HttpServletRequest): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
             is Json.Object -> Tournament.fromJson(getObjectPayload(request))
             is Element -> OpenGotha.import(payload)
@@ -47,7 +47,7 @@ object TournamentHandler: PairgothApiHandler {
         return Json.Object("success" to true, "id" to tournament.id)
     }
 
-    override fun put(request: HttpServletRequest): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
         // BC TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
@@ -67,7 +67,7 @@ object TournamentHandler: PairgothApiHandler {
         return Json.Object("success" to true)
     }
 
-    override fun delete(request: HttpServletRequest): Json {
+    override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         Store.deleteTournament(tournament)
         tournament.dispatchEvent(TournamentDeleted, Json.Object("id" to tournament.id))
