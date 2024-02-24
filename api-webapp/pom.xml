@@ -16,7 +16,6 @@
     <description>PairGoth pairing system</description>
     <url>TODO</url>
     <properties>
-        <pac4j.version>5.7.1</pac4j.version>
     </properties>
     <build>
         <defaultGoal>package</defaultGoal>
@@ -166,9 +165,9 @@
         </dependency>
         <!-- auth -->
         <dependency>
-            <groupId>org.pac4j</groupId>
-            <artifactId>pac4j-oauth</artifactId>
-            <version>${pac4j.version}</version>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.16.1</version>
         </dependency>
         <!-- logging -->
         <dependency>

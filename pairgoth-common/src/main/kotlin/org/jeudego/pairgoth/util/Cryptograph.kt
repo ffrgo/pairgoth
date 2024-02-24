@@ -1,5 +1,6 @@
 package org.jeudego.pairgoth.util
 
+import org.apache.commons.codec.binary.Base64
 import java.io.Serializable
 
 /**
@@ -26,4 +27,10 @@ interface Cryptograph : Serializable {
      * @return decrypted string
      */
     fun decrypt(bytes: ByteArray): String
+
+
+    fun webEncrypt(str: String) = Base64.encodeBase64URLSafeString(encrypt(str))
+
+    fun webDecrypt(str: String) = decrypt(Base64.decodeBase64(str))
+
 }

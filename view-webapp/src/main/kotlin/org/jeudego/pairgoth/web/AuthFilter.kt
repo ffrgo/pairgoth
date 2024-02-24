@@ -34,7 +34,7 @@ class AuthFilter: Filter {
         if (auth == "oauth" && uri.startsWith("/oauth/")) {
             val provider = uri.substring("/oauth/".length)
             val helper = OauthHelperFactory.getHelper(provider)
-            val accessToken = helper.getAccessToken(request.getParameter("code") ?: "")
+            val accessToken = helper.getAccessToken(request.session.id, request.getParameter("code") ?: "")
             val user = helper.getUserInfos(accessToken)
             request.session.setAttribute("logged", user)
             response.sendRedirect("/index")
