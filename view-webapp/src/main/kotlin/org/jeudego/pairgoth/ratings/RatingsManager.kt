@@ -91,7 +91,7 @@ object RatingsManager: Runnable {
         }
     }
     val logger = LoggerFactory.getLogger("ratings")
-    val path = Path.of(WebappManager.getProperty("ratings.path") ?: "ratings").also {
+    val path = Path.of(WebappManager.properties.getProperty("ratings.path") ?: "ratings").also {
         val file = it.toFile()
         if (!file.mkdirs() && !file.isDirectory) throw Error("Property pairgoth.ratings.path must be a directory")
     }

@@ -14,7 +14,7 @@ class ApiTool {
         const val JSON = "application/json"
         const val XML = "application/xml"
         val apiRoot by lazy {
-            WebappManager.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}/" }
+            WebappManager.properties.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}/" }
                 ?: throw Error("no configured API url")
         }
         val logger = LoggerFactory.getLogger("api")

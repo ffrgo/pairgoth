@@ -22,7 +22,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     private var updated = false
 
     val url: URL by lazy {
-        WebappManager.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
+        WebappManager.properties.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
     }
 
     fun updateIfNeeded(): Boolean {

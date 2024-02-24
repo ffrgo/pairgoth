@@ -20,7 +20,7 @@ class ApiServlet : AsyncProxyServlet() {
 
     companion object {
         private val apiRoot by lazy {
-            WebappManager.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}" }
+            WebappManager.properties.getProperty("api.external.url")?.let { "${it.removeSuffix("/")}" }
                 ?: throw Error("no configured API url")
         }
     }

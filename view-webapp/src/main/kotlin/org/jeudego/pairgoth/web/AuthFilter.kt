@@ -28,7 +28,7 @@ class AuthFilter: Filter {
         val response = resp as HttpServletResponse
         val uri = request.requestURI
         val session: HttpSession? = request.getSession(false)
-        val auth = WebappManager.getProperty("auth") ?: throw Error("authentication not configured")
+        val auth = WebappManager.properties.getProperty("auth") ?: throw Error("authentication not configured")
         val forwarded = request.getAttribute(RequestDispatcher.FORWARD_REQUEST_URI) != null
 
         if (auth == "oauth" && uri.startsWith("/oauth/")) {
@@ -66,6 +66,5 @@ class AuthFilter: Filter {
             val nolangUri = uri.replace(Regex("^/../"), "/")
             return whitelist.contains(nolangUri)
         }
-
     }
 }

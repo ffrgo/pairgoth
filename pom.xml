@@ -93,6 +93,7 @@
   </properties>
 
   <modules>
+    <module>pairgoth-common</module>
     <module>api-webapp</module>
     <module>view-webapp</module>
     <module>webserver</module>

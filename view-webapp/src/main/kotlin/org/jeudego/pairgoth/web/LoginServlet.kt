@@ -16,7 +16,7 @@ class LoginServlet: HttpServlet() {
             val mimeType = if (sep == -1) contentType else contentType.substring(0, sep).trim { it <= ' ' }
             if (!isJson(mimeType)) throw Error("expecting json")
             val payload = Json.Companion.parse(req.reader.readText())?.asObject() ?: throw Error("null json")
-            val user = when (WebappManager.getProperty("auth")) {
+            val user = when (WebappManager.properties.getProperty("auth")) {
                 "sesame" -> checkSesame(payload)
                 else -> checkLoginPass(payload)
             } ?: throw Error("authentication failed")
@@ -33,7 +33,7 @@ class LoginServlet: HttpServlet() {
     }
 
     fun checkSesame(payload: Json.Object): Json.Object? {
-        val expected = WebappManager.getProperty("auth.sesame") ?: throw Error("sesame wrongly configured")
+        val expected = WebappManager.properties.getProperty("auth.sesame") ?: throw Error("sesame wrongly configured")
         return if (payload.getString("sesame")?.equals(expected) == true) Json.Object("logged" to true) else null
     }
 
