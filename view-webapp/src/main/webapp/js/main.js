@@ -238,7 +238,7 @@ onLoad(() => {
       case 'Enter': {
         if (tab === '#registration') {
           if (typeof(searchResultShown) === 'function') {
-            if (searchResultShown()) {
+            if (searchResultShown() && typeof(searchHighlight) !== 'undefined') {
               fillPlayer(searchResult[searchHighlight]);
             } else {
               $('#register')[0].click();

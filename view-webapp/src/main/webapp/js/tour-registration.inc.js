@@ -16,7 +16,7 @@ function initSearch() {
 }
 
 function searchResultShown() {
-  return !(typeof(searchHighlight) === 'undefined' || !searchResult || !searchResult.length || typeof(searchResult[searchHighlight]) === 'undefined')
+  return !(!searchResult || !searchResult.length)
 }
 
 function search(needle) {
@@ -40,7 +40,6 @@ function search(needle) {
     store('searchFormState', searchFormState);
     api.postJson('search', search)
       .then(result => {
-        console.log(result)
         if (Array.isArray(result)) {
           searchResult = result
           let html = resultTemplate.render(result);
@@ -271,6 +270,21 @@ onLoad(() => {
     if (resultLine) {
       let index = e.target.closest('.result-line').data('index');
       fillPlayer(searchResult[index]);
+    }
+    let tab = document.location.hash;
+    if (store('addingPlayers') && tab === '#registration') {
+      let modal = e.target.closest('#player');
+      if (!modal) {
+        let button = e.target.closest('button');
+        if (!button) {
+          if (searchResultShown()) {
+            $('#needle')[0].value = '';
+            initSearch();
+          } else {
+            close_modal();
+          }
+        }
+      }
     }
   });
   $('#unregister').on('click', e => {
