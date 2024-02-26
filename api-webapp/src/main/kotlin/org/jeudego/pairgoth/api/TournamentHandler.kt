@@ -36,7 +36,7 @@ object TournamentHandler: PairgothApiHandler {
         }
     }
 
-    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
             is Json.Object -> Tournament.fromJson(getObjectPayload(request))
             is Element -> OpenGotha.import(payload)

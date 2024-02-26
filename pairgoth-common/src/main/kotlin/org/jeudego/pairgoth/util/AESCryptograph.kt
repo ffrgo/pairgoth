@@ -52,6 +52,5 @@ class AESCryptograph : Cryptograph {
     companion object {
         private val CIPHER = "AES/ECB/PKCS5Padding"
         private val ALGORITHM = "AES"
-
     }
 }

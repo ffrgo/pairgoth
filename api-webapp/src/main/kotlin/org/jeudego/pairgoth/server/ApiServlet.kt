@@ -1,5 +1,7 @@
 package org.jeudego.pairgoth.server
 
+import com.github.benmanes.caffeine.cache.Cache
+import com.github.benmanes.caffeine.cache.Caffeine
 import com.republicate.kson.Json
 import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.api.ApiHandler
@@ -8,23 +10,28 @@ import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
 import org.jeudego.pairgoth.api.StandingsHandler
 import org.jeudego.pairgoth.api.TeamHandler
+import org.jeudego.pairgoth.api.TokenHandler
 import org.jeudego.pairgoth.api.TournamentHandler
+import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.Colorizer.blue
 import org.jeudego.pairgoth.util.Colorizer.green
 import org.jeudego.pairgoth.util.Colorizer.red
 import org.jeudego.pairgoth.util.XmlUtils
 import org.jeudego.pairgoth.util.parse
 import org.jeudego.pairgoth.util.toString
+import org.jeudego.pairgoth.web.sharedSecret
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Element
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+
 
 class ApiServlet: HttpServlet() {
 
@@ -49,7 +56,11 @@ class ApiServlet: HttpServlet() {
         val requestLock = if (request.method == "GET") lock.readLock() else lock.writeLock()
         try {
             requestLock.lock()
-            doProtectedRequest(request, response)
+            if (checkAuthorization(request, response)) {
+                doProtectedRequest(request, response)
+            } else {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+            }
         } finally {
             requestLock.unlock()
         }
@@ -85,7 +96,8 @@ class ApiServlet: HttpServlet() {
 
             val handler = when (entity) {
                 "tour" ->
-                    when (subEntity) {
+                    if ("token" == selector) TokenHandler
+                    else when (subEntity) {
                         null -> TournamentHandler
                         "part" -> PlayerHandler
                         "pair" -> PairingHandler
@@ -274,11 +286,19 @@ class ApiServlet: HttpServlet() {
         }
     }
 
+    private fun checkAuthorization(request: HttpServletRequest, response: HttpServletResponse): Boolean {
+        val auth = WebappManager.getMandatoryProperty("auth")
+        return auth == "none" ||
+            "/api/tour/token" == request.requestURI ||
+            TokenHandler.getLoggedUser(request)?.also {
+                request.setAttribute(USER_KEY, it)
+            } != null
+    }
+
     companion object {
         private var logger = LoggerFactory.getLogger("api")
         private const val EXPECTED_CHARSET = "utf8"
-        const val AUTH_HEADER = "Authorization"
-        const val AUTH_PREFIX = "Bearer"
+        const val USER_KEY = "pairgoth-user"
         fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
         fun isXml(mimeType: String) = "text/xml" == mimeType || "application/xml" == mimeType || mimeType.endsWith("+xml")
     }

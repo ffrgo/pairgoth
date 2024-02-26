@@ -20,7 +20,7 @@ class LoginServlet: HttpServlet() {
                 "sesame" -> checkSesame(payload)
                 else -> checkLoginPass(payload)
             } ?: throw Error("authentication failed")
-            req.session.setAttribute("logged", user)
+            AuthFilter.handleSuccessfulLogin(req, user)
             val ret = Json.Object("status" to "ok")
             resp.contentType = "application/json"
             resp.writer.println(ret.toString())
@@ -34,7 +34,7 @@ class LoginServlet: HttpServlet() {
 
     fun checkSesame(payload: Json.Object): Json.Object? {
         val expected = WebappManager.properties.getProperty("auth.sesame") ?: throw Error("sesame wrongly configured")
-        return if (payload.getString("sesame")?.equals(expected) == true) Json.Object("logged" to true) else null
+        return if (payload.getString("sesame")?.equals(expected) == true) Json.Object(AuthFilter.SESSION_KEY_USER to true) else null
     }
 
     fun checkLoginPass(payload: Json.Object): Json.Object? {

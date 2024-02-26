@@ -19,7 +19,7 @@ object PlayerHandler: PairgothApiHandler {
         }
     }
 
-    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         val player = Player.fromJson(payload)

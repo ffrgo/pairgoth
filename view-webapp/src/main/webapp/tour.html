@@ -45,6 +45,7 @@
 <!-- error messages included as html elements so that they are translated -->
 <div id="required_field" class="hidden">Required field</div>
 <script type="text/javascript">
+  const apiToken = '$!api.bearer';
 #if($tour)
   const tour_id = ${tour.id};
   const tour_rounds = ${tour.rounds};

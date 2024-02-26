@@ -10,6 +10,7 @@ import org.apache.http.NameValuePair
 import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.ApiClient.JsonApiClient
 import org.jeudego.pairgoth.util.Cryptograph
+import org.jeudego.pairgoth.util.Randomizer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -55,7 +56,7 @@ abstract class OAuthHelper {
     companion object {
         protected var logger: Logger = LoggerFactory.getLogger("oauth")
         private val cryptograph: Cryptograph = AESCryptograph().apply {
-            init("0efd28fb53cbac42")
+            init(Randomizer.randomString(16))
         }
     }
 }

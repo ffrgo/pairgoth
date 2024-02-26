@@ -32,7 +32,7 @@ object PairingHandler: PairgothApiHandler {
         )
     }
 
-    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")

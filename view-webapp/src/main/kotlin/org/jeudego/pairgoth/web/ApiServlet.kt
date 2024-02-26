@@ -2,12 +2,15 @@ package org.jeudego.pairgoth.web
 
 import org.eclipse.jetty.client.api.Request;
 import org.eclipse.jetty.proxy.AsyncProxyServlet;
+import org.jeudego.pairgoth.view.ApiTool
 import javax.servlet.http.HttpServletRequest
 
 class ApiServlet : AsyncProxyServlet() {
 
     override fun addProxyHeaders(clientRequest: HttpServletRequest, proxyRequest: Request) {
-        // proxyRequest.header("X-EGC-User", some user id...)
+        AuthFilter.getBearer(clientRequest)?.let { bearer ->
+            proxyRequest.header("Authorization", "Bearer $bearer")
+        }
     }
 
     override fun rewriteTarget(clientRequest: HttpServletRequest): String {

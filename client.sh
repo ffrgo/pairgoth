@@ -1,10 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-trap 'kill $CSSWATCH; exit' INT
-( cd view-webapp; ./csswatch.sh ) &
-CSSWATCH=$!
+# debug version
+# mvn package && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5006 -jar application/target/pairgoth-engine.jar
 
-export MAVEN_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5006"
-#mvn --projects view-webapp -Dpairgoth.api.url=http://localhost:8085/api/ package jetty:run
-mvn -DskipTests=true --projects view-webapp package jetty:run
-kill $CSSWATCH
+mvn -DskipTests=true package && java -Dpairgoth.mode=client -jar application/target/pairgoth-engine.jar

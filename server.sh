@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/sh
 
-export MAVEN_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=*:5005"
-mvn -DskipTests=true --projects api-webapp package jetty:run
+# debug version
+# mvn package && java -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5006 -jar application/target/pairgoth-engine.jar
+
+mvn -DskipTests=true package && java -Dpairgoth.mode=server -jar application/target/pairgoth-engine.jar

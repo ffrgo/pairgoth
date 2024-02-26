@@ -71,17 +71,17 @@
     <pairgoth.webapp.host>localhost</pairgoth.webapp.host>
     <pairgoth.webapp.port>8080</pairgoth.webapp.port>
     <pairgoth.webapp.context>/</pairgoth.webapp.context>
-    <!-- CB TODO - what if webapp context does not qtart with '/' ? -->
     <pairgoth.webapp.external.url>${pairgoth.webapp.protocol}://${pairgoth.webapp.host}:${pairgoth.webapp.port}${pairgoth.webapp.context}</pairgoth.webapp.external.url>
     <pairgoth.api.protocol>http</pairgoth.api.protocol>
     <pairgoth.api.host>localhost</pairgoth.api.host>
     <pairgoth.api.port>8085</pairgoth.api.port>
     <pairgoth.api.context>/api</pairgoth.api.context>
     <pairgoth.api.external.url>${pairgoth.api.protocol}://${pairgoth.api.host}:${pairgoth.api.port}${pairgoth.api.context}</pairgoth.api.external.url>
+    <pairgoth.mode>standalone</pairgoth.mode>
     <pairgoth.store>file</pairgoth.store>
     <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
     <pairgoth.auth>none</pairgoth.auth>
-    <pairgoth.auth.sesame>this_should_be_overriden_with_a_command_line_option</pairgoth.auth.sesame>
+    <pairgoth.auth.sesame>this_should_be_overriden</pairgoth.auth.sesame>
     <pairgoth.oauth.ffg.client_id>pairtogh</pairgoth.oauth.ffg.client_id>
     <pairgoth.smtp.sender></pairgoth.smtp.sender>
     <pairgoth.smtp.host></pairgoth.smtp.host>

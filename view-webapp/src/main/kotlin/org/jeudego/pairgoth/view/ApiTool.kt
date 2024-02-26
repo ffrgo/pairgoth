@@ -6,8 +6,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.internal.EMPTY_REQUEST
+import org.jeudego.pairgoth.web.AuthFilter
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
+import javax.servlet.http.HttpServletRequest
 
 class ApiTool {
     companion object {
@@ -19,8 +21,18 @@ class ApiTool {
         }
         val logger = LoggerFactory.getLogger("api")
     }
+    private lateinit var request: HttpServletRequest
+    fun setRequest(req: HttpServletRequest) {
+        request = req
+    }
+    private fun getBearer() = AuthFilter.getBearer(request)
+
     private val client = OkHttpClient()
-    private fun prepare(url: String) = Request.Builder().url("$apiRoot$url").header("Accept", JSON)
+    private fun prepare(url: String) =
+        Request.Builder().url("$apiRoot$url")
+            .header("Accept", JSON)
+            .header("Authorization", "Bearer ${getBearer()}")
+
     private fun Json.toRequestBody() = toString().toRequestBody(JSON.toMediaType())
     private fun Request.Builder.process(): Json {
         try {

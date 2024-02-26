@@ -65,6 +65,7 @@
                         <port>${pairgoth.api.port}</port>
                     </httpConnector>
                     <systemProperties>
+                        <pairgoth.auth>${pairgoth.auth}</pairgoth.auth>
                         <pairgoth.env>${pairgoth.env}</pairgoth.env>
                         <pairgoth.version>${pairgoth.version}</pairgoth.version>
                         <pairgoth.api.external.url>${pairgoth.api.external.url}</pairgoth.api.external.url>
@@ -164,6 +165,11 @@
             <version>2.13.0</version>
         </dependency>
         <!-- auth -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version>
+        </dependency>
         <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>

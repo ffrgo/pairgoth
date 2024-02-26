@@ -19,9 +19,8 @@ let  headers = function(withJson) {
     if (withJson) {
       ret['Content-Type'] = 'application/json';
     }
-    let accessToken = store('accessToken');
-    if (accessToken) {
-        ret['Authorization'] = `Bearer ${accessToken}`;
+    if (apiToken) {
+        ret['Authorization'] = `Bearer ${apiToken}`;
     }
     return ret;
 };

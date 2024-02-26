@@ -19,7 +19,7 @@ object TeamHandler: PairgothApiHandler {
         }
     }
 
-    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val payload = getObjectPayload(request)

@@ -21,7 +21,7 @@ interface ApiHandler {
         notImplemented()
     }
 
-    fun post(request: HttpServletRequest, response: HttpServletResponse): Json {
+    fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         notImplemented()
     }
 

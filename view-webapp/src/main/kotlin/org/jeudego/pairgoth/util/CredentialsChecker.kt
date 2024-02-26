@@ -15,11 +15,11 @@ object CredentialsChecker {
         val sha256 = hasher.digest(password.toByteArray(StandardCharsets.UTF_8)).toHexString()
         DriverManager.getConnection("jdbc:sqlite:$CREDENTIALS_DB").use { conn ->
             val rs =
-                conn.prepareStatement("SELECT 1 FROM cred WHERE email = ? AND password = ?").apply {
+                conn.prepareStatement("SELECT id FROM cred WHERE email = ? AND password = ?").apply {
                     setString(1, email)
                     setString(2, password)
                 }.executeQuery()
-            return if (rs.next()) Json.Object("email" to email) else null
+            return if (rs.next()) Json.Object("id" to "${rs.getInt("id")}", "email" to email) else null
         }
     }
 
@@ -27,7 +27,7 @@ object CredentialsChecker {
     fun initDatabase() {
         if (!File(CREDENTIALS_DB).exists()) {
             DriverManager.getConnection("jdbc:sqlite:$CREDENTIALS_DB").use { conn ->
-                conn.createStatement().executeUpdate("CREATE TABLE cred (email VARCHAR(200) UNIQUE NOT NULL, password VARCHAR(200) NOT NULL)")
+                conn.createStatement().executeUpdate("CREATE TABLE cred (id INTEGER PRIMARY KEY AUTOINCREMENT, email VARCHAR(200) UNIQUE NOT NULL, password VARCHAR(200) NOT NULL)")
             }
         }
     }
