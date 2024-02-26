@@ -59,17 +59,44 @@ private fun cleanup() {
     FileUtils.deleteDirectory(webapps.toFile())
 }
 
+private val allowedModes = setOf("standalone", "server", "client")
+
 private fun readProperties() {
-    val defaultProps = getResource("/server.default.properties") ?: throw Error("missing default server properties")
+    // do a first pass at determining the final 'mode', since it will influence other default value
+    var mode = "standalone"
+    val userProperties = File("./pairgoth.properties")
+    if (userProperties.exists()) {
+        val userProps = Properties()
+        userProps.load(FileReader(userProperties))
+        if (userProps.contains("mode")) mode = userProps.getProperty("mode")
+    }
+    val systemMode: String? = System.getProperty("pairgoth.mode")
+    if (systemMode != null) {
+        mode = systemMode
+    }
+
+    if (!allowedModes.contains(mode)) throw Error("invalid mode: $mode")
+
+    // read default properties
+    val defaultProps = getResource("/${mode}.default.properties") ?: throw Error("missing default server properties")
     defaultProps.openStream().use {
         serverProps.load(InputStreamReader(it, StandardCharsets.UTF_8))
     }
-    val properties = File("./pairgoth.properties")
-    if (properties.exists()) {
-        serverProps.load(FileReader(properties))
-    }
+    // default env depends upon the presence of the pom.xml file
     val env = if (File("./pom.xml").exists()) "dev" else "prod"
     serverProps["env"] = env
+    // read user properties
+    if (userProperties.exists()) {
+        serverProps.load(FileReader(userProperties))
+    }
+    // read system properties
+    System.getProperties().forEach {
+        val key = it.key as String
+        val value = it.value as String
+        if (key.startsWith("pairgoth.")) {
+            serverProps[key.removePrefix("pairgoth.")] = value
+        }
+    }
 }
 
 private fun publishProperties() {
@@ -149,12 +176,23 @@ private fun launchServer() {
         }
     }
 
-    val webappUrl = URL(
-        serverProps.getProperty("webapp.protocol") ?: throw Error("missing property webapp.protocol"),
-        serverProps.getProperty("webapp.protocol") ?: throw Error("missing property webapp.protocol"),
-        serverProps.getProperty("webapp.port")?.toInt() ?: 80,
-        "/"
-    )
+    val webappUrl = when (mode) {
+        "client", "standalone" ->
+            URL(
+                serverProps.getProperty("webapp.protocol") ?: throw Error("missing property webapp.protocol"),
+                serverProps.getProperty("webapp.host") ?: throw Error("missing property webapp.host"),
+                serverProps.getProperty("webapp.port")?.toInt() ?: 80,
+                "/"
+            )
+        "server" ->
+            URL(
+                serverProps.getProperty("api.protocol") ?: throw Error("missing property api.protocol"),
+                serverProps.getProperty("api.host") ?: throw Error("missing property api.host"),
+                serverProps.getProperty("api.port")?.toInt() ?: 80,
+                "/"
+            )
+        else -> throw Error("invalid mode: $mode")
+    }
     val secure = webappUrl.protocol == "https"
 
     // create server

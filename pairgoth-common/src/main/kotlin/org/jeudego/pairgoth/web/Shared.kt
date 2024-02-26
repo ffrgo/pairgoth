@@ -16,3 +16,5 @@ val sharedSecret: String by lazy {
         if (it.length != 16) throw RuntimeException("shared secret must be 16 ascii chars long")
     }
 }
+
+fun ByteArray.toHex(): String = joinToString(separator = "") { eachByte -> "%02x".format(eachByte) }

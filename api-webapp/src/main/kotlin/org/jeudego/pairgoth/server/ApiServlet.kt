@@ -56,6 +56,7 @@ class ApiServlet: HttpServlet() {
         val requestLock = if (request.method == "GET") lock.readLock() else lock.writeLock()
         try {
             requestLock.lock()
+            logger.logRequest(request, !request.requestURI.contains(".") && request.requestURI.length > 1)
             if (checkAuthorization(request, response)) {
                 doProtectedRequest(request, response)
             } else {
@@ -68,7 +69,6 @@ class ApiServlet: HttpServlet() {
 
     private fun doProtectedRequest(request: HttpServletRequest, response: HttpServletResponse) {
         val uri = request.requestURI
-        logger.logRequest(request, !uri.contains(".") && uri.length > 1)
 
         var payload: Json? = null
         var reason = "OK"

@@ -10,6 +10,7 @@ import org.jeudego.pairgoth.web.AuthFilter
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 class ApiTool {
     companion object {
@@ -36,7 +37,22 @@ class ApiTool {
     private fun Json.toRequestBody() = toString().toRequestBody(JSON.toMediaType())
     private fun Request.Builder.process(): Json {
         try {
-            return client.newCall(build()).execute().use { response ->
+            val apiReq = build()
+            if (logger.isTraceEnabled) {
+                logger.trace(">> ${apiReq.method} ${apiReq.url}")
+                apiReq.headers.forEach { header ->
+                    logger.trace("   ${header.first} ${header.second}")
+                }
+            }
+
+            logger.trace("   ")
+            return client.newCall(apiReq).execute().use { response ->
+                if (logger.isTraceEnabled) {
+                    logger.trace("<< ${response.code} ${response.message}")
+                    response.headers.forEach { header ->
+                        logger.trace("   ${header.first} ${header.second}")
+                    }
+                }
                 if (response.isSuccessful) {
                     when (response.body?.contentType()?.subtype) {
                         null -> throw Error("null body or content type")
@@ -44,6 +60,10 @@ class ApiTool {
                         else -> throw Error("unhandled content type: ${response.body!!.contentType()}")
                     }
                 } else {
+                    if (response.code == HttpServletResponse.SC_UNAUTHORIZED) {
+                        request.session.removeAttribute(AuthFilter.SESSION_KEY_API_TOKEN)
+                        request.session.removeAttribute(AuthFilter.SESSION_KEY_USER)
+                    }
                     when (response.body?.contentType()?.subtype) {
                         "json" -> Json.parse(response.body!!.string()) ?: throw Error("could not parse error json")
                         else -> throw Error("${response.code} ${response.message}")

@@ -9,6 +9,7 @@ import org.jeudego.pairgoth.oauth.OauthHelperFactory
 import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.view.ApiTool
 import org.slf4j.LoggerFactory
+import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.servlet.Filter
@@ -95,39 +96,55 @@ class AuthFilter: Filter {
         }
 
         fun fetchApiToken(req: HttpServletRequest, user: Json.Object): String? {
-            val challengeReq = Request.Builder().url("${ApiTool.apiRoot}tour/token")
-                .header("Authorization", "Bearer ${getBearer(req)}")
-                .build()
-            val challengeResp = client.newCall(challengeReq).execute()
-            if (challengeResp.code == HttpServletResponse.SC_UNAUTHORIZED) {
-                val email = user.getString("email") ?: "-"
-                val challenge = challengeResp.headers["WWW-Authenticate"]
-                if (challenge != null) {
-                    val signature = hasher.digest(
-                        "${
-                            req.session.id
-                        }:${
-                            challenge
-                        }:${
-                            email
-                        }".toByteArray(StandardCharsets.UTF_8))
-                    val answer = Json.Object(
-                        "session" to req.session.id,
-                        "email" to email,
-                        "signature" to signature
-                    )
-                    val answerReq = Request.Builder().url("${ApiTool.apiRoot}tour/token").post(
-                        answer.toString().toRequestBody(ApiTool.JSON.toMediaType())
-                    ).build()
-                    val answerResp = client.newCall(answerReq).execute()
-                    if (answerResp.isSuccessful && "json" == answerResp.body?.contentType()?.subtype) {
-                        val payload = Json.parse(answerResp.body!!.string())
-                        if (payload != null && payload.isObject) {
-                            val token = payload.asObject().getString("token")
-                            if (token != null) return token
+            try {
+                logger.trace("getting challenge...")
+                val challengeReq = Request.Builder().url("${ApiTool.apiRoot}tour/token")
+                    .header("Accept", "application/json")
+                    .header("Authorization", "Bearer ${getBearer(req)}")
+                    .build()
+                val challengeResp = client.newCall(challengeReq).execute()
+                challengeResp.use {
+                    if (challengeResp.code == HttpServletResponse.SC_UNAUTHORIZED) {
+                        logger.trace("building answer...")
+                        val email = user.getString("email") ?: "-"
+                        val challenge = challengeResp.headers["WWW-Authenticate"]
+                        if (challenge != null) {
+                            val signature = hasher.digest(
+                                "${
+                                    req.session.id
+                                }:${
+                                    challenge
+                                }:${
+                                    email
+                                }".toByteArray(StandardCharsets.UTF_8)
+                            ).toHex()
+                            val answer = Json.Object(
+                                "session" to req.session.id,
+                                "email" to email,
+                                "signature" to signature
+                            )
+                            val answerReq = Request.Builder().url("${ApiTool.apiRoot}tour/token")
+                                .header("Accept", "application/json")
+                                .post(answer.toString().toRequestBody(ApiTool.JSON.toMediaType()))
+                                .build()
+                            val answerResp = client.newCall(answerReq).execute()
+                            answerResp.use {
+                                if (answerResp.isSuccessful && "json" == answerResp.body?.contentType()?.subtype) {
+                                    val payload = Json.parse(answerResp.body!!.string())
+                                    if (payload != null && payload.isObject) {
+                                        val token = payload.asObject().getString("token")
+                                        if (token != null) {
+                                            logger.trace("got token $token")
+                                            return token
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+            } catch (e: IOException) {
+                logger.warn("could not fetch access token", e)
             }
             return null
         }

@@ -8,6 +8,9 @@ import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.Cryptograph
 import org.jeudego.pairgoth.util.Randomizer
 import org.jeudego.pairgoth.web.sharedSecret
+import org.jeudego.pairgoth.web.toHex
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
 import java.util.Random
 import java.util.concurrent.TimeUnit
 import javax.servlet.http.HttpServletRequest
@@ -18,6 +21,7 @@ object TokenHandler: ApiHandler {
     const val AUTH_HEADER = "Authorization"
     const val AUTH_PREFIX = "Bearer"
 
+    private val hasher = MessageDigest.getInstance("SHA-256")
     private val cryptograph = AESCryptograph().apply { init(sharedSecret) }
 
     private data class AuthorizationPayload(
@@ -26,19 +30,24 @@ object TokenHandler: ApiHandler {
         val userInfos: Json
     )
 
-    private fun getAuthorizationPayload(request: HttpServletRequest): AuthorizationPayload? {
+    private fun parseAuthorizationHeader(request: HttpServletRequest): Pair<String, String>? {
         val authorize = request.getHeader(AUTH_HEADER) as String?
         if (authorize != null && authorize.startsWith("$AUTH_PREFIX ")) {
             val bearer = authorize.substring(AUTH_PREFIX.length + 1)
             val clear = cryptograph.webDecrypt(bearer)
             val parts = clear.split(':')
             if (parts.size == 2) {
-                val sessionId = parts[0]
-                val accessKey = parts[1]
-                val accessPayload = accesses.getIfPresent(accessKey)
-                if (accessPayload != null && sessionId == accessPayload.getString("session")) {
-                    return AuthorizationPayload(sessionId, accessKey, accessPayload)
-                }
+                return Pair(parts[0], parts[1])
+            }
+        }
+        return null
+    }
+
+    private fun getAuthorizationPayload(request: HttpServletRequest): AuthorizationPayload? {
+        parseAuthorizationHeader(request)?.let { (sessionId, accessKey) ->
+            val accessPayload = accesses.getIfPresent(accessKey)
+            if (accessPayload != null && sessionId == accessPayload.getString("session")) {
+                return AuthorizationPayload(sessionId, accessKey, accessPayload)
             }
         }
         return null
@@ -63,15 +72,15 @@ object TokenHandler: ApiHandler {
         if (challenge != null) {
             val email = auth.getString("email")
             val signature = auth.getString("signature")
-            val expectedSignature = cryptograph.webEncrypt(
+            val expectedSignature = hasher.digest(
                 "${
                     session
                 }:${
                     challenge
                 }:${
                     email
-                }"
-            )
+                }".toByteArray(StandardCharsets.UTF_8)
+            ).toHex()
             if (signature == expectedSignature) {
                 val accessKey = Randomizer.randomString(32)
                 accesses.put(accessKey, Json.Object(
@@ -93,10 +102,11 @@ object TokenHandler: ApiHandler {
     }
 
     private fun failed(request: HttpServletRequest, response: HttpServletResponse) {
-        val authPayload = getAuthorizationPayload(request)
-        if (authPayload != null && authPayload.sessionId.isNotEmpty()) {
+        val authValues = parseAuthorizationHeader(request)
+        if (authValues != null && authValues.first.isNotEmpty()) {
+            val sessionId = authValues.first
             val challenge = Randomizer.randomString(32)
-            challenges.put(authPayload.sessionId, challenge)
+            challenges.put(sessionId, challenge)
             response.addHeader("WWW-Authenticate", challenge)
             response.status = HttpServletResponse.SC_UNAUTHORIZED
             response.writer.println(Json.Object("status" to "failed", "message" to "unauthorized"))

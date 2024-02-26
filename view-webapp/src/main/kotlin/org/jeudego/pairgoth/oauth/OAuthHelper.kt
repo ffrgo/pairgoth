@@ -40,8 +40,9 @@ abstract class OAuthHelper {
     fun getAccessToken(sessionID: String, code: String): String {
         val (url, params) = getAccessTokenURL(code)
         val json = JsonApiClient.post(url, null, *params.toTypedArray()).asObject()
-        val state = json.getString("state") ?:  throw IOException("could not get state")
-        if (!checkState(state, sessionID)) throw IOException("invalid state")
+        // CB TODO - do not check state for now
+        // val state = json.getString("state") ?:  throw IOException("could not get state")
+        // if (!checkState(state, sessionID)) throw IOException("invalid state")
         return json.getString("access_token") ?: throw IOException("could not get access token")
     }
 
