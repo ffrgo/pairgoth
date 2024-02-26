@@ -10,7 +10,6 @@ import org.junit.jupiter.api.TestMethodOrder
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import kotlin.test.fail
 
 @TestMethodOrder(MethodName::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -85,7 +84,8 @@ class BasicTests: TestBase() {
             "rating" to -500,
             "rank" to -5,
             "country" to "FR",
-            "club" to "13Ma"
+            "club" to "13Ma",
+            "final" to true
         )
 
         val anotherPlayer = Json.Object(
