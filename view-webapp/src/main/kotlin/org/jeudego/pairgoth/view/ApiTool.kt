@@ -26,7 +26,7 @@ class ApiTool {
     fun setRequest(req: HttpServletRequest) {
         request = req
     }
-    private fun getBearer() = AuthFilter.getBearer(request)
+    fun getBearer() = AuthFilter.getBearer(request)
 
     private val client = OkHttpClient()
     private fun prepare(url: String) =

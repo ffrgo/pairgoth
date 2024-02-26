@@ -94,8 +94,9 @@ function addPlayers() {
   // initial search checkboxes position
   ['countryFilter', 'aga', 'egf', 'ffg'].forEach(id => {
     let value = store(id);
-    if (value !== null && typeof(value) !== 'undefined') {
-      $(`#${id}`)[0].checked = value;
+    let ctl = $(`#${id}`);
+    if (value !== null && typeof(value) !== 'undefined' && ctl.length) {
+      ctl[0].checked = value;
     }
   });
   form.val('final', status);
@@ -250,10 +251,13 @@ onLoad(() => {
     $('#needle')[0].value = '';
     $('#search-result').clear();
   });
-  let searchFromState = store('searchFormState')
-  if (searchFromState) {
+  let searchFormState = store('searchFormState')
+  if (searchFormState) {
     for (let id of ["countryFilter", "aga", "egf", "ffg"]) {
-      $(`#${id}`)[0].checked = searchFromState[id];
+      let ctl = $(`#${id}`);
+      if (ctl.length) {
+        ctl[0].checked = searchFormState[id];
+      }
     }
   }
   $('.toggle').on('click', e => {

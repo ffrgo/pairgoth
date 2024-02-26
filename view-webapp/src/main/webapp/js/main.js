@@ -110,6 +110,7 @@ HTMLFormElement.prototype.val = function(name, value) {
   let ctl = this.find(`[name="${name}"]`)[0];
   if (!ctl) {
     console.error(`unknown input name: ${name}`)
+    return undefined
   }
   let tag = ctl.tagName;
   let type = tag === 'INPUT' ? ctl.attr('type') : undefined;
