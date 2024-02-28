@@ -114,6 +114,8 @@ sealed class Tournament <P: Pairable>(
         }
         return changed
     }
+
+    fun pairedPlayers() = games.flatMap { it.values }.flatMap { listOf(it.black, it.white) }.toSet()
 }
 
 // standard tournament of individuals

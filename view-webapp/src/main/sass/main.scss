@@ -434,9 +434,14 @@
   }
 
   .toggle {
-    display: inline-block;
+    padding-top: 0.2em;
+    display: inline-flex;
+    flex-flow: column nowrap;
+    justify-content: space-evenly;
+    align-items: center;
     cursor: pointer;
     text-align: center;
+    vertical-align: middle;
     input {
       display: none !important;
     }

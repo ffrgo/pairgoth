@@ -260,7 +260,7 @@ onLoad(() => {
       }
     }
   }
-  $('.toggle').on('click', e => {
+  $('#search-form .toggle').on('click', e => {
     let chk = e.target.closest('.toggle');
     let checkbox = chk.find('input')[0];
     checkbox.checked = !checkbox.checked;
@@ -268,6 +268,16 @@ onLoad(() => {
     let value = checkbox.checked;
     store(id, value);
     initSearch();
+  });
+  $('#list-header .toggle').on('click', e => {
+    let chk = e.target.closest('.toggle');
+    let checkbox = chk.find('input')[0];
+    checkbox.checked = !checkbox.checked;
+    if (checkbox.checked) {
+      $('td.reg-status:not(.final)').forEach(node => node.parentNode.addClass('filtered'));
+    } else {
+      $('td.reg-status:not(.final)').forEach(node => node.parentNode.removeClass('filtered'));
+    }
   });
   document.on('click', e => {
     let resultLine = e.target.closest('.result-line');
@@ -320,12 +330,12 @@ onLoad(() => {
       id: id,
       final: newStatus
     }).then(player => {
-        if (player !== 'error') {
-          cell.toggleClass('final');
-          standingsUpToDate = false;
-          pairablesUpToDate = false;
-        }
-      });
+      if (player !== 'error') {
+        cell.toggleClass('final');
+        standingsUpToDate = false;
+        pairablesUpToDate = false;
+      }
+    });
     e.preventDefault();
     return false;
   });

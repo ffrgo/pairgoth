@@ -3,9 +3,18 @@
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
     <div id="list-header">
-      <div id="filter-box" class="ui icon input">
-        <input type="text" id="filter" placeholder="Filter..."/>
-        <i class="circular times link icon"></i>
+      <div>
+        <div id="filter-box" class="ui icon input">
+          <input type="text" id="filter" placeholder="Filter..."/>
+          <i class="circular times link icon"></i>
+        </div>
+        <div class="toggle">
+          <input id="filter-final" name="filter-final" type="checkbox"/>
+          <div class="checkbox">
+            <div class="circle"></div>
+          </div>
+          <label>Final</label>
+        </div>
       </div>
       <div>
         $parts.size() participants, $utils.countFinals($parts) confirmed.

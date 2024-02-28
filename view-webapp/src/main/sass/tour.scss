@@ -63,6 +63,9 @@
 
   #players-list {
     max-width: 95vw;
+    #players tr.filtered {
+      display: none;
+    }
   }
 
   #player {

@@ -199,7 +199,7 @@ onLoad(() => {
     switch (e.key) {
       case 'Escape': {
         if (tab === '#registration') {
-          if ($('#player').hasClass('shown') && $('#needle')[0].value) {
+          if ($('#player').hasClass('shown') && searchResultShown()) {
             $('#needle')[0].value = '';
             initSearch();
           } else {
