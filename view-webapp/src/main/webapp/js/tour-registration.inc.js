@@ -21,19 +21,19 @@ function searchResultShown() {
 
 function search(needle) {
   needle = needle.trim();
-  if (needle && needle.length > 2) {
+  if (needle && (needle === '*' || needle.length > 2)) {
     let form = $('#player-form')[0];
     let search = {
       needle: needle,
-      aga: form.val('aga'),
+      // aga: form.val('aga'),
       egf: form.val('egf'),
       ffg: form.val('ffg'),
     }
     let country = form.val('countryFilter');
     if (country) search.countryFilter = country;
     let searchFormState = {
-      countryFilter: country ? true : false,
-      aga: search.aga,
+      countryFilter: !!country,
+      // aga: search.aga,
       egf: search.egf,
       ffg: search.ffg
     };
@@ -92,7 +92,7 @@ function addPlayers() {
   let status = form.val('final') || false;
   form.reset();
   // initial search checkboxes position
-  ['countryFilter', 'aga', 'egf', 'ffg'].forEach(id => {
+  ['countryFilter', /* 'aga', */ 'egf', 'ffg'].forEach(id => {
     let value = store(id);
     let ctl = $(`#${id}`);
     if (value !== null && typeof(value) !== 'undefined' && ctl.length) {
@@ -253,7 +253,7 @@ onLoad(() => {
   });
   let searchFormState = store('searchFormState')
   if (searchFormState) {
-    for (let id of ["countryFilter", "aga", "egf", "ffg"]) {
+    for (let id of ["countryFilter", /* "aga", */ "egf", "ffg"]) {
       let ctl = $(`#${id}`);
       if (ctl.length) {
         ctl[0].checked = searchFormState[id];
@@ -409,5 +409,8 @@ onLoad(() => {
         mmsCorrection: 0
       }));
     bulkUpdate(players);
+  });
+  $('#browse-players').on('click', e => {
+    search('*');
   });
 });

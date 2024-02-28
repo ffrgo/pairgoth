@@ -103,12 +103,32 @@ object RatingsManager: Runnable {
             if (aga && ratingsHandlers[Ratings.AGA]!!.active) mask = mask or Ratings.AGA.flag
             if (egf && ratingsHandlers[Ratings.EGF]!!.active) mask = mask or Ratings.EGF.flag
             if (ffg && ratingsHandlers[Ratings.FFG]!!.active) mask = mask or Ratings.FFG.flag
-            val matches = index.match(needle, mask, country)
-            return matches.map { it -> players[it] }.toCollection(Json.MutableArray())
+            return if (needle == "*") {
+                sortedPlayers(mask, country)
+            } else {
+                val matches = index.match(needle, mask, country)
+                matches.map { it -> players[it] }.toCollection(Json.MutableArray())
+            }
         } finally {
             updateLock.readLock().unlock()
         }
 
     }
+
+    private fun sortedPlayers(mask: Int, country: String?): Json.Array {
+        val cntry = country?.let { it.uppercase(Locale.ROOT) }
+        val orig = Ratings.values().filter { (it.flag and mask) != 0 }.map { it.name }.toSet()
+        return players.filter {
+            val player = it as Json.Object
+            (cntry == null || cntry == player.getString("country")) && orig.contains(player.getString("origin"))
+        }.sortedWith { a,b ->
+            val left = a as Json.Object
+            val right = b as Json.Object
+            val cmp = left.getString("name")!!.compareTo(right.getString("name")!!)
+            if (cmp == 0) left.getString("firstname")!!.compareTo(right.getString("firstname")!!)
+            else cmp
+        }.toCollection(Json.MutableArray())
+    }
+
     val index = PlayerIndex()
 }
