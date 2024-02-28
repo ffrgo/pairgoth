@@ -9,9 +9,8 @@ import javax.servlet.http.HttpServletResponse
 
 class ImportServlet: HttpServlet() {
 
-    private val api by lazy { ApiTool() }
-
     override fun doPost(req: HttpServletRequest, resp: HttpServletResponse) {
+        val api = ApiTool().apply { setRequest(req) }
         val uploads = Upload.handleFileUpload(req)
         if (uploads.size != 1) resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
         else {
