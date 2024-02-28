@@ -7,7 +7,10 @@ import org.jeudego.pairgoth.server.SSEServlet
 import org.jeudego.pairgoth.server.WebappManager
 import org.mockito.kotlin.*
 import java.io.*
+import java.nio.charset.StandardCharsets
 import java.util.*
+import javax.servlet.ReadListener
+import javax.servlet.ServletInputStream
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -23,6 +26,7 @@ object TestAPI {
 
     private fun <T> testRequest(reqMethod: String, uri: String, accept: String = "application/json", payload: T? = null): String {
 
+        WebappManager.properties["auth"] = "none"
         WebappManager.properties["webapp.env"] = "test"
 
         // mock request
@@ -30,6 +34,7 @@ object TestAPI {
         val selector = argumentCaptor<String>()
         val subSelector = argumentCaptor<String>()
         val reqPayload = argumentCaptor<String>()
+        val myInputStream = payload?.let { DelegatingServletInputStream(payload.toString().byteInputStream(StandardCharsets.UTF_8)) }
         val myReader = payload?.let { BufferedReader(StringReader(payload.toString())) }
         val req = mock<HttpServletRequest> {
             on { method } doReturn reqMethod
@@ -41,6 +46,7 @@ object TestAPI {
             on { getAttribute(ApiHandler.SUBSELECTOR_KEY) } doAnswer { subSelector.allValues.lastOrNull() }
             on { getAttribute(ApiHandler.PAYLOAD_KEY) } doAnswer { reqPayload.allValues.lastOrNull() }
             on { reader } doReturn myReader
+            on { inputStream } doReturn myInputStream
             on { scheme } doReturn "http"
             on { localName } doReturn "pairgoth"
             on { localPort } doReturn 80
@@ -87,3 +93,27 @@ fun getTestResources(path: String) = getTestFile(path).listFiles()
 fun getTestFile(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path")
 
 fun getOutputFile(path: String) = File("${System.getProperty("test.build.dir")}/$path")
+
+class DelegatingServletInputStream(val sourceStream: InputStream) : ServletInputStream() {
+
+    override fun read(): Int {
+        return sourceStream.read()
+    }
+
+    override fun isFinished(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun isReady(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun setReadListener(readListener: ReadListener?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun close() {
+        super.close()
+        sourceStream.close()
+    }
+}
