@@ -9,10 +9,20 @@ function publish(format, extension) {
     if (resp.ok) return resp.text()
     else throw "publish error"
   }).then(txt => {
-    let blob = new Blob(['\uFEFF', txt.trim()], {type: 'plain/text;charset=utf-8'});
+    let blob = new Blob(['\uFEFF', txt.trim()], {type: 'text/plain;charset=utf-8'});
     downloadFile(blob, `${shortName}.${extension}`);
     close_modal();
   }).catch(err => showError(err));
+}
+
+function publishHtml() {
+  let html = $('#standings-table')[0].outerHTML;
+  console.log(html)
+  let form = $('#tournament-infos')[0];
+  let shortName = form.val('shortName');
+  let blob = new Blob(['\uFEFF', html], {type: 'text/html;charset=utf-8'});
+  downloadFile(blob, `${shortName}-standings-R${activeRound}.html`);
+  close_modal();
 }
 
 onLoad(() => {
@@ -59,13 +69,18 @@ onLoad(() => {
   $('#publish').on('click', e => {
     modal('publish-modal');
   });
+/*
   $('#publish-modal').on('click', e => {
     close_modal();
   });
+*/
   $('.publish-ffg').on('click', e => {
     publish('ffg', 'tou');
   });
   $('.publish-egf').on('click', e => {
     publish('egf', 'h9');
+  });
+  $('.publish-html').on('click', e => {
+    publishHtml();
   });
 });

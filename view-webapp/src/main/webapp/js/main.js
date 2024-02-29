@@ -281,4 +281,8 @@ onLoad(() => {
     title.toggleClass('active');
     content.toggleClass('active');
   });
+  $('#dimmer').on('click', e => {
+    let dialog = e.target.closest('.popup');
+    if (!dialog) close_modal();
+  });
 });
