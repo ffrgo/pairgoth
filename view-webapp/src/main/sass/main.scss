@@ -203,6 +203,9 @@
   span > input[type="radio"] { vertical-align: text-top; }
   span > input[type="text"] { vertical-align: baseline; width: initial; }
   span > input.date { vertical-align: baseline; width: 8em; }
+  .ui.table>tbody>tr>td, .ui.table>tr>td {
+    padding: 0.2em 0.2em;
+  }
 
   .step, .step .title { font-size: 1em; }
   .step:before { font-size: 1em; }
