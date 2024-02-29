@@ -19,7 +19,7 @@ let  headers = function(withJson) {
     if (withJson) {
       ret['Content-Type'] = 'application/json';
     }
-    if (apiToken) {
+    if (typeof(apiToken) !== 'undefined') {
         ret['Authorization'] = `Bearer ${apiToken}`;
     }
     return ret;
