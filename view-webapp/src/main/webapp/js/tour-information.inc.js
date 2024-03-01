@@ -177,7 +177,6 @@ onLoad(() => {
         stones: form.val('stones')
       }
     }
-    console.log(tour);
     if (typeof(tour_id) !== 'undefined') {
       api.putJson(`tour/${tour_id}`, tour)
         .then(tour => {
@@ -228,7 +227,6 @@ onLoad(() => {
         }
       }
     }
-    console.log(tour);
     api.putJson(`tour/${tour_id}`, tour)
       .then(tour => {
         if (tour !== 'error') {
