@@ -40,13 +40,13 @@
         </div>
         <div class="nine wide field">
           <label>Location</label>
-          <span class="info"></span>
-          <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
           <div class="edit online">
             <label>
               <input name="online" type="checkbox" #if($tour && $tour.online) checked #end value="true"/>&nbsp;<b>online tournament</b>
             </label>
           </div>
+          <span class="info"></span>
+          <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
         </div>
       </div>
     </div>

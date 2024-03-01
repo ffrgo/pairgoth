@@ -128,7 +128,7 @@ club	club
 country	pays
 d	d
 first name	prénom
-from	de
+from	du
 games )	parties )
 h	h
 in a way that best suits your needs. Here are your options:	de la manière qui répond le mieux à vos besoin. Voici vos options :
@@ -155,7 +155,7 @@ standalone, web interface	indépendant, interface web
 standalone, web interface, via docker	indépendant, interface web, via docker
 table	table
 the configuration guide	le guide de configuration
-to	à
+to	au
 unpairable players	joueurs non disponibles
 unpairable,	non disponibles,
 version 0.1 supports the	version 0.1 supporte le système d’appariement
