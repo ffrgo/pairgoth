@@ -1,6 +1,11 @@
 #!/bin/bash
 
-mvn -DskipTests=true install # needed for pairgoth-common
+VERSION=$(grep '<version>' pom.xml | head -1 | egrep  -o '[0-9.]+')
+
+if [ !-f "$HOME/.m2/repository/org/jeudego/pairgoth/pairgoth-common/$VERSION/pairgoth-common-$VERSION.jar" ]
+then
+    mvn -DskipTests=true install # needed for pairgoth-common    
+fi
 
 trap 'kill $CSSWATCH; exit' INT
 ( cd view-webapp; ./csswatch.sh ) &
