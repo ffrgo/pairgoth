@@ -60,12 +60,12 @@
   const safeRegex = /^[-a-zA-Z0-9_.]+$/;
 
   function parseDate(value) {
-    let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
+    let format = Datepicker.locales[datepickerLocale]?.format || 'dd/mm/yyyy';
     let date = Datepicker.parseDate(value, format, datepickerLocale);
     return Datepicker.formatDate(date, 'yyyy-mm-dd')
   }
   function formatDate(value) {
-    let format = Datepicker.locales[datepickerLocale]?.format || 'mm/dd/yyyy';
+    let format = Datepicker.locales[datepickerLocale]?.format || 'dd/mm/yyyy';
     let date = Datepicker.parseDate(value, 'yyyy-mm-dd', datepickerLocale);
     return Datepicker.formatDate(date, format)
   }
@@ -120,6 +120,9 @@
             }
             info.textContent = txt;
           }
+        } else if (input.hasClass('date')) {
+          let rawDate = input.value;
+          info.textContent = formatDate(rawDate);
         } else {
           info.textContent = input.value;
         }
