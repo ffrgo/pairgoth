@@ -1,5 +1,7 @@
 #!/bin/bash
 
+mvn -DskipTests=true install # needed for pairgoth-common
+
 trap 'kill $CSSWATCH; exit' INT
 ( cd view-webapp; ./csswatch.sh ) &
 CSSWATCH=$!
