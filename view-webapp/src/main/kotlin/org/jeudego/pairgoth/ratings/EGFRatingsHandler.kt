@@ -23,6 +23,9 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                     player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
                         player["rank"] = ((rating - 2050)/100).let { if (it < 0) "${-it+1}k" else "${it+1}d" }
                     }
+                    if ("UK" == player.getString("country")) {
+                        player["country"] = "GB"
+                    }
                 }
             }
         }

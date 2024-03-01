@@ -106,7 +106,10 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     firstname = json.getString("firstname") ?: default?.firstname ?: badRequest("missing firstname"),
     rating = json.getInt("rating") ?: default?.rating ?: badRequest("missing rating"),
     rank = json.getInt("rank") ?: default?.rank ?: badRequest("missing rank"),
-    country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
+    country = ( json.getString("country") ?: default?.country ?: badRequest("missing country") ).let {
+        // EGC uses UK, while FFG and browser language use GB
+        if (it == "UK") "GB" else it
+    },
     club = json.getString("club") ?: default?.club ?: badRequest("missing club"),
     final = json.getBoolean("final") ?: default?.final ?: true,
     mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
