@@ -88,7 +88,10 @@
     </table>
   </div>
   <div class="right form-actions">
-    <button id="publish" class="ui yellow floating button">Publish</button>
+    <button id="publish" class="ui yellow floating right labeled icon button">
+      <i class="paper plane outline icon"></i>
+      Publish
+    </button>
   </div>
 </div>
 <div id="publish-modal" class="popup">
@@ -97,12 +100,23 @@
       Publish standings
     </div>
     <div class="popup-content">
-      <div class="horz">
-        <span>Choose format</span>
-        <button type="button" class="ui blue floating publish-html button">HTML</button>
-        <button type="button" class="ui blue floating publish-egf button">EGF</button>
-        <button type="button" class="ui blue floating publish-ffg button">FFG</button>
-      </div>
+      <form class="ui edit form">
+        <div class="field">
+          <label>Encoding</label>
+          <select id="encoding">
+            <option value="utf-8">UTF-8</option>
+            <option value="iso-8859-1">ISO 8859-1</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Choose format</label>
+          <div class="inline fields">
+            <button type="button" class="ui blue floating publish-html button">HTML</button>
+            <button type="button" class="ui blue floating publish-egf button">EGF</button>
+            <button type="button" class="ui blue floating publish-ffg button">FFG</button>
+          </div>
+        </div>
+      </form>
     </div>
     <div class="popup-footer">
       <div class="form-actions">

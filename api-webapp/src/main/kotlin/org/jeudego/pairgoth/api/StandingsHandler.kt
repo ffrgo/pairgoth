@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletResponse
 import kotlin.math.max
 import kotlin.math.min
 import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
+import java.io.OutputStreamWriter
+import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 
 object StandingsHandler: PairgothApiHandler {
@@ -71,17 +73,29 @@ object StandingsHandler: PairgothApiHandler {
                 }
             }
         }
-        val accept = request.getHeader("Accept")?.substringBefore(";")
-        return when(accept) {
+        val acceptHeader = request.getHeader("Accept") as String?
+        val accept = acceptHeader?.substringBefore(";")
+        val acceptEncoding = acceptHeader?.substringAfter(";charset=", "utf-8") ?: "utf-8"
+        val encoding = when (acceptEncoding) {
+            "utf-8" -> StandardCharsets.UTF_8
+            "iso-8859-1" -> StandardCharsets.ISO_8859_1
+            else -> ApiHandler.badRequest("unknown encoding in Accept header: $accept")
+        }
+        val writer by lazy {
+            PrintWriter(OutputStreamWriter(response.outputStream, encoding))
+        }
+        return when (accept) {
             "application/json" -> sortedPairables.toJsonArray()
             "application/egf" -> {
+                response.contentType = "text/plain;charset=${encoding}"
                 val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
                 if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
-                exportToEGFFormat(tournament, sortedPairables, neededCriteria, response.writer)
+                exportToEGFFormat(tournament, sortedPairables, neededCriteria, writer)
                 return null
             }
             "application/ffg" -> {
-                exportToFFGFormat(tournament, sortedPairables, response.writer)
+                response.contentType = "text/plain;charset=${encoding}"
+                exportToFFGFormat(tournament, sortedPairables, writer)
                 return null
             }
             else -> ApiHandler.badRequest("invalid Accept header: $accept")
@@ -159,7 +173,6 @@ ${
     }
 
     private fun exportToFFGFormat(tournament: Tournament<*>, lines: List<Json.Object>, writer: PrintWriter) {
-        // let's try in UTF-8
         val ret =
 """;name=${tournament.shortName}
 ;date=${frDate.format(tournament.startDate)}

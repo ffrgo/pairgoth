@@ -1,15 +1,18 @@
 function publish(format, extension) {
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
+  let encoding = $('#encoding')[0].value;
   let hdrs = headers();
-  hdrs['Accept'] = `application/${format}`
+  hdrs['Accept'] = `application/${format};charset=${encoding}`
   fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
     headers: hdrs
   }).then(resp => {
-    if (resp.ok) return resp.text()
+    if (resp.ok) return resp.arrayBuffer()
     else throw "publish error"
-  }).then(txt => {
-    let blob = new Blob(['\uFEFF', txt.trim()], {type: 'text/plain;charset=utf-8'});
+  }).then(bytes => {
+    let blob = new Blob(
+      encoding === 'utf-8' ? ['\uFEFF', bytes] : [bytes],
+      { type: `text/plain;charset=${encoding}` });
     downloadFile(blob, `${shortName}.${extension}`);
     close_modal();
   }).catch(err => showError(err));
