@@ -87,8 +87,11 @@ object TokenHandler: ApiHandler {
                     email
                 }".toByteArray(StandardCharsets.UTF_8)
             ).toHex()
+            logger.trace("Expected signature: $expectedSignature")
+            logger.trace("Received signature: $signature")
             if (signature == expectedSignature) {
                 val accessKey = Randomizer.randomString(32)
+                logger.trace("Generating access key: $accessKey")
                 accesses.put(accessKey, Json.Object(
                     "session" to session,
                     "email" to email
@@ -102,6 +105,7 @@ object TokenHandler: ApiHandler {
 
     override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         getAuthorizationPayload(request)?.let { payload ->
+            logger.trace("Invalidating access key for session id ${payload.sessionId} with user infos ${payload.userInfos}")
             accesses.invalidate(payload.accessKey)
         }
         return Json.Object("success" to true)
@@ -112,6 +116,7 @@ object TokenHandler: ApiHandler {
         if (authValues != null && authValues.first.isNotEmpty()) {
             val sessionId = authValues.first
             val challenge = Randomizer.randomString(32)
+            logger.trace("Generated challenge: $challenge")
             challenges.put(sessionId, challenge)
             response.addHeader("WWW-Authenticate", challenge)
             response.status = HttpServletResponse.SC_UNAUTHORIZED
