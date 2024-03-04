@@ -51,7 +51,7 @@
         <div class="field">
           <input name="password" type="password" placeholder="password"/>
         </div>
-        <button id="login-email" type="button" class="ui green floating button">Log in</button>
+        <button id="login-email" type="submit" class="ui green floating button">Log in</button>
       </div>
     </form>
   </div>
@@ -78,7 +78,8 @@
     // ]]#
   #end
     // #[[
-    $('#login-email').on('click', e => {
+    $('#login-form').on('submit', e => {
+      e.preventDefault();
       let form = $('#login-form')[0]
       let password = form.val('password');
       digestMessage(password).then(enc => {
@@ -93,6 +94,7 @@
             }
           });
       });
+      return false;
     });
     // ]]#
   });
