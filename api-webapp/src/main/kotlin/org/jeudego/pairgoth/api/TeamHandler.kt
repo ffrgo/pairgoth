@@ -25,7 +25,7 @@ object TeamHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val team = tournament.teamFromJson(payload)
         tournament.teams[team.id] = team
-        tournament.dispatchEvent(TeamAdded, team.toJson())
+        tournament.dispatchEvent(TeamAdded, request, team.toJson())
         return Json.Object("success" to true, "id" to team.id)
     }
 
@@ -37,7 +37,7 @@ object TeamHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val updated = tournament.teamFromJson(payload, team)
         tournament.teams[updated.id] = updated
-        tournament.dispatchEvent(TeamUpdated, team.toJson())
+        tournament.dispatchEvent(TeamUpdated, request, team.toJson())
         return Json.Object("success" to true)
     }
 
@@ -46,7 +46,7 @@ object TeamHandler: PairgothApiHandler {
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid team selector")
         tournament.teams.remove(id) ?: badRequest("invalid team id")
-        tournament.dispatchEvent(TeamDeleted, Json.Object("id" to id))
+        tournament.dispatchEvent(TeamDeleted, request, Json.Object("id" to id))
         return Json.Object("success" to true)
     }
 }

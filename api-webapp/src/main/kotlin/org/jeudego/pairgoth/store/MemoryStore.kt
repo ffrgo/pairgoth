@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.store
 import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Tournament
 
-class MemoryStore: IStore {
+class MemoryStore: Store {
     private val tournaments = mutableMapOf<ID, Tournament<*>>()
 
     override fun getTournaments(): Map<ID, Map<String, String>> = tournaments.mapValues {

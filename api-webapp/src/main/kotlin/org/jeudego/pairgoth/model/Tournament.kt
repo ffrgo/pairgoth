@@ -9,6 +9,8 @@ import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.store.nextPlayerId
+import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
 import java.util.*
 import kotlin.math.roundToInt
@@ -178,7 +180,7 @@ class TeamTournament(
     }
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(
-        id = json.getInt("id") ?: default?.id ?: Store.nextPlayerId,
+        id = json.getInt("id") ?: default?.id ?: nextPlayerId,
         name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
         final = json.getBoolean("final") ?: default?.final ?: badRequest("missing final")
     ).apply {
@@ -199,7 +201,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
     // No clean way to avoid this redundancy
     val tournament = if (type.playersNumber == 1)
             StandardTournament(
-                id = json.getInt("id") ?: default?.id ?: Store.nextTournamentId,
+                id = json.getInt("id") ?: default?.id ?: nextTournamentId,
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
@@ -217,7 +219,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             )
         else
             TeamTournament(
-                id = json.getInt("id") ?: default?.id ?: Store.nextTournamentId,
+                id = json.getInt("id") ?: default?.id ?: nextTournamentId,
                 type = type,
                 name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),

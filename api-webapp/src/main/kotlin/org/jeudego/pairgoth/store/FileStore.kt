@@ -10,23 +10,40 @@ import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toID
+import org.jeudego.pairgoth.server.WebappManager
 import java.lang.Integer.max
 import java.nio.file.Path
+import java.nio.file.PathMatcher
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.readText
 import kotlin.io.path.useDirectoryEntries
+import kotlin.io.path.walk
 
 private const val LEFT_PAD = 6 // left padding of IDs with '0' in filename
 private fun Tournament<*>.filename() = "${id.toString().padStart(LEFT_PAD, '0')}-${shortName}.tour"
 
-class FileStore(pathStr: String): IStore {
+class FileStore(pathStr: String): Store {
     companion object {
         private val filenameRegex = Regex("^(\\d+)-(.*)\\.tour$")
         private val displayFormat: DateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         private val timestampFormat: DateFormat = SimpleDateFormat("yyyyMMddHHmmss")
         private val timestamp: String get() = timestampFormat.format(Date())
+
+        @OptIn(ExperimentalPathApi::class)
+        private fun getMaxID(): ID {
+            val rootPath = Path.of(WebappManager.properties.getProperty("store.file.path") ?: ".")
+            val globMatcher = PathMatcher { path -> path.fileName.toString().endsWith(".tour") }
+            return rootPath.walk().filter { path -> globMatcher.matches(path) }.mapNotNull { path ->
+                val match = filenameRegex.matchEntire(path.fileName.toString())
+                match?.let { it.groupValues[1].toID() }
+            }.maxOrNull() ?: 0
+        }
+        init {
+            _nextTournamentId.set(getMaxID())
+        }
     }
 
     private val path = Path.of(pathStr).also {
@@ -34,12 +51,9 @@ class FileStore(pathStr: String): IStore {
         if (!file.mkdirs() && !file.isDirectory) throw Error("Property pairgoth.store.file.path must be a directory")
     }
 
-    init {
-        _nextTournamentId.set(getTournaments().keys.maxOrNull() ?: 0.toID())
-    }
-
 
     private fun lastModified(path: Path) = displayFormat.format(Date(path.toFile().lastModified()))
+
 
     override fun getTournaments(): Map<ID, Map<String, String>> {
         return path.useDirectoryEntries("*.tour") { entries ->

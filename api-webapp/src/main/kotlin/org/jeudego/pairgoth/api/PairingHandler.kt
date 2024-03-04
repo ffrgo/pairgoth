@@ -58,7 +58,7 @@ object PairingHandler: PairgothApiHandler {
             }
         val games = tournament.pair(round, pairables)
         val ret = games.map { it.toJson() }.toJsonArray()
-        tournament.dispatchEvent(GamesAdded, Json.Object("round" to round, "games" to ret))
+        tournament.dispatchEvent(GamesAdded, request, Json.Object("round" to round, "games" to ret))
         return ret
     }
 
@@ -98,7 +98,7 @@ object PairingHandler: PairgothApiHandler {
             if (payload.containsKey("t")) {
                 game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
             }
-            tournament.dispatchEvent(GameUpdated, Json.Object("round" to round, "game" to game.toJson()))
+            tournament.dispatchEvent(GameUpdated, request, Json.Object("round" to round, "game" to game.toJson()))
             if (game.table != previousTable) {
                 val sortedPairables = tournament.getSortedPairables(round)
                 val sortedMap = sortedPairables.associateBy {
@@ -113,7 +113,10 @@ object PairingHandler: PairgothApiHandler {
                     val games = tournament.games(round).values.sortedBy {
                         if (it.table == 0) Int.MAX_VALUE else it.table
                     }
-                    tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+                    tournament.dispatchEvent(
+                        TablesRenumbered, request,
+                        Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()))
+                    )
                 }
             }
             return Json.Object("success" to true)
@@ -132,7 +135,10 @@ object PairingHandler: PairgothApiHandler {
                 val games = tournament.games(round).values.sortedBy {
                     if (it.table == 0) Int.MAX_VALUE else it.table
                 }
-                tournament.dispatchEvent(TablesRenumbered, Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())))
+                tournament.dispatchEvent(
+                    TablesRenumbered, request,
+                    Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()))
+                )
             }
             return Json.Object("success" to true)
         }
@@ -161,7 +167,7 @@ object PairingHandler: PairgothApiHandler {
                 }
             }
         }
-        tournament.dispatchEvent(GamesDeleted, Json.Object("round" to round, "games" to payload))
+        tournament.dispatchEvent(GamesDeleted, request, Json.Object("round" to round, "games" to payload))
         return Json.Object("success" to true)
     }
 }

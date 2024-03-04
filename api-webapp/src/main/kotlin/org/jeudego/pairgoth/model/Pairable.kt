@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.model
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.store.nextPlayerId
 import java.util.*
 
 // Pairable
@@ -101,7 +102,7 @@ class Player(
 }
 
 fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Player(
-    id = json.getInt("id") ?: default?.id ?: Store.nextPlayerId,
+    id = json.getInt("id") ?: default?.id ?: nextPlayerId,
     name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
     firstname = json.getString("firstname") ?: default?.firstname ?: badRequest("missing firstname"),
     rating = json.getInt("rating") ?: default?.rating ?: badRequest("missing rating"),

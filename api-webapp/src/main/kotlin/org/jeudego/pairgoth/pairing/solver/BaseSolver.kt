@@ -6,6 +6,7 @@ import org.jeudego.pairgoth.pairing.BasePairingHelper
 import org.jeudego.pairgoth.pairing.detRandom
 import org.jeudego.pairgoth.pairing.nonDetRandom
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.store.nextGameId
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
@@ -118,7 +119,7 @@ sealed class BaseSolver(
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
-        if (chosenByePlayer != ByePlayer) result += Game(id = Store.nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
+        if (chosenByePlayer != ByePlayer) result += Game(id = nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
         val DEBUG_EXPORT_WEIGHT = false
         if (DEBUG_EXPORT_WEIGHT) {
@@ -554,6 +555,6 @@ sealed class BaseSolver(
         // CB TODO team of individuals pairing
         val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
         usedTables.set(table)
-        return listOf(Game(id = Store.nextGameId, table = table, black = black.id, white = white.id, handicap = hd(white = white, black = black), drawnUpDown = dudd(black, white)))
+        return listOf(Game(id = nextGameId, table = table, black = black.id, white = white.id, handicap = hd(white = white, black = black), drawnUpDown = dudd(black, white)))
     }
 }

@@ -7,6 +7,9 @@ import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.opengotha.TournamentType
 import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.Store
+import org.jeudego.pairgoth.store.nextGameId
+import org.jeudego.pairgoth.store.nextPlayerId
+import org.jeudego.pairgoth.store.nextTournamentId
 import org.w3c.dom.Element
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -118,7 +121,7 @@ object OpenGotha {
         )
 
         val tournament = StandardTournament(
-            id = Store.nextTournamentId,
+            id = nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
             name = genParams.name,
             shortName = genParams.shortName,
@@ -153,7 +156,7 @@ object OpenGotha {
         // import players
         ogTournament.players.player.map { player ->
             Player(
-                id = Store.nextPlayerId,
+                id = nextPlayerId,
                 name = player.name,
                 firstname = player.firstName,
                 rating = player.rating,
@@ -174,7 +177,7 @@ object OpenGotha {
         }.entries.sortedBy { it.key }.map {
             it.value.map { game ->
                 Game(
-                    id = Store.nextGameId,
+                    id = nextGameId,
                     table = game.tableNumber,
                     black = canonicMap[game.blackPlayer] ?: throw Error("player not found: ${game.blackPlayer}"),
                     white = canonicMap[game.whitePlayer] ?: throw Error("player not found: ${game.whitePlayer}"),

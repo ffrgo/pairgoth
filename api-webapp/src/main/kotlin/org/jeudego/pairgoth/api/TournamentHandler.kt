@@ -9,9 +9,9 @@ import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.server.ApiServlet
 import org.jeudego.pairgoth.server.Event.*
+import org.jeudego.pairgoth.store.getStore
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -21,12 +21,12 @@ object TournamentHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val accept = request.getHeader("Accept")
         return when (val id = getSelector(request)?.toIntOrNull()) {
-            null -> Store.getTournaments().toJsonObject()
+            null -> getStore(request).getTournaments().toJsonObject()
             else ->
                 when {
-                    ApiServlet.isJson(accept) -> Store.getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")
+                    ApiServlet.isJson(accept) -> getStore(request).getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")
                     ApiServlet.isXml(accept) -> {
-                        val export = Store.getTournament(id)?.let { OpenGotha.export(it) } ?: badRequest("no tournament with id #${id}")
+                        val export = getStore(request).getTournament(id)?.let { OpenGotha.export(it) } ?: badRequest("no tournament with id #${id}")
                         response.contentType = "application/xml; charset=UTF-8"
                         response.writer.write(export)
                         null // return null to indicate that we handled the response ourself
@@ -42,8 +42,8 @@ object TournamentHandler: PairgothApiHandler {
             is Element -> OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
-        Store.addTournament(tournament)
-        tournament.dispatchEvent(TournamentAdded, tournament.toJson())
+        getStore(request).addTournament(tournament)
+        tournament.dispatchEvent(TournamentAdded, request, tournament.toJson())
         return Json.Object("success" to true, "id" to tournament.id)
     }
 
@@ -63,14 +63,14 @@ object TournamentHandler: PairgothApiHandler {
             clear()
             putAll(tournament.games(round))
         }
-        updated.dispatchEvent(TournamentUpdated, updated.toJson())
+        updated.dispatchEvent(TournamentUpdated, request, updated.toJson())
         return Json.Object("success" to true)
     }
 
     override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
-        Store.deleteTournament(tournament)
-        tournament.dispatchEvent(TournamentDeleted, Json.Object("id" to tournament.id))
+        getStore(request).deleteTournament(tournament)
+        tournament.dispatchEvent(TournamentDeleted, request, Json.Object("id" to tournament.id))
         return Json.Object("success" to true)
     }
 }
