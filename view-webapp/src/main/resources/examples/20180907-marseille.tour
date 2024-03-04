@@ -1,0 +1,1494 @@
+{
+  "type" : "INDIVIDUAL",
+  "name" : "Frioul 2018",
+  "shortName" : "Frioul",
+  "startDate" : "2018-09-07",
+  "endDate" : "2018-09-09",
+  "country" : "fr",
+  "location" : "Frioul",
+  "online" : false,
+  "komi" : 7.5,
+  "rules" : "FRENCH",
+  "gobanSize" : 19,
+  "timeSystem" : {
+    "type" : "CANADIAN",
+    "mainTime" : 60,
+    "byoyomi" : 300,
+    "stones" : 15
+  },
+  "rounds" : 4,
+  "pairing" : {
+    "type" : "MAC_MAHON",
+    "base" : {
+      "nx1" : 0.5,
+      "dupWeight" : 5.0E14,
+      "random" : 0.0,
+      "colorBalanceWeight" : 1000000.0
+    },
+    "main" : {
+      "catWeight" : 0.0,
+      "scoreWeight" : 1.0E11,
+      "upDownWeight" : 1.0E8,
+      "upDownCompensate" : true,
+      "upDownLowerMode" : "MIDDLE",
+      "upDownUpperMode" : "MIDDLE",
+      "maximizeSeeding" : 5000000.0,
+      "firstSeedLastRound" : 2,
+      "firstSeed" : "SPLIT_AND_RANDOM",
+      "secondSeed" : "SPLIT_AND_SLIP",
+      "firstSeedAddCrit" : "RATING",
+      "secondSeedAddCrit" : "NONE"
+    },
+    "secondary" : {
+      "barThreshold" : true,
+      "rankThreshold" : 0,
+      "winsThreshold" : false,
+      "secWeight" : 1.0E11
+    },
+    "geo" : {
+      "weight" : 1.215752192E9,
+      "mmsDiffCountry" : 1,
+      "mmsDiffClubGroup" : 2,
+      "mmsDiffClub" : 3
+    },
+    "handicap" : {
+      "weight" : 0.0,
+      "useMMS" : true,
+      "threshold" : 0,
+      "correction" : 1,
+      "ceiling" : 9
+    },
+    "placement" : [
+      "MMS",
+      "SOSM",
+      "SOSOSM"
+    ],
+    "mmFloor" : -20,
+    "mmBar" : 0
+  },
+  "players" : [
+    {
+      "id" : 783,
+      "name" : "Mignucci",
+      "firstname" : "Bernard",
+      "rating" : 1778,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 784,
+      "name" : "Lakssil",
+      "firstname" : "Maleek",
+      "rating" : 1917,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "76Ro"
+    },
+    {
+      "id" : 785,
+      "name" : "Tournellec",
+      "firstname" : "Julien",
+      "rating" : 2050,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 786,
+      "name" : "Becker",
+      "firstname" : "Denis",
+      "rating" : 1276,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 787,
+      "name" : "Lefebvre",
+      "firstname" : "Louise",
+      "rating" : -400,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 788,
+      "name" : "Lefebvre",
+      "firstname" : "Nina",
+      "rating" : -400,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 789,
+      "name" : "Guerre-Genton",
+      "firstname" : "Philippe",
+      "rating" : 2064,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 790,
+      "name" : "Goloubkov",
+      "firstname" : "Alexandra",
+      "rating" : 1023,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 791,
+      "name" : "Berreby",
+      "firstname" : "Monique",
+      "rating" : 1951,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 792,
+      "name" : "Marechal",
+      "firstname" : "Morgane",
+      "rating" : 696,
+      "rank" : -14,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 793,
+      "name" : "Crepy",
+      "firstname" : "Pascal",
+      "rating" : 1373,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 794,
+      "name" : "Leclercq",
+      "firstname" : "Philippe",
+      "rating" : 523,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 795,
+      "name" : "Vaca",
+      "firstname" : "Jean-François",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 796,
+      "name" : "Detivaud",
+      "firstname" : "Pierre",
+      "rating" : 1817,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 797,
+      "name" : "Nguyen_The",
+      "firstname" : "Minh",
+      "rating" : 1559,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 798,
+      "name" : "Coppey",
+      "firstname" : "Philippe",
+      "rating" : 1317,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 799,
+      "name" : "Cornaggia",
+      "firstname" : "Rémi",
+      "rating" : 1841,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 800,
+      "name" : "Pastorino",
+      "firstname" : "Alexandre",
+      "rating" : 500,
+      "rank" : -16,
+      "country" : "Fr",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 801,
+      "name" : "Buffard",
+      "firstname" : "Yann",
+      "rating" : -900,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 802,
+      "name" : "Blanckaert",
+      "firstname" : "Till",
+      "rating" : 1392,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 803,
+      "name" : "Martin",
+      "firstname" : "Yvan",
+      "rating" : 1567,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "44Na"
+    },
+    {
+      "id" : 804,
+      "name" : "Rioland",
+      "firstname" : "Florent",
+      "rating" : 2336,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 805,
+      "name" : "Spano",
+      "firstname" : "Christelle",
+      "rating" : 261,
+      "rank" : -18,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 806,
+      "name" : "Thao",
+      "firstname" : "Stéphane",
+      "rating" : 1893,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 807,
+      "name" : "Morel",
+      "firstname" : "Aurélien",
+      "rating" : 2119,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38GJ"
+    },
+    {
+      "id" : 808,
+      "name" : "Damaz",
+      "firstname" : "Dani",
+      "rating" : 1785,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 809,
+      "name" : "Betored",
+      "firstname" : "Didier",
+      "rating" : 1258,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 810,
+      "name" : "Mougin",
+      "firstname" : "Déborah",
+      "rating" : 1346,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 811,
+      "name" : "Artigny",
+      "firstname" : "Julie",
+      "rating" : 1790,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "83SA"
+    },
+    {
+      "id" : 812,
+      "name" : "Lefebvre",
+      "firstname" : "Loïc",
+      "rating" : 2131,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 813,
+      "name" : "Guibert",
+      "firstname" : "Cécile",
+      "rating" : 1850,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 814,
+      "name" : "Coppe",
+      "firstname" : "Bernard",
+      "rating" : 1898,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 815,
+      "name" : "Bonat",
+      "firstname" : "Axel",
+      "rating" : 1974,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "13Mr"
+    },
+    {
+      "id" : 816,
+      "name" : "Roubertie",
+      "firstname" : "Julien",
+      "rating" : 2382,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 817,
+      "name" : "Lefebvre",
+      "firstname" : "Antoine",
+      "rating" : 1941,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 818,
+      "name" : "Couffignal",
+      "firstname" : "Marie",
+      "rating" : 784,
+      "rank" : -13,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 819,
+      "name" : "Carbonnel",
+      "firstname" : "Roland",
+      "rating" : 1662,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 820,
+      "name" : "Blanco",
+      "firstname" : "Cyril",
+      "rating" : 480,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 821,
+      "name" : "Brochet",
+      "firstname" : "Philippe",
+      "rating" : 1660,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "84Va"
+    },
+    {
+      "id" : 822,
+      "name" : "Lacroix",
+      "firstname" : "Caroline",
+      "rating" : 877,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 823,
+      "name" : "Lextrait",
+      "firstname" : "Cesar",
+      "rating" : 2265,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 824,
+      "name" : "le_Lidec",
+      "firstname" : "Gaël",
+      "rating" : 1418,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 825,
+      "name" : "Col",
+      "firstname" : "Sylvain",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 826,
+      "name" : "Stieglitz",
+      "firstname" : "Robin",
+      "rating" : 1916,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 827,
+      "name" : "Dumas",
+      "firstname" : "Olivier",
+      "rating" : 1271,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 828,
+      "name" : "Passow",
+      "firstname" : "Adrian",
+      "rating" : 2354,
+      "rank" : 3,
+      "country" : "DE",
+      "club" : "B"
+    },
+    {
+      "id" : 829,
+      "name" : "Ferreira",
+      "firstname" : "Joao",
+      "rating" : 1179,
+      "rank" : -9,
+      "country" : "PT",
+      "club" : "xxxx"
+    },
+    {
+      "id" : 830,
+      "name" : "le_Lidec",
+      "firstname" : "Philémon",
+      "rating" : -292,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 831,
+      "name" : "Margouillet",
+      "firstname" : "Kevin",
+      "rating" : 290,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 832,
+      "name" : "Pettex",
+      "firstname" : "Romain",
+      "rating" : 600,
+      "rank" : -15,
+      "country" : "Fr",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 833,
+      "name" : "Imhoff",
+      "firstname" : "Lisa",
+      "rating" : 574,
+      "rank" : -15,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 834,
+      "name" : "Hueber",
+      "firstname" : "Jean-Philippe",
+      "rating" : 1880,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "84Va"
+    },
+    {
+      "id" : 835,
+      "name" : "Camps",
+      "firstname" : "Marie-Françoise",
+      "rating" : 1149,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 836,
+      "name" : "Reynal",
+      "firstname" : "Sylvain",
+      "rating" : 1078,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 837,
+      "name" : "Ghyselen",
+      "firstname" : "Guillaume",
+      "rating" : 1857,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 838,
+      "name" : "Fronteri",
+      "firstname" : "Pierre",
+      "rating" : 1590,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 839,
+      "name" : "Brisson",
+      "firstname" : "Claude",
+      "rating" : 1504,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 840,
+      "name" : "Jumelin",
+      "firstname" : "Macha",
+      "rating" : 1421,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "38Gr"
+    }
+  ],
+  "games" : [
+    [
+      {
+        "id" : 2,
+        "t" : 1,
+        "w" : 812,
+        "b" : 816,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 3,
+        "t" : 2,
+        "w" : 828,
+        "b" : 815,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 4,
+        "t" : 3,
+        "w" : 789,
+        "b" : 804,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 5,
+        "t" : 4,
+        "w" : 785,
+        "b" : 807,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 6,
+        "t" : 5,
+        "w" : 791,
+        "b" : 806,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 7,
+        "t" : 6,
+        "w" : 837,
+        "b" : 817,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 8,
+        "t" : 7,
+        "w" : 784,
+        "b" : 813,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 9,
+        "t" : 8,
+        "w" : 834,
+        "b" : 826,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 10,
+        "t" : 9,
+        "w" : 814,
+        "b" : 811,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 11,
+        "t" : 10,
+        "w" : 799,
+        "b" : 783,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 12,
+        "t" : 11,
+        "w" : 808,
+        "b" : 796,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 13,
+        "t" : 12,
+        "w" : 821,
+        "b" : 819,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 14,
+        "t" : 13,
+        "w" : 803,
+        "b" : 825,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 15,
+        "t" : 14,
+        "w" : 838,
+        "b" : 797,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 16,
+        "t" : 15,
+        "w" : 840,
+        "b" : 793,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 17,
+        "t" : 16,
+        "w" : 802,
+        "b" : 824,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 18,
+        "t" : 17,
+        "w" : 810,
+        "b" : 809,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 19,
+        "t" : 18,
+        "w" : 827,
+        "b" : 798,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 20,
+        "t" : 19,
+        "w" : 786,
+        "b" : 829,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 21,
+        "t" : 20,
+        "w" : 835,
+        "b" : 822,
+        "h" : 1,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 22,
+        "t" : 21,
+        "w" : 790,
+        "b" : 836,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 23,
+        "t" : 22,
+        "w" : 818,
+        "b" : 792,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 24,
+        "t" : 23,
+        "w" : 832,
+        "b" : 820,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 25,
+        "t" : 24,
+        "w" : 833,
+        "b" : 800,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 26,
+        "t" : 25,
+        "w" : 794,
+        "b" : 831,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 27,
+        "t" : 26,
+        "w" : 805,
+        "b" : 830,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 28,
+        "t" : 27,
+        "w" : 795,
+        "b" : 788,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 29,
+        "t" : 28,
+        "w" : 801,
+        "b" : 787,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 30,
+        "t" : 25,
+        "w" : 820,
+        "b" : 795,
+        "h" : 2,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 31,
+        "t" : 26,
+        "w" : 831,
+        "b" : 805,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 32,
+        "t" : 27,
+        "w" : 787,
+        "b" : 830,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 33,
+        "t" : 28,
+        "w" : 788,
+        "b" : 801,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 34,
+        "t" : 1,
+        "w" : 816,
+        "b" : 828,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 35,
+        "t" : 2,
+        "w" : 804,
+        "b" : 807,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 36,
+        "t" : 4,
+        "w" : 789,
+        "b" : 785,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 37,
+        "t" : 5,
+        "w" : 815,
+        "b" : 784,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 38,
+        "t" : 7,
+        "w" : 817,
+        "b" : 814,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 39,
+        "t" : 8,
+        "w" : 813,
+        "b" : 806,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 40,
+        "t" : 9,
+        "w" : 783,
+        "b" : 834,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 41,
+        "t" : 10,
+        "w" : 796,
+        "b" : 837,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 42,
+        "t" : 11,
+        "w" : 799,
+        "b" : 821,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 43,
+        "t" : 12,
+        "w" : 811,
+        "b" : 808,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 44,
+        "t" : 13,
+        "w" : 819,
+        "b" : 797,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 45,
+        "t" : 14,
+        "w" : 803,
+        "b" : 838,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 46,
+        "t" : 15,
+        "w" : 825,
+        "b" : 802,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 47,
+        "t" : 16,
+        "w" : 809,
+        "b" : 840,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 48,
+        "t" : 17,
+        "w" : 824,
+        "b" : 786,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 49,
+        "t" : 18,
+        "w" : 793,
+        "b" : 827,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 50,
+        "t" : 19,
+        "w" : 798,
+        "b" : 810,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 51,
+        "t" : 20,
+        "w" : 829,
+        "b" : 790,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 52,
+        "t" : 22,
+        "w" : 836,
+        "b" : 822,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 53,
+        "t" : 23,
+        "w" : 792,
+        "b" : 832,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 54,
+        "t" : 24,
+        "w" : 800,
+        "b" : 794,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 55,
+        "t" : 1,
+        "w" : 807,
+        "b" : 816,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 56,
+        "t" : 2,
+        "w" : 785,
+        "b" : 804,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 57,
+        "t" : 3,
+        "w" : 806,
+        "b" : 812,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 58,
+        "t" : 4,
+        "w" : 814,
+        "b" : 789,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 59,
+        "t" : 5,
+        "w" : 834,
+        "b" : 784,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 60,
+        "t" : 6,
+        "w" : 815,
+        "b" : 783,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 61,
+        "t" : 7,
+        "w" : 817,
+        "b" : 796,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 62,
+        "t" : 8,
+        "w" : 813,
+        "b" : 803,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 63,
+        "t" : 9,
+        "w" : 808,
+        "b" : 799,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 64,
+        "t" : 10,
+        "w" : 797,
+        "b" : 821,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 65,
+        "t" : 11,
+        "w" : 840,
+        "b" : 825,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 66,
+        "t" : 12,
+        "w" : 802,
+        "b" : 793,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 67,
+        "t" : 13,
+        "w" : 786,
+        "b" : 798,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 68,
+        "t" : 14,
+        "w" : 824,
+        "b" : 810,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 69,
+        "t" : 15,
+        "w" : 827,
+        "b" : 809,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 70,
+        "t" : 16,
+        "w" : 829,
+        "b" : 836,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 71,
+        "t" : 17,
+        "w" : 835,
+        "b" : 790,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 72,
+        "t" : 18,
+        "w" : 822,
+        "b" : 792,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 73,
+        "t" : 19,
+        "w" : 818,
+        "b" : 800,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 74,
+        "t" : 20,
+        "w" : 832,
+        "b" : 794,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 75,
+        "t" : 21,
+        "w" : 820,
+        "b" : 805,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 76,
+        "t" : 22,
+        "w" : 831,
+        "b" : 801,
+        "h" : 3,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 77,
+        "t" : 23,
+        "w" : 787,
+        "b" : 795,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 78,
+        "t" : 24,
+        "w" : 830,
+        "b" : 788,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 79,
+        "t" : 1,
+        "w" : 807,
+        "b" : 814,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 80,
+        "t" : 2,
+        "w" : 816,
+        "b" : 804,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 81,
+        "t" : 3,
+        "w" : 812,
+        "b" : 817,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 82,
+        "t" : 4,
+        "w" : 784,
+        "b" : 785,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 83,
+        "t" : 5,
+        "w" : 826,
+        "b" : 806,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 84,
+        "t" : 6,
+        "w" : 815,
+        "b" : 834,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 85,
+        "t" : 7,
+        "w" : 783,
+        "b" : 808,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 86,
+        "t" : 8,
+        "w" : 821,
+        "b" : 786,
+        "h" : 2,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 87,
+        "t" : 9,
+        "w" : 803,
+        "b" : 799,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 88,
+        "t" : 10,
+        "w" : 825,
+        "b" : 819,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 89,
+        "t" : 12,
+        "w" : 838,
+        "b" : 802,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 90,
+        "t" : 13,
+        "w" : 840,
+        "b" : 798,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 91,
+        "t" : 14,
+        "w" : 793,
+        "b" : 810,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 92,
+        "t" : 15,
+        "w" : 829,
+        "b" : 827,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 93,
+        "t" : 17,
+        "w" : 809,
+        "b" : 790,
+        "h" : 1,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 94,
+        "t" : 18,
+        "w" : 835,
+        "b" : 818,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 95,
+        "t" : 19,
+        "w" : 822,
+        "b" : 833,
+        "h" : 2,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 96,
+        "t" : 20,
+        "w" : 792,
+        "b" : 800,
+        "h" : 2,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 97,
+        "t" : 21,
+        "w" : 832,
+        "b" : 831,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 98,
+        "t" : 22,
+        "w" : 794,
+        "b" : 820,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 99,
+        "t" : 23,
+        "w" : 805,
+        "b" : 795,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 100,
+        "t" : 24,
+        "w" : 788,
+        "b" : 787,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ]
+  ]
+}

@@ -1,6 +1,12 @@
 package org.jeudego.pairgoth.view
 
 import com.republicate.kson.Json
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.ExperimentalPathApi
+import kotlin.io.path.walk
+
 
 /**
  * Generic utilities
@@ -71,4 +77,21 @@ class PairgothTool {
         games.filter {
             it.getInt("b")!! != 0 && it.getInt("w")!! != 0
         }
+
+    @OptIn(ExperimentalPathApi::class)
+    fun getExampleTournaments(): List<String> {
+        val classLoader: ClassLoader = PairgothTool::class.java.classLoader
+        val examplesPath = Paths.get(classLoader.getResource(EXAMPLES_DIRECTORY).toURI())
+        return examplesPath.walk().filter(Files::isRegularFile).map { it.fileName.toString().removeSuffix(".tour") }.sorted().toList()
+    }
+
+    fun getExampleTournament(name: String): Json.Object {
+        val classLoader: ClassLoader = PairgothTool::class.java.classLoader
+        return Json.parse(classLoader.getResource("$EXAMPLES_DIRECTORY/$name.tour").readText())?.asObject()
+            ?: throw Error("wrong resource file")
+    }
+
+    companion object {
+        const val EXAMPLES_DIRECTORY = "examples"
+    }
 }

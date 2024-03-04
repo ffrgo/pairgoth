@@ -21,6 +21,8 @@ Cancel	Annuler
 Change	Mettre à jour
 Chinese rules	Règles chinoises
 Choose format	Choix du format
+Clone	Dupliquer
+Clone example tournament	Dupliquer un tournoi d'exemple
 Close	Fermer
 Club	Club
 Compile from the sources	Compiler depuis les sources&nbsp;
@@ -34,6 +36,7 @@ Download the standalone web interface module which suits your need, then follow	
 Edit	Éditer
 Encoding	Encodage
 Enter the magic word	Entrer le mot magique
+Example tournament	Tournoi
 Export	Exporter
 Export tournament	Exporter le tournoi
 Family name	Nom de famille

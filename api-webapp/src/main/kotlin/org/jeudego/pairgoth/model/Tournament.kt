@@ -235,8 +235,18 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
             )
-    json["pairables"]?.let { pairables ->
-
+    (json["players"] as Json.Array?)?.forEach { obj ->
+        val pairable = obj as Json.Object
+        tournament.players[pairable.getID("id")!!] = Player.fromJson(pairable)
+    }
+    (json["games"] as Json.Array?)?.forEachIndexed { i, arr ->
+        val round = i + 1
+        val tournamentGames = tournament.games(round)
+        val games = arr as Json.Array
+        games.forEach { obj ->
+            val game = obj as Json.Object
+            tournamentGames[game.getID("id")!!] = Game.fromJson(game)
+        }
     }
     return tournament
 }

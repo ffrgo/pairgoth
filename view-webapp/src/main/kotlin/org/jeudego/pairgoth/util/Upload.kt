@@ -20,7 +20,8 @@ object Upload {
         // Check that we have a file upload request
         val isMultipart: Boolean = ServletFileUpload.isMultipartContent(request)
         if (!isMultipart) {
-            throw IOException("multipart content expected")
+            logger.warn("multipart content expected")
+            return listOf()
         }
         val files = mutableListOf<Pair<String, ByteArray>>()
 
