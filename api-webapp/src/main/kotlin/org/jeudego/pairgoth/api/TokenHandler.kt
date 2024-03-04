@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.api
 import com.github.benmanes.caffeine.cache.Cache
 import com.github.benmanes.caffeine.cache.Caffeine
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
 import org.jeudego.pairgoth.server.ApiServlet
 import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.Cryptograph
@@ -32,9 +33,11 @@ object TokenHandler: ApiHandler {
 
     private fun parseAuthorizationHeader(request: HttpServletRequest): Pair<String, String>? {
         val authorize = request.getHeader(AUTH_HEADER) as String?
+        logger.trace("Found authentication header: $authorize")
         if (authorize != null && authorize.startsWith("$AUTH_PREFIX ")) {
             val bearer = authorize.substring(AUTH_PREFIX.length + 1)
             val clear = cryptograph.webDecrypt(bearer)
+            logger.trace("Decrypted bearer: $clear")
             val parts = clear.split(':')
             if (parts.size == 2) {
                 return Pair(parts[0], parts[1])
@@ -45,8 +48,11 @@ object TokenHandler: ApiHandler {
 
     private fun getAuthorizationPayload(request: HttpServletRequest): AuthorizationPayload? {
         parseAuthorizationHeader(request)?.let { (sessionId, accessKey) ->
+            logger.trace("Session ID: $sessionId")
+            logger.trace("Access key: $accessKey")
             val accessPayload = accesses.getIfPresent(accessKey)
             if (accessPayload != null && sessionId == accessPayload.getString("session")) {
+                logger.trace("Found matching entry: $accessPayload")
                 return AuthorizationPayload(sessionId, accessKey, accessPayload)
             }
         }
