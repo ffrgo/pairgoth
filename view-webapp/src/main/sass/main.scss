@@ -206,6 +206,10 @@
   .ui.table>tbody>tr>td, .ui.table>tr>td {
     padding: 0.2em 0.2em;
   }
+  select.ui.dropdown {
+    height: unset;
+    font-size: inherit;
+  }
 
   .step, .step .title { font-size: 1em; }
   .step:before { font-size: 1em; }

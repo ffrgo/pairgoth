@@ -269,14 +269,13 @@ onLoad(() => {
     store(id, value);
     initSearch();
   });
-  $('#list-header .toggle').on('click', e => {
-    let chk = e.target.closest('.toggle');
-    let checkbox = chk.find('input')[0];
-    checkbox.checked = !checkbox.checked;
-    if (checkbox.checked) {
+  $('#reglist-mode').on('change', e => {
+    let mode = e.target.value;
+    $('td.reg-status').forEach(node => node.parentNode.removeClass('filtered'));
+    if (mode === 'prelim') {
+      $('td.reg-status.final').forEach(node => node.parentNode.addClass('filtered'));
+    } else if (mode === 'final') {
       $('td.reg-status:not(.final)').forEach(node => node.parentNode.addClass('filtered'));
-    } else {
-      $('td.reg-status:not(.final)').forEach(node => node.parentNode.removeClass('filtered'));
     }
   });
   document.on('click', e => {

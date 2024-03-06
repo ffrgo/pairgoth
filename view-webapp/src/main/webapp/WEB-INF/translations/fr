@@ -43,6 +43,7 @@ Export tournament	Exporter le tournoi
 Family name	Nom de famille
 Filter	Filtrer
 Filter...	Filtrer…
+Final only	Inscriptions finales
 First name	Prénom
 Fischer timing	Cadence Fischer
 French rules	Règles françaises
@@ -80,13 +81,16 @@ Next rounds seeding	Méthode rondes suivantes
 OpenGotha file	Fichier OpenGotha
 Pair	Apparier
 Pair-go tournament	Tournoi de pair-go
-Pairing	Appariement
+Pairing	Appariements
 Pairings for round	Appariement pour la ronde
 Participation	Participation
+Preliminary and final	Toutes les inscriptions
+Preliminary only	Inscriptions préliminaires
 Publish	Publier
 Publish standings	Publier le classement
 Rank	Niveau
 Rating	Classement
+Reg	Inscr.
 Register	Inscrire
 Registration	Inscriptions
 Rengo with 2 players teams	Rengo par équipes de 2
