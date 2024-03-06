@@ -10,7 +10,7 @@ onLoad(() => {
     if ($('#tournament-infos').hasClass('edit') && typeof(tour_id) !== 'undefined') {
       $('#tournament-infos').removeClass('edit')
     } else {
-      document.location.href = '/index';
+      window.location.href = '/index';
     }
     return false;
   });
@@ -105,6 +105,17 @@ onLoad(() => {
 
   $('#export').on('click', e => {
     modal('export-modal');
+  });
+
+  $('#delete').on('click', e => {
+    if (confirm('Supprimer ce tournoi ?')) {
+      api.deleteJson(`tour/${tour_id}`, {})
+        .then(resp => {
+          if (resp !== 'error') {
+            window.location.href = '/index';
+          }
+        })
+    }
   });
 
   $('#export-pairgoth').on('click', e => {
