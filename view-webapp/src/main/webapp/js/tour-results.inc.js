@@ -53,12 +53,13 @@ onLoad(()=>{
     let newResult = results[(index + 1)%results.length];
     setResult(gameId, newResult, oldResult);
   });
-  $('#filter').on('click', e=>{
-    let filter = $('#filter-results')[0].checked;
-    if (filter) {
-      $('#results-table tr').filter(':not(:has(td.result[data-result="?"]))').addClass('filtered');
+  $('#results-filter').on('click', e => {
+    let filter = $('#results-filter input')[0];
+    filter.checked = !filter.checked;
+    if (filter.checked) {
+      $('#results-table tbody tr').filter(':not(:has(td.result[data-result="?"]))').addClass('filtered');
     } else {
-      $('#results-table tr').removeClass('filtered');
+      $('#results-table tbody tr').removeClass('filtered');
     }
   });
 });
