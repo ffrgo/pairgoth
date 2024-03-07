@@ -92,11 +92,13 @@ object StandingsHandler: PairgothApiHandler {
                 val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
                 if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
                 exportToEGFFormat(tournament, sortedPairables, neededCriteria, writer)
+                writer.flush()
                 return null
             }
             "application/ffg" -> {
                 response.contentType = "text/plain;charset=${encoding}"
                 exportToFFGFormat(tournament, sortedPairables, writer)
+                writer.flush()
                 return null
             }
             else -> ApiHandler.badRequest("invalid Accept header: $accept")

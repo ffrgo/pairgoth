@@ -27,7 +27,9 @@ class ImportServlet: HttpServlet() {
                     if (json == null || !json.isObject) {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     } else {
-                        apiResp = api.post("tour", json.asObject())
+                        val filtered = Json.MutableObject(json.asObject())
+                        filtered.remove("id")
+                        apiResp = api.post("tour", filtered)
                     }
                 }
                 else { // xml ?
@@ -55,8 +57,10 @@ class ImportServlet: HttpServlet() {
         if (example == null || !example.isObject) {
             response.sendError(HttpServletResponse.SC_BAD_REQUEST)
         } else {
+            val filtered = Json.MutableObject(example.asObject())
+            filtered.remove("id")
             val api = ApiTool().apply { setRequest(request) }
-            val apiResp = api.post("tour", example)
+            val apiResp = api.post("tour", filtered)
             if (apiResp.isObject && apiResp.asObject().getBoolean("success") == true) {
                 response.contentType = "application/json; charset=UTF-8"
                 response.writer.println(apiResp.toString())
