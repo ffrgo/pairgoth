@@ -235,27 +235,30 @@
 <div id="macmahon-groups" class="wide popup">
   <div class="popup-body">
     <div class="popup-content">
-      <div id="under-group" class="multi-select" title="bar-1">
-  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar - 1))
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #set($underGroup = $mmsMap.get(30 + $tour.pairing.mmBar - 1))
+      <div id="under-group" class="multi-select" title="bar-1#if($underGroup && $underGroup.size() > 0), $underGroup.size() players#end">
+  #foreach($part in $underGroup)
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
   #end
       </div>
       <div class="pairing-buttons">
         <button id="under-to-top" class="ui blue icon floating button"><i class="angle double right icon"></i></button>
         <button id="top-to-under" class="ui orange icon floating button"><i class="angle double left icon"></i></button>
       </div>
-      <div id="top-group" class="multi-select" title="top group">
-  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar))
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #set($topGroup = $mmsMap.get(30 + $tour.pairing.mmBar))
+      <div id="top-group" class="multi-select" title="bar (top group)#if($topGroup && $topGroup.size() > 0), $topGroup.size() players#end">
+  #foreach($part in $topGroup)
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
   #end
       </div>
       <div class="pairing-buttons">
         <button id="top-to-super" class="ui blue icon floating button"><i class="angle double right icon"></i></button>
         <button id="super-to-top" class="ui orange icon floating button"><i class="angle double left icon"></i></button>
       </div>
-      <div id="super-group" class="multi-select" title="super group">
-  #foreach($part in $mmsMap.get(30 + $tour.pairing.mmBar + 1))
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+  #set($superGroup = $mmsMap.get(30 + $tour.pairing.mmBar + 1))
+      <div id="super-group" class="multi-select" title="bar+1 (super group)#if($superGroup && $superGroup.size() > 0), $superGroup.size() players#end">
+  #foreach($part in $superGroup)
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
   #end
       </div>
     </div>
