@@ -11,7 +11,7 @@ abstract class BasePairingHelper(
     val placement: PlacementParams,
     ) {
 
-    abstract val scores: Map<ID, Double>
+    abstract val scores: Map<ID, Pair<Double, Double>>
     val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
     else HistoryHelper(history) { scores }
 
@@ -19,7 +19,7 @@ abstract class BasePairingHelper(
 
     // The main criterion that will be used to define the groups should be defined by subclasses
     // SOS and variants will be computed based on this score
-    val Pairable.main: Double get() = scores[id] ?: 0.0
+    val Pairable.main: Double get() = scores[id]?.second ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
 
     // pairables sorted using overloadable sort function

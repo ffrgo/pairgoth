@@ -4,33 +4,48 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
+import org.jeudego.pairgoth.model.Pairable.Companion.MIN_RANK
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.historyBefore
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 //  TODO CB avoid code redundancy with solvers
 
-fun Tournament<*>.mmBase(pairable: Pairable): Double {
-    if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
-    return min(max(pairable.rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + pairable.mmsCorrection
-}
-
 fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
+
+    fun Pairable.mmBase(): Double {
+        if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
+        return min(max(rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + mmsCorrection
+    }
+
+    fun roundScore(score: Double): Double {
+        val epsilon = 0.00001
+        // Note: this works for now because we only have .0 and .5 fractional parts
+        return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
+        else ceil(score - epsilon)
+    }
+
     val historyHelper = HistoryHelper(historyBefore(round + 1)) {
-        if (pairing.type == PairingType.SWISS) wins
+        if (pairing.type == PairingType.SWISS) wins.mapValues { Pair(0.0, it.value) }
         else pairables.mapValues {
-            it.value.let {
-                    pairable ->
-                mmBase(pairable) +
-                        (nbW(pairable) ?: 0.0) + // TODO take tournament parameter into account
-                        (1..round).map { round ->
-                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
-                        }.sum() * pairing.pairingParams.main.mmsValueAbsent
+            it.value.let { pairable ->
+                val mmBase = pairable.mmBase()
+                Pair(
+                    mmBase,
+                    roundScore(mmBase +
+                            (nbW(pairable) ?: 0.0) + // TODO take tournament parameter into account
+                            (1..round).map { round ->
+                                if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
+                            }.sum() * pairing.pairingParams.main.mmsValueAbsent)
+                )
             }
         }
     }

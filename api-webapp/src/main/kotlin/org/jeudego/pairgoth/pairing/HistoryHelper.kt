@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
 
-open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: HistoryHelper.()-> Map<ID, Double>) {
+open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
 
     // List of all the pairables ID present in the history
     val allPairables = history.flatten()
@@ -95,25 +95,31 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     }
 
     // define mms to be a synonym of scores
-    val mms by lazy { scores }
+    val mms by lazy { scores.mapValues { it -> it.value.second } }
 
     // SOS related functions given a score function
     val sos by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white]?.second ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black]?.second ?: 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
+        }.mapValues { (id, score) ->
+            // "If the player does not participate in a round, the opponent's score is replaced by the starting score of the player himself."
+            score + playersPerRound.map { players ->
+                if (players.contains(id)) 0.0
+                else scores[id]?.first ?: 0.0
+            }.sum()
         }
     }
 
     // sos-1
     val sosm1 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white]?.second ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black]?.second ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues {
@@ -125,9 +131,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     // sos-2
     val sosm2 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white] ?: 0.0)
+            Pair(game.black, scores[game.white]?.second ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black] ?: 0.0)
+            Pair(game.white, scores[game.black]?.second ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues {
@@ -141,11 +147,11 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         (history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white] ?: 0.0 else 0.0)
+            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white]?.second ?: 0.0 else 0.0)
         } + history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black] ?: 0.0 else 0.0)
+            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black]?.second ?: 0.0 else 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
@@ -202,7 +208,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
 
-class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scoresGetter: () -> Map<ID, Double>):
+class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scoresGetter: () -> Map<ID, Pair<Double, Double>>):
         HistoryHelper(history, { scoresGetter() }) {
 
     private fun Pairable.asTeam() = this as TeamTournament.Team

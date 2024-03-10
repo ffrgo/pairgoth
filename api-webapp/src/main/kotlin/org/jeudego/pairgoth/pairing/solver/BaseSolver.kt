@@ -496,11 +496,11 @@ sealed class BaseSolver(
         return pairable.rank
     }
 
-    fun roundScore(score: Double): Int {
+    fun roundScore(score: Double): Double {
         val epsilon = 0.00001
         // Note: this works for now because we only have .0 and .5 fractional parts
-        return if (pairing.main.roundDownScore) floor(score + epsilon).roundToInt()
-        else ceil(score - epsilon).roundToInt()
+        return if (pairing.main.roundDownScore) floor(score + epsilon)
+        else ceil(score - epsilon)
     }
 
     open fun HandicapParams.clamp(input: Int): Int {

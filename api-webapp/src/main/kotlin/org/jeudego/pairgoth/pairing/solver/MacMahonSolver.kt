@@ -4,6 +4,7 @@ import org.jeudego.pairgoth.model.*
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class MacMahonSolver(round: Int,
                      history: List<List<Game>>,
@@ -11,31 +12,33 @@ class MacMahonSolver(round: Int,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
                      usedTables: BitSet,
-                     private val mmFloor: Int, private val mmBar: Int):
+                     private val mmFloor: Int, private val mmBar: Int)  :
     BaseSolver(round, history, pairables, pairingParams, placementParams, usedTables) {
 
-    override val scores: Map<ID, Double> by lazy {
+    override val scores: Map<ID, Pair<Double, Double>> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
         val pairing = pairables.map { it.id }.toSet()
         pairablesMap.mapValues {
             it.value.let { pairable ->
-                pairable.mmBase +
+                Pair(
+                    pairable.mmBase,
+                    roundScore(pairable.mmBase +
                         pairable.nbW + // TODO take tournament parameter into account
-                        pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent
+                        pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent))
             }
         }
     }
 
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {
         if (useMMS) {
-            return roundScore(pairable.mms + Pairable.MIN_RANK)
+            return pairable.mms.roundToInt()
         } else {
             return pairable.rank
         }
     }
 
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
-    val Pairable.mms: Double get() = scores[id] ?: 0.0
+    val Pairable.mms: Double get() = scores[id]?.second ?: 0.0
 
     // CB TODO - configurable criteria
     val mainScoreMin = mmFloor + PLA_SMMS_SCORE_MIN - Pairable.MIN_RANK

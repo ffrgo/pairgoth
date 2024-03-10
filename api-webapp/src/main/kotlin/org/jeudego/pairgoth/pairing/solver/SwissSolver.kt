@@ -15,7 +15,8 @@ class SwissSolver(round: Int,
     // In a Swiss tournament the main criterion is the number of wins and already computed
 
     override val scores by lazy {
-        historyHelper.wins
+        historyHelper.wins.mapValues {
+            Pair(0.0, it.value) }
     }
     //
     // get() by lazy { historyHelper.wins }
