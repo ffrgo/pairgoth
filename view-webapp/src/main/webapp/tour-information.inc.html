@@ -34,7 +34,7 @@
             <option></option>
 #set($defaultCountry = $translate.defaultCountry[$request.lang])
 #foreach($country in $countries.countries)
-            <option value="$country.key" #if($tour && $country.key == $tour.country || !$tour && $country.key == $defaultCountry) selected #end>$country.value</option>
+            <option value="$country.key" #if($tour && $country.key == $tour.country.toLowerCase() || !$tour && $country.key == $defaultCountry) selected #end>$country.value</option>
 #end
           </select>
         </div>
