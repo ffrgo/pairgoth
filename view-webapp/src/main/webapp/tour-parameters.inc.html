@@ -24,6 +24,18 @@
           </label>
         </div>
       </div>
+      <div class="inline fields">
+        <div class="field">
+          <label>
+            Round
+            <select name="roundDownScore">
+              <option value="true" #if($tour.pairing.main.roundDownScore) selected #end>down</option>
+              <option value="false" #if(!$tour.pairing.main.roundDownScore) selected #end>up</option>
+            </select>
+            NBW/MMS score
+          </label>
+        </div>
+      </div>
 #end
       <div class="ui fluid styled accordion">
         <div class="title"><i class="dropdown icon"></i>Seeding methods inside groups of same score</div>
