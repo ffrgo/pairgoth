@@ -189,7 +189,7 @@
         <div id="maxTime" class="three wide field #if($tour && $tour.timeSystem.type != 'FISCHER')hidden#end">
           <label>Max time</label>
           <span class="info"></span>
-          <input name="maxTime" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.maxTime" != "")#toHMS($tour.timeSystem.maxTime)#{else}00:40:00#end"/>
+          <input name="maxTime" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.maxTime" != '' && "$!tour.timeSystem.maxTime" != '-1')#toHMS($tour.timeSystem.maxTime)#end"/>
         </div>
         <div id="byoyomi" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN' && $tour.timeSystem.type != 'STANDARD')hidden#end">
           <label>Byo-yomi time</label>

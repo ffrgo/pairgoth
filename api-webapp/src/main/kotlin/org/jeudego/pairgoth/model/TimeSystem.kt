@@ -8,7 +8,7 @@ data class TimeSystem(
     val type: TimeSystemType,
     val mainTime: Int,
     val increment: Int,
-    val maxTime: Int = Int.MAX_VALUE,
+    val maxTime: Int = -1,
     val byoyomi: Int,
     val periods: Int,
     val stones: Int
@@ -37,7 +37,7 @@ fun StandardByoyomi(mainTime: Int, byoyomi: Int, periods: Int) =
             stones = 1
         )
 
-fun FischerTime(mainTime: Int, increment: Int, maxTime: Int = Int.MAX_VALUE) =
+fun FischerTime(mainTime: Int, increment: Int, maxTime: Int = -1) =
         TimeSystem(
             type = FISCHER,
             mainTime = mainTime,
@@ -75,7 +75,7 @@ fun TimeSystem.Companion.fromJson(json: Json.Object) =
         "FISCHER" -> FischerTime(
             mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
             increment = json.getInt("increment") ?: badRequest("missing timeSystem increment"),
-            maxTime = json.getInt("maxTime") ?: Integer.MAX_VALUE
+            maxTime = json.getInt("maxTime")?.let { if (it == Int.MAX_VALUE) -1 else it } ?: -1
         )
         "SUDDEN_DEATH" -> SuddenDeath(
             mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
@@ -87,7 +87,7 @@ fun TimeSystem.toJson() = when (type) {
     TimeSystem.TimeSystemType.CANADIAN -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "stones" to stones)
     TimeSystem.TimeSystemType.JAPANESE -> Json.Object("type" to type.name, "mainTime" to mainTime, "byoyomi" to byoyomi, "periods" to periods)
     TimeSystem.TimeSystemType.FISCHER ->
-        if (maxTime == Int.MAX_VALUE) Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment)
+        if (maxTime == Int.MAX_VALUE || maxTime == -1) Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment)
         else Json.Object("type" to type.name, "mainTime" to mainTime, "increment" to increment, "maxTime" to maxTime)
     TimeSystem.TimeSystemType.SUDDEN_DEATH -> Json.Object("type" to type.name, "mainTime" to mainTime)
 }
