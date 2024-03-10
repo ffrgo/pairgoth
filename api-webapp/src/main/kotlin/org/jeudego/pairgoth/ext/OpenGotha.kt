@@ -127,6 +127,7 @@ object OpenGotha {
             shortName = genParams.shortName,
             startDate = genParams.beginDate.toLocalDate(),
             endDate = genParams.endDate.toLocalDate(),
+            director = genParams.director,
             country = "fr", // no country in opengotha format
             location = genParams.location,
             online = genParams.isBInternet ?: false,
@@ -298,7 +299,7 @@ object OpenGotha {
                 TimeSystem.TimeSystemType.JAPANESE -> "STDBYOYOMI"
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
-            } }" director="" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
+            } }" director="${tournament.director}" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
                 displayRank(
                     if (tournament.pairing is MacMahon) tournament.pairing.mmBar else 8
                 ).uppercase(Locale.ROOT)

@@ -22,6 +22,7 @@ sealed class Tournament <P: Pairable>(
     val shortName: String,
     val startDate: LocalDate,
     val endDate: LocalDate,
+    val director: String,
     val country: String,
     val location: String,
     val online: Boolean,
@@ -128,6 +129,7 @@ class StandardTournament(
     shortName: String,
     startDate: LocalDate,
     endDate: LocalDate,
+    director: String,
     country: String,
     location: String,
     online: Boolean,
@@ -137,7 +139,7 @@ class StandardTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5
-): Tournament<Player>(id, type, name, shortName, startDate, endDate, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
     override val players get() = _pairables
 }
 
@@ -149,6 +151,7 @@ class TeamTournament(
     shortName: String,
     startDate: LocalDate,
     endDate: LocalDate,
+    director: String,
     country: String,
     location: String,
     online: Boolean,
@@ -158,7 +161,7 @@ class TeamTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5
-): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
     companion object {}
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
@@ -207,6 +210,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
                 startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
                 endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
+                director = json.getString("director") ?: default?.director ?: "",
                 country = (json.getString("country") ?: default?.country ?: "fr").let { if (it.isEmpty()) "fr" else it },
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
@@ -225,6 +229,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 shortName = json.getString("shortName") ?: default?.shortName ?: badRequest("missing shortName"),
                 startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
                 endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
+                director = json.getString("director") ?: default?.director ?: "",
                 country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
@@ -258,6 +263,7 @@ fun Tournament<*>.toJson() = Json.Object(
     "shortName" to shortName,
     "startDate" to startDate.toString(),
     "endDate" to endDate.toString(),
+    "director" to director,
     "country" to country,
     "location" to location,
     "online" to online,

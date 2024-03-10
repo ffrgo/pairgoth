@@ -160,6 +160,7 @@ onLoad(() => {
       shortName: form.val('shortName'),
       startDate: parseDate(form.val('startDate')),
       endDate: parseDate(form.val('endDate')),
+      director: form.val('director'),
       type: form.val('type'),
       rounds: form.val('rounds'),
       country: form.val('country'),

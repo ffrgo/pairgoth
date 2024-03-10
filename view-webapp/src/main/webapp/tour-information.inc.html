@@ -14,16 +14,21 @@
         </div>
       </div>
       <div class="fields">
-        <div class="ten wide field">
+        <div class="eight wide field">
           <label>Dates</label>
           <span id="date-range">
-          from
+            from
+            <span class="info"></span>
+            <input type="text" name="startDate" required class="date" placeholder="start date" #if($tour) value="$tour.startDate" #end/>
+            to
+            <span class="info"></span>
+            <input type="text" name="endDate" required class="date" placeholder="end date" #if($tour) value="$tour.endDate" #end/>
+          </span>
+        </div>
+        <div class="eight wide field">
+          <label>Director</label>
           <span class="info"></span>
-          <input type="text" name="startDate" required class="date" placeholder="start date" #if($tour) value="$tour.startDate" #end/>
-          to
-          <span class="info"></span>
-          <input type="text" name="endDate" required class="date" placeholder="end date" #if($tour) value="$tour.endDate" #end/>
-        </span>
+          <input type="text" name="director" placeholder="Tournament director" value="$!tour.director"/>
         </div>
       </div>
       <div class="two stackable fields">
