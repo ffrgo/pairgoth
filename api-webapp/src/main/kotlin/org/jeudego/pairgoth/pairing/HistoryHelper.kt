@@ -107,10 +107,10 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             acc + next.second
         }.mapValues { (id, score) ->
             // "If the player does not participate in a round, the opponent's score is replaced by the starting score of the player himself."
-            score + playersPerRound.map { players ->
+            score + playersPerRound.sumOf { players ->
                 if (players.contains(id)) 0.0
                 else scores[id]?.first ?: 0.0
-            }.sum()
+            }
         }
     }
 
@@ -122,9 +122,13 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             Pair(game.white, scores[game.black]?.second ?: 0.0)
         }).groupBy {
             it.first
-        }.mapValues {
-          val scores = it.value.map { it.second }.sorted()
-          scores.sum() - (scores.firstOrNull() ?: 0.0)
+        }.mapValues { (id, pairs) ->
+          val oppScores = pairs.map { it.second }.sortedDescending()
+          oppScores.sum() - (oppScores.firstOrNull() ?: 0.0) +
+              playersPerRound.sumOf { players ->
+                  if (players.contains(id)) 0.0
+                  else scores[id]?.first ?: 0.0
+              }
         }
     }
 
@@ -136,9 +140,13 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             Pair(game.white, scores[game.black]?.second ?: 0.0)
         }).groupBy {
             it.first
-        }.mapValues {
-            val scores = it.value.map { it.second }.sorted()
-            scores.sum() - scores.getOrElse(0) { 0.0 } - scores.getOrElse(1) { 0.0 }
+        }.mapValues { (id, pairs) ->
+            val oppScores = pairs.map { it.second }.sorted()
+            oppScores.sum() - oppScores.getOrElse(0) { 0.0 } - oppScores.getOrElse(1) { 0.0 } +
+                playersPerRound.sumOf { players ->
+                    if (players.contains(id)) 0.0
+                    else scores[id]?.first ?: 0.0
+                }
         }
     }
 
@@ -159,6 +167,7 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
 
     // sosos
     val sosos by lazy {
+        val currentRound = history.size
         (history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
@@ -169,6 +178,11 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
             Pair(game.white, sos[game.black] ?: 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
+        }.mapValues { (id, sosos) ->
+            sosos + playersPerRound.sumOf { players ->
+                if (players.contains(id)) 0.0
+                else (scores[id]?.first ?: 0.0) * currentRound
+            }
         }
     }
 
