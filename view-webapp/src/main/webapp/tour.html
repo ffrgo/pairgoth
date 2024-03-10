@@ -73,10 +73,8 @@
     if (value && /\d+:\d+:\d+/.test(value)) {
       let parts = value.split(':');
       let seconds = parts[0] * 3600 + parts[1] * 60 + parts[2] * 1;
-      console.log(`${value} => ${seconds}`);
       return seconds;
     }
-    console.log(`invalid hh:mm:ss value: ${value}`);
     return 0;
   }
   function chooseStep(step) {
