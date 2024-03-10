@@ -166,7 +166,7 @@ object OpenGotha {
                 final = "FIN" == player.registeringStatus,
                 mmsCorrection = player.smmsCorrection
             ).also {
-                player.participating.toString().forEachIndexed { i,c ->
+                player.participating.forEachIndexed { i,c ->
                     if (c == '0') it.skip.add(i + 1)
                 }
                 canonicMap.put("${player.name.replace(" ", "")}${player.firstName.replace(" ", "")}".uppercase(Locale.ENGLISH), it.id)
