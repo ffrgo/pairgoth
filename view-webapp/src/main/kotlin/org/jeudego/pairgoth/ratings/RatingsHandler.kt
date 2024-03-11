@@ -6,18 +6,27 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
+import java.io.File
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.name
+import kotlin.io.path.useDirectoryEntries
 
 abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
-
-    private val delay = TimeUnit.HOURS.toMillis(1L)
+    companion object {
+        private val delay = TimeUnit.HOURS.toMillis(1L)
+        private val ymd = DateTimeFormatter.ofPattern("yyyyMMdd")
+    }
     private val client = OkHttpClient()
     abstract val defaultURL: URL
     open val active = true
-    val cacheFile = RatingsManager.path.resolve("${origin.name}.json").toFile()
+    // val cacheFile = RatingsManager.path.resolve("${origin.name}.json").toFile()
     lateinit var players: Json.Array
     private var updated = false
 
@@ -25,23 +34,38 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         WebappManager.properties.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
     }
 
+    private fun getRatingsFiles() = RatingsManager.path.useDirectoryEntries("${origin.name}-*.json") { entries ->
+        entries.sortedBy { it.fileName.name }.map {
+            it.toFile()
+        }.toList()
+    }
+
+    private fun getLatestRatingsFile() = getRatingsFiles().lastOrNull()
+
+    private fun initIfNeeded(ratingsFile: File): Boolean {
+        return if (!this::players.isInitialized) {
+            players = Json.parse(ratingsFile.readText())?.asArray() ?: Json.Array()
+            true
+        } else false
+    }
+
     fun updateIfNeeded(): Boolean {
-        return if (Date().time - cacheFile.lastModified() > delay) {
-            RatingsManager.logger.info("Updating $origin cache from $url")
-            val payload = fetchPayload()
-            players = parsePayload(payload).also {
-                val cachePayload = it.toString()
-                cacheFile.printWriter().use { out ->
-                    out.println(cachePayload)
-                }
-            }
-            true
-        } else if (!this::players.isInitialized) {
-            players = Json.parse(cacheFile.readText())?.asArray() ?: Json.Array()
-            true
-        } else {
-            false
+        val latestRatingsFile = getLatestRatingsFile()
+        if (latestRatingsFile != null && Date().time - latestRatingsFile.lastModified() < delay) {
+            return initIfNeeded(latestRatingsFile)
         }
+        val payload = fetchPayload()
+        val (lastUpdated, lastPlayers) = parsePayload(payload)
+        val targetRatingsFilename = "${origin.name}-${ymd.format(lastUpdated)}.json"
+        if (latestRatingsFile != null && latestRatingsFile.name == targetRatingsFilename) {
+            return initIfNeeded(latestRatingsFile)
+        }
+        RatingsManager.logger.info("Updating $origin cache from $url")
+        RatingsManager.path.resolve(targetRatingsFilename).toFile().printWriter().use { out ->
+            out.println(lastPlayers.toString())
+        }
+        players = lastPlayers
+        return true
     }
 
     fun fetchPlayers(): Json.Array {
@@ -62,7 +86,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     }
     open fun defaultCharset() = StandardCharsets.UTF_8
     fun updated() = updated
-    abstract fun parsePayload(payload: String): Json.Array
+    abstract fun parsePayload(payload: String): Pair<LocalDate, Json.Array>
     val logger = LoggerFactory.getLogger(origin.name)
     val atom = "[-._`'a-zA-ZÀ-ÿ]"
 }
