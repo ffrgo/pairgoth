@@ -15,18 +15,6 @@
       <div class="inline fields">
         <div class="field">
           <label>
-            MMS score for non-played rounds
-            <select name="mmsValueAbsent">
-              <option value="0" #if($tour.pairing.main.mmsValueAbsent == 0) selected #end>0</option>
-              <option value="0.5" #if($tour.pairing.main.mmsValueAbsent == 0.5) selected #end>½</option>
-              <option value="1" #if($tour.pairing.main.mmsValueAbsent == 1) selected #end>1</option>
-            </select>
-          </label>
-        </div>
-      </div>
-      <div class="inline fields">
-        <div class="field">
-          <label>
             Round
             <select name="roundDownScore">
               <option value="true" #if($tour.pairing.main.roundDownScore) selected #end>down</option>
@@ -36,20 +24,33 @@
           </label>
         </div>
       </div>
-      <div class="inline fields">
-        <div class="field">
-          <label>
-            For SOS/SOSOS calculations, use
-            <select name="sosValueAbsentUseBase">
-              <option value="true" #if($tour.pairing.main.sosValueAbsentUseBase) selected #end>base MMS</option>
-              <option value="false" #if(!$tour.pairing.main.sosValueAbsentUseBase) selected #end>base MMS + rounds/2</option>
-            </select>
-            of self player when absent from rounds
-          </label>
-        </div>
-      </div>
 #end
       <div class="ui fluid styled accordion">
+#if($tour.pairing.type == 'MAC_MAHON')
+        <div class="title"><i class="dropdown icon"></i>Special Mac Mahon handling for players absent from a round</div>
+        <div class="content">
+          <div class="field">
+            <label>
+              MMS score for non-played rounds:
+              <select name="mmsValueAbsent">
+                <option value="0" #if($tour.pairing.main.mmsValueAbsent == 0) selected #end>0</option>
+                <option value="0.5" #if($tour.pairing.main.mmsValueAbsent == 0.5) selected #end>½</option>
+                <option value="1" #if($tour.pairing.main.mmsValueAbsent == 1) selected #end>1</option>
+              </select>
+            </label>
+          </div>
+          <div class="field">
+            <label>
+              SOS for non-played rounds:
+              <select name="sosValueAbsentUseBase">
+                <option value="true" #if($tour.pairing.main.sosValueAbsentUseBase) selected #end>base MMS</option>
+                <option value="false" #if(!$tour.pairing.main.sosValueAbsentUseBase) selected #end>base MMS + rounds/2</option>
+              </select>
+              of player
+            </label>
+          </div>
+        </div>
+#end
         <div class="title"><i class="dropdown icon"></i>Seeding methods inside groups of same score</div>
         <div class="content">
           <div class="field">
