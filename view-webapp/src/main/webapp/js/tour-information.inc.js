@@ -216,6 +216,7 @@ onLoad(() => {
         main: {
           mmsValueAbsent: form.val('mmsValueAbsent'),
           roundDownScore: form.val('roundDownScore'),
+          sosValueAbsentUseBase: form.val('sosValueAbsentUseBase'),
           firstSeedLastRound: form.val('firstSeedLastRound'),
           firstSeedAddCrit: form.val('firstSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
           firstSeed: form.val('firstSeed'),

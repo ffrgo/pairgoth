@@ -20,11 +20,14 @@ class MacMahonSolver(round: Int,
         val pairing = pairables.map { it.id }.toSet()
         pairablesMap.mapValues {
             it.value.let { pairable ->
-                Pair(
-                    pairable.mmBase,
-                    roundScore(pairable.mmBase +
+                val score = roundScore(pairable.mmBase +
                         pairable.nbW + // TODO take tournament parameter into account
-                        pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent))
+                        pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent)
+                Pair(
+                    if (pairingParams.main.sosValueAbsentUseBase) pairable.mmBase
+                    else roundScore(pairable.mmBase + round/2),
+                    score
+                )
             }
         }
     }
