@@ -49,7 +49,7 @@ class PlayerIndex {
         logger.info("indexing players")
         var count = 0L
         IndexWriter(directory, IndexWriterConfig(StandardAnalyzer()).apply {
-            setOpenMode(IndexWriterConfig.OpenMode.CREATE)
+            openMode = IndexWriterConfig.OpenMode.CREATE
         }).use { writer ->
             players.forEachIndexed { i, p ->
                 val player = p as Json.Object
