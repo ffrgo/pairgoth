@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.lang.Exception
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -53,7 +54,12 @@ object RatingsManager: Runnable {
         override fun run() {
             try {
                 players = ratingsHandlers.values.filter { it.active }.flatMapTo(Json.MutableArray()) { ratings ->
-                    ratings.fetchPlayers()
+                    val ratingsFile = WebappManager.properties.getProperty("ratings.${ratings.origin.name.lowercase()}") as String?
+                    if (ratingsFile == null) {
+                        ratings.fetchPlayers()
+                    } else {
+                        ratings.fetchPlayers(Paths.get("").resolve(ratingsFile).toFile())
+                    }
                 }
                 val updated = ratingsHandlers.values.filter { it.active }.map { it.updated() }.reduce { u1, u2 ->
                     u1 or u2

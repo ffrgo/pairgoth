@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -26,15 +24,15 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     private val client = OkHttpClient()
     abstract val defaultURL: URL
     open val active = true
-    // val cacheFile = RatingsManager.path.resolve("${origin.name}.json").toFile()
     lateinit var players: Json.Array
+    lateinit var activeRatingsFile: File
     private var updated = false
 
     val url: URL by lazy {
         WebappManager.properties.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
     }
 
-    private fun getRatingsFiles() = RatingsManager.path.useDirectoryEntries("${origin.name}-*.json") { entries ->
+    public fun getRatingsFiles() = RatingsManager.path.useDirectoryEntries("${origin.name}-*.json") { entries ->
         entries.sortedBy { it.fileName.name }.map {
             it.toFile()
         }.toList()
@@ -44,11 +42,19 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
     private fun initIfNeeded(ratingsFile: File): Boolean {
         return if (!this::players.isInitialized) {
-            players = Json.parse(ratingsFile.readText())?.asArray() ?: Json.Array()
+            readPlayers(ratingsFile)
             true
         } else false
     }
 
+    @Synchronized
+    private fun readPlayers(ratingsFile: File) {
+        logger.info("Reading ${origin.name} players from ${ratingsFile.canonicalPath}")
+        players = Json.parse(ratingsFile.readText())?.asArray() ?: Json.Array()
+        activeRatingsFile = ratingsFile
+    }
+
+    @Synchronized
     fun updateIfNeeded(): Boolean {
         val latestRatingsFile = getLatestRatingsFile()
         if (latestRatingsFile != null && Date().time - latestRatingsFile.lastModified() < delay) {
@@ -56,12 +62,13 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         }
         val payload = fetchPayload()
         val (lastUpdated, lastPlayers) = parsePayload(payload)
-        val targetRatingsFilename = "${origin.name}-${ymd.format(lastUpdated)}.json"
-        if (latestRatingsFile != null && latestRatingsFile.name == targetRatingsFilename) {
+        val ratingsFilename = "${origin.name}-${ymd.format(lastUpdated)}.json"
+        if (latestRatingsFile != null && latestRatingsFile.name == ratingsFilename) {
             return initIfNeeded(latestRatingsFile)
         }
         RatingsManager.logger.info("Updating $origin cache from $url")
-        RatingsManager.path.resolve(targetRatingsFilename).toFile().printWriter().use { out ->
+        activeRatingsFile = RatingsManager.path.resolve(ratingsFilename).toFile()
+        activeRatingsFile.printWriter().use { out ->
             out.println(lastPlayers.toString())
         }
         players = lastPlayers
@@ -70,6 +77,11 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
     fun fetchPlayers(): Json.Array {
         updated = updateIfNeeded()
+        return players
+    }
+
+    fun fetchPlayers(ratingsFile: File): Json.Array {
+        initIfNeeded(ratingsFile)
         return players
     }
 
