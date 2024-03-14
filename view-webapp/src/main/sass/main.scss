@@ -513,6 +513,10 @@
       display: none !important;
     }
 
+    #center, #paired {
+      overflow-y: hidden;
+    }
+
     body {
       &.nogame {
         #pairables {
