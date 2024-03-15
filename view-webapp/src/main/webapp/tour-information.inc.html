@@ -28,7 +28,7 @@
         <div class="eight wide field">
           <label>Director</label>
           <span class="info"></span>
-          <input type="text" name="director" placeholder="Tournament director" value="$!tour.director"/>
+          <input type="text" name="director" placeholder="Tournament director" #if($tour) value="$!tour.director" #end/>
         </div>
       </div>
       <div class="two stackable fields">
@@ -111,7 +111,7 @@
           </select>
         </div>
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
-          <label>Hd threshold</label>
+          <label>No hd threshold</label>
           <span class="info"></span>
           <select name="threshold">
 #set($limit = 0)
