@@ -125,7 +125,7 @@ private fun extractWarFiles() {
     val webappsFolderURL = getResource("/META-INF/webapps") ?: throw Error("webapps not found")
     val jarConnection = webappsFolderURL.openConnection() as JarURLConnection
     val jarFile: JarFile = jarConnection.jarFile
-    val extractVersion = Regex(".*?-(\\d+\\.\\d+(?:-[^.-]+)?).war")
+    val extractVersion = Regex(".*?-(\\d+\\.\\d+(?:\\.\\d+)?(?:-[^.-]+)?).war")
     var version: String? = null
     jarFile.entries().toList().filter { entry ->
         entry.name.startsWith(jarConnection.entryName)
