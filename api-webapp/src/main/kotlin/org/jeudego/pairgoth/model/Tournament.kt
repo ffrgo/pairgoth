@@ -119,6 +119,7 @@ sealed class Tournament <P: Pairable>(
     }
 
     fun pairedPlayers() = games.flatMap { it.values }.flatMap { listOf(it.black, it.white) }.toSet()
+    fun hasPlayer(dbId: DatabaseId, pId: String) = players.values.filter { player -> pId == player.externalIds[dbId] }.isNotEmpty()
 }
 
 // standard tournament of individuals

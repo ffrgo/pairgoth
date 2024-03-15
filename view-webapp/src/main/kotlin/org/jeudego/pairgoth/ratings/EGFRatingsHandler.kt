@@ -33,6 +33,10 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                         if ("UK" == player.getString("country")) {
                             player["country"] = "GB"
                         }
+                        // fix for missing firstnames
+                        if (player.getString("firstname") == null) {
+                            player["firstname"] = ""
+                        }
                     }
                 }
             }

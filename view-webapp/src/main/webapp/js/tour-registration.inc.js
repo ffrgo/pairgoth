@@ -74,12 +74,13 @@ function fillPlayer(player) {
   let form = $('#player-form')[0];
   form.val('name', player.name);
   form.val('firstname', player.firstname);
-  console.log(country);
   form.val('country', country);
   form.val('club', player.club);
   form.val('rank', parseRank(player.rank));
   form.val('rating', player.rating);
   form.val('final', false);
+  form.val('ffg_id', player.ffg);
+  form.val('egf_id', player.egf);
   $('#needle')[0].value = '';
   initSearch();
   $('#register').focus();
@@ -194,6 +195,12 @@ onLoad(() => {
       club: form.val('club'),
       skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0]),
       final: form.val('final')
+    }
+    for (let origin of ['egf', 'ffg']) {
+      let value = form.val(`${origin}_id`);
+      if (value) {
+        player[origin] = value;
+      }
     }
     if (form.hasClass('add')) {
       api.postJson(`tour/${tour_id}/part`, player)

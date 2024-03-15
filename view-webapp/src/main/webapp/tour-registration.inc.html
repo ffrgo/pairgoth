@@ -78,6 +78,9 @@
   <div class="popup-body">
     <form id="player-form" class="ui form edit">
       <input type="hidden" name="id"/>
+      <input type="hidden" name="egf_id"/>
+      <input type="hidden" name="ffg_id"/>
+      <!-- input type="hidden" name="aga"/> -->
       <div class="popup-content">
         <div id="search-form" class="five stackable fields">
 #if($tour.country)
@@ -109,7 +112,7 @@
           </div>
 *#
           <div class="two wide field">
-            <div class="toggle">
+            <div class="toggle" title="$utils.ratingsDates.egf">
               <input id="egf" name="egf" type="checkbox" checked value="true"/>
               <div class="search-param checkbox">
                 <div class="circle"></div>
@@ -118,7 +121,7 @@
             </div>
           </div>
           <div class="two wide field">
-            <div class="toggle">
+            <div class="toggle" title="$utils.ratingsDates.ffg">
               <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
               <div class="search-param checkbox">
                 <div class="circle"></div>

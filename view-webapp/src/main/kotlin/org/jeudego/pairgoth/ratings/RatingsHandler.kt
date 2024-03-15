@@ -32,7 +32,9 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         WebappManager.properties.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
     }
 
-    public fun getRatingsFiles() = RatingsManager.path.useDirectoryEntries("${origin.name}-*.json") { entries ->
+    fun activeDate() = ymd.parse(activeRatingsFile.name.substringBefore(".json").substringAfter("${origin.name}-"))
+
+    fun getRatingsFiles() = RatingsManager.path.useDirectoryEntries("${origin.name}-*.json") { entries ->
         entries.sortedBy { it.fileName.name }.map {
             it.toFile()
         }.toList()

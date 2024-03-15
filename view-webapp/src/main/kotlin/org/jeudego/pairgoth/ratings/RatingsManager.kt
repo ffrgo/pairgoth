@@ -8,6 +8,7 @@ import java.io.BufferedReader
 import java.lang.Exception
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -131,10 +132,15 @@ object RatingsManager: Runnable {
             val left = a as Json.Object
             val right = b as Json.Object
             val cmp = left.getString("name")!!.compareTo(right.getString("name")!!)
-            if (cmp == 0) left.getString("firstname")!!.compareTo(right.getString("firstname")!!)
+            if (cmp == 0) (left.getString("firstname") ?: "").compareTo(right.getString("firstname") ?: "")
             else cmp
         }.toCollection(Json.MutableArray())
     }
 
     val index = PlayerIndex()
+
+    public fun getRatingsDates() = ratingsHandlers.filter{ it.value.active }.map {
+        Pair(it.key.name.lowercase(),
+        DateTimeFormatter.ISO_LOCAL_DATE.format(it.value.activeDate()))
+    }.toMap()
 }

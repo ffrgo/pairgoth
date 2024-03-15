@@ -23,6 +23,9 @@ object PlayerHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         val player = Player.fromJson(payload)
+        player.externalIds.forEach { dbId, pId ->
+            if (tournament.hasPlayer(dbId, pId)) badRequest("player already registered")
+        }
         tournament.players[player.id] = player
         tournament.dispatchEvent(PlayerAdded, request, player.toJson())
         return Json.Object("success" to true, "id" to player.id)

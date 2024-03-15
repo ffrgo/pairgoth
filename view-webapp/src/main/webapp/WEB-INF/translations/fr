@@ -51,7 +51,7 @@ French rules	Règles françaises
 Given name	Prénom
 Goban	Goban
 Hd correction	Correction hd
-Hd threshold	Seuil hd
+No hd threshold	Seuil sans hd
 How to use	Comment utiliser
 Import	Importer
 Import tournament	Importer un tournoi
@@ -122,6 +122,8 @@ Team of 4 individual players	Équipe de 4 joueurs individuels
 Team of 5 individual players	Équipe de 5 joueurs individuels
 That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server to which you can connect using a browser.	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Pairgoth lancera un serveur web local auquel vous pourrez vous connecter depuis un navigateur.
 Time system	Temps
+Tournament director	Directeur de tournoi
+Tournament name	Nom du tournoi
 Tournament type	Type de tournoi
 Unpair	Désapparier
 Unregister	Désinscrire
@@ -137,6 +139,7 @@ Black	Noir
 club	club
 country	pays
 d	d
+end date	date de fin
 first name	prénom
 from	du
 games )	parties )
@@ -163,9 +166,11 @@ sources	sources
 sources on FFG's gitlab	sur le serveur gitab de la FFG
 standalone, web interface	indépendant, interface web
 standalone, web interface, via docker	indépendant, interface web, via docker
+start date	date de début
 table	table
 the configuration guide	le guide de configuration
 to	au
+tournament location	lieu du tournoi
 unpairable players	joueurs non disponibles
 unpairable,	non disponibles,
 version 0.1 supports the	version 0.1 supporte le système d’appariement
@@ -174,6 +179,7 @@ White	Blanc
 white vs. black	blanc vs. Noir
 confirmed.	confirmé(s).
 Note that login to this instance is reserved to French federation actors plus several external people at our discretion. Send us	La connexion à cette instance est réservée aux acteurs de la FFG et à quelques personnes extérieures, à notre discrétion. Envoyez-nous
+yyyymmdd-city	aaaammjj-ville
 an email	un email
 to request an access.	pour demander un accès.
 (not yet available)	(pas encore disponible)

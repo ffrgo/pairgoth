@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.view
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.ratings.RatingsManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -94,4 +95,6 @@ class PairgothTool {
     companion object {
         const val EXAMPLES_DIRECTORY = "examples"
     }
+
+    fun getRatingsDates() = RatingsManager.getRatingsDates()
 }
