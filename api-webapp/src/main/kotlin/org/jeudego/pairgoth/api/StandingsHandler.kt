@@ -101,6 +101,12 @@ object StandingsHandler: PairgothApiHandler {
                 writer.flush()
                 return null
             }
+            "text/csv" -> {
+                response.contentType = "text/csv;charset=${encoding}"
+                exportToCSVFormat(tournament, sortedPairables, writer)
+                writer.flush()
+                return null
+            }
             else -> ApiHandler.badRequest("invalid Accept header: $accept")
         }
     }
@@ -222,6 +228,40 @@ ${
 }
 """
         writer.println(ret)
+    }
+
+    private fun exportToCSVFormat(tournament: Tournament<*>, lines: List<Json.Object>, writer: PrintWriter) {
+        val fields = listOf(
+            Pair("num", false),
+            Pair("place", false),
+            // Pair("egf", false), TODO configure display of egf / ffg field
+            Pair("name", true),
+            Pair("firstname", true),
+            Pair("country", false),
+            Pair("club", true),
+            Pair("rank", false),
+            Pair("NBW", false)
+        );
+
+        // headers
+        writer.println("${
+            fields.joinToString(";") { it.first }
+        };${
+            (1..tournament.rounds).joinToString(";") { "R$it" }
+        };${
+            tournament.pairing.placementParams.criteria.joinToString(";") { it.name }            
+        }")
+
+        // lines
+        lines.forEach { line ->
+            writer.println("${
+                fields.joinToString(";") { if (it.second) "\"${line[it.first]}\"" else "${line[it.first]}" }
+            };${
+                line.getArray("results")!!.joinToString(";")
+            };${
+                tournament.pairing.placementParams.criteria.joinToString(";") { line.getString(it.name) ?: "" }
+            }")
+        }
     }
 
     private val numFormat = DecimalFormat("###0.#")

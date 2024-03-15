@@ -3,7 +3,7 @@ function publish(format, extension) {
   let shortName = form.val('shortName');
   let encoding = $('#encoding')[0].value;
   let hdrs = headers();
-  hdrs['Accept'] = `application/${format};charset=${encoding}`
+  hdrs['Accept'] = `${format};charset=${encoding}`
   fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
     headers: hdrs
   }).then(resp => {
@@ -20,7 +20,6 @@ function publish(format, extension) {
 
 function publishHtml() {
   let html = $('#standings-table')[0].outerHTML;
-  console.log(html)
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
   let blob = new Blob(['\uFEFF', html], {type: 'text/html;charset=utf-8'});
@@ -78,10 +77,13 @@ onLoad(() => {
   });
 */
   $('.publish-ffg').on('click', e => {
-    publish('ffg', 'tou');
+    publish('application/ffg', 'tou');
   });
   $('.publish-egf').on('click', e => {
-    publish('egf', 'h9');
+    publish('application/egf', 'h9');
+  });
+  $('.publish-csv').on('click', e => {
+    publish('text/csv', 'csv');
   });
   $('.publish-html').on('click', e => {
     publishHtml();

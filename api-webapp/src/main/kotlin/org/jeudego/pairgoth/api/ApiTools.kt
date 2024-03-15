@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
+import org.jeudego.pairgoth.model.DatabaseId
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.Pairable.Companion.MIN_RANK
@@ -90,7 +91,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
     val pairables = pairables.values.filter { it.final }.map { it.toMutableJson() }
     pairables.forEach { player ->
         for (crit in criteria) {
-            player[crit.first] = crit.second[player.getID()] ?: 0.0
+            player[crit.first] = (crit.second[player.getID()] ?: 0.0).toInt()
         }
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }

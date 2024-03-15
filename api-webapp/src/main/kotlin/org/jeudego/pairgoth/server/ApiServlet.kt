@@ -235,7 +235,7 @@ class ApiServlet: HttpServlet() {
         //         2) there will be other content types: .tou, .h9, .html
         if (!isJson(accept) &&
             (!isXml(accept) || !request.requestURI.matches(Regex("/api/tour/\\d+"))) &&
-            (!accept.startsWith("application/ffg") && !accept.startsWith("application/egf") || !request.requestURI.matches(Regex("/api/tour/\\d+/standings/\\d+")))
+            (!accept.startsWith("application/ffg") && !accept.startsWith("application/egf") && !accept.startsWith("text/csv") || !request.requestURI.matches(Regex("/api/tour/\\d+/standings/\\d+")))
 
         ) throw ApiException(
             HttpServletResponse.SC_BAD_REQUEST,
