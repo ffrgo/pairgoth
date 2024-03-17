@@ -21,13 +21,13 @@ class PairgothTool {
     fun getCriteria() = mapOf(
         "NONE" to "No tie break", // No ranking / tie-break
 
-        "CATEGORY" to "Category",
+        // TODO "CATEGORY" to "Category",
         "RANK" to "Rank",
         "RATING" to "Rating",
         "NBW" to "Number of wins", // Number win
         "MMS" to "Mac Mahon score", // Macmahon score
-        "STS" to "Strasbourg score", // Strasbourg score
-        "CPS" to "Cup score", // Cup score
+        // TODO "STS" to "Strasbourg score", // Strasbourg score
+        // TODO "CPS" to "Cup score", // Cup score
 
         "SOSW" to "Sum of opponents wins", // Sum of opponents NBW
         "SOSWM1" to "Sum of opponents wins minus 1", //-1
@@ -41,16 +41,16 @@ class PairgothTool {
         "SOSMM2" to "Sum of opponents Mac Mahon score minus 2",
         "SODOSM" to "Sum of defeated opponents Mac Mahon score",
         "SOSOSM" to "Sum of opponents SOSM",
-        "CUSSM" to "Cumulative sum of opponents Mac Mahon score",
+        // TODO "CUSSM" to "Cumulative sum of opponents Mac Mahon score",
 
-        "SOSTS" to "Sum of opponents Strasbourg score", // Sum of opponnents Strasbourg score
+        // TODO "SOSTS" to "Sum of opponents Strasbourg score", // Sum of opponnents Strasbourg score
 
-        "EXT" to "Attempted achievements", // Exploits tentes
-        "EXR" to "Succeeded achievements", // Exploits reussis
+        // TODO "EXT" to "Attempted achievements", // Exploits tentes
+        // TODO "EXR" to "Succeeded achievements", // Exploits reussis
 
         // For the two criteria below see the user documentation
-        "SDC" to "Simplified direct confrontation", // Simplified direct confrontation
-        "DC" to "Direct confrontation", // Direct confrontation
+        // TODO "SDC" to "Simplified direct confrontation", // Simplified direct confrontation
+        // TODO "DC" to "Direct confrontation", // Direct confrontation
     )
 
     fun getResultsStats(games: Collection<Json.Object>): Json.Object {

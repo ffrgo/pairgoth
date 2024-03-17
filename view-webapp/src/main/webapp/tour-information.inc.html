@@ -62,6 +62,7 @@
           <span class="info"></span>
           <select name="type">
             <option value="INDIVIDUAL" #if(!$tour || $tour.type == 'INDIVIDUAL') selected #end>Individual players</option>
+            #* TODO
             <option value="PAIRGO" #if($tour && $tour.type == 'PAIRGO') selected #end>Pair-go tournament</option>
             <option value="RENGO2" #if($tour && $tour.type == 'RENGO2') selected #end>Rengo with 2 players teams</option>
             <option value="RENGO3" #if($tour && $tour.type == 'RENGO3') selected #end>Rengo with 3 players team</option>
@@ -69,6 +70,7 @@
             <option value="TEAM3" #if($tour && $tour.type == 'TEAM3') selected #end>Team of 3 individual players</option>
             <option value="TEAM4" #if($tour && $tour.type == 'TEAM4') selected #end>Team of 4 individual players</option>
             <option value="TEAM5" #if($tour && $tour.type == 'TEAM5') selected #end>Team of 5 individual players</option>
+            *#
           </select>
         </div>
         <div class="four wide field">
@@ -84,7 +86,7 @@
           <select name="pairing">
             <option value="MAC_MAHON" #if(!$tour || $tour.pairing.type == 'MAC_MAHON') selected #end>Mac Mahon</option>
             <option value="SWISS" #if($tour && $tour.pairing.type == 'SWISS') selected #end>Swiss</option>
-            <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') selected #end>Round-robin</option>
+            ## TODO <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') selected #end>Round-robin</option>
           </select>
         </div>
         <div class="mms pairing four wide field #if($tour && $tour.pairing.type != 'MAC_MAHON') hidden #end">
