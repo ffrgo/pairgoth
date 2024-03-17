@@ -127,6 +127,10 @@
       }
     });
 
+    $('#error').on('click', e => {
+      clearFeedback();
+    });
+
     // prev/next round buttons
     if (typeof(activeRound) !== 'undefined') {
       if (activeRound === 1) {

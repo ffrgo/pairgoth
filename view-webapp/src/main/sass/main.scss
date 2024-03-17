@@ -343,6 +343,14 @@
     background: lightcoral;
     border: solid 2px red;
     color: red;
+    &::after {
+      content: 'x';
+      position: absolute;
+      top: 0.1em;
+      right: 0.1em;
+      cursor: pointer;
+      line-height: 0.4em;
+    }
   }
 
   body.initial {
@@ -632,6 +640,9 @@
           }
         }
       }
+    }
+    .player {
+      color: black !important;
     }
     .ui.red.circular.label {
       background-color: white;

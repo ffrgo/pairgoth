@@ -302,9 +302,11 @@
     }
     .player {
       &.winner {
+        color: darkred;
         font-weight: bold;
       }
       &.looser {
+        color: blue;
         font-style: italic;
       }
     }
