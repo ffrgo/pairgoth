@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.pairing.solver.BaseSolver
+import org.jeudego.pairgoth.store.lastPlayerId
 import org.junit.jupiter.api.Test
 import java.io.File
 import java.io.FileWriter
@@ -159,11 +160,19 @@ class PairingTests: TestBase() {
         }
 
         /*
-        2 solutions have the same sum of weights, OpenGotha pairing is
+        At least 2 solutions have the same sum of weights, OpenGotha pairing is
         """[{"id":698,"t":1,"w":335,"b":324,"h":0,"r":"b","dd":0},{"id":699,"t":2,"w":316,"b":311,"h":0,"r":"b","dd":0},{"id":700,"t":3,"w":337,"b":325,"h":0,"r":"b","dd":0},{"id":701,"t":4,"w":313,"b":326,"h":0,"r":"b","dd":0},{"id":702,"t":5,"w":321,"b":309,"h":0,"r":"b","dd":0},{"id":703,"t":6,"w":319,"b":317,"h":0,"r":"b","dd":0},{"id":704,"t":7,"w":340,"b":312,"h":0,"r":"b","dd":0},{"id":705,"t":8,"w":332,"b":318,"h":0,"r":"b","dd":0},{"id":706,"t":9,"w":336,"b":327,"h":0,"r":"b","dd":0},{"id":707,"t":10,"w":333,"b":322,"h":0,"r":"b","dd":0},{"id":708,"t":11,"w":315,"b":328,"h":0,"r":"b","dd":0},{"id":709,"t":12,"w":323,"b":334,"h":0,"r":"b","dd":0},{"id":710,"t":13,"w":329,"b":331,"h":0,"r":"b","dd":0},{"id":711,"t":14,"w":339,"b":310,"h":0,"r":"b","dd":0},{"id":712,"t":15,"w":338,"b":320,"h":0,"r":"b","dd":0},{"id":713,"t":16,"w":330,"b":314,"h":0,"r":"b","dd":0}]"""
         Pairgoth pairing is
-         */
-        pairingsOG[6] = """[{"id":810,"t":1,"w":335,"b":324,"h":0,"r":"?","dd":0},{"id":811,"t":2,"w":337,"b":325,"h":0,"r":"?","dd":1},{"id":812,"t":3,"w":316,"b":319,"h":0,"r":"?","dd":1},{"id":813,"t":4,"w":313,"b":326,"h":0,"r":"?","dd":0},{"id":814,"t":5,"w":321,"b":309,"h":0,"r":"?","dd":0},{"id":815,"t":6,"w":311,"b":317,"h":0,"r":"?","dd":1},{"id":816,"t":7,"w":340,"b":312,"h":0,"r":"?","dd":0},{"id":817,"t":8,"w":332,"b":318,"h":0,"r":"?","dd":0},{"id":818,"t":9,"w":336,"b":327,"h":0,"r":"?","dd":0},{"id":819,"t":10,"w":333,"b":322,"h":0,"r":"?","dd":0},{"id":820,"t":11,"w":315,"b":328,"h":0,"r":"?","dd":1},{"id":821,"t":12,"w":323,"b":334,"h":0,"r":"?","dd":0},{"id":822,"t":13,"w":329,"b":331,"h":0,"r":"?","dd":0},{"id":823,"t":14,"w":339,"b":310,"h":0,"r":"?","dd":0},{"id":824,"t":15,"w":338,"b":320,"h":0,"r":"?","dd":0},{"id":825,"t":16,"w":330,"b":314,"h":0,"r":"?","dd":0}]"""
+        */
+        pairingsOG[6] = Json.parse(
+            """[{"id":810,"t":1,"w":335,"b":324,"h":0,"r":"?","dd":0},{"id":811,"t":2,"w":337,"b":325,"h":0,"r":"?","dd":1},{"id":812,"t":3,"w":316,"b":319,"h":0,"r":"?","dd":1},{"id":813,"t":4,"w":313,"b":326,"h":0,"r":"?","dd":0},{"id":814,"t":5,"w":321,"b":309,"h":0,"r":"?","dd":0},{"id":815,"t":6,"w":311,"b":317,"h":0,"r":"?","dd":1},{"id":816,"t":7,"w":340,"b":312,"h":0,"r":"?","dd":0},{"id":817,"t":8,"w":332,"b":318,"h":0,"r":"?","dd":0},{"id":818,"t":9,"w":336,"b":327,"h":0,"r":"?","dd":0},{"id":819,"t":10,"w":333,"b":322,"h":0,"r":"?","dd":0},{"id":820,"t":11,"w":315,"b":328,"h":0,"r":"?","dd":1},{"id":821,"t":12,"w":323,"b":334,"h":0,"r":"?","dd":0},{"id":822,"t":13,"w":329,"b":331,"h":0,"r":"?","dd":0},{"id":823,"t":14,"w":339,"b":310,"h":0,"r":"?","dd":0},{"id":824,"t":15,"w":338,"b":320,"h":0,"r":"?","dd":0},{"id":825,"t":16,"w":330,"b":314,"h":0,"r":"?","dd":0}]"""
+        )!!.asArray().mapTo(Json.MutableArray()) {
+            // adjust ids
+            Json.MutableObject(it as Json.Object).also { game ->
+                game["w"] = game.getInt("w")!! - 340 + lastPlayerId
+                game["b"] = game.getInt("b")!! - 340 + lastPlayerId
+            }
+        }.toString()
 
         var games: Json.Array
         var firstGameID: Int
