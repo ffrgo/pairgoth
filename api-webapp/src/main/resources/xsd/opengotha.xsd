@@ -123,25 +123,25 @@
     <xs:simpleContent>
       <xs:extension base="xs:string">
         <xs:attribute type="xs:long" name="paiBaAvoidDuplGame"/>
-        <xs:attribute type="xs:int" name="paiBaBalanceWB"/>
+        <xs:attribute type="xs:long" name="paiBaBalanceWB"/>
         <xs:attribute type="xs:string" name="paiBaDeterministic"/>
-        <xs:attribute type="xs:int" name="paiBaRandom"/>
+        <xs:attribute type="xs:long" name="paiBaRandom"/>
         <xs:attribute type="xs:string" name="paiMaAdditionalPlacementCritSystem1"/>
         <xs:attribute type="xs:string" name="paiMaAdditionalPlacementCritSystem2"/>
-        <xs:attribute type="xs:int" name="paiMaAvoidMixingCategories"/>
+        <xs:attribute type="xs:long" name="paiMaAvoidMixingCategories"/>
         <xs:attribute type="xs:string" name="paiMaCompensateDUDD"/>
         <xs:attribute type="xs:string" name="paiMaDUDDLowerMode"/>
         <xs:attribute type="xs:string" name="paiMaDUDDUpperMode"/>
-        <xs:attribute type="xs:int" name="paiMaDUDDWeight"/>
+        <xs:attribute type="xs:long" name="paiMaDUDDWeight"/>
         <xs:attribute type="xs:int" name="paiMaLastRoundForSeedSystem1"/>
-        <xs:attribute type="xs:int" name="paiMaMaximizeSeeding"/>
+        <xs:attribute type="xs:long" name="paiMaMaximizeSeeding"/>
         <xs:attribute type="xs:long" name="paiMaMinimizeScoreDifference"/>
         <xs:attribute type="xs:string" name="paiMaSeedSystem1"/>
         <xs:attribute type="xs:string" name="paiMaSeedSystem2"/>
-        <xs:attribute type="xs:int" name="paiSeAvoidSameGeo"/>
+        <xs:attribute type="xs:long" name="paiSeAvoidSameGeo"/>
         <xs:attribute type="xs:string" name="paiSeBarThresholdActive"/>
         <xs:attribute type="xs:long" name="paiSeDefSecCrit"/>
-        <xs:attribute type="xs:int" name="paiSeMinimizeHandicap"/>
+        <xs:attribute type="xs:long" name="paiSeMinimizeHandicap"/>
         <xs:attribute type="xs:string" name="paiSeNbWinsThresholdActive"/>
         <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameClub"/>
         <xs:attribute type="xs:int" name="paiSePreferMMSDiffRatherThanSameCountry"/>
