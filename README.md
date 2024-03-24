@@ -29,6 +29,7 @@ Please refer to [Pairgoth](https://pairgoth.jeudego.org) landing page.
 ├── docker .................................... Docker packaging
 │   ├── pairgoth.properties.example ........... Docker property file to instanciate
 │   └── run.sh ................................ Docker launch script
+├── pairgoth-common............................ Shared utility code library
 └── api-webapp ................................ Engine web application
     └── src
         ├── main
@@ -49,7 +50,6 @@ api-webapp/src/main/kotlin/org/jeudego/pairgoth
 ├── model .................................. Domain logic model
 ├── pairing ................................ Pairing solvers
 ├── store .................................. Persistence handlers
-├── util ................................... Various utilities
 └── web .................................... Web interface
 ```
 
