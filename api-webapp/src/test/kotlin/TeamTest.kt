@@ -23,7 +23,7 @@ class TeamTest {
         val anotherTeamPlayerID = resp.getInt("id") ?: fail("id cannot be null")
         var arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[]", arr.toString(), "expecting an empty array")
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Buffallos", "players":[$aTeamPlayerID, $anotherTeamPlayerID] }""")?.asObject() ?: fail("no null allowed here")).asObject()
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Buffallos", "players":[$aTeamPlayerID, $anotherTeamPlayerID], "final":true }""")?.asObject() ?: fail("no null allowed here")).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val aTeamID = resp.getInt("id") ?: error("no null allowed here")
         resp = TestAPI.get("/api/tour/$aTeamTournamentID/team/$aTeamID").asObject()
@@ -31,7 +31,7 @@ class TeamTest {
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
         // nothing stops us in reusing players in different teams, at least for now...
-        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aTeamPlayerID, $anotherTeamPlayerID] }""")?.asObject() ?: fail("no null here")).asObject()
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aTeamPlayerID, $anotherTeamPlayerID], "final":true }""")?.asObject() ?: fail("no null here")).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val anotherTeamID = resp.getInt("id") ?: fail("no null here")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
