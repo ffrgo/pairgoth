@@ -23,6 +23,7 @@ class BasicTests: TestBase() {
             "shortName" to "mon-tournoi",
             "startDate" to "2023-05-10",
             "endDate" to "2023-05-12",
+            "director" to "Nestor Burma",
             "country" to "FR",
             "location" to "Marseille",
             "online" to false,

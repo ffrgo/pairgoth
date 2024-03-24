@@ -43,9 +43,11 @@ object PlayerHandler: PairgothApiHandler {
         }
         val leavingRounds = updated.skip.toSet().minus(player.skip.toSet())
         leavingRounds.forEach {  round ->
-            val playing = tournament.games(round).values.flatMap { listOf(it.black, it.white) }
-            if (playing.contains(id)) {
-                throw badRequest("player is playing in round #$round")
+            if (round <= tournament.lastRound()) {
+                val playing = tournament.games(round).values.flatMap { listOf(it.black, it.white) }
+                if (playing.contains(id)) {
+                    throw badRequest("player is playing in round #$round")
+                }
             }
         }
         tournament.players[id] = updated

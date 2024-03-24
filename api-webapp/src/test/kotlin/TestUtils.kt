@@ -27,6 +27,7 @@ object TestAPI {
     private fun <T> testRequest(reqMethod: String, uri: String, accept: String = "application/json", payload: T? = null): String {
 
         WebappManager.properties["auth"] = "none"
+        WebappManager.properties["store"] = "memory"
         WebappManager.properties["webapp.env"] = "test"
 
         // mock request
