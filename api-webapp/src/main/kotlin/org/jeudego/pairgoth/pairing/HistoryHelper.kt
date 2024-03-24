@@ -218,6 +218,14 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         }
     }
 
+    val byePlayers by lazy {
+        history.flatten().mapNotNull { game ->
+            if (game.white == ByePlayer.id) game.black
+            else if (game.black == ByePlayer.id) game.white
+            else null
+        }
+    }
+
 }
 
 // CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores

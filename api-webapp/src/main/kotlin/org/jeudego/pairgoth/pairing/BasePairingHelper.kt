@@ -12,8 +12,11 @@ abstract class BasePairingHelper(
     ) {
 
     abstract val scores: Map<ID, Pair<Double, Double>>
-    val historyHelper = if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(history) { scores }
-    else HistoryHelper(history) { scores }
+    val historyHelper =
+        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(
+            history
+        ) { scores }
+        else HistoryHelper(history) { scores }
 
     // Extend pairables with members from all rounds
 
@@ -26,10 +29,12 @@ abstract class BasePairingHelper(
     protected val sortedPairables by lazy {
         pairables.sortedWith(::sort)
     }
+
     // pairables sorted for pairing purposes
     protected val pairingSortedPairables by lazy {
         pairables.sortedWith(::pairingSort).toMutableList()
     }
+
     // pairables sorted for pairing purposes
     protected val nameSortedPairables by lazy {
         pairables.sortedWith(::nameSort).toMutableList()
@@ -79,7 +84,7 @@ abstract class BasePairingHelper(
 
     protected val Pairable.group: Int get() = _groups[id]!!
 
-    protected val Pairable.drawnUpDown: Pair<Int,Int> get() = historyHelper.drawnUpDown(this) ?: Pair(0,0)
+    protected val Pairable.drawnUpDown: Pair<Int, Int> get() = historyHelper.drawnUpDown(this) ?: Pair(0, 0)
 
     protected val Pairable.nbBye: Int get() = historyHelper.nbPlayedWithBye(this) ?: 0
 
@@ -93,8 +98,11 @@ abstract class BasePairingHelper(
     val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
     val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
     fun Pairable.missedRounds(upToRound: Int, pairing: Set<ID>): Int = (1..upToRound).map { round ->
-        if (historyHelper.playersPerRound.getOrNull(round - 1)?.contains(id) == true || round == upToRound && pairing.contains(id)) 0 else 1
+        if (historyHelper.playersPerRound.getOrNull(round - 1)
+                ?.contains(id) == true || round == upToRound && pairing.contains(id)
+        ) 0 else 1
     }.sum()
+
     fun Pairable.eval(criterion: Criterion) = evalCriterion(this, criterion)
     open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.NONE -> 0.0
@@ -121,6 +129,7 @@ abstract class BasePairingHelper(
         }
         return 0
     }
+
     open fun pairingSort(p: Pairable, q: Pairable): Int {
         for (criterion in placement.criteria) {
             val criterionP = p.eval(criterion)
@@ -141,6 +150,7 @@ abstract class BasePairingHelper(
         }
         return p.fullName().compareTo(q.fullName())
     }
+
     open fun nameSort(p: Pairable, q: Pairable): Int {
         return p.fullName().compareTo(q.fullName())
     }

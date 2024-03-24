@@ -33,7 +33,6 @@ sealed class BaseSolver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
-        var byePlayers: MutableList<Pairable> = mutableListOf()
         var weightsLogger: PrintWriter? = null
     }
 
@@ -79,7 +78,7 @@ sealed class BaseSolver(
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
                 weightForBye = p.rank + 2*(p.main + p.rank)
-                if (p in byePlayers) weightForBye += 1000
+                if (p.id in historyHelper.byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
                     chosenByePlayer = p
@@ -87,7 +86,6 @@ sealed class BaseSolver(
                 // println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
             println("Bye player : " + chosenByePlayer.fullName())
-            byePlayers.add(chosenByePlayer)
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
