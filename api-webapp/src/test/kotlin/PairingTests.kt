@@ -314,7 +314,17 @@ class PairingTests: TestBase() {
             val skipSeeding = round <= 2
             assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simplemm/simplemm_weights_R$round.txt"), skipSeeding), "Not matching opengotha weights for round $round")
             logger.info("Weights for round $round match OpenGotha")
-            assertTrue(compare_games(games, Json.parse(pairings[round - 1])!!.asArray(), skipColor=true),"pairings for round $round differ")
+
+            // fix players ids (TODO - reset memstore between each test for simplicity)
+            val maxId = games.flatMap { listOf((it as Json.Object).getInt("b")!!, (it as Json.Object).getInt("w")!!) }.max()
+            val fixedGames = games.mapTo(Json.MutableArray()) {
+                val game = it as Json.Object
+                Json.MutableObject(game)
+                    .set("b", game.getInt("b")!! - maxId + 16)
+                    .set("w", game.getInt("w")!! - maxId + 16)
+            }
+
+            assertTrue(compare_games(fixedGames, Json.parse(pairings[round - 1])!!.asArray(), skipColor=true),"pairings for round $round differ")
             logger.info("Pairing for round $round match OpenGotha")
 
             forcedGames = Json.parse(pairings[round-1])!!.asArray()
