@@ -44,8 +44,16 @@ sealed class BaseSolver(
                 pairing.secondary.apply(p1, p2) +
                 pairing.geo.apply(p1, p2)
 
+    open fun pairgothBlackWhite(p1: Pairable, p2: Pairable): Double {
+        val hd1 = pairing.handicap.handicap(white = p1, black = p2)
+        val hd2 = pairing.handicap.handicap(white = p2, black = p1)
+        return if (hd1 > 0 && hd2 == 0) pairing.base.colorBalanceWeight * 10
+        else 0.0
+    }
+
     open fun weight(p1: Pairable, p2: Pairable) =
         openGothaWeight(p1, p2) +
+        pairgothBlackWhite(p1, p2) +
         // pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
@@ -199,9 +207,10 @@ sealed class BaseSolver(
             if (wb1 * wb2 < 0) colorBalanceWeight
             else if (wb1 == 0 && abs(wb2) >= 2 || wb2 == 0 && abs(wb1) >= 2) colorBalanceWeight / 2 else 0.0
         } else {
+            /* Moved to pairgothBlackWhite()
             // apply a *big* score to let the stronger player have white
-            if (hd2 == 0) colorBalanceWeight * 10
-            else 0.0
+            if (hd1 > 0 && hd2 == 0 && !avoidPairgothSpecificWeights) colorBalanceWeight * 10
+            else */ 0.0
         }
         return score
     }
