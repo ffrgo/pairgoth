@@ -28,14 +28,12 @@ interface Store {
     fun deleteTournament(tournament: Tournament<*>)
 }
 
-private val memoryStore: Store = MemoryStore()
-
 fun getStore(request: HttpServletRequest): Store {
     val storeType = WebappManager.getMandatoryProperty("store")
     return when (val auth = WebappManager.getMandatoryProperty("auth")) {
         "none", "sesame" ->
             when (storeType) {
-                "memory" -> memoryStore
+                "memory" -> MemoryStore
                 "file" -> {
                     val filePath = WebappManager.properties.getProperty("store.file.path") ?: "."
                     FileStore(filePath)

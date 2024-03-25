@@ -2,9 +2,18 @@ package org.jeudego.pairgoth.store
 
 import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Tournament
+import java.util.concurrent.atomic.AtomicInteger
 
-class MemoryStore: Store {
+object MemoryStore: Store {
     private val tournaments = mutableMapOf<ID, Tournament<*>>()
+
+    // for tests
+    fun reset() {
+        tournaments.clear()
+        _nextTournamentId.set(0)
+        _nextPlayerId.set(0)
+       _nextGameId.set(0)
+    }
 
     override fun getTournaments(): Map<ID, Map<String, String>> = tournaments.mapValues {
         mapOf("name" to it.value.shortName)
