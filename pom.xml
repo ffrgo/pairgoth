@@ -24,7 +24,7 @@
       <id>republicate.com</id>
       <url>https://republicate.com/maven2</url>
       <releases>
-        <enabled>false</enabled>
+        <enabled>true</enabled>
       </releases>
       <snapshots>
       <enabled>true</enabled>
