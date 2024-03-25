@@ -109,7 +109,8 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     rank = json.getInt("rank") ?: default?.rank ?: badRequest("missing rank"),
     country = ( json.getString("country") ?: default?.country ?: badRequest("missing country") ).let {
         // EGC uses UK, while FFG and browser language use GB
-        if (it == "UK") "GB" else it
+        val up = it.uppercase(Locale.ROOT)
+        if (up == "UK") "GB" else up
     },
     club = json.getString("club") ?: default?.club ?: badRequest("missing club"),
     final = json.getBoolean("final") ?: default?.final ?: true,
