@@ -82,6 +82,9 @@ object TestAPI {
 
     fun get(uri: String): Json = Json.parse(testRequest<Void>("GET", uri)) ?: throw Error("no payload")
     fun getXml(uri: String): String = testRequest<Void>("GET", uri, "application/xml")
+    fun getJson(uri: String): String = testRequest<Void>("GET", uri, "application/json")
+    fun getCSV(uri: String): String = testRequest<Void>("GET", uri, "text/csv")
+    fun getFFG(uri: String): String = testRequest<Void>("GET", uri, "application/ffg")
     fun <T> post(uri: String, payload: T) = Json.parse(testRequest("POST", uri, payload = payload)) ?: throw Error("no payload")
     fun <T> put(uri: String, payload: T) = Json.parse(testRequest("PUT", uri, payload = payload)) ?: throw Error("no payload")
     fun <T> delete(uri: String, payload: T) = Json.parse(testRequest("DELETE", uri, payload = payload)) ?: throw Error("no payload")

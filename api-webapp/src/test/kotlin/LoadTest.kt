@@ -5,6 +5,7 @@ import org.ajbrown.namemachine.NameGenerator
 import org.ajbrown.namemachine.NameGeneratorOptions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.io.IOException
 import kotlin.random.Random
 
 class LoadTest: TestBase() {
@@ -13,7 +14,18 @@ class LoadTest: TestBase() {
         val PLAYERS = 1500
         val ROUNDS = 10
         val SKIP_RATIO = 0.1 // 10%
-        
+
+        @JvmStatic
+        fun main(args: Array<String>) {
+            System.out.println("Press Enter to continue...")
+            try {
+                System.`in`.read()
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+            LoadTest().testVeryBigTournament()
+        }
+
         private val nameGenerator = NameGenerator(
             NameGeneratorOptions().apply {
                 randomSeed = 123456L
@@ -72,6 +84,9 @@ class LoadTest: TestBase() {
             repeat(PLAYERS) {
                 TestAPI.post("/api/tour/$tour/part", generatePlayer())
             }
+            getOutputFile("verybig-nopairing.json").printWriter().use {
+                it.println(TestAPI.getJson("/api/tour/$tour"))
+            }
             repeat(ROUNDS) {
                 val round = it + 1
                 val resp = TestAPI.post("/api/tour/$tour/pair/$round", Json.Array("all"))
@@ -86,8 +101,11 @@ class LoadTest: TestBase() {
                     ))
                 }
             }
-            val standings = TestAPI.get("/api/tour/$tour/standings/$ROUNDS")
-            logger.info(standings.toString())
+            // val standings = TestAPI.get("/api/tour/$tour/standings/$ROUNDS")
+            // logger.info(standings.toString())
+            getOutputFile("verybig.json").printWriter().use {
+                it.println(TestAPI.getJson("/api/tour/$tour"))
+            }
         } finally {
             val after = System.currentTimeMillis()
             logger.info("testVeryBigTournament ran in ${(after - before) / 1000} seconds")

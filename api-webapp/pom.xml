@@ -289,6 +289,7 @@
         <dependency>
             <groupId>org.mockito.kotlin</groupId>
             <artifactId>mockito-kotlin</artifactId>
+            <!--<version>5.2.1</version>-->
             <version>4.1.0</version>
             <scope>test</scope>
         </dependency>

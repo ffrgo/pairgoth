@@ -61,7 +61,7 @@
     <!-- kotlin -->
     <kotlin.version>1.9.22</kotlin.version>
     <kotlin.code.style>official</kotlin.code.style>
-    <kotlin.compiler.jvmTarget>10</kotlin.compiler.jvmTarget>
+    <kotlin.compiler.jvmTarget>11</kotlin.compiler.jvmTarget>
     <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
 
     <!-- pairgoth default properties -->
@@ -188,6 +188,9 @@
           <groupId>org.jetbrains.kotlin</groupId>
           <artifactId>kotlin-maven-plugin</artifactId>
           <version>${kotlin.version}</version>
+          <configuration>
+            <jvmTarget>11</jvmTarget>
+          </configuration>
         </plugin>
         <plugin>
           <artifactId>properties-maven-plugin</artifactId>
