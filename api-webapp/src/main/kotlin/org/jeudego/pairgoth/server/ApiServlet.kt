@@ -299,7 +299,7 @@ class ApiServlet: HttpServlet() {
         private var logger = LoggerFactory.getLogger("api")
         private const val EXPECTED_CHARSET = "utf8"
         const val USER_KEY = "pairgoth-user"
-        fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json")
+        fun isJson(mimeType: String) = "text/json" == mimeType || "application/json" == mimeType || mimeType.endsWith("+json") || "application/pairgoth" == mimeType
         fun isXml(mimeType: String) = "text/xml" == mimeType || "application/xml" == mimeType || mimeType.endsWith("+xml")
     }
 }

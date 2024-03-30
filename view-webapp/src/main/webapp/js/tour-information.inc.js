@@ -123,7 +123,7 @@ onLoad(() => {
     let form = $('#tournament-infos')[0];
     let shortName = form.val('shortName');
     let hdrs = headers();
-    hdrs['Accept'] = 'application/json';
+    hdrs['Accept'] = 'application/pairgoth';
     fetch(`${base}tour/${tour_id}`, {
       headers: hdrs
     }).then(resp => {

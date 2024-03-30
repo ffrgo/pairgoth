@@ -45,10 +45,10 @@ class LoadTest: TestBase() {
                 "rating" to rating,
                 "rank" to (rating - 2050)/100,
                 "final" to true,
-                "skip" to (1..ROUNDS).map {
+                "skip" to (0..ROUNDS - 1).map {
                     rand.nextDouble() < SKIP_RATIO
                 }.mapIndexedNotNullTo(Json.MutableArray()) { index, skip ->
-                    if (skip) index else null
+                    if (skip) (index + 1) else null
                 }
             )
         }
@@ -84,7 +84,7 @@ class LoadTest: TestBase() {
             repeat(PLAYERS) {
                 TestAPI.post("/api/tour/$tour/part", generatePlayer())
             }
-            getOutputFile("verybig-nopairing.json").printWriter().use {
+            getOutputFile("verybig-nopairing.tour").printWriter().use {
                 it.println(TestAPI.getJson("/api/tour/$tour"))
             }
             repeat(ROUNDS) {
@@ -97,13 +97,14 @@ class LoadTest: TestBase() {
                 games.map { (it as Json.Object).getInt("id")!! }.forEach { gameId ->
                     TestAPI.put("/api/tour/$tour/res/$round", Json.Object(
                         "id" to gameId,
+                        // TODO - credible probabilistic results based on scores
                         "result" to if (rand.nextBoolean()) "w" else "b"
                     ))
                 }
             }
             // val standings = TestAPI.get("/api/tour/$tour/standings/$ROUNDS")
             // logger.info(standings.toString())
-            getOutputFile("verybig.json").printWriter().use {
+            getOutputFile("verybig.tour").printWriter().use {
                 it.println(TestAPI.getJson("/api/tour/$tour"))
             }
         } finally {

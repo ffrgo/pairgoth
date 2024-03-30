@@ -8,6 +8,7 @@ import org.jeudego.pairgoth.ext.OpenGotha
 import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
+import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.server.ApiServlet
 import org.jeudego.pairgoth.server.Event.*
@@ -24,12 +25,20 @@ object TournamentHandler: PairgothApiHandler {
             null -> getStore(request).getTournaments().toJsonObject()
             else ->
                 when {
-                    ApiServlet.isJson(accept) -> getStore(request).getTournament(id)?.toJson() ?: badRequest("no tournament with id #${id}")
+                    ApiServlet.isJson(accept) -> {
+                        getStore(request).getTournament(id)?.let {
+                            if (accept == "application/pairgoth") {
+                                it.toFullJson()
+                            } else {
+                                it.toJson()
+                            }
+                        } ?: badRequest("no tournament with id #${id}")
+                    }
                     ApiServlet.isXml(accept) -> {
                         val export = getStore(request).getTournament(id)?.let { OpenGotha.export(it) } ?: badRequest("no tournament with id #${id}")
                         response.contentType = "application/xml; charset=UTF-8"
                         response.writer.write(export)
-                        null // return null to indicate that we handled the response ourself
+                        null // return null to indicate that we handled the response ourselves
                     }
                     else -> badRequest("unhandled Accept header: $accept")
                 }
@@ -48,7 +57,7 @@ object TournamentHandler: PairgothApiHandler {
     }
 
     override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
-        // BC TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
+        // CB TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)
         // disallow changing type
