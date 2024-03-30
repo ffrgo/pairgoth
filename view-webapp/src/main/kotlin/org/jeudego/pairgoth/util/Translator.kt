@@ -140,7 +140,7 @@ class Translator private constructor(private val iso: String) {
     private val missingTranslations: MutableSet<String> = ConcurrentSkipListSet()
 
     private fun reportMissingTranslation(enText: String) {
-        logger.warn("missing translation towards {}: {}", iso, enText)
+        logger.debug("missing translation towards {}: {}", iso, enText)
         if (saveMissingTranslations) missingTranslations.add(enText)
     }
 
