@@ -4,9 +4,10 @@ import com.republicate.kson.Json
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.*
 
 object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
-    val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy")
+    val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
     override val defaultURL = URL("https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html")
     override fun parsePayload(payload: String): Pair<LocalDate, Json.Array> {
         val ratingsDateString = payload.lines().filter { it.startsWith("(") }.first().trim().removeSurrounding("(", ")")
