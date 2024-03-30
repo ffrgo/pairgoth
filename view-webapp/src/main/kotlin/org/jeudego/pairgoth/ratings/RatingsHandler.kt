@@ -7,6 +7,7 @@ import okhttp3.Request
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
 import java.io.File
+import java.io.IOException
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
@@ -27,6 +28,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     lateinit var players: Json.Array
     lateinit var activeRatingsFile: File
     private var updated = false
+    val ready get() = this::activeRatingsFile.isInitialized && this::players.isInitialized
 
     val url: URL by lazy {
         WebappManager.properties.getProperty("ratings.${origin.name.lowercase(Locale.ROOT)}")?.let { URL(it) } ?: defaultURL
@@ -63,6 +65,15 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
             return initIfNeeded(latestRatingsFile)
         }
         val payload = fetchPayload()
+        if (payload == null) {
+            // an error occurred while fetching the payload, and has been reported
+            if (latestRatingsFile != null) {
+                // fall back to last ratings file
+                return initIfNeeded(latestRatingsFile)
+            } else {
+                return false
+            }
+        }
         val (lastUpdated, lastPlayers) = parsePayload(payload)
         val ratingsFilename = "${origin.name}-${ymd.format(lastUpdated)}.json"
         if (latestRatingsFile != null && latestRatingsFile.name == ratingsFilename) {
@@ -87,15 +98,20 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         return players
     }
 
-    protected fun fetchPayload(): String {
-        val request = Request.Builder()
-            .url(url)
-            .build()
+    protected fun fetchPayload(): String? {
+        try {
+            val request = Request.Builder()
+                .url(url)
+                .build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw Error("Could not fetch $origin ratings: unexpected code $response")
-            val contentType = response.headers["Content-Type"]?.toMediaType()
-            return response.body!!.source().readString(contentType?.charset() ?: defaultCharset())
+            client.newCall(request).execute().use { response ->
+                if (!response.isSuccessful) throw IOException("Could not fetch $origin ratings: unexpected code $response")
+                val contentType = response.headers["Content-Type"]?.toMediaType()
+                return response.body!!.source().readString(contentType?.charset() ?: defaultCharset())
+            }
+        } catch (ioe: IOException) {
+            logger.error("Could not refresh ${origin.name} ratings from ${url}", ioe)
+            return null
         }
     }
     open fun defaultCharset() = StandardCharsets.UTF_8

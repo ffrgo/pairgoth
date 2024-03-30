@@ -36,7 +36,7 @@ object RatingsManager: Runnable {
         );
     }
 
-    fun activeMask() = ratingsHandlers.entries.filter { it.value.active }.map { it.key.flag }.reduce { a,b -> a or b }
+    fun activeMask() = ratingsHandlers.entries.filter { it.value.active && it.value.ready }.map { it.key.flag }.reduce { a,b -> a or b }
 
     val timer = Timer()
     lateinit var players: Json.MutableArray
@@ -139,7 +139,7 @@ object RatingsManager: Runnable {
 
     val index = PlayerIndex()
 
-    public fun getRatingsDates() = ratingsHandlers.filter{ it.value.active }.map {
+    fun getRatingsDates() = ratingsHandlers.filter{ it.value.active && it.value.ready }.map {
         Pair(it.key.name.lowercase(),
         DateTimeFormatter.ISO_LOCAL_DATE.format(it.value.activeDate()))
     }.toMap()
