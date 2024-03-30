@@ -120,7 +120,7 @@ Team of 2 individual players	Équipe de 2 joueurs individuels
 Team of 3 individual players	Équipe de 3 joueurs individuels
 Team of 4 individual players	Équipe de 4 joueurs individuels
 Team of 5 individual players	Équipe de 5 joueurs individuels
-That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server to which you can connect using a browser.	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Pairgoth lancera un serveur web local auquel vous pourrez vous connecter depuis un navigateur.
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server on port 8080 to which you can connect using a browser.	C’est la meilleure option si vous préférez le faire tourner localement ou quand vous voulez être capable de faire l’appariement sans internet. Pairgoth lancera un serveur web local sur le port 8080 auquel vous pourrez vous connecter depuis un navigateur.
 Time system	Temps
 Tournament director	Directeur de tournoi
 Tournament name	Nom du tournoi
