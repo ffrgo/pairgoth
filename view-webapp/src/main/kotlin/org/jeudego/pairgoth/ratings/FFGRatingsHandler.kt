@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
-    val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+    val ratingsDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy")
     override val defaultURL = URL("https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt")
     override fun parsePayload(payload: String): Pair<LocalDate, Json.Array> {
         val ratingsDateString = payload.lineSequence().first().substringAfter("#Echelle au ").substringBefore(" ")
