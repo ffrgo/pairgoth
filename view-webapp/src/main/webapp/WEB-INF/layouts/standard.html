@@ -56,7 +56,15 @@
   </div>
   <div id="center">
     <div id="inner">
-#translate($page)
+#if($tour && $tour.error)
+      <script type="text/javascript">
+        onLoad(()=>{
+          showError("$esc.javascript($tour.error)");
+        });
+      </script>
+#else
+  #translate($page)
+#end
     </div>
   </div>
   <div id="footer" class="horz flex">
