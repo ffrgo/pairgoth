@@ -9,7 +9,7 @@
         <xs:attribute type="xs:string" name="club" use="optional"/>
         <xs:attribute type="xs:string" name="country" use="optional"/>
         <xs:attribute type="xs:string" name="egfPin" use="optional"/>
-        <xs:attribute type="xs:int" name="ffgLicence" use="optional"/>
+        <xs:attribute type="xs:string" name="ffgLicence" use="optional"/>
         <xs:attribute type="xs:string" name="ffgLicenceStatus" use="optional"/>
         <xs:attribute type="xs:string" name="firstName"/>
         <xs:attribute type="xs:string" name="grade" use="optional"/>
