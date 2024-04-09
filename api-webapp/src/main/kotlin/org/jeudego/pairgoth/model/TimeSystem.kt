@@ -67,7 +67,7 @@ fun TimeSystem.Companion.fromJson(json: Json.Object) =
             byoyomi = json.getInt("byoyomi") ?: badRequest("missing timeSystem byoyomi"),
             stones = json.getInt("stones") ?: badRequest("missing timeSystem stones")
         )
-        "STANDARD" -> StandardByoyomi(
+        "STANDARD", "JAPANESE" -> StandardByoyomi(
             mainTime = json.getInt("mainTime") ?: badRequest("missing timeSystem mainTime"),
             byoyomi = json.getInt("byoyomi") ?: badRequest("missing timeSystem byoyomi"),
             periods = json.getInt("periods") ?: badRequest("missing timeSystem periods")
