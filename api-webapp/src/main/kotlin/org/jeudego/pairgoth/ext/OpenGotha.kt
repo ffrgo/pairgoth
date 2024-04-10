@@ -170,6 +170,13 @@ object OpenGotha {
                 player.participating.forEachIndexed { i,c ->
                     if (c == '0') it.skip.add(i + 1)
                 }
+                if (player.ffgLicence.isNotEmpty()) {
+                    it.externalIds[DatabaseId.FFG] = player.ffgLicence
+                }
+                if (player.egfPin.isNotEmpty()) {
+                    it.externalIds[DatabaseId.EGF] = player.egfPin
+                }
+                it.externalIds
                 canonicMap.put("${player.name.replace(" ", "")}${player.firstName.replace(" ", "")}".uppercase(Locale.ENGLISH), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
@@ -222,7 +229,11 @@ object OpenGotha {
                         player.club
                     }" country="${
                         player.country
-                    }" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="${
+                    }" egfPin="${
+                        player.externalIds[DatabaseId.EGF] ?: ""
+                    }" ffgLicence="${
+                        player.externalIds[DatabaseId.FFG] ?: ""
+                    }" ffgLicenceStatus="" firstName="${
                         player.firstname
                     }" grade="${
                         player.displayRank()
