@@ -157,7 +157,7 @@ onLoad(() => {
   });
   $('#cancel-register').on('click', e => {
     e.preventDefault();
-    if ($('#player-form').hasClass('edit') && !$('#register').hasClass('disabled')) {
+    if (!$('#player-form').hasClass('add') && !$('#register').hasClass('disabled')) {
       let confirmMessage = $('#drop-changes').text();
       if (!confirm(confirmMessage)) {
         return false;
