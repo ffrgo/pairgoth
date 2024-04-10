@@ -146,71 +146,73 @@
           </div>
           <div id="search-result"></div>
         </div>
-        <div class="two stackable fields">
-          <div class="eight wide field">
-            <label>Family name</label>
-            <span class="info"></span>
-            <input type="text" name="name" placeholder="last name"/>
+        <div class="player-fields">
+          <div class="two stackable fields">
+            <div class="eight wide field">
+              <label>Family name</label>
+              <span class="info"></span>
+              <input type="text" name="name" placeholder="last name"/>
+            </div>
+            <div class="eight wide field">
+              <label>Given name</label>
+              <span class="info"></span>
+              <input type="text" name="firstname" placeholder="first name"/>
+            </div>
           </div>
-          <div class="eight wide field">
-            <label>Given name</label>
-            <span class="info"></span>
-            <input type="text" name="firstname" placeholder="first name"/>
-          </div>
-        </div>
-        <div class="two stackable fields">
-          <div class="eight wide field">
-            <label>Country</label>
-            <span class="info"></span>
-            <select name="country">
-              <option></option>
+          <div class="two stackable fields">
+            <div class="eight wide field">
+              <label>Country</label>
+              <span class="info"></span>
+              <select name="country">
+                <option></option>
 #set($defaultCountry = $translate.defaultCountry[$request.lang])
 #foreach($country in $countries.countries)
-              <option value="$country.key">$country.value</option>
+                <option value="$country.key">$country.value</option>
 #end
-            </select>
+              </select>
+            </div>
+            <div class="eight wide field">
+              <label>Club</label>
+              <span class="info"></span>
+              <input type="text" name="club" placeholder="club"/>
+            </div>
           </div>
-          <div class="eight wide field">
-            <label>Club</label>
-            <span class="info"></span>
-            <input type="text" name="club" placeholder="club"/>
-          </div>
-        </div>
-        <div class="two stackable fields">
-          <div class="eight wide field">
-            <label>Rank</label>
-            <span class="info"></span>
-            <select name="rank">
-              <option></option>
+          <div class="two stackable fields">
+            <div class="eight wide field">
+              <label>Rank</label>
+              <span class="info"></span>
+              <select name="rank">
+                <option></option>
 #levels()
-            </select>
+              </select>
+            </div>
+            <div class="eight wide field">
+              <label>Rating</label>
+              <span class="info"></span>
+              <input name="rating" type="text" class="numeric"/>
+            </div>
           </div>
-          <div class="eight wide field">
-            <label>Rating</label>
-            <span class="info"></span>
-            <input name="rating" type="text" class="numeric"/>
-          </div>
-        </div>
-        <div class="inline fields">
-          <label>Final ?</label>
-          <div id="final-reg" class="field">
-            <input name="final" type="hidden"/>
-            <button id="reg-status" type="button" class="ui icon roundedremove mini button">
-              <span class="final"><i class="fa fa-check"></i></span>
-              <span class="preliminary"><i class="fa fa-question"></i></span>
-            </button>
-          </div>
-          <label>Participation</label>
+          <div class="inline fields">
+            <label>Final ?</label>
+            <div id="final-reg" class="field">
+              <input name="final" type="hidden"/>
+              <button id="reg-status" type="button" class="ui icon roundedremove mini button">
+                <span class="final"><i class="fa fa-check"></i></span>
+                <span class="preliminary"><i class="fa fa-question"></i></span>
+              </button>
+            </div>
+            <label>Participation</label>
 #foreach($r in [1..$tour.rounds])
-          <div class="centered field">
-            <label>R${r}</label>
-            <input name="r${r}" type="checkbox" checked="checked" class="participation"/>
-          </div>
+            <div class="centered field">
+              <label>R${r}</label>
+              <input name="r${r}" type="checkbox" checked="checked" class="participation"/>
+            </div>
 #end
+          </div>
         </div>
       </div>
       <div class="popup-footer">
-        <button id="cancel-register" type="button" class="ui gray right labeled icon floating close button">
+        <button id="cancel-register" type="button" class="ui gray right labeled icon floating button">
           <i class="times icon"></i>
           <span class="edition">Close</span>
           <span class="creation">Close</span>
@@ -288,6 +290,8 @@
   </div>
 </div>
 #end
+<div id="drop-changes" class="hidden">Drop changes?</div>
+<div id="unregister-player" class="hidden">Unregister this player?</div>
 #[[
 <script id="result" type="text/template">
   {{for #data}}

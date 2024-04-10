@@ -157,6 +157,12 @@ onLoad(() => {
   });
   $('#cancel-register').on('click', e => {
     e.preventDefault();
+    if ($('#player-form').hasClass('edit') && !$('#register').hasClass('disabled')) {
+      let confirmMessage = $('#drop-changes').text();
+      if (!confirm(confirmMessage)) {
+        return false;
+      }
+    }
     close_modal();
     searchHighlight = undefined;
     return false;
@@ -246,6 +252,7 @@ onLoad(() => {
           }
           form.removeClass('add');
           $('#player').removeClass('create').addClass('edit');
+          $('#register').addClass('disabled');
           modal('player');
         }
       });
@@ -310,12 +317,15 @@ onLoad(() => {
   $('#unregister').on('click', e => {
     let form = $('#player-form')[0];
     let id = form.val('id');
-    api.deleteJson(`tour/${tour_id}/part/${id}`)
-      .then(ret => {
-        if (ret !== 'error') {
-          window.location.reload();
-        }
-    });
+    let confirmMessage = $('#unregister-player').text();
+    if (confirm(confirmMessage)) {
+      api.deleteJson(`tour/${tour_id}/part/${id}`)
+        .then(ret => {
+          if (ret !== 'error') {
+            window.location.reload();
+          }
+        });
+    }
   });
   $('#reg-status').on('click', e => {
     let current = $('#final-reg').hasClass('final');
@@ -428,5 +438,8 @@ onLoad(() => {
   });
   $('#browse-players').on('click', e => {
     search('*');
+  });
+  $('.player-fields').on('change input', e => {
+    $('#register').removeClass('disabled');
   });
 });
