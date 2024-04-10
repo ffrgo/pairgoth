@@ -157,12 +157,6 @@ onLoad(() => {
   });
   $('#cancel-register').on('click', e => {
     e.preventDefault();
-    if (!$('#player-form').hasClass('add') && !$('#register').hasClass('disabled')) {
-      let confirmMessage = $('#drop-changes').text();
-      if (!confirm(confirmMessage)) {
-        return false;
-      }
-    }
     close_modal();
     searchHighlight = undefined;
     return false;
@@ -211,9 +205,9 @@ onLoad(() => {
     if (form.hasClass('add')) {
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
-          console.log(player)
           if (player !== 'error') {
             store('registrationSuccess', true);
+            store('scrollIntoView', player.id)
             window.location.reload();
           }
         });
@@ -224,6 +218,7 @@ onLoad(() => {
         .then(player => {
           if (player !== 'error') {
             store('registrationSuccess', true);
+            store('scrollIntoView', id)
             window.location.reload();
           }
         });
@@ -390,8 +385,20 @@ onLoad(() => {
       $('#player').addClass('successful');
       setTimeout(() => $('#player .success-feedback').addClass('done'), 0);
     }
-    store.remove('registrationSuccess');
   }
+  store.remove('registrationSuccess');
+  let scrollIntoView = store('scrollIntoView');
+  if (scrollIntoView) {
+    let row = $(`tr[data-id="${scrollIntoView}"`);
+    if (row.length) {
+      row.addClass('highlighted');
+      store.remove('scroll');
+      setTimeout(()=>{
+        row[0].scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+    }
+  }
+  store.remove('scrollIntoView');
   if (store('macmahonGroups')) {
     modal('macmahon-groups');
   }

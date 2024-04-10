@@ -203,9 +203,9 @@
             </div>
             <label>Participation</label>
 #foreach($r in [1..$tour.rounds])
-            <div class="centered field">
-              <label>R${r}</label>
-              <input name="r${r}" type="checkbox" checked="checked" class="participation"/>
+            <div class="active centered field">
+              <label for="participation_r${r}">R${r}</label>
+              <input id="participation_r${r}" name="r${r}" type="checkbox" checked="checked" class="participation"/>
             </div>
 #end
           </div>

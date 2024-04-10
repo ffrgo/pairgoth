@@ -160,6 +160,23 @@ function modal(id) {
 }
 
 function close_modal() {
+  // check if modal requires confirmation
+  let shownPopup = $('.shown.popup');
+  if (shownPopup.length == 1) {
+    let id = shownPopup.attr('id');
+    switch (id) {
+      case 'player': {
+        if (!$('#player-form').hasClass('add') && !$('#register').hasClass('disabled')) {
+          let confirmMessage = $('#drop-changes').text();
+          if (!confirm(confirmMessage)) {
+            return false;
+          }
+        }
+        break;
+      }
+    }
+  }
+  // close modal
   $('body').removeClass('dimmed');
   $(`.popup`).removeClass('shown');
   store('addingPlayers', false);

@@ -63,8 +63,13 @@
 
   #players-list {
     max-width: 95vw;
-    #players tr.filtered {
-      display: none;
+    #players {
+      tr.filtered {
+        display: none;
+      }
+      tr.highlighted {
+        background-color: #D0FFD0;
+      }
     }
   }
 
@@ -95,6 +100,9 @@
       &.done {
         opacity: 0;
       }
+    }
+    .active > * {
+      cursor: pointer;
     }
   }
 

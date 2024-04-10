@@ -116,12 +116,11 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Play
     final = json.getBoolean("final") ?: default?.final ?: true,
     mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
 ).also { player ->
-    player.skip.clear()
-    json.getArray("skip")?.let {
+    (json.getArray("skip") ?: default?.skip)?.let {
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
     }
     DatabaseId.values().forEach { dbid ->
-        json.getString(dbid.key)?.let { id ->
+        (json.getString(dbid.key) ?: default?.externalIds?.get(dbid))?.let { id ->
             player.externalIds[dbid] = id
         }
     }
