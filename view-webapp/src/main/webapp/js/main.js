@@ -166,7 +166,7 @@ function close_modal() {
     let id = shownPopup.attr('id');
     switch (id) {
       case 'player': {
-        if (!$('#player-form').hasClass('add') && !$('#register').hasClass('disabled')) {
+        if (shownPopup.hasClass('edit') && !$('#register').hasClass('disabled')) {
           let confirmMessage = $('#drop-changes').text();
           if (!confirm(confirmMessage)) {
             return false;
