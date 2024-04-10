@@ -27,6 +27,11 @@
           <th>First name</th>
           <th>Country</th>
           <th>Club</th>
+#if($tour.country == 'FR')
+          <th>FFG</th>
+#else
+          <th>PIN</th>
+#end
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
@@ -43,6 +48,11 @@
             <td>$part.firstname</td>
             <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
+  #if($tour.country == 'FR')
+            <td>$!part.ffg</td>
+  #else
+            <td>$!part.egf</td>
+  #end
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
             <td>$part.rating</td>
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
