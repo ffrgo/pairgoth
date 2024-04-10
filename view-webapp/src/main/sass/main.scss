@@ -506,6 +506,7 @@
       width: unset;
       height: unset;
       font-size: 0.65em;
+      overflow: visible;
     }
 
     .roundbox {
@@ -561,10 +562,6 @@
           display: none !important;
         }
       }
-    }
-
-    .circular.label {
-      transform: scale(0.7);
     }
 
     #pairing-right {
@@ -644,17 +641,23 @@
     .player {
       color: black !important;
     }
-    .ui.red.circular.label {
-      background-color: white;
-      color: white;
-      border-color: black;
-      text-decoration: solid line-through black;
-    }
-    .ui.green.circular.label {
-      background-color: white;
-      color: black;
-      border-color: black;
+
+    .participation .ui.label {
+      background: none;
+      border: none;
       font-weight: bold;
+      min-width: unset;
+      &.red {
+        color: rgba(0,0,0,0);
+        text-decoration: solid line-through black;
+      }
+      &.green {
+        color: black;
+      }
     }
+
+    table tr td, table tr th { page-break-inside:avoid; }
+    thead { display:table-header-group; }
+    tfoot { display:table-footer-group; }
   }
 }

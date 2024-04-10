@@ -56,14 +56,16 @@
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
             <td>$part.rating</td>
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
+              <div class="participation">
   #foreach($round in [1..$tour.rounds])
     ## CB TODO - upstream json parsing should not give longs here, should it?
     #if($part.skip && $part.skip.contains($round.longValue()))
-              <label class="ui red circular label">$round</label>
+                <label class="ui red label">$round</label>
     #else
-              <label class="ui green circular label">$round</label>
+                <label class="ui green label">$round</label>
     #end
   #end
+              </div>
             </td>
           </tr>
 #end

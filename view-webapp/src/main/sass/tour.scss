@@ -70,6 +70,18 @@
       tr.highlighted {
         background-color: #D0FFD0;
       }
+      .participation {
+        white-space: nowrap;
+        .ui.label {
+          font-size: 0.8rem;
+          min-width: 2em;
+          min-height: 2em;
+          padding: .5em !important;
+          line-height: 1em;
+          text-align: center;
+          border-radius: 500rem;
+        }
+      }
     }
   }
 
