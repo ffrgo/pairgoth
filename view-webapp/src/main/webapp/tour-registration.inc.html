@@ -88,66 +88,71 @@
 </div>
 <div id="player" class="popup">
   <div class="popup-body">
+
+    <form id="search-form" class="ui edit form">
+      <div id="search-header" class="five stackable fields">
+#if($tour.country)
+        <div class="two wide field">
+          <div class="toggle">
+            <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label>$tour.country.toUpperCase()</label>
+          </div>
+        </div>
+#end
+        <div class="needle eight wide field">
+          <div class="ui icon input">
+            <input id="needle" name="needle" type="text" placeholder="Search...">
+            <i id="clear-search" class="clickable close icon"></i>
+          </div>
+        </div>
+#* Disabled
+        <div class="two wide field">
+          <div class="toggle">
+            <input id="aga" name="aga" type="checkbox" value="true"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label>AGA</label>
+          </div>
+        </div>
+*#
+        <div class="two wide field">
+          <div class="toggle" title="${utils.ratingsDates.egf|'no egf ratings'}">
+            <input id="egf" name="egf" type="checkbox" checked value="true"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label>EGF</label>
+          </div>
+        </div>
+        <div class="two wide field">
+          <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
+            <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label>FFG</label>
+          </div>
+        </div>
+        <div class="two wide field">
+          <button id="browse-players" type="button" class="ui basic icon button">
+            <i class="sort alphabet down icon"></i>
+          </button>
+        </div>
+      </div>
+    </form>
+    <div id="search-wrapper">
+      <div id="search-result"></div>
+    </div>
     <form id="player-form" class="ui form edit">
       <input type="hidden" name="id"/>
       <input type="hidden" name="egf_id"/>
       <input type="hidden" name="ffg_id"/>
       <!-- input type="hidden" name="aga"/> -->
       <div class="popup-content">
-        <div id="search-form" class="five stackable fields">
-#if($tour.country)
-          <div class="two wide field">
-            <div class="toggle">
-              <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
-              <div class="search-param checkbox">
-                <div class="circle"></div>
-              </div>
-              <label>$tour.country.toUpperCase()</label>
-            </div>
-          </div>
-#end
-          <div class="eight wide field">
-            <div class="ui icon input">
-              <input id="needle" name="needle" type="text" placeholder="Search...">
-              <i id="clear-search" class="clickable close icon"></i>
-            </div>
-          </div>
-#* Disabled
-          <div class="two wide field">
-            <div class="toggle">
-              <input id="aga" name="aga" type="checkbox" value="true"/>
-              <div class="search-param checkbox">
-                <div class="circle"></div>
-              </div>
-              <label>AGA</label>
-            </div>
-          </div>
-*#
-          <div class="two wide field">
-            <div class="toggle" title="${utils.ratingsDates.egf|'no egf ratings'}">
-              <input id="egf" name="egf" type="checkbox" checked value="true"/>
-              <div class="search-param checkbox">
-                <div class="circle"></div>
-              </div>
-              <label>EGF</label>
-            </div>
-          </div>
-          <div class="two wide field">
-            <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
-              <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
-              <div class="search-param checkbox">
-                <div class="circle"></div>
-              </div>
-              <label>FFG</label>
-            </div>
-          </div>
-          <div class="two wide field">
-            <button id="browse-players" type="button" class="ui basic icon button">
-              <i class="sort alphabet down icon"></i>
-            </button>
-          </div>
-          <div id="search-result"></div>
-        </div>
         <div class="player-fields">
           <div class="two stackable fields">
             <div class="eight wide field">
@@ -297,7 +302,7 @@
 #[[
 <script id="result" type="text/template">
   {{for #data}}
-    <div class="result-line" data-index="{{:#getIndex()}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
+    <div class="result-line" data-index="{{:#getIndex()}}" data-name="{{:name}}">[{{:origin}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
   {{/for}}
 </script>
 <script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>

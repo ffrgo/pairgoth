@@ -22,7 +22,7 @@ function searchResultShown() {
 function search(needle) {
   needle = needle.trim();
   if (needle && (needle === '*' || needle.length > 2)) {
-    let form = $('#player-form')[0];
+    let form = $('#search-form')[0];
     let search = {
       needle: needle,
       // aga: form.val('aga'),
@@ -44,6 +44,22 @@ function search(needle) {
           searchResult = result
           let html = resultTemplate.render(result);
           $('#search-result')[0].innerHTML = html;
+          if (needle === '*') {
+            setTimeout(() => {
+              let scrollTo = $('#needle')[0].value.trim();
+              while (scrollTo.length > 0) {
+                let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
+                if (target.length > 0) {
+                  target[0].scrollIntoView({ behavior: "smooth", block: "center" });
+                  break;
+                }
+                scrollTo = scrollTo.substring(0, scrollTo.length - 1);
+              }
+            }, 0);
+          } else {
+            let scrollable = $('#player .popup-body');
+            scrollable[0].scrollTop = 0;
+          }
         } else console.log(result);
       });
   } else {
@@ -88,7 +104,6 @@ function fillPlayer(player) {
 
 function addPlayers() {
   let form = $('#player-form')[0];
-  form.addClass('add');
   // keep preliminary/final status
   let status = form.val('final') || false;
   form.reset();
@@ -202,7 +217,7 @@ onLoad(() => {
         player[origin] = value;
       }
     }
-    if (form.hasClass('add')) {
+    if ($('#player').hasClass('create')) {
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
           if (player !== 'error') {
@@ -245,7 +260,6 @@ onLoad(() => {
           for (r = 1; r <= tour_rounds; ++r) {
             form.val(`r${r}`, !(player.skip && player.skip.includes(r)));
           }
-          form.removeClass('add');
           $('#player').removeClass('create').addClass('edit');
           $('#register').addClass('disabled');
           modal('player');

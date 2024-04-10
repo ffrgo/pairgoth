@@ -118,17 +118,35 @@
     }
   }
 
-  #player-form {
-    &:not(.add) {
+  #player {
+    &.edit {
       #search-form, #search-result {
         display: none;
       }
     }
+    &.create {
+      .popup-body {
+        padding-top: 0;
+        .needle {
+          padding-top: 0.25em;
+        }
+      }
+    }
   }
   #search-form {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  #search-header {
+    position: relative;
+    background-color: white;
+  }
+  #search-wrapper {
     position: relative;
   }
   #search-result {
+    text-align: left;
     position: absolute;
     background-color: gray;
     z-index: 2;
