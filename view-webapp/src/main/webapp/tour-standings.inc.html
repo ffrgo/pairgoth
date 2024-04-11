@@ -100,6 +100,9 @@
       Publish standings
     </div>
     <div class="popup-content">
+#if($round < $tour.rounds)
+      <div class="warning">Warning: publishing partial results at round <span>$round</span> out of <span>$tour.rounds</span>!</div>
+#end
       <form class="ui edit form">
         <div class="field">
           <label>Encoding</label>

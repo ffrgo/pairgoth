@@ -198,8 +198,17 @@ onLoad(() => {
     // $('#player-form')[0].requestSubmit() not working?!
     $('#player-form')[0].dispatchEvent(new CustomEvent('submit', {cancelable: true}));
   });
+  $('#search-form').on('submit', e => {
+    // this form is never meant to be submitted
+    e.preventDefault();
+    return false;
+  });
   $('#player-form').on('submit', e => {
     e.preventDefault();
+    if ($('#register').hasClass('disabled')) {
+      // user pressed enter
+      return false;
+    }
     let form = $('#player-form')[0];
     let player = {
       name: form.val('name'),

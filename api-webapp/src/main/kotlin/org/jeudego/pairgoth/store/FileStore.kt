@@ -138,7 +138,17 @@ class FileStore(pathStr: String): Store {
             entries.mapNotNull { entry ->
                 entry.toFile()
             }.firstOrNull()
-        }?.renameTo(path.resolve(filename + "-${timestamp}").toFile())
+        }?.let { file ->
+            val dest = path.resolve(filename + "-${timestamp}").toFile()
+            if (dest.exists()) {
+                // it means the user performed several actions in the same second...
+                // drop the last occurrence
+                dest.delete()
+            }
+            if (!file.renameTo(dest)) {
+                throw Error("Cannot rename ${file.path} to ${dest.path}")
+            }
+        }
 
         addTournament(tournament)
     }

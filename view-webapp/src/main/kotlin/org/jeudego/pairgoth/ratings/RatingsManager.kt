@@ -47,9 +47,11 @@ object RatingsManager: Runnable {
         }
     }
 
+    const val PERIOD = 3600000L
+
     override fun run() {
         logger.info("launching ratings manager")
-        timer.scheduleAtFixedRate(Task, 0L, 3600000L)
+        timer.scheduleAtFixedRate(Task, 0L, PERIOD)
     }
     object Task: TimerTask() {
         override fun run() {

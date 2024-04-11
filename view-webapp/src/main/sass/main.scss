@@ -43,6 +43,12 @@
     color: darkred;
   }
 
+  .warning {
+    color: darkred;
+    font-weight: bold;
+    font-style: italic;
+  }
+
   /* header, center, footer */
   
   #header {
@@ -302,17 +308,21 @@
   }
 
   #backdrop {
-    display: none;
+    display: block;
+    background-color: rgba(0,0,0,0.2);
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    transition: opacity 500s ease-out;
+    pointer-events: none;
     &.active {
-      display: block;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 999;
-      background-color: rgba(0,0,0,0.2);
+      pointer-events: initial;
       cursor: wait;
+      opacity: 1;
     }
   }
 

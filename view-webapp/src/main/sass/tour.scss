@@ -341,6 +341,7 @@
       }
     }
     .player {
+      min-width: 12em;
       &.winner {
         color: darkred;
         font-weight: bold;
