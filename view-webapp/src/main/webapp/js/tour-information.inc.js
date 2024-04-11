@@ -130,7 +130,9 @@ onLoad(() => {
       if (resp.ok) return resp.text()
       else throw "export error"
     }).then(txt => {
-      let blob = new Blob(['\uFEFF', txt.trim()], {type: 'application/json;charset=utf-8'});
+      // json does not need BOM header
+      // let blob = new Blob(['\uFEFF', txt.trim()], {type: 'application/json;charset=utf-8'});
+      let blob = new Blob([txt.trim()], {type: 'application/json;charset=utf-8'});
       downloadFile(blob, `${shortName}.tour`);
     }).catch(err => showError(err));
   });
