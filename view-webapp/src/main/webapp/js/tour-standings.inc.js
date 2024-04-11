@@ -80,7 +80,7 @@ onLoad(() => {
     publish('application/ffg', 'tou');
   });
   $('.publish-egf').on('click', e => {
-    publish('application/egf', 'h9');
+    publish('application/egf', 'h' + (typeof(correction) === 'number' && correction > 0 ? correction : 9 ));
   });
   $('.publish-csv').on('click', e => {
     publish('text/csv', 'csv');
