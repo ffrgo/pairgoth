@@ -107,7 +107,7 @@
     right: 0;
     background-color: black;
     opacity: 0;
-    transition: opacity 0.5s;
+    transition: opacity 300ms;
     z-index: 50;
     pointer-events: none;
   }
@@ -120,7 +120,7 @@
   .ui.modal {
     display: block;
     opacity: 0;
-    transition: opacity 0.5s;
+    transition: opacity 300ms;
     pointer-events: none;
   }
 
@@ -145,7 +145,7 @@
 
   .button.floating {
     box-shadow: 0px 8px 8px -5px rgba(0,0,0,35%);
-    transition: all 0.3s;
+    transition: all 200ms;
     &.white  {
       border: solid 1px black;
       background-color: white;
@@ -155,7 +155,7 @@
       transform: scale(1.05);
     }
     &:active {
-      transition: all 0.1s;
+      transition: all 200ms;
       box-shadow: none;
       transform: translate(0px, 5px);
     }
@@ -235,7 +235,7 @@
     max-height: 0;
     overflow-y: hidden;
     padding: 0 1em 0 2em;
-    transition: all 0.5s ease-out;
+    //transition: all 1s linear;
     &.active {
       padding: 0.5em 1em 0.5em 2em;
       max-height: 150vh;
@@ -392,7 +392,7 @@
       max-height: 80vh;
       max-width: 80vw;
       transform: rotate3d(1, 0, 0, 90deg);
-      transition: transform 1s cubic-bezier(0.500, 0.250, 0.300, 1.650);
+      transition: transform 300ms ease-out;
       background-color: white;
       padding: 1em;
       border-radius: 5px;
@@ -423,7 +423,7 @@
     }
     &.shown {
       pointer-events: initial;
-      transition: transform 1s cubic-bezier(0.500, 0.250, 0.300, 1.650);
+      transition: transform 300ms ease-out; // cubic-bezier(0.500, 0.250, 0.300, 1.650);
       display: block;
       .popup-body {
         transform: rotate3d(1, 0, 0, 0deg);
