@@ -513,7 +513,8 @@ sealed class BaseSolver(
     open fun HandicapParams.clamp(input: Int): Int {
         var hd = input
         if (hd >= correction) hd -= correction
-        if (hd < 0) hd = max(hd + correction, 0)
+        else if (hd < 0) hd = max(hd + correction, 0)
+        else hd = 0
         // Clamp handicap with ceiling
         hd = min(hd, ceiling)
         hd = max(hd, -ceiling)
