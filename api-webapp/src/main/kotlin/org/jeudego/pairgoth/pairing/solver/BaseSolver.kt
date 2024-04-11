@@ -512,6 +512,7 @@ sealed class BaseSolver(
 
     open fun HandicapParams.clamp(input: Int): Int {
         var hd = input
+        // TODO - validate that "correction" is >= 0 (or modify the UI and the following code to handle the <0 case)
         if (hd >= correction) hd -= correction
         else if (hd < 0) hd = max(hd + correction, 0)
         else hd = 0
