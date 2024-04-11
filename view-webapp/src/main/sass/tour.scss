@@ -36,7 +36,9 @@
     flex-flow: column nowrap;
     justify-content: space-between;
     margin: 1px;
+    padding: 0.2em;
     background-color: #eeeeee;
+    align-items: flex-start;
     &.centered {
       align-items: center;
     }
