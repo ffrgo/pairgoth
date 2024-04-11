@@ -1,9 +1,12 @@
 package org.jeudego.pairgoth.web
 
 import com.republicate.kson.Json
+import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.util.Upload
 import org.jeudego.pairgoth.view.ApiTool
 import org.jeudego.pairgoth.view.PairgothTool.Companion.EXAMPLES_DIRECTORY
+import java.io.ByteArrayInputStream
+import java.io.InputStreamReader
 import java.nio.charset.StandardCharsets
 import javax.servlet.http.HttpServlet
 import javax.servlet.http.HttpServletRequest
@@ -23,7 +26,8 @@ class ImportServlet: HttpServlet() {
                 val bytes = uploads.first().second
                 var apiResp: Json? = null
                 if (name.endsWith(".tour")) {
-                    val json = Json.parse(bytes.toString(StandardCharsets.UTF_8))
+                    val content = InputStreamReader(BOMInputStream(ByteArrayInputStream(bytes)), StandardCharsets.UTF_8).readText()
+                    val json = Json.parse(content)
                     if (json == null || !json.isObject) {
                         resp.sendError(HttpServletResponse.SC_BAD_REQUEST)
                     } else {
