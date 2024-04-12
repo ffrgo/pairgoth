@@ -1,0 +1,757 @@
+{
+  "id" : 3,
+  "type" : "INDIVIDUAL",
+  "name" : "Stage FFG 2021",
+  "shortName" : "stage-2021",
+  "startDate" : "2021-07-10",
+  "endDate" : "2021-07-24",
+  "country" : "FR",
+  "location" : "Montcabrier",
+  "online" : false,
+  "komi" : 7.5,
+  "rules" : "FRENCH",
+  "gobanSize" : 19,
+  "timeSystem" : {
+    "type" : "STANDARD",
+    "mainTime" : 60,
+    "byoyomi" : 30,
+    "periods" : 1
+  },
+  "rounds" : 10,
+  "pairing" : {
+    "type" : "MAC_MAHON",
+    "base" : {
+      "nx1" : 0.5,
+      "dupWeight" : 5.0E14,
+      "random" : 0.0,
+      "colorBalanceWeight" : 1000000.0
+    },
+    "main" : {
+      "catWeight" : 0.0,
+      "scoreWeight" : 1.0E11,
+      "upDownWeight" : 1.0E8,
+      "upDownCompensate" : true,
+      "upDownLowerMode" : "MIDDLE",
+      "upDownUpperMode" : "MIDDLE",
+      "maximizeSeeding" : 5000000.0,
+      "firstSeedLastRound" : 2,
+      "firstSeed" : "SPLIT_AND_RANDOM",
+      "secondSeed" : "SPLIT_AND_SLIP",
+      "firstSeedAddCrit" : "RATING",
+      "secondSeedAddCrit" : "NONE"
+    },
+    "secondary" : {
+      "barThreshold" : true,
+      "rankThreshold" : 0,
+      "winsThreshold" : false,
+      "secWeight" : 1.0E11
+    },
+    "geo" : {
+      "weight" : 1.215752192E9,
+      "mmsDiffCountry" : 1,
+      "mmsDiffClubGroup" : 2,
+      "mmsDiffClub" : 3
+    },
+    "handicap" : {
+      "weight" : 0.0,
+      "useMMS" : false,
+      "threshold" : 0,
+      "correction" : 1,
+      "ceiling" : 9
+    },
+    "placement" : [
+      "MMS",
+      "SOSM",
+      "SOSOSM"
+    ],
+    "mmFloor" : -20,
+    "mmBar" : 0
+  },
+  "players" : [
+    {
+      "id" : 706,
+      "name" : "Evain",
+      "firstname" : "Andéol",
+      "rating" : 1982,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 707,
+      "name" : "Guerre-Genton",
+      "firstname" : "Philippe",
+      "rating" : 2080,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 708,
+      "name" : "Ougier",
+      "firstname" : "Ariane",
+      "rating" : 2392,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 709,
+      "name" : "Fourcade",
+      "firstname" : "Annabel",
+      "rating" : -900,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 710,
+      "name" : "Bonetti",
+      "firstname" : "Benoit",
+      "rating" : -900,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "31Ba"
+    },
+    {
+      "id" : 711,
+      "name" : "Frappart",
+      "firstname" : "Bastien",
+      "rating" : 1598,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "94Ca"
+    },
+    {
+      "id" : 712,
+      "name" : "Rosenblatt",
+      "firstname" : "Simon",
+      "rating" : 2022,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "75Op"
+    },
+    {
+      "id" : 713,
+      "name" : "Aim",
+      "firstname" : "Warren",
+      "rating" : 1877,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 714,
+      "name" : "Perrin",
+      "firstname" : "Thibaut",
+      "rating" : 1652,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 715,
+      "name" : "Robichon",
+      "firstname" : "Benoit",
+      "rating" : 2046,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 716,
+      "name" : "Ronayette",
+      "firstname" : "Elodie",
+      "rating" : 1436,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 717,
+      "name" : "Houari",
+      "firstname" : "Kevin",
+      "rating" : 1674,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 718,
+      "name" : "Stockholm",
+      "firstname" : "Daniel",
+      "rating" : 1391,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "75OB"
+    },
+    {
+      "id" : 719,
+      "name" : "le",
+      "firstname" : "Tâm_Loup",
+      "rating" : 1492,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 720,
+      "name" : "Mezouar",
+      "firstname" : "Abdallah",
+      "rating" : 2198,
+      "rank" : 1,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 721,
+      "name" : "Rioland",
+      "firstname" : "Florent",
+      "rating" : 2342,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 722,
+      "name" : "Wilhelm",
+      "firstname" : "Lubin",
+      "rating" : 2045,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 723,
+      "name" : "Ougier",
+      "firstname" : "Guillaume",
+      "rating" : 2418,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 724,
+      "name" : "Wargny",
+      "firstname" : "Anaïs",
+      "rating" : -900,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "76Ha"
+    },
+    {
+      "id" : 725,
+      "name" : "Goossens",
+      "firstname" : "Sylvie",
+      "rating" : -101,
+      "rank" : -22,
+      "country" : "FR",
+      "club" : "64Pa"
+    },
+    {
+      "id" : 726,
+      "name" : "Vieille",
+      "firstname" : "Louis",
+      "rating" : -900,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 727,
+      "name" : "Bouisset",
+      "firstname" : "Rose-Marie",
+      "rating" : 1280,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "75OB"
+    },
+    {
+      "id" : 728,
+      "name" : "Johnson",
+      "firstname" : "Hugo",
+      "rating" : 1028,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 729,
+      "name" : "Beltran",
+      "firstname" : "Arnaud",
+      "rating" : 1989,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "66Pe"
+    },
+    {
+      "id" : 730,
+      "name" : "Gaschignard",
+      "firstname" : "Jean-Paul",
+      "rating" : 1925,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "42Se"
+    },
+    {
+      "id" : 731,
+      "name" : "Thomazeau",
+      "firstname" : "Gregoire",
+      "rating" : 1774,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "00St"
+    },
+    {
+      "id" : 732,
+      "name" : "Perroux",
+      "firstname" : "Etienne",
+      "rating" : 1978,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "91Or"
+    },
+    {
+      "id" : 733,
+      "name" : "Pittonet",
+      "firstname" : "Jonathan",
+      "rating" : -900,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "00St"
+    },
+    {
+      "id" : 734,
+      "name" : "Yung",
+      "firstname" : "Oscar",
+      "rating" : 1689,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "10Tr"
+    },
+    {
+      "id" : 735,
+      "name" : "Lidureau",
+      "firstname" : "Nicolas",
+      "rating" : 777,
+      "rank" : -13,
+      "country" : "FR",
+      "club" : "06Ni"
+    },
+    {
+      "id" : 736,
+      "name" : "Lidureau",
+      "firstname" : "Andrea",
+      "rating" : -298,
+      "rank" : -24,
+      "country" : "FR",
+      "club" : "06Ni"
+    },
+    {
+      "id" : 737,
+      "name" : "Clergue",
+      "firstname" : "Olivier",
+      "rating" : 2158,
+      "rank" : 1,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 738,
+      "name" : "Mir",
+      "firstname" : "Abel",
+      "rating" : 1174,
+      "rank" : -9,
+      "country" : "FR",
+      "club" : "75Ju"
+    },
+    {
+      "id" : 739,
+      "name" : "Grange-Praderas",
+      "firstname" : "Jean-Romain",
+      "rating" : 1250,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "64Pa"
+    },
+    {
+      "id" : 740,
+      "name" : "Doisneau",
+      "firstname" : "Brigitte",
+      "rating" : 883,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "44Na"
+    },
+    {
+      "id" : 741,
+      "name" : "Mangin",
+      "firstname" : "Elian",
+      "rating" : 2118,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 742,
+      "name" : "Lips",
+      "firstname" : "Fabien",
+      "rating" : 2408,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "75Al"
+    },
+    {
+      "id" : 743,
+      "name" : "Battin",
+      "firstname" : "Léo",
+      "rating" : 2097,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "42Se"
+    },
+    {
+      "id" : 744,
+      "name" : "Garlatti",
+      "firstname" : "Gérald",
+      "rating" : 1745,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "73Ch"
+    },
+    {
+      "id" : 745,
+      "name" : "Teissier",
+      "firstname" : "Antonin",
+      "rating" : 605,
+      "rank" : -15,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 746,
+      "name" : "Lemoine",
+      "firstname" : "Theo",
+      "rating" : 2172,
+      "rank" : 1,
+      "country" : "FR",
+      "club" : "49An"
+    },
+    {
+      "id" : 747,
+      "name" : "Robert",
+      "firstname" : "Raphaël",
+      "rating" : 1008,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "59Li"
+    },
+    {
+      "id" : 748,
+      "name" : "Martin-Vallas",
+      "firstname" : "Bruno",
+      "rating" : 1050,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "30LV"
+    },
+    {
+      "id" : 749,
+      "name" : "Chauvin",
+      "firstname" : "Christian",
+      "rating" : 1650,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 750,
+      "name" : "Papazoglou",
+      "firstname" : "Alain",
+      "rating" : 1704,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 751,
+      "name" : "Col",
+      "firstname" : "Sylvain",
+      "rating" : 1796,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 752,
+      "name" : "Papazoglou",
+      "firstname" : "Jean-Yves",
+      "rating" : 1356,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "31Ba"
+    },
+    {
+      "id" : 753,
+      "name" : "Gauthier",
+      "firstname" : "Henri",
+      "rating" : 2094,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "21Di"
+    },
+    {
+      "id" : 754,
+      "name" : "Radal",
+      "firstname" : "Lucien",
+      "rating" : 1878,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 755,
+      "name" : "Paret",
+      "firstname" : "Léonard",
+      "rating" : 910,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "38GJ"
+    },
+    {
+      "id" : 756,
+      "name" : "Saint-Paul",
+      "firstname" : "Florent",
+      "rating" : 1410,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 757,
+      "name" : "Goffard",
+      "firstname" : "Mikaël",
+      "rating" : 1490,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 758,
+      "name" : "Bisaccia",
+      "firstname" : "Thomas",
+      "rating" : 918,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "42Se"
+    },
+    {
+      "id" : 759,
+      "name" : "Willenbucher",
+      "firstname" : "Antoine",
+      "rating" : 950,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 760,
+      "name" : "Bernard",
+      "firstname" : "Gaultier",
+      "rating" : 1710,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 761,
+      "name" : "Fiorina",
+      "firstname" : "Baptiste",
+      "rating" : 1474,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 762,
+      "name" : "Hautefeuille",
+      "firstname" : "Octave",
+      "rating" : 868,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 763,
+      "name" : "Bakri",
+      "firstname" : "Adam",
+      "rating" : -738,
+      "rank" : -28,
+      "country" : "FR",
+      "club" : "77ML"
+    },
+    {
+      "id" : 764,
+      "name" : "Girousse",
+      "firstname" : "Siméon",
+      "rating" : 2273,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "64Pa"
+    },
+    {
+      "id" : 765,
+      "name" : "Kuperberg",
+      "firstname" : "Denis",
+      "rating" : 2250,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 766,
+      "name" : "Lebas_de_Saint_Martin",
+      "firstname" : "Sophie",
+      "rating" : 1302,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "75Al"
+    },
+    {
+      "id" : 767,
+      "name" : "Derrien",
+      "firstname" : "Christele",
+      "rating" : 835,
+      "rank" : -13,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 768,
+      "name" : "Kunne",
+      "firstname" : "Stéphan",
+      "rating" : 2320,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "91Or"
+    },
+    {
+      "id" : 769,
+      "name" : "Forissier",
+      "firstname" : "Gilles",
+      "rating" : 402,
+      "rank" : -17,
+      "country" : "FR",
+      "club" : "69Ly"
+    },
+    {
+      "id" : 770,
+      "name" : "Ravera",
+      "firstname" : "Sylvain",
+      "rating" : 1761,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "92Le"
+    },
+    {
+      "id" : 771,
+      "name" : "Grosdoy",
+      "firstname" : "Siméon",
+      "rating" : 1375,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 772,
+      "name" : "Valot",
+      "firstname" : "Raphaël",
+      "rating" : 1718,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "25Be"
+    },
+    {
+      "id" : 773,
+      "name" : "Barcelo",
+      "firstname" : "Patrice",
+      "rating" : 1979,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 774,
+      "name" : "Levointurier",
+      "firstname" : "Christophe",
+      "rating" : 1365,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "00St"
+    },
+    {
+      "id" : 775,
+      "name" : "Bocquet",
+      "firstname" : "Jean-François",
+      "rating" : 1820,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 776,
+      "name" : "Gzhal",
+      "firstname" : "Soufiane",
+      "rating" : 750,
+      "rank" : -13,
+      "country" : "FR",
+      "club" : "63Ce"
+    },
+    {
+      "id" : 777,
+      "name" : "Teissier",
+      "firstname" : "Samuel",
+      "rating" : 2351,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 778,
+      "name" : "Paris",
+      "firstname" : "Cyriel",
+      "rating" : 950,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "31To"
+    },
+    {
+      "id" : 779,
+      "name" : "Streicher",
+      "firstname" : "Frédéric",
+      "rating" : 2050,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 780,
+      "name" : "Puaud",
+      "firstname" : "Denis",
+      "rating" : 1360,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "31Ba"
+    },
+    {
+      "id" : 781,
+      "name" : "Loizance",
+      "firstname" : "Benjamin",
+      "rating" : 1603,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "35Re"
+    }
+  ],
+  "games" : []
+}

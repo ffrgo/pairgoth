@@ -1,0 +1,1757 @@
+{
+  "id" : 1,
+  "type" : "INDIVIDUAL",
+  "name" : "Frioul 2018",
+  "shortName" : "frioul-2018",
+  "startDate" : "2018-09-07",
+  "endDate" : "2018-09-07",
+  "country" : "",
+  "location" : "Frioul",
+  "online" : false,
+  "komi" : 7.5,
+  "rules" : "FRENCH",
+  "gobanSize" : 19,
+  "timeSystem" : {
+    "type" : "CANADIAN",
+    "mainTime" : 60,
+    "byoyomi" : 300,
+    "stones" : 15
+  },
+  "rounds" : 4,
+  "pairing" : {
+    "type" : "MAC_MAHON",
+    "base" : {
+      "nx1" : 0.5,
+      "dupWeight" : 5.0E14,
+      "random" : 0.0,
+      "colorBalanceWeight" : 1000000.0
+    },
+    "main" : {
+      "catWeight" : 0.0,
+      "scoreWeight" : 1.0E11,
+      "upDownWeight" : 1.0E8,
+      "upDownCompensate" : true,
+      "upDownLowerMode" : "MIDDLE",
+      "upDownUpperMode" : "MIDDLE",
+      "maximizeSeeding" : 5000000.0,
+      "firstSeedLastRound" : 2,
+      "firstSeed" : "SPLIT_AND_RANDOM",
+      "secondSeed" : "SPLIT_AND_SLIP",
+      "firstSeedAddCrit" : "RATING",
+      "secondSeedAddCrit" : "NONE"
+    },
+    "secondary" : {
+      "barThreshold" : true,
+      "rankThreshold" : 0,
+      "winsThreshold" : false,
+      "secWeight" : 1.0E11
+    },
+    "geo" : {
+      "weight" : 1.215752192E9,
+      "mmsDiffCountry" : 1,
+      "mmsDiffClubGroup" : 2,
+      "mmsDiffClub" : 3
+    },
+    "handicap" : {
+      "weight" : 0.0,
+      "useMMS" : true,
+      "threshold" : 0,
+      "correction" : 1,
+      "ceiling" : 9
+    },
+    "placement" : [
+      "MMS",
+      "SOSM",
+      "SOSOSM"
+    ],
+    "mmFloor" : -20,
+    "mmBar" : 0
+  },
+  "players" : [
+    {
+      "id" : 1,
+      "name" : "Mignucci",
+      "firstname" : "Bernard",
+      "rating" : 1778,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 2,
+      "name" : "Lakssil",
+      "firstname" : "Maleek",
+      "rating" : 1917,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "76Ro"
+    },
+    {
+      "id" : 3,
+      "name" : "Tournellec",
+      "firstname" : "Julien",
+      "rating" : 2050,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "92An"
+    },
+    {
+      "id" : 4,
+      "name" : "Becker",
+      "firstname" : "Denis",
+      "rating" : 1276,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 5,
+      "name" : "Lefebvre",
+      "firstname" : "Louise",
+      "rating" : -400,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 6,
+      "name" : "Lefebvre",
+      "firstname" : "Nina",
+      "rating" : -400,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 7,
+      "name" : "Guerre-Genton",
+      "firstname" : "Philippe",
+      "rating" : 2064,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 8,
+      "name" : "Goloubkov",
+      "firstname" : "Alexandra",
+      "rating" : 1023,
+      "rank" : -11,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 9,
+      "name" : "Berreby",
+      "firstname" : "Monique",
+      "rating" : 1951,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 10,
+      "name" : "Marechal",
+      "firstname" : "Morgane",
+      "rating" : 696,
+      "rank" : -14,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 11,
+      "name" : "Crepy",
+      "firstname" : "Pascal",
+      "rating" : 1373,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 12,
+      "name" : "Leclercq",
+      "firstname" : "Philippe",
+      "rating" : 523,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 13,
+      "name" : "Vaca",
+      "firstname" : "Jean-François",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 14,
+      "name" : "Detivaud",
+      "firstname" : "Pierre",
+      "rating" : 1817,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "38Gr",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 15,
+      "name" : "Nguyen_The",
+      "firstname" : "Minh",
+      "rating" : 1559,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "31To",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 16,
+      "name" : "Coppey",
+      "firstname" : "Philippe",
+      "rating" : 1317,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 17,
+      "name" : "Cornaggia",
+      "firstname" : "Rémi",
+      "rating" : 1841,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "35Re"
+    },
+    {
+      "id" : 18,
+      "name" : "Pastorino",
+      "firstname" : "Alexandre",
+      "rating" : 500,
+      "rank" : -16,
+      "country" : "Fr",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 19,
+      "name" : "Buffard",
+      "firstname" : "Yann",
+      "rating" : -900,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 20,
+      "name" : "Blanckaert",
+      "firstname" : "Till",
+      "rating" : 1392,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 21,
+      "name" : "Martin",
+      "firstname" : "Yvan",
+      "rating" : 1567,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "44Na"
+    },
+    {
+      "id" : 22,
+      "name" : "Rioland",
+      "firstname" : "Florent",
+      "rating" : 2336,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 23,
+      "name" : "Spano",
+      "firstname" : "Christelle",
+      "rating" : 261,
+      "rank" : -18,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 24,
+      "name" : "Thao",
+      "firstname" : "Stéphane",
+      "rating" : 1893,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 25,
+      "name" : "Morel",
+      "firstname" : "Aurélien",
+      "rating" : 2119,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38GJ"
+    },
+    {
+      "id" : 26,
+      "name" : "Damaz",
+      "firstname" : "Dani",
+      "rating" : 1785,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 27,
+      "name" : "Betored",
+      "firstname" : "Didier",
+      "rating" : 1258,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 28,
+      "name" : "Mougin",
+      "firstname" : "Déborah",
+      "rating" : 1346,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 29,
+      "name" : "Artigny",
+      "firstname" : "Julie",
+      "rating" : 1790,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "83SA",
+      "skip" : [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 30,
+      "name" : "Lefebvre",
+      "firstname" : "Loïc",
+      "rating" : 2131,
+      "rank" : 0,
+      "country" : "FR",
+      "club" : "38Gr",
+      "skip" : [
+        2
+      ]
+    },
+    {
+      "id" : 31,
+      "name" : "Guibert",
+      "firstname" : "Cécile",
+      "rating" : 1850,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 32,
+      "name" : "Coppe",
+      "firstname" : "Bernard",
+      "rating" : 1898,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 33,
+      "name" : "Bonat",
+      "firstname" : "Axel",
+      "rating" : 1974,
+      "rank" : -1,
+      "country" : "FR",
+      "club" : "13Mr"
+    },
+    {
+      "id" : 34,
+      "name" : "Roubertie",
+      "firstname" : "Julien",
+      "rating" : 2382,
+      "rank" : 3,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 35,
+      "name" : "Lefebvre",
+      "firstname" : "Antoine",
+      "rating" : 1941,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "84Av"
+    },
+    {
+      "id" : 36,
+      "name" : "Couffignal",
+      "firstname" : "Marie",
+      "rating" : 784,
+      "rank" : -13,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        2
+      ]
+    },
+    {
+      "id" : 37,
+      "name" : "Carbonnel",
+      "firstname" : "Roland",
+      "rating" : 1662,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "38Gr",
+      "skip" : [
+        3
+      ]
+    },
+    {
+      "id" : 38,
+      "name" : "Blanco",
+      "firstname" : "Cyril",
+      "rating" : 480,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 39,
+      "name" : "Brochet",
+      "firstname" : "Philippe",
+      "rating" : 1660,
+      "rank" : -4,
+      "country" : "FR",
+      "club" : "84Va"
+    },
+    {
+      "id" : 40,
+      "name" : "Lacroix",
+      "firstname" : "Caroline",
+      "rating" : 877,
+      "rank" : -12,
+      "country" : "FR",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 41,
+      "name" : "Lextrait",
+      "firstname" : "Cesar",
+      "rating" : 2265,
+      "rank" : 2,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        1
+      ]
+    },
+    {
+      "id" : 42,
+      "name" : "le_Lidec",
+      "firstname" : "Gaël",
+      "rating" : 1418,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 43,
+      "name" : "Col",
+      "firstname" : "Sylvain",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "34Mo"
+    },
+    {
+      "id" : 44,
+      "name" : "Stieglitz",
+      "firstname" : "Robin",
+      "rating" : 1916,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "38Gr",
+      "skip" : [
+        2,
+        3
+      ]
+    },
+    {
+      "id" : 45,
+      "name" : "Dumas",
+      "firstname" : "Olivier",
+      "rating" : 1271,
+      "rank" : -8,
+      "country" : "FR",
+      "club" : "38Gr"
+    },
+    {
+      "id" : 46,
+      "name" : "Passow",
+      "firstname" : "Adrian",
+      "rating" : 2354,
+      "rank" : 3,
+      "country" : "DE",
+      "club" : "B",
+      "skip" : [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 47,
+      "name" : "Ferreira",
+      "firstname" : "Joao",
+      "rating" : 1179,
+      "rank" : -9,
+      "country" : "PT",
+      "club" : "xxxx"
+    },
+    {
+      "id" : 48,
+      "name" : "le_Lidec",
+      "firstname" : "Philémon",
+      "rating" : -292,
+      "rank" : -20,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 49,
+      "name" : "Margouillet",
+      "firstname" : "Kevin",
+      "rating" : 290,
+      "rank" : -16,
+      "country" : "FR",
+      "club" : "06Pe"
+    },
+    {
+      "id" : 50,
+      "name" : "Pettex",
+      "firstname" : "Romain",
+      "rating" : 600,
+      "rank" : -15,
+      "country" : "Fr",
+      "club" : "13Ma"
+    },
+    {
+      "id" : 51,
+      "name" : "Imhoff",
+      "firstname" : "Lisa",
+      "rating" : 574,
+      "rank" : -15,
+      "country" : "FR",
+      "club" : "34Mo",
+      "skip" : [
+        2,
+        3
+      ]
+    },
+    {
+      "id" : 52,
+      "name" : "Hueber",
+      "firstname" : "Jean-Philippe",
+      "rating" : 1880,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "84Va"
+    },
+    {
+      "id" : 53,
+      "name" : "Camps",
+      "firstname" : "Marie-Françoise",
+      "rating" : 1149,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "34Mo",
+      "skip" : [
+        2
+      ]
+    },
+    {
+      "id" : 54,
+      "name" : "Reynal",
+      "firstname" : "Sylvain",
+      "rating" : 1078,
+      "rank" : -10,
+      "country" : "FR",
+      "club" : "34Mo",
+      "skip" : [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 55,
+      "name" : "Ghyselen",
+      "firstname" : "Guillaume",
+      "rating" : 1857,
+      "rank" : -2,
+      "country" : "FR",
+      "club" : "69Ly",
+      "skip" : [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20
+      ]
+    },
+    {
+      "id" : 56,
+      "name" : "Fronteri",
+      "firstname" : "Pierre",
+      "rating" : 1590,
+      "rank" : -5,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        3
+      ]
+    },
+    {
+      "id" : 57,
+      "name" : "Brisson",
+      "firstname" : "Claude",
+      "rating" : 1504,
+      "rank" : -6,
+      "country" : "FR",
+      "club" : "13Ma",
+      "skip" : [
+        1
+      ]
+    },
+    {
+      "id" : 58,
+      "name" : "Jumelin",
+      "firstname" : "Macha",
+      "rating" : 1421,
+      "rank" : -7,
+      "country" : "FR",
+      "club" : "38Gr"
+    }
+  ],
+  "games" : [
+    [
+      {
+        "id" : 1,
+        "t" : 1,
+        "w" : 30,
+        "b" : 34,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 2,
+        "t" : 2,
+        "w" : 46,
+        "b" : 33,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 3,
+        "t" : 3,
+        "w" : 7,
+        "b" : 22,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 4,
+        "t" : 4,
+        "w" : 3,
+        "b" : 25,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 5,
+        "t" : 5,
+        "w" : 9,
+        "b" : 24,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 6,
+        "t" : 6,
+        "w" : 55,
+        "b" : 35,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 7,
+        "t" : 7,
+        "w" : 2,
+        "b" : 31,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 8,
+        "t" : 8,
+        "w" : 52,
+        "b" : 44,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 9,
+        "t" : 9,
+        "w" : 32,
+        "b" : 29,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 10,
+        "t" : 10,
+        "w" : 17,
+        "b" : 1,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 11,
+        "t" : 11,
+        "w" : 26,
+        "b" : 14,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 12,
+        "t" : 12,
+        "w" : 39,
+        "b" : 37,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 13,
+        "t" : 13,
+        "w" : 21,
+        "b" : 43,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 14,
+        "t" : 14,
+        "w" : 56,
+        "b" : 15,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 15,
+        "t" : 15,
+        "w" : 58,
+        "b" : 11,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 16,
+        "t" : 16,
+        "w" : 20,
+        "b" : 42,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 17,
+        "t" : 17,
+        "w" : 28,
+        "b" : 27,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 18,
+        "t" : 18,
+        "w" : 45,
+        "b" : 16,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 19,
+        "t" : 19,
+        "w" : 4,
+        "b" : 47,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 20,
+        "t" : 20,
+        "w" : 53,
+        "b" : 40,
+        "h" : 1,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 21,
+        "t" : 21,
+        "w" : 8,
+        "b" : 54,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 22,
+        "t" : 22,
+        "w" : 36,
+        "b" : 10,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 23,
+        "t" : 23,
+        "w" : 50,
+        "b" : 38,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 24,
+        "t" : 24,
+        "w" : 51,
+        "b" : 18,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 25,
+        "t" : 25,
+        "w" : 12,
+        "b" : 49,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 26,
+        "t" : 26,
+        "w" : 23,
+        "b" : 48,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 27,
+        "t" : 27,
+        "w" : 13,
+        "b" : 6,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 28,
+        "t" : 28,
+        "w" : 19,
+        "b" : 5,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 29,
+        "t" : 25,
+        "w" : 38,
+        "b" : 13,
+        "h" : 2,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 30,
+        "t" : 26,
+        "w" : 49,
+        "b" : 23,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 31,
+        "t" : 27,
+        "w" : 5,
+        "b" : 48,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 32,
+        "t" : 28,
+        "w" : 6,
+        "b" : 19,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 33,
+        "t" : 1,
+        "w" : 34,
+        "b" : 46,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 34,
+        "t" : 2,
+        "w" : 22,
+        "b" : 25,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 35,
+        "t" : 4,
+        "w" : 7,
+        "b" : 3,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 36,
+        "t" : 5,
+        "w" : 33,
+        "b" : 2,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 37,
+        "t" : 7,
+        "w" : 35,
+        "b" : 32,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 38,
+        "t" : 8,
+        "w" : 31,
+        "b" : 24,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 39,
+        "t" : 9,
+        "w" : 1,
+        "b" : 52,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 40,
+        "t" : 10,
+        "w" : 14,
+        "b" : 55,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 41,
+        "t" : 11,
+        "w" : 17,
+        "b" : 39,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 42,
+        "t" : 12,
+        "w" : 29,
+        "b" : 26,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 43,
+        "t" : 13,
+        "w" : 37,
+        "b" : 15,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 44,
+        "t" : 14,
+        "w" : 21,
+        "b" : 56,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 45,
+        "t" : 15,
+        "w" : 43,
+        "b" : 20,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 46,
+        "t" : 16,
+        "w" : 27,
+        "b" : 58,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 47,
+        "t" : 17,
+        "w" : 42,
+        "b" : 4,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 48,
+        "t" : 18,
+        "w" : 11,
+        "b" : 45,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 49,
+        "t" : 19,
+        "w" : 16,
+        "b" : 28,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 50,
+        "t" : 20,
+        "w" : 47,
+        "b" : 8,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 51,
+        "t" : 22,
+        "w" : 54,
+        "b" : 40,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 52,
+        "t" : 23,
+        "w" : 10,
+        "b" : 50,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 53,
+        "t" : 24,
+        "w" : 18,
+        "b" : 12,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 54,
+        "t" : 1,
+        "w" : 25,
+        "b" : 34,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 55,
+        "t" : 2,
+        "w" : 3,
+        "b" : 22,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 56,
+        "t" : 3,
+        "w" : 24,
+        "b" : 30,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 57,
+        "t" : 4,
+        "w" : 32,
+        "b" : 7,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 58,
+        "t" : 5,
+        "w" : 52,
+        "b" : 2,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 59,
+        "t" : 6,
+        "w" : 33,
+        "b" : 1,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 60,
+        "t" : 7,
+        "w" : 35,
+        "b" : 14,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 61,
+        "t" : 8,
+        "w" : 31,
+        "b" : 21,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 62,
+        "t" : 9,
+        "w" : 26,
+        "b" : 17,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 63,
+        "t" : 10,
+        "w" : 15,
+        "b" : 39,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 64,
+        "t" : 11,
+        "w" : 58,
+        "b" : 43,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 65,
+        "t" : 12,
+        "w" : 20,
+        "b" : 11,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 66,
+        "t" : 13,
+        "w" : 4,
+        "b" : 16,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 67,
+        "t" : 14,
+        "w" : 42,
+        "b" : 28,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 68,
+        "t" : 15,
+        "w" : 45,
+        "b" : 27,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 69,
+        "t" : 16,
+        "w" : 47,
+        "b" : 54,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 70,
+        "t" : 17,
+        "w" : 53,
+        "b" : 8,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 71,
+        "t" : 18,
+        "w" : 40,
+        "b" : 10,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 72,
+        "t" : 19,
+        "w" : 36,
+        "b" : 18,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 73,
+        "t" : 20,
+        "w" : 50,
+        "b" : 12,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 74,
+        "t" : 21,
+        "w" : 38,
+        "b" : 23,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 75,
+        "t" : 22,
+        "w" : 49,
+        "b" : 19,
+        "h" : 3,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 76,
+        "t" : 23,
+        "w" : 5,
+        "b" : 13,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 77,
+        "t" : 24,
+        "w" : 48,
+        "b" : 6,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ],
+    [
+      {
+        "id" : 78,
+        "t" : 1,
+        "w" : 25,
+        "b" : 32,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 79,
+        "t" : 2,
+        "w" : 34,
+        "b" : 22,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 80,
+        "t" : 3,
+        "w" : 30,
+        "b" : 35,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 81,
+        "t" : 4,
+        "w" : 2,
+        "b" : 3,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 82,
+        "t" : 5,
+        "w" : 44,
+        "b" : 24,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 83,
+        "t" : 6,
+        "w" : 33,
+        "b" : 52,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 84,
+        "t" : 7,
+        "w" : 1,
+        "b" : 26,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 85,
+        "t" : 8,
+        "w" : 39,
+        "b" : 4,
+        "h" : 2,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 86,
+        "t" : 9,
+        "w" : 21,
+        "b" : 17,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 87,
+        "t" : 10,
+        "w" : 43,
+        "b" : 37,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 88,
+        "t" : 12,
+        "w" : 56,
+        "b" : 20,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 89,
+        "t" : 13,
+        "w" : 58,
+        "b" : 16,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 90,
+        "t" : 14,
+        "w" : 11,
+        "b" : 28,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 91,
+        "t" : 15,
+        "w" : 47,
+        "b" : 45,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 92,
+        "t" : 17,
+        "w" : 27,
+        "b" : 8,
+        "h" : 1,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 93,
+        "t" : 18,
+        "w" : 53,
+        "b" : 36,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 94,
+        "t" : 19,
+        "w" : 40,
+        "b" : 51,
+        "h" : 2,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 95,
+        "t" : 20,
+        "w" : 10,
+        "b" : 18,
+        "h" : 2,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 96,
+        "t" : 21,
+        "w" : 50,
+        "b" : 49,
+        "h" : 1,
+        "r" : "w",
+        "dd" : 0
+      },
+      {
+        "id" : 97,
+        "t" : 22,
+        "w" : 12,
+        "b" : 38,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 98,
+        "t" : 23,
+        "w" : 23,
+        "b" : 13,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      },
+      {
+        "id" : 99,
+        "t" : 24,
+        "w" : 6,
+        "b" : 5,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 0
+      }
+    ]
+  ]
+}
