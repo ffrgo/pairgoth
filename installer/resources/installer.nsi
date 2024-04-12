@@ -15,9 +15,9 @@
 !define LICENSE_TXT "resources/LICENSE.txt"
 
 !define INSTALL_DIR "$PROGRAMFILES64\${APP_NAME}"
-!define INSTALL_TYPE "SetShellVarContext all"
+!define INSTALL_TYPE "SetShellVarContext current"
 !define DATA_DIR "$LocalAppdata\Pairgoth"
-!define REG_ROOT "HKLM"
+!define REG_ROOT "HKCU"
 !define REG_APP_PATH "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAIN_APP_EXE}"
 !define UNINSTALL_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 !define REG_START_MENU "Start Menu Folder"

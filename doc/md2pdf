@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# HTML doc generation. Needs 'pandoc'.
+
+INPUT=$1
+BASE=$(basename -s .md $INPUT)
+
+if test -f "$BASE.css"
+then
+  pandoc --pdf-engine-opt=--enable-local-file-access -t html -F mermaid-filter --css $BASE.css $INPUT -o $BASE.pdf
+else
+  pandoc  --pdf-engine=xelatex -F mermaid-filter $INPUT -o $BASE.pdf
+#  pandoc --pdf-engine-opt=--enable-local-file-access -t html -F mermaid-filter $INPUT -o $BASE.pdf
+fi
+
+## See also pandoc --number-sections
+

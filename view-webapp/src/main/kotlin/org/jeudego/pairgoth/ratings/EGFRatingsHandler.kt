@@ -19,7 +19,7 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
             }.mapNotNullTo(Json.MutableArray()) {
                 val match = linePattern.matchEntire(it)
                 if (match == null) {
-                    logger.error("could not parse line: $it")
+                    logger.debug("could not parse line: $it")
                     null
                 } else {
                     val pairs = groups.map {

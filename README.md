@@ -53,7 +53,7 @@ api-webapp/src/main/kotlin/org/jeudego/pairgoth
 └── web .................................... Web interface
 ```
 
-Tests are located in `webapp/src/test/kotlin`
+Tests are located in `api-webapp/src/test/kotlin`
 
 ## Building and running
 
@@ -82,5 +82,3 @@ The `./server.sh` will launch the server in debugging mode, with a remote debugg
 The `./client.sh` will launch the web client in debugging mode, with a remote debugger socket on port 5006.
 
 The corresponding `./debug-...` scripts will do the same with additional debugging features like automatic re-compilation of CSS files, automatic reloading of template files, etc.
-
-

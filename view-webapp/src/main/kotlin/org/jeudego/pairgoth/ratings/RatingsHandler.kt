@@ -110,7 +110,8 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
                 return response.body!!.source().readString(contentType?.charset() ?: defaultCharset())
             }
         } catch (ioe: IOException) {
-            logger.error("Could not refresh ${origin.name} ratings from ${url}", ioe)
+            logger.error("Could not refresh ${origin.name} ratings from ${url}: ${ioe.javaClass.name} ${ioe.message}")
+            logger.debug("Could not refresh ${origin.name} ratings from ${url}", ioe)
             return null
         }
     }

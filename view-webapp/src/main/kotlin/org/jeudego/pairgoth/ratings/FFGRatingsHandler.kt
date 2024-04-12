@@ -17,7 +17,7 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
               payload.lines().mapNotNullTo(Json.MutableArray()) { line ->
                 val match = linePattern.matchEntire(line)
                 if (match == null) {
-                    logger.error("could not parse line: $line")
+                    logger.debug("could not parse line: $line")
                     null
                 } else {
                     val pairs = groups.map {

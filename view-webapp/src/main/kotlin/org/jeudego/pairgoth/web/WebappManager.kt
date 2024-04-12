@@ -41,6 +41,16 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
             else -> throw Error("Unhandled auth: $auth")
         }
 
+        logger.info("")
+        logger.info("*****************************************************************")
+        logger.info("*                                                               *")
+        logger.info("*  Web server is ready.                                         *");
+        logger.info("*  Open a browser on http://localhost:8080 to access Pairgoth.  *")
+        logger.info("*  Press control-c to stop the server when you are done.        *")
+        logger.info("*                                                               *")
+        logger.info("*****************************************************************")
+        logger.info("")
+
         registerService("ratings", RatingsManager)
         startService("ratings")
     }

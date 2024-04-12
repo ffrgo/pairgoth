@@ -95,7 +95,8 @@ object RatingsManager: Runnable {
                 }
 
             } catch (e: Exception) {
-                logger.error("could not build or refresh index", e)
+                logger.error("could not build or refresh index: ${e.javaClass.name} ${e.message}")
+                logger.debug("could not build or refresh index", e)
             }
         }
     }
