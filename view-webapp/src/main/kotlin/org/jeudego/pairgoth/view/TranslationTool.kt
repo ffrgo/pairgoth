@@ -39,6 +39,7 @@ class TranslationTool {
 
     fun datepickerLocale(language: String, locale: String) =
         if (datepickerLocales.contains(locale)) locale
+        else if (locale == "en") "en-GB"
         else language
 
     companion object {
