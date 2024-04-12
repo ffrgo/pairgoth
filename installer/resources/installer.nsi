@@ -16,6 +16,7 @@
 
 !define INSTALL_DIR "$PROGRAMFILES64\${APP_NAME}"
 !define INSTALL_TYPE "SetShellVarContext all"
+!define DATA_DIR "$LocalAppdata\Pairgoth"
 !define REG_ROOT "HKLM"
 !define REG_APP_PATH "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAIN_APP_EXE}"
 !define UNINSTALL_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
@@ -86,12 +87,31 @@ InstallDir "${INSTALL_DIR}"
 
 ######################################################################
 
+!include "StrFunc.nsh"
+${Using:StrFunc} StrRep
+
+######################################################################
+
 Section -MainProgram
 	${INSTALL_TYPE}
 
 	SetOverwrite ifnewer
 	SetOutPath "$INSTDIR"
 	File /r "target/files/"
+
+	${StrRep} $1 "${DATA_DIR}" "\" "/"
+
+	FileOpen $0 "pairgoth.properties" w
+	FileWrite $0 "auth = none"
+	FileWrite $0 "$\r$\n"
+	FileWrite $0 "store.file.path = $1/tournamentfiles"
+	FileWrite $0 "$\r$\n"
+	FileWrite $0 "ratings.path = $1/ratings"
+	FileWrite $0 "$\r$\n"
+	FileClose $0
+	SetOutPath "${DATA_DIR}"
+	File /r "target/data/"
+	SetOutPath "$INSTDIR"
 
 SectionEnd
 
