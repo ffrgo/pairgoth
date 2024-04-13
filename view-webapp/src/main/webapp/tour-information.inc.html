@@ -147,6 +147,7 @@
           <label>Rules</label>
           <span class="info"></span>
           <select name="rules">
+            <option value="AGA" #if($tour && $tour.rules == 'AGA') selected #end>AGA rules</option>
             <option value="CHINESE" #if($tour && $tour.rules == 'CHINESE') selected #end>Chinese rules</option>
             <option value="FRENCH" #if(!$tour || $tour.rules == 'FRENCH') selected #end>French rules</option>
             <option value="JAPANESE" #if($tour && $tour.rules == 'JAPANESE') selected #end>Japanese rules</option>

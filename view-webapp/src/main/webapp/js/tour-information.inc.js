@@ -168,6 +168,9 @@ onLoad(() => {
       country: form.val('country'),
       online: form.val('online'),
       location: form.val('location'),
+      rules: form.val('rules'),
+      gobanSize: form.val('gobanSize'),
+      komi: form.val('komi'),
       pairing: {
         type: form.val('pairing'),
         // mmFloor: form.val('mmFloor'),

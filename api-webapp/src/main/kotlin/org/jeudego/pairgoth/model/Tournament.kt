@@ -235,7 +235,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
                 komi = json.getDouble("komi") ?: default?.komi ?: 7.5,
-                rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: Rules.FRENCH,
+                rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: if (json.getString("country")?.lowercase(Locale.ROOT) ==  "fr") Rules.FRENCH else Rules.AGA,
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
