@@ -23,6 +23,7 @@ import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.security.KeyFactory
 import java.security.KeyStore
 import java.security.cert.CertificateFactory
@@ -109,10 +110,11 @@ private fun publishProperties() {
         }
     }
     // we want colorized output on linux
-    if (System.getProperty("os.name") == "Linux")
-    {
+    if (System.getProperty("os.name") == "Linux") {
         System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", "false");
     }
+    // remember the current working directory
+    System.setProperty("pairgoth.cwd", Paths.get("").toAbsolutePath().toString())
 }
 
 private fun extractWarFiles() {
@@ -219,6 +221,8 @@ private fun createContext(webapp: String, contextPath: String) = WebAppContext()
     context.contextPath = contextPath
     if (webapp == "api") {
         context.allowNullPathInfo = true
+    } else {
+
     }
 }
 

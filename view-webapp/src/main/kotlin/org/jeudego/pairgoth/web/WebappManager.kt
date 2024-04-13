@@ -6,6 +6,7 @@ import org.jeudego.pairgoth.ratings.RatingsManager
 import org.jeudego.pairgoth.util.Translator
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.nio.file.Paths
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.*
@@ -14,6 +15,8 @@ import javax.servlet.*
 import javax.servlet.annotation.WebListener
 import javax.servlet.http.HttpSessionEvent
 import javax.servlet.http.HttpSessionListener
+import kotlin.io.path.createSymbolicLinkPointingTo
+import kotlin.io.path.exists
 
 @WebListener
 class WebappManager : BaseWebappManager("View Webapp", "view") {
@@ -21,6 +24,17 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
     /* ServletContextListener interface */
     override fun contextInitialized(sce: ServletContextEvent) {
         super.contextInitialized(sce)
+
+        // create a symlink for external resources access
+        properties.getProperty("cwd")?.let { cwd ->
+            val target = Paths.get(cwd).resolve("resources")
+            if (target.exists()) {
+                val source = Paths.get(context.getRealPath("/")).resolve("resources")
+                if (!source.exists()) {
+                    source.createSymbolicLinkPointingTo(target)
+                }
+            }
+        }
 
         // publish some properties to the webapp context; for easy access from the template
         context.setAttribute("env", properties.getProperty("env") ?: "dev")

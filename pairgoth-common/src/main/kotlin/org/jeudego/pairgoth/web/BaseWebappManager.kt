@@ -119,6 +119,8 @@ abstract class BaseWebappManager(val webappName: String, loggerName: String) : S
             // fail to correctly implement SSL...
             disableSSLCertificateChecks()
 
+            logger.info("webapp ${webappName} root filesystem path: ${context.getRealPath("")}")
+
         } catch (ioe: IOException) {
             logger.error("webapp initialization error", ioe)
         }
