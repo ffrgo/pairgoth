@@ -2,19 +2,12 @@
   <form id="tournament-infos" class="ui form #if(!$tour)edit#end">
     <div class="roundbox">
       <div class="two stackable fields">
-        <div class="eleven wide field">
+        <div class="eight wide field">
           <label>Name</label>
           <span class="info"></span>
           <input type="text" name="name" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
         </div>
-        <div class="five wide field">
-          <label>Short name</label>
-          <span class="info"></span>
-          <input type="text" name="shortName" required placeholder="yyyymmdd-city" #if($tour) value="$tour.shortName" #end/>
-        </div>
-      </div>
-      <div class="fields">
-        <div class="eight wide field">
+        <div class="right eight wide field">
           <label>Dates</label>
           <span id="date-range">
             from
@@ -25,14 +18,9 @@
             <input type="text" name="endDate" required class="date" placeholder="end date" #if($tour) value="$tour.endDate" #end/>
           </span>
         </div>
-        <div class="eight wide field">
-          <label>Director</label>
-          <span class="info"></span>
-          <input type="text" name="director" placeholder="Tournament director" #if($tour) value="$!tour.director" #end/>
-        </div>
       </div>
       <div class="two stackable fields">
-        <div class="seven wide field">
+        <div class="eight wide field">
           <label>Country</label>
           <span class="info"></span>
           <select name="country" placeholder="country">
@@ -43,7 +31,7 @@
 #end
           </select>
         </div>
-        <div class="nine wide field">
+        <div class="right eight wide field">
           <label>Location</label>
           <div class="edit online">
             <label>
@@ -52,6 +40,18 @@
           </div>
           <span class="info"></span>
           <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
+        </div>
+      </div>
+      <div class="fields">
+        <div class="eight wide field">
+          <label>Director</label>
+          <span class="info"></span>
+          <input type="text" name="director" placeholder="Tournament director" #if($tour) value="$!tour.director" #end/>
+        </div>
+        <div class="right eight wide field">
+          <label>Short name</label>
+          <span class="info"></span>
+          <input type="text" name="shortName" required placeholder="yyyymmdd-city" #if($tour) value="$tour.shortName" #end/>
         </div>
       </div>
     </div>
@@ -73,7 +73,7 @@
             *#
           </select>
         </div>
-        <div class="four wide field">
+        <div class="right four wide field">
           <label>Rounds</label>
           <span class="info"></span>
           <input type="number" name="rounds" required min="1" value="#if($tour)$tour.rounds#{else}1#end"/>

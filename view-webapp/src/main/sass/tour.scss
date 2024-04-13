@@ -42,6 +42,9 @@
     &.centered {
       align-items: center;
     }
+    &.right {
+      align-items: flex-end;
+    }
   }
   .inline.fields {
     background-color: #eeeeee;
