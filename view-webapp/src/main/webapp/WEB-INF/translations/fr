@@ -165,7 +165,7 @@ project is fully open source, and under the very permissive	est un logiciel libr
 result	résultat
 result sheets	feuilles de résultat
 sources	sources
-sources on FFG's gitlab	sur le serveur gitab de la FFG
+sources on github	sources sur github
 standalone, web interface	indépendant, interface web
 standalone, web interface, via docker	indépendant, interface web, via docker
 start date	date de début
@@ -175,7 +175,7 @@ to	au
 tournament location	lieu du tournoi
 unpairable players	joueurs non disponibles
 unpairable,	non disponibles,
-version 0.1 supports the	version 0.1 supporte le système d’appariement
+supports the	implémente le système d’appariement
 white	blanc
 White	Blanc
 white vs. black	blanc vs. Noir
@@ -191,3 +191,9 @@ Log in using an email	Se connecter avec un email
 password	mot de passe
 Warning: publishing partial results at round	Attention: publication partielle des résultats à la ronde
 out of	sur
+For any further help or question, join us	Pour tout autre demande ou question, contactez-nous
+by email	par email
+or	ou
+on our discord channel	sur notre canal discord
+standalone installer for Windows with Java included	installateur Windows avec Java inclus
+(please ensure that your Windows user has administrative rights).	(svp assurez-vous que l'utilisateur a les droits d'administration Windows).
