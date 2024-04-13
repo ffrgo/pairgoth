@@ -25,9 +25,9 @@
           <span class="info"></span>
           <select name="country" placeholder="country">
             <option></option>
-#set($defaultCountry = $translate.defaultCountry[$request.lang])
+#set($defaultCountry = $countries.country.first)
 #foreach($country in $countries.countries)
-            <option value="$country.key" #if($tour && $country.key == $tour.country.toLowerCase() || !$tour && $country.key == $defaultCountry) selected #end>$country.value</option>
+            <option value="$country.key" #if($tour && $country.key.toLowerCase() == $tour.country.toLowerCase() || !$tour && $country.key.toLowerCase() == $defaultCountry.toLowerCase()) selected #end>$country.value</option>
 #end
           </select>
         </div>

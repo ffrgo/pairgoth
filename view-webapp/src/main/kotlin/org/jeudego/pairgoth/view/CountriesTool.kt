@@ -22,7 +22,7 @@ class CountriesTool {
         }
     }
 
-    public fun getCountries() = countries.entries
+    public fun getCountries() = countries.entries.sortedBy { it.value }
 
     companion object {
         private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)([a-z]{2}))?)(?:;q=([0-9.]+))?", RegexOption.IGNORE_CASE)
