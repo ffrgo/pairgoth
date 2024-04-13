@@ -24,9 +24,17 @@ function setResult(id, result, previous) {
           let indicator = $('#known')[0];
           let known = parseInt(indicator.innerText);
           indicator.innerText = ++known;
+          // and again for overview
+          indicator = $('#known2')[0];
+          known = parseInt(indicator.innerText);
+          indicator.innerText = ++known;
         } else if (result === '?') {
           let indicator = $('#known')[0];
           let known = parseInt(indicator.innerText);
+          indicator.innerText = --known;
+          // and again for overview
+          indicator = $('#known2')[0];
+          known = parseInt(indicator.innerText);
           indicator.innerText = --known;
         }
       }

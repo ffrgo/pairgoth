@@ -532,11 +532,12 @@
     }
 
     #title {
+      position: relative;
       font-size: 1rem !important;
       margin-top: 0.1em !important;
     }
 
-    #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle {
+    #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview {
       display: none !important;
     }
 

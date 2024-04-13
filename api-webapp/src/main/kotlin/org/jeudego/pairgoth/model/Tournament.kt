@@ -120,6 +120,15 @@ sealed class Tournament <P: Pairable>(
 
     fun pairedPlayers() = games.flatMap { it.values }.flatMap { listOf(it.black, it.white) }.toSet()
     fun hasPlayer(dbId: DatabaseId, pId: String) = pId.isNotBlank() && players.values.filter { player -> pId == player.externalIds[dbId] }.isNotEmpty()
+
+    fun stats() = (0..rounds - 1).map { index ->
+        Json.Object(
+            "participants" to pairables.values.count { !it.skip.contains(index + 1) },
+            "paired" to (games.getOrNull(index)?.values?.flatMap { listOf(it.black, it.white) }?.count { it != 0 } ?: 0),
+            "games" to (games.getOrNull(index)?.values?.count() ?: 0),
+            "ready" to (games.getOrNull(index)?.values?.count { it.result != Game.Result.UNKNOWN } ?: 0)
+        )
+    }.toJsonArray()
 }
 
 // standard tournament of individuals
@@ -257,7 +266,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
     return tournament
 }
 
-fun Tournament<*>.toJson() = Json.Object(
+fun Tournament<*>.toJson() = Json.MutableObject(
     "id" to id,
     "type" to type.name,
     "name" to name,

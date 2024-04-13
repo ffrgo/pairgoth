@@ -32,6 +32,7 @@
 #if($tour)
   <h1 id="title">
     $esc.html($tour.name)
+    <div id="overview"><button class="ui mini green circular icon floating button"><i class="ui small info icon"></i></button></div>
   </h1>
 #end
 #translate('tour-information.inc.html')
@@ -153,6 +154,9 @@
         }
       });
     }
+    $('#overview').on('click', () => {
+      modal('tournament-overview')
+    });
   });
   // ]]#
 #include('/js/tour-information.inc.js')
@@ -174,3 +178,38 @@
         vertical-align: initial;
     }
 </style>
+#if($tour)
+<div id="tournament-overview" class="popup">
+  <div class="popup-body">
+    <div class="popup-content">
+      <table>
+        <thead>
+          <tr>
+            <th>Round</th>
+            <th>Participants</th>
+            <th>Paired</th>
+            <th>Results</th>
+          </tr>
+        </thead>
+        <tbody>
+  #foreach($r in [1..$tour.rounds])
+    #set($stats = $tour.stats[$r - 1])
+          <tr>
+            <td>$r</td>
+            <td>$stats.participants</td>
+            <td>$stats.paired</td>
+            <td>#if($round == $r)<span id="known2">#end$stats.ready#if($round == $r)</span>#end/$stats.games</td>
+          </tr>
+  #end
+        </tbody>
+      </table>
+    </div>
+    <div class="popup-footer">
+      <button type="button" class="ui gray right labeled icon floating close button">
+        <i class="times icon"></i>
+        Close
+      </button>
+    </div>
+  </div>
+</div>
+#end

@@ -30,7 +30,9 @@ object TournamentHandler: PairgothApiHandler {
                             if (accept == "application/pairgoth") {
                                 it.toFullJson()
                             } else {
-                                it.toJson()
+                                it.toJson().also { json ->
+                                    (json as Json.MutableObject)["stats"] = it.stats()
+                                }
                             }
                         } ?: badRequest("no tournament with id #${id}")
                     }
