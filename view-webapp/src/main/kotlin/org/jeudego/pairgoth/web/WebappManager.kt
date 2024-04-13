@@ -42,13 +42,13 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
         }
 
         logger.info("")
-        logger.info("*****************************************************************")
-        logger.info("*                                                               *")
-        logger.info("*  Web server is ready.                                         *");
-        logger.info("*  Open a browser on http://localhost:8080 to access Pairgoth.  *")
-        logger.info("*  Press control-c to stop the server when you are done.        *")
-        logger.info("*                                                               *")
-        logger.info("*****************************************************************")
+        logger.info("*********************************************")
+        logger.info("*                                           *")
+        logger.info("*  Pairgoth web server is ready.            *");
+        logger.info("*  Open a browser on http://localhost:8080  *")
+        logger.info("*  Press control-c to stop the server.      *")
+        logger.info("*                                           *")
+        logger.info("*********************************************")
         logger.info("")
 
         registerService("ratings", RatingsManager)
