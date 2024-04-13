@@ -631,7 +631,7 @@
           gap: 1em;
 
           .equal {
-            padding: 0.2em 1em;
+            padding: 1em;
             border: solid 1px gray;
           }
 
@@ -652,6 +652,9 @@
             font-style: italic;
             text-align: left;
             flex: 1;
+            &:not(:first-child) {
+              padding-left: 6em;
+            }
           }
         }
       }

@@ -35,7 +35,9 @@
       <div class="subtitle">Result sheet</div>
       <div class="details">
         <div>Table $game.t</div>
-        <div>Hd $game.h</div>
+  #set($komi = $tour.komi)
+  #if($game.h) #set($komi = $komi - $math.floor($komi)) #end
+        <div>Handicap $game.h &nbsp;&dash;&nbsp; Komi $komi</div>
         <div>Round $round</div>
       </div>
       <div class="instructions">
