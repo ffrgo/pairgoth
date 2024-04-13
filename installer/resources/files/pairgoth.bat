@@ -1,1 +1,1 @@
-jre\bin\java.exe lib\pairgoth-engine.jar
+jre\bin\java.exe -jar lib\pairgoth-engine.jar
