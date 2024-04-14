@@ -39,7 +39,7 @@
         </thead>
         <tbody>
 #foreach($part in $parts)
-          <tr data-id="$part.id" data-text="$esc.html("$part.name.toUpperCase() $part.firstname.toUpperCase() $part.club.toUpperCase()")">
+          <tr data-id="$part.id" data-text="$esc.html("$part.name.toUpperCase() $part.firstname.toUpperCase() $part.club.toUpperCase()")" class="#if($part.final)final#end">
             <td class="centered reg-status #if($part.final)final#end" data-sort="$!part.final">
               <span class="preliminary"><i class="fa fa-question"></i></span>
               <span class="final"><i class="fa fa-check"></i></span>

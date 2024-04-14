@@ -365,6 +365,7 @@ onLoad(() => {
       final: newStatus
     }).then(player => {
       if (player !== 'error') {
+        tr.toggleClass('final');
         cell.toggleClass('final');
         standingsUpToDate = false;
         pairablesUpToDate = false;

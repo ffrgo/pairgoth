@@ -111,6 +111,9 @@
           border-radius: 500rem;
         }
       }
+      tr:not(.final) .participation {
+        opacity: 0.5;
+      }
     }
   }
 
