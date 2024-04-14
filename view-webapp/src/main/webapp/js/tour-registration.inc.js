@@ -249,7 +249,7 @@ onLoad(() => {
     }
   });
   $('#players > tbody > tr').on('click', e => {
-    let regStatus = e.target.closest('td.reg-status');
+    let regStatus = e.target.closest('td.reg-status, td.participating');
     if (regStatus) return;
     let id = e.target.closest('tr').attr('data-id');
     api.getJson(`tour/${tour_id}/part/${id}`)
@@ -471,5 +471,26 @@ onLoad(() => {
   });
   $('.player-fields').on('change input', e => {
     $('#register').removeClass('disabled');
+  });
+  $('.participation label').on('click', e => {
+    let part = e.target;
+    let id = part.closest('tr').data('id');
+    let round = parseInt(part.text());
+    let skip = new Set(part.closest('.participation').find('label.red').map(it => parseInt(it.innerText)));
+    if (skip.has(round)) skip.delete(round);
+    else skip.add(round);
+    api.putJson(`tour/${tour_id}/part/${id}`, {
+      id: id,
+      skip: Array.from(skip)
+    }).then(player => {
+      if (player !== 'error') {
+        part.toggleClass('red');
+        part.toggleClass('green');
+        standingsUpToDate = false;
+        pairablesUpToDate = false;
+      }
+    });
+    e.preventDefault();
+    return false;
   });
 });
