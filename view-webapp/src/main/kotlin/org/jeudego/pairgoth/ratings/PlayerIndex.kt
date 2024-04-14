@@ -36,6 +36,7 @@ class PlayerIndex {
         val MAX_HITS = 20
         val logger = LoggerFactory.getLogger("index")
         val queryParser = ComplexPhraseQueryParser(TEXT, StandardAnalyzer())
+        val stopChars = Regex("[_-]")
     }
     private final val directory: Directory = ByteBuffersDirectory(NoLockFactory.INSTANCE)
     private val reader by lazy { DirectoryReader.open(directory) }
@@ -59,7 +60,7 @@ class PlayerIndex {
                 doc.add(StoredField(ID, i));
                 doc.add(StringField(ORIGIN, player.field(ORIGIN).lowercase(Locale.ROOT), Field.Store.NO))
                 doc.add(StringField(COUNTRY, player.field(COUNTRY).lowercase(Locale.ROOT), Field.Store.NO))
-                doc.add(TextField(TEXT, "${player.field(NAME)} ${player.nullableField(FIRSTNAME)}", Field.Store.NO))
+                doc.add(TextField(TEXT, "${player.field(NAME).replace(stopChars, " ")} ${player.nullableField(FIRSTNAME)}", Field.Store.NO))
                 player.getString(PIN)?.let {
                     doc.add(StringField(PIN, it, Field.Store.NO))
                 }
@@ -98,7 +99,6 @@ class PlayerIndex {
                         .add(filter, BooleanClause.Occur.FILTER)
                         .build()
                 }
-
                 2 -> {
                     if (activeMask.countOneBits() > 2) {
                         val filter =
