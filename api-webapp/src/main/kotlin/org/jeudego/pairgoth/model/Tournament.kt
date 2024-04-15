@@ -177,7 +177,7 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
-    private fun List<Int>.average(provider: (Player)->Int) = (sumOf {id -> provider(players[id]!!)} - epsilon / players.size).roundToInt()
+    private fun List<Int>.average(provider: (Player)->Int) = ((sumOf {id -> provider(players[id]!!)} - epsilon) / size).roundToInt()
 
     inner class Team(id: ID, name: String, rating: Int, rank: Int, final: Boolean, mmsCorrection: Int = 0): Pairable(id, name, rating, rank, final, mmsCorrection) {
         val playerIds = mutableSetOf<ID>()
