@@ -196,6 +196,8 @@ class TeamTournament(
             club?.also { json["club"] = it }
         }
         val teamOfIndividuals: Boolean get() = type.individual
+
+        override val skip get() = playerIds.map { players[it]!!.skip }.reduce { left, right -> (left union right) as MutableSet<Int> }
     }
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null): Team {

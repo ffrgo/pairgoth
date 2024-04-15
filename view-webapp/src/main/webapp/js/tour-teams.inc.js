@@ -13,10 +13,14 @@ function split(teams) {
   let promises = teams.map(team => api.deleteJson(`tour/${tour_id}/team/${team}`));
   Promise.all(promises)
     .then(rsts => {
+      let all = true;
+      let any = false;
       for (let rst of rsts) {
+        all = all && rst.success;
+        any = any || rst.success;
         if (!rst.success) console.error(rst.error)
       }
-      document.location.reload();
+      if (any) document.location.reload();
     });
 }
 
@@ -28,6 +32,10 @@ onLoad(() => {
   });
   $('#split').on('click', e => {
     let rows = $('#teams .selected.listitem')
+    if (rows.length == 0) {
+      $('#teams .listitem').addClass('selected');
+      rows = $('#teams .selected.listitem');
+    }
     let teams = rows.map(item => parseInt(item.data("id")));
     if (teams.length !== 0) split(teams);
   });

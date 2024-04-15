@@ -21,7 +21,7 @@ sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: I
     open fun fullName(separator: String = " "): String {
         return name
     }
-    val skip = mutableSetOf<Int>() // skipped rounds
+    open val skip = mutableSetOf<Int>() // skipped rounds
 
     fun equals(other: Pairable): Boolean {
         return id == other.id

@@ -117,7 +117,7 @@ onLoad(()=>{
   });
   $('#pair').on('click', e => {
     let parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
-    if (parts.length) {
+    if (parts.length === 0) {
       $('#pairables .listitem').addClass('selected');
       parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     }

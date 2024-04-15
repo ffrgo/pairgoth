@@ -161,11 +161,11 @@ ${
         "${
             player.getString("num")!!.padStart(4, ' ')
         } ${
-            "${player.getString("name")} ${player.getString("firstname")}".padEnd(30, ' ').take(30)
+            "${player.getString("name")} ${player.getString("firstname") ?: ""}".padEnd(30, ' ').take(30)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
-            player.getString("country")!!.uppercase()
+            player.getString("country")?.uppercase() ?: ""
         } ${
             (player.getString("club") ?: "").padStart(4).take(4)
         } ${
@@ -209,7 +209,7 @@ ${
         "${
             player.getString("num")!!.padStart(4, ' ')
         } ${
-            "${player.getString("name")} ${player.getString("firstname")}".padEnd(24, ' ').take(24)
+            "${player.getString("name")} ${player.getString("firstname") ?: ""}".padEnd(24, ' ').take(24)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
@@ -255,7 +255,7 @@ ${
         // lines
         lines.forEach { line ->
             writer.println("${
-                fields.joinToString(";") { if (it.second) "\"${line[it.first]}\"" else "${line[it.first]}" }
+                fields.joinToString(";") { if (it.second) "\"${line[it.first] ?: ""}\"" else "${line[it.first] ?: ""}" }
             };${
                 line.getArray("results")!!.joinToString(";")
             };${

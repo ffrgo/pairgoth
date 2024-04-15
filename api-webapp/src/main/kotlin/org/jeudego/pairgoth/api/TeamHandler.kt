@@ -45,6 +45,9 @@ object TeamHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid team selector")
+        if (tournament.pairedPlayers().contains(id)) {
+            badRequest("team is playing");
+        }
         tournament.teams.remove(id) ?: badRequest("invalid team id")
         tournament.dispatchEvent(TeamDeleted, request, Json.Object("id" to id))
         return Json.Object("success" to true)

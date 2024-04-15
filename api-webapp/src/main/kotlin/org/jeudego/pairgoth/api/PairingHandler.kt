@@ -147,12 +147,10 @@ object PairingHandler: PairgothApiHandler {
     override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
-        // Nope
-        // if (round != tournament.lastRound()) badRequest("cannot delete games in other rounds but the last")
         val payload = getArrayPayload(request)
         val allPlayers = payload.size == 1 && payload[0] == "all"
         if (allPlayers) {
+            // TODO - just remove this, it is never used ; and no check is done on whether the players are playing...
             tournament.games(round).clear()
         } else {
             payload.forEach {
