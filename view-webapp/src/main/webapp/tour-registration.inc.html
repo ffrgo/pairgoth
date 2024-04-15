@@ -3,7 +3,6 @@
   #set($pmap = $utils.toMap($parts))
 #else
   #set($teams = $api.get("tour/${params.id}/team"))
-  $log.debug("@@@@@@@@@ teams = $teams")
   #set($pmap = $utils.toMap($teams))
 #end
 
@@ -99,7 +98,7 @@
     <form id="search-form" class="ui edit form">
       <div id="search-header" class="five stackable fields">
 #if($tour.country)
-        <div class="two wide field">
+        <div class="two wide centered field">
           <div class="toggle">
             <input id="countryFilter" name="countryFilter" type="checkbox" value="$tour.country"/>
             <div class="search-param checkbox">
@@ -116,7 +115,7 @@
           </div>
         </div>
 #* Disabled
-        <div class="two wide field">
+        <div class="two wide centered field">
           <div class="toggle">
             <input id="aga" name="aga" type="checkbox" value="true"/>
             <div class="search-param checkbox">
@@ -126,7 +125,7 @@
           </div>
         </div>
 *#
-        <div class="two wide field">
+        <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.egf|'no egf ratings'}">
             <input id="egf" name="egf" type="checkbox" checked value="true"/>
             <div class="search-param checkbox">
@@ -135,7 +134,7 @@
             <label>EGF</label>
           </div>
         </div>
-        <div class="two wide field">
+        <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
             <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
             <div class="search-param checkbox">
@@ -195,12 +194,12 @@
             <div class="eight wide field">
               <label>Rating</label>
               <span class="info"></span>
-              <input name="rating" type="text" class="numeric"/>
+              <input id="rating" name="rating" type="text" class="numeric"/>
             </div>
             <div class="eight wide field">
               <label>Rank<span class="note">initialized from rating</span></label>
               <span class="info"></span>
-              <select name="rank">
+              <select id="rank" name="rank">
                 <option></option>
 #levels()
               </select>

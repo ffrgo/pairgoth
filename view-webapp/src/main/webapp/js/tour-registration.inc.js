@@ -3,7 +3,8 @@ let searchTimer = undefined;
 let resultTemplate;
 let searchResult;
 let searchHighlight;
-let manualRating;
+let manualRating = false;
+let manualRank = false;
 
 function initSearch() {
   let needle = $('#needle')[0].value.trim();
@@ -16,7 +17,7 @@ function initSearch() {
 }
 
 function searchResultShown() {
-  return !(!searchResult || !searchResult.length)
+  return !(!searchResult || searchResult.length === 0)
 }
 
 function search(needle) {
@@ -111,7 +112,7 @@ function addPlayers() {
   ['countryFilter', /* 'aga', */ 'egf', 'ffg'].forEach(id => {
     let value = store(id);
     let ctl = $(`#${id}`);
-    if (value !== null && typeof(value) !== 'undefined' && ctl.length) {
+    if (value !== null && typeof(value) !== 'undefined' && ctl.length !== 0) {
       ctl[0].checked = value;
     }
   });
@@ -287,7 +288,7 @@ onLoad(() => {
   if (searchFormState) {
     for (let id of ["countryFilter", /* "aga", */ "egf", "ffg"]) {
       let ctl = $(`#${id}`);
-      if (ctl.length) {
+      if (ctl.length !== 0) {
         ctl[0].checked = searchFormState[id];
       }
     }
@@ -384,14 +385,15 @@ onLoad(() => {
       else tr.removeClass('hidden');
     });
   });
-  manualRating = ($('#player input[name="rating"]')[0].value !== '');
+  manualRating = ($('#rating')[0].value !== '');
+  manualRank = ($('#rank')[0].value !== '');
   $('#player input[name="rating"]').on('input', e=>{
     manualRating = true;
   });
   $('#player select[name="rank"]').on('input', e=>{
     let rank = e.target.value;
     let ratingCtl = $('#player input[name="rating"]')[0];
-    if (!manualRating) {
+    if (!$('#rating')[0].value || !manualRating) {
       ratingCtl.value = 2050 + 100 * rank;
     }
   });
@@ -414,7 +416,7 @@ onLoad(() => {
   let scrollIntoView = store('scrollIntoView');
   if (scrollIntoView) {
     let row = $(`tr[data-id="${scrollIntoView}"`);
-    if (row.length) {
+    if (row.length !== 0) {
       row.addClass('highlighted');
       store.remove('scroll');
       setTimeout(()=>{
@@ -493,5 +495,16 @@ onLoad(() => {
     });
     e.preventDefault();
     return false;
+  });
+  $('#rating').on('input', e => {
+    if (!$('#rank')[0].value || !manualRank) {
+      let rank = (e.target.value - 2050) / 100;
+      console.log(rank);
+      $('#rank')[0].value = `${rank}`;
+    }
+    return true;
+  });
+  $('#rank').on('input', e => {
+    manualRank = true;
   });
 });
