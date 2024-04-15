@@ -88,7 +88,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.DC -> StandingsHandler.nullMap
         }
     }
-    val pairables = pairables.values.filter { it.final }.map { it.toMutableJson() }
+    val pairables = pairables.values.filter { it.final }.map { it.toDetailedJson() }
     pairables.forEach { player ->
         for (crit in criteria) {
             player[crit.first] = (crit.second[player.getID()] ?: 0.0).toInt()

@@ -1,0 +1,34 @@
+#set($teamables = $utils.getTeamables($parts, $teams))
+<div class="tab-content" id="teams-tab">
+  <div id="teams-content">
+    <div id="teams-lists">
+      <div id="teams-left">
+        <div id="teamables" class="multi-select" title="team members">
+#foreach($part in $teamables)
+          <div data-id="$part.id" data-name="$part.name" class="listitem pairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+#end
+        </div>
+      </div>
+      <div id="teams-right">
+        <div id="teams-buttons">
+          <div class="vert flex">
+            <input type="text" id="team-name" placeholder="team name"/>
+            <button id="teamup" class="ui blue right labeled icon floating disabled button">
+              <i class="angle double right icon"></i>
+              Team up
+            </button>
+          </div>
+          <button id="split" class="ui orange right labeled icon floating button">
+            <i class="angle double left icon"></i>
+            Split
+          </button>
+        </div>
+        <div id="teams" class="multi-select" title="teams">
+#foreach($team in $teams)
+          <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank)#if($team.country) $team.country#end</span></div>
+#end
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

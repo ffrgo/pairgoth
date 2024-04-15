@@ -8,13 +8,14 @@ import java.util.*
 
 // Pairable
 
-sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
+sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
     companion object {
         const val MIN_RANK: Int = -30 // 30k
         const val MAX_RANK: Int = 8 // 9D
     }
-    abstract fun toJson(): Json.Object
+    fun toJson(): Json.Object = toMutableJson()
     abstract fun toMutableJson(): Json.MutableObject
+    open fun toDetailedJson() = toMutableJson()
     abstract val club: String?
     abstract val country: String?
     open fun fullName(separator: String = " "): String {
@@ -28,9 +29,6 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
 }
 
 object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE, true) {
-    override fun toJson(): Json.Object {
-        throw Error("bye player should never be serialized")
-    }
     override fun toMutableJson(): Json.MutableObject {
         throw Error("bye player should never be serialized")
     }
@@ -95,7 +93,6 @@ class Player(
         }
     }
 
-    override fun toJson(): Json.Object = toMutableJson()
     override fun fullName(separator: String): String {
         return name + separator + firstname
     }

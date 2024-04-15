@@ -65,9 +65,9 @@
         <tr>
           <td>$part.num</td>
           <td>$part.place</td>
-          <td>$part.name $part.firstname</td>
+          <td>$part.name#if($part.firstname) $part.firstname#end</td>
           <td data-sort="$part.rank">#rank($part.rank)</td>
-          <td>$part.country</td>
+          <td>#if($part.country)$part.country#end</td>
           <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
   #foreach($r in [0..$mx])

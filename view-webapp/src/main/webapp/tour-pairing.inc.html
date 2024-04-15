@@ -27,13 +27,13 @@
         <div id="pairables" class="multi-select" title="pairable players">
 #foreach($p in $pairables)
   #set($part = $pmap[$p])
-          <div data-id="$part.id" class="listitem pairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" class="listitem pairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>
 #end
         </div>
         <div id="unpairables" class="multi-select" title="unpairable players">
 #foreach($p in $unpairables)
   #set($part = $pmap[$p])
-          <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>
 #end
         </div>
       </div>
@@ -59,9 +59,9 @@
   #set($black = $pmap[$game.b])
             <div class="listitem game" data-id="$game.id">
               <div class="table" data-value="$game.t">#$game.t</div>
-              <div class="white" data-id="$game.w">#if($white)$white.name $white.firstname#{else}BIP#end</div>
+              <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
               <div class="levels">#if($white)#rank($white.rank)#end&nbsp;/&nbsp;#if($black)#rank($black.rank)#end</div>
-              <div class="black" data-id="$game.b">#if($black)$black.name $black.firstname#{else}BIP#end</div>
+              <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
               <div class="handicap" data-value="$game.h">#if($game.h)h$game.h#{else}&nbsp;#end</div>
             </div>
 #end

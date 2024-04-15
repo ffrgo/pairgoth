@@ -14,8 +14,8 @@ object TeamHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         return when (val pid = getSubSelector(request)?.toIntOrNull()) {
-            null -> tournament.teams.values.map { it.toJson() }.toJsonArray()
-            else -> tournament.teams[pid]?.toJson() ?: badRequest("no team with id #${pid}")
+            null -> tournament.teams.values.map { it.toDetailedJson() }.toJsonArray()
+            else -> tournament.teams[pid]?.toDetailedJson() ?: badRequest("no team with id #${pid}")
         }
     }
 

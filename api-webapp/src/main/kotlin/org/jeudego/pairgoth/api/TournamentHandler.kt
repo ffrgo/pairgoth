@@ -26,12 +26,14 @@ object TournamentHandler: PairgothApiHandler {
             else ->
                 when {
                     ApiServlet.isJson(accept) -> {
-                        getStore(request).getTournament(id)?.let {
+                        getStore(request).getTournament(id)?.let { tour ->
                             if (accept == "application/pairgoth") {
-                                it.toFullJson()
+                                tour.toFullJson()
                             } else {
-                                it.toJson().also { json ->
-                                    (json as Json.MutableObject)["stats"] = it.stats()
+                                tour.toJson().also { json ->
+                                    // additional attributes for the webapp
+                                    json["stats"] = tour.stats()
+                                    json["teamSize"] = tour.type.playersNumber
                                 }
                             }
                         } ?: badRequest("no tournament with id #${id}")

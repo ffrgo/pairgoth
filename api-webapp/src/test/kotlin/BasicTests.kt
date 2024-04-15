@@ -2,11 +2,13 @@ package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonObject
+import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.model.ID
 import org.junit.jupiter.api.MethodOrderer.MethodName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestMethodOrder
+import java.io.Serializable
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -143,7 +145,13 @@ class BasicTests: TestBase() {
         // filter out "id", and also "komi", "rules" and "gobanSize" which were provided by default
         // also filter out "pairing", which is filled by all default values
         val cmp = Json.Object(*resp.entries.filter { it.key !in listOf("id", "komi", "rules", "gobanSize", "pairing") }.map { Pair(it.key, it.value) }.toTypedArray())
-        val expected = aTournament.entries.filter { it.key != "pairing" }.map { Pair(it.key, it.value) }.toMap().toJsonObject()
+        val expected = aTournament.entries.filter { it.key != "pairing" }.map { Pair(it.key, it.value) }.toMap().toMutableJsonObject().also { map ->
+            map["stats"] = Json.Array(
+                Json.Object("participants" to 0, "paired" to 0, "games" to 0, "ready" to 0),
+                Json.Object("participants" to 0, "paired" to 0, "games" to 0, "ready" to 0)
+            )
+            map["teamSize"] = 1
+        }
         assertEquals(expected.toString(), cmp.toString(), "tournament differs")
     }
 

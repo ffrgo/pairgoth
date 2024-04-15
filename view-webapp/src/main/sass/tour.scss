@@ -237,6 +237,45 @@
     }
   }
 
+  /* teams section */
+
+  #teams-content {
+    display: flex;
+    flex-flow: column;
+    justify-content: start;
+    align-items: center;
+  }
+
+  #teams-lists {
+    margin-top: 1em;
+    flex-grow: 2;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    gap: 1em;
+    align-items: start;
+  }
+  #teams-buttons {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    align-items: stretch;
+    gap: 1em;
+    max-width: max(10em, 20vw);
+  }
+  #teams-right {
+    display: inline-flex;
+    flex-flow: row wrap;
+    gap: 1em;
+    flex-shrink: 1;
+    max-width: max(300px, 60vw);
+    justify-content: center;
+  }
+
+  #teams {
+    max-width: max(50vw, 20em);
+  }
+
   /* pairing section */
 
   #pairing-content {
@@ -428,7 +467,7 @@
     }
   }
 
-  @media(max-width: 1400px) {
+  @media(max-width: 1600px) {
     .ui.steps > .step:not(.active) {
       padding-left: 1.2em;
       padding-right: 0.8em;

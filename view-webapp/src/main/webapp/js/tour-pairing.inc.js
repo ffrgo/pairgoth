@@ -81,36 +81,43 @@ function updatePairable() {
 }
 
 onLoad(()=>{
+  // note - this handler is also in use for lists on Mac Mahon super groups and teams pages
   $('.listitem').on('click', e => {
+    let listitem = e.target.closest('.listitem');
+    let box = e.target.closest('.multi-select');
     if (e.shiftKey && typeof(focused) !== 'undefined') {
       let from = focused.index('.listitem');
-      let to = e.target.closest('.listitem').index('.listitem');
+      let to = listitem.index('.listitem');
       if (from > to) {
         let tmp = from;
         from = to;
         to = tmp;
       }
-      let parent = e.target.closest('.multi-select');
-      let children = parent.childNodes.filter('.listitem');
+      let children = box.childNodes.filter('.listitem');
       for (let j = from; j <= to; ++j) {  new Tablesort($('#players')[0]);
         children.item(j).addClass('selected');
         children.item(j).attr('draggable', true);
       }
     } else {
-      let target = e.target.closest('.listitem');
       if (e.detail === 1) {
-        focused = target.toggleClass('selected').attr('draggable', target.hasClass('selected'));
-      } else if (target.closest('#paired')) {
-        focused = target.attr('draggable', target.hasClass('selected'));
-        editGame(focused);
-      } else {
-        editPairable(focused);
+        // single click
+        focused = listitem.toggleClass('selected').attr('draggable', listitem.hasClass('selected'));
+      } else if (listitem.closest('#pairing-lists')) {
+        // on pairing page
+        if (listitem.closest('#paired')) {
+          // double click
+          focused = listitem.attr('draggable', listitem.hasClass('selected'));
+          editGame(focused);
+        } else if (listitem.closest('#pairables')) {
+          editPairable(focused);
+        }
       }
     }
+    box.dispatchEvent(new CustomEvent('listitems'));
   });
   $('#pair').on('click', e => {
     let parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
-    if (parts.length == 0) {
+    if (parts.length) {
       $('#pairables .listitem').addClass('selected');
       parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     }

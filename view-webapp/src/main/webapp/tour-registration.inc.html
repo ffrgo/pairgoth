@@ -1,5 +1,12 @@
 #set($parts = $api.get("tour/${params.id}/part"))
-#set($pmap = $utils.toMap($parts))
+#if($tour.type == 'INDIVIDUAL' || $tour.type.startsWith('TEAM'))
+  #set($pmap = $utils.toMap($parts))
+#else
+  #set($teams = $api.get("tour/${params.id}/team"))
+  $log.debug("@@@@@@@@@ teams = $teams")
+  #set($pmap = $utils.toMap($teams))
+#end
+
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
     <div id="list-header">
@@ -27,11 +34,11 @@
           <th>First name</th>
           <th>Country</th>
           <th>Club</th>
-#if($tour.country == 'FR')
-          <th>FFG</th>
-#else
+##if($tour.country == 'FR')
+##          <th>FFG</th>
+##else
           <th>PIN</th>
-#end
+##end
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
@@ -77,7 +84,7 @@
         <i class="plus icon"></i>
         Add player
       </button>
-#if($tour.pairing.type == 'MAC_MAHON')
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
       <button id="edit-macmahon-groups" class="ui right labeled icon floating button">
         <i class="pencil icon"></i>
         Mac Mahon groups
@@ -238,7 +245,7 @@
     <div class="success-feedback"><i class="big green check icon"></i></div>
   </div>
 </div>
-#if($tour.pairing.type == 'MAC_MAHON')
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
   #set($mmbase = $api.get("tour/${params.id}/standings/0"))
   #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
     #if($mmbase.error)

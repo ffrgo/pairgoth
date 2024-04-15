@@ -9,6 +9,13 @@
       <div class="title">Registration</div>
     </div>
   </div>
+#if($tour.type != 'INDIVIDUAL')
+  <div class="step" data-step="teams">
+    <div class="content">
+      <div class="title">Teams</div>
+    </div>
+  </div>
+#end
   <div class="step" data-step="pairing">
     <div class="content">
       <div class="title">Pairing</div>

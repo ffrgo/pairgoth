@@ -62,8 +62,8 @@
           <span class="info"></span>
           <select name="type">
             <option value="INDIVIDUAL" #if(!$tour || $tour.type == 'INDIVIDUAL') selected #end>Individual players</option>
-            #* TODO
             <option value="PAIRGO" #if($tour && $tour.type == 'PAIRGO') selected #end>Pair-go tournament</option>
+            #* TODO
             <option value="RENGO2" #if($tour && $tour.type == 'RENGO2') selected #end>Rengo with 2 players teams</option>
             <option value="RENGO3" #if($tour && $tour.type == 'RENGO3') selected #end>Rengo with 3 players team</option>
             <option value="TEAM2" #if($tour && $tour.type == 'TEAM2') selected #end>Team of 2 individual players</option>

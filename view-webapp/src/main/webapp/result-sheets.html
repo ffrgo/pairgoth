@@ -11,7 +11,11 @@
   #set($round = $math.min($math.max($round, 1), $tour.rounds))
 #end
 <div class="section">
-#set($parts = $api.get("tour/${params.id}/part"))
+#if($tour.type == 'INDIVIDUAL' || $tour.type.startsWith('TEAM'))
+  #set($parts = $api.get("tour/${params.id}/part"))
+#else
+  #set($parts = $api.get("tour/${params.id}/team"))
+#end
 #set($pmap = $utils.toMap($parts))
 #set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
 #if($roundPairing.error)
@@ -46,13 +50,13 @@
       <div class="players">
         <div class="white player">
           <div class="color">White</div>
-          <div class="name">$white.name $white.firstname #rank($white.rank)<br/>($white.country.toUpperCase(), $white.club)</div>
+          <div class="name">$white.name $!white.firstname #rank($white.rank)<br/>#if($white.country)($white.country.toUpperCase()#if($white.club), $white.club#end)#end</div>
 ##          <div class="pin">$white.egf</div>
         </div>
         <div class="equal">½-½</div>
         <div class="black player">
           <div class="color">Black</div>
-          <div class="name">$black.name $black.firstname #rank($black.rank)<br/>($black.country.toUpperCase(), $black.club)</div>
+          <div class="name">$black.name $!black.firstname #rank($black.rank)<br/>#if($black.country)($black.country.toUpperCase()#if($black.club), $black.club#end)#end</div>
 ##          <div class="pin">$black.egf</div>
         </div>
       </div>

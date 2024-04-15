@@ -38,6 +38,9 @@
 #translate('tour-information.inc.html')
 #if($tour)
   #translate('tour-registration.inc.html')
+  #if($tour.type != 'INDIVIDUAL')
+    #translate('tour-teams.inc.html')
+  #end
   #translate('tour-pairing.inc.html')
   #translate('tour-results.inc.html')
   #translate('tour-standings.inc.html')
@@ -54,7 +57,7 @@
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
   let standingsUpToDate = true;
   let pairablesUpToDate = true;
-  // $params
+  const teamSize = $tour.teamSize;
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
@@ -162,6 +165,9 @@
 #include('/js/tour-information.inc.js')
 #if($tour)
   #include('/js/tour-registration.inc.js')
+  #if($tour.type != 'INDIVIDUAL')
+    #include('/js/tour-teams.inc.js')
+  #end
   #include('/js/tour-pairing.inc.js')
   #include('/js/tour-results.inc.js')
   #include('/js/tour-standings.inc.js')

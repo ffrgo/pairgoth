@@ -8,7 +8,6 @@ import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
-import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
@@ -172,39 +171,53 @@ class TeamTournament(
     gobanSize: Int = 19,
     komi: Double = 7.5
 ): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
-    companion object {}
+    companion object {
+        private val epsilon = 0.0001
+    }
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
-    inner class Team(id: ID, name: String, final: Boolean): Pairable(id, name, 0, 0, final) {
+    private fun List<Int>.average(provider: (Player)->Int) = (sumOf {id -> provider(players[id]!!)} - epsilon / players.size).roundToInt()
+
+    inner class Team(id: ID, name: String, rating: Int, rank: Int, final: Boolean, mmsCorrection: Int = 0): Pairable(id, name, rating, rank, final, mmsCorrection) {
         val playerIds = mutableSetOf<ID>()
-        val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[id] }.toSet()
-        override val rating: Int get() = if (teamPlayers.isEmpty()) super.rating else (teamPlayers.sumOf { player -> player.rating.toDouble() } / players.size).roundToInt()
-        override val rank: Int get() = if (teamPlayers.isEmpty()) super.rank else (teamPlayers.sumOf { player -> player.rank.toDouble() } / players.size).roundToInt()
-        override val club: String? get() = teamPlayers.map { club }.distinct().let { if (it.size == 1) it[0] else null }
-        override val country: String? get() = teamPlayers.map { country }.distinct().let { if (it.size == 1) it[0] else null }
+        val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[it] }.toSet()
+        override val club: String? get() = teamPlayers.map { it.club }.distinct().let { if (it.size == 1) it[0] else null }
+        override val country: String? get() = teamPlayers.map { it.country }.distinct().let { if (it.size == 1) it[0] else null }
         override fun toMutableJson() = Json.MutableObject(
             "id" to id,
             "name" to name,
             "players" to playerIds.toList().toJsonArray()
         )
-        override fun toJson(): Json.Object = toMutableJson()
+
+        override fun toDetailedJson() = toMutableJson().also { json ->
+            json["rank"] = rank
+            country?.also { json["country"] = it }
+            club?.also { json["club"] = it }
+        }
         val teamOfIndividuals: Boolean get() = type.individual
     }
 
-    fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null) = Team(
-        id = json.getInt("id") ?: default?.id ?: nextPlayerId,
-        name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
-        final = json.getBoolean("final") ?: default?.final ?: badRequest("missing final")
-    ).apply {
-        json.getArray("players")?.let { arr ->
-            arr.mapTo(playerIds) {
-                if (it != null && it is Number) it.toInt().also { id -> players.containsKey(id) }
+    fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null): Team {
+        val teamPlayersIds = json.getArray("players")?.let { arr ->
+            arr.map {
+                if (it != null && it is Number) it.toInt().also { id ->
+                    if (!players.containsKey(id)) badRequest("invalid player id: ${id}")
+                }
                 else badRequest("invalid players array")
             }
         } ?: badRequest("missing players")
+        return Team(
+            id = json.getInt("id") ?: default?.id ?: nextPlayerId,
+            name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
+            rating = json.getInt("rating") ?: default?.rating ?: teamPlayersIds.average(Player::rating),
+            rank = json.getInt("rank") ?: default?.rank ?: teamPlayersIds.average(Player::rank),
+            final = teamPlayersIds.all { players[it]!!.final },
+            mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
+        ).also {
+                it.playerIds.addAll(teamPlayersIds)
+        }
     }
-
 }
 
 // Serialization
@@ -250,9 +263,15 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
             )
-    (json["players"] as Json.Array?)?.forEach { obj ->
+    json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
         tournament.players[pairable.getID("id")!!] = Player.fromJson(pairable)
+    }
+    if (tournament is TeamTournament) {
+        json.getArray("teams")?.forEach { obj ->
+            val team = obj as Json.Object
+            tournament.teams[team.getID("id")!!] = tournament.teamFromJson(team)
+        }
     }
     (json["games"] as Json.Array?)?.forEachIndexed { i, arr ->
         val round = i + 1
@@ -286,7 +305,7 @@ fun Tournament<*>.toJson() = Json.MutableObject(
 )
 
 fun Tournament<*>.toFullJson(): Json.Object {
-    val json = Json.MutableObject(toJson())
+    val json = toJson()
     json["players"] = Json.Array(players.values.map { it.toJson() })
     if (this is TeamTournament) {
         json["teams"] = Json.Array(teams.values.map { it.toJson() })

@@ -97,4 +97,11 @@ class PairgothTool {
     }
 
     fun getRatingsDates() = RatingsManager.getRatingsDates()
+
+    fun getTeamables(players: Collection<Json.Object>, teams: Collection<Json.Object>): List<Json.Object> {
+        val teamed = teams.flatMap { team ->
+            team.getArray("players")!!.map { it -> it as Long }
+        }.toSet()
+        return players.filter { p -> !teamed.contains(p.getLong("id")) }
+    }
 }

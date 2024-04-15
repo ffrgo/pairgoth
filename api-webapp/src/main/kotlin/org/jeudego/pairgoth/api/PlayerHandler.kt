@@ -14,8 +14,8 @@ object PlayerHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         return when (val pid = getSubSelector(request)?.toIntOrNull()) {
-            null -> tournament.pairables.values.map { it.toJson() }.toJsonArray()
-            else -> tournament.pairables[pid]?.toJson() ?: badRequest("no player with id #${pid}")
+            null -> tournament.players.values.map { it.toJson() }.toJsonArray()
+            else -> tournament.players[pid]?.toJson() ?: badRequest("no player with id #${pid}")
         }
     }
 
