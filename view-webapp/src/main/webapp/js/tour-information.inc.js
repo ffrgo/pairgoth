@@ -1,3 +1,12 @@
+let manualShortName;
+
+function autofillShortName(dt, loc) {
+  if (!manualShortName && dt !== '' &&  loc !== '') {
+    let ymd = parseDate(dt).replaceAll(/-/g, '');
+    $('input[name="shortName"]')[0].value = `${ymd}-${loc}`;
+  }
+}
+
 onLoad(() => {
   $('#edit').on('click', e => {
     e.preventDefault();
@@ -252,5 +261,21 @@ onLoad(() => {
           window.location.reload();
         }
       });
+  });
+  let shortName = $('input[name="shortName"]');
+  manualShortName = (shortName[0].value !== '');
+  let startDate = $('input[name="startDate"]');
+  let location = $('input[name="location"]');
+  startDate.on('change', e => {
+    if (!manualShortName) autofillShortName(startDate[0].value, location[0].value)
+  });
+  $('#date-range').on('changeDate', e => {
+    if (!manualShortName) autofillShortName(startDate[0].value, location[0].value)
+  });
+  location.on('input', e => {
+    if (!manualShortName) autofillShortName(startDate[0].value, location[0].value)
+  });
+  shortName.on('input', e => {
+    manualShortName = true;
   });
 });
