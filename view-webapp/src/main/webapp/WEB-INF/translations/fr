@@ -134,7 +134,7 @@ We offer you the flexibility to use	Nous vous offrons la flexibilité d’utilis
 Welcome to	Bienvenue sur
 What is	Qu’est-ce que
 Your feedback is most welcome!	Vos retours sont les bienvenus !
-and uses the same algorithm internally, as well as import and export features towards its format.	et utilise le même algorithme en interne, ainsi que des fonctionnalités d’import et d’export vers et depuis son format.
+and uses the same algorithm and parameters internally, as well as import and export features towards its format.	et utilise le même algorithme et les mêmes paramètres en interne, ainsi que des fonctionnalités d’import et d’export vers et depuis son format.
 apache licence	licence Apache
 black	noir
 Black	Noir
@@ -160,7 +160,7 @@ pairable players	joueurs disponibles
 pairable,	disponibles,
 pairgoth	pairgoth
 pairing system, ideal for championships with no handicap games, as well as the	, idéal pour les championnats sans handicap, ainsi que le système d’appariement
-pairing system, more suited for classical tournaments and cups. It is still in a beta stage. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Il en est encore à une phase « beta ». Les versions futures comporteront plus de systèmes d’appariements et de fonctionnalités.
+pairing system, more suited for classical tournaments and cups. Future versions will support more pairing systems and more features.	, plus adapté pour les tournois classiques et les coupes. Les futures versions comporteront plus de systèmes d’appariements et de fonctionnalités.
 project is fully open source, and under the very permissive	est un logiciel libre, et sous la très permissive
 result	résultat
 result sheets	feuilles de résultat
@@ -191,7 +191,7 @@ Log in using an email	Se connecter avec un email
 password	mot de passe
 Warning: publishing partial results at round	Attention: publication partielle des résultats à la ronde
 out of	sur
-For any further help or question, join us	Pour tout autre demande ou question, contactez-nous
+For any further help or question, contact us	Pour tout autre demande ou question, contactez-nous
 by email	par email
 or	ou
 on our discord channel	sur notre canal discord
@@ -199,3 +199,7 @@ standalone installer for Windows with Java included	installateur Windows avec Ja
 (please ensure that your Windows user has administrative rights).	(svp assurez-vous que l'utilisateur a les droits d'administration Windows).
 AGA rules	Règles AGA
 initialized from rating	initialisé à partir du classement
+You can join the	Vous pouvez rejoindre la
+Pairgoth mailing list	liste de diffusion Pairgoth
+to be notified about updates and to discuss the software.	pour être mis au courant des mises à jour et pour discuter du logiciel.
+(give us a star if you have a github account!)	(donnez-nous une étoile si vous avez un compte github !)
