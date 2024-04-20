@@ -1,5 +1,4 @@
 const SEARCH_DELAY = 100;
-const SEARCH_DELAY = 100;
 let searchTimer = undefined;
 let resultTemplate;
 let searchResult;
