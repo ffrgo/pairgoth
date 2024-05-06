@@ -100,7 +100,7 @@ function fillPlayer(player) {
   form.val('egf_id', player.egf);
   $('#needle')[0].value = '';
   initSearch();
-  $('#register').focus();
+  $('#register').removeClass('disabled').focus();
 }
 
 function addPlayers() {
@@ -118,6 +118,7 @@ function addPlayers() {
   });
   form.val('final', status);
   $('#player').removeClass('edit').addClass('create');
+  $('#register').removeClass('disabled');
   modal('player');
   $('#needle').focus();
   store('addingPlayers', true);
