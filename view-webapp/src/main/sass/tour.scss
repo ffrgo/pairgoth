@@ -191,8 +191,11 @@
     }
     .result-line {
       cursor: pointer;
-      &:hover, &.highlighted {
-        background-color: rgba(100,200,255,200);
+      &:hover {
+        background-color: rgba(100, 200, 255, 0.44);
+      }
+      &.highlighted, &.highlighted:hover {
+        background-color: rgba(100,200,255,1);
       }
     }
   }

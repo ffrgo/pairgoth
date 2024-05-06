@@ -120,13 +120,39 @@ function addPlayers() {
   $('#player').removeClass('edit').addClass('create');
   $('#register').removeClass('disabled');
   modal('player');
-  $('#needle').focus();
+  setTimeout(() => $('#needle').focus(), 100);
   store('addingPlayers', true);
 }
 
 function bulkUpdate(players) {
   Promise.all(players.map(p => api.putJson(`tour/${tour_id}/part/${p.id}`, p)))
     .then((values) => window.location.reload());
+}
+
+function navigateResults(ev) {
+  let lines = $('.result-line');
+  lines.removeClass('highlighted');
+  searchHighlight = Math.max(searchHighlight, 0);
+  searchHighlight = Math.min(searchHighlight, lines.length - 1);
+  let targeted = lines[searchHighlight];
+  if (targeted) {
+    targeted.addClass('highlighted');
+    // let's scroll into view manually, since DOM API scrollIntoView() is fooled by the sticky header.
+    let scrollContainer = targeted.closest('.popup-body');
+    // TODO - the "24" is the search-result padding. Avoid hardcoding it.
+    let scrollTop = scrollContainer.scrollTop + 24;
+    let scrollBottom = scrollContainer.scrollTop + scrollContainer.clientHeight - 24 - $('#search-form')[0].offsetHeight;
+    let top = targeted.offsetTop;
+    let bottom = top + targeted.offsetHeight;
+    if (top < scrollTop) {
+      scrollContainer.scrollTop -= (scrollTop - top);
+    } else if (bottom > scrollBottom) {
+      scrollContainer.scrollTop += (bottom - scrollBottom);
+    }
+  }
+  ev.preventDefault();
+  ev.cancelBubble = true;
+  ev.stopPropagation();
 }
 
 let tableSort;

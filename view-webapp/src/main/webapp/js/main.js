@@ -210,8 +210,25 @@ onLoad(() => {
   $('#dimmer').on('click', e => $('.popup').removeClass('shown');
    */
 
-  // keyboard handling
-  document.on('keyup', e => {
+  /* Inhibate default behavior of page down and page up when search result is shown */
+  document.addEventListener('keydown', e => {
+    switch (e.key) {
+      case 'PageDown':
+      case 'PageUp': {
+        if (document.location.hash === '#registration') {
+          if (typeof (searchResultShown) === 'function' && searchResultShown()) {
+            e.preventDefault();
+            e.cancelBubble = true;
+            e.stopPropagation();
+            return false;
+          }
+        }
+      }
+    }
+  }, true);
+
+    // keyboard handling
+  document.addEventListener('keyup', e => {
     let tab = document.location.hash;
     switch (e.key) {
       case 'Escape': {
@@ -230,12 +247,9 @@ onLoad(() => {
       case 'ArrowDown': {
         if (tab === '#registration') {
           if (typeof(searchResultShown) === 'function' && searchResultShown()) {
-            let lines = $('.result-line');
             if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
             else ++searchHighlight;
-            searchHighlight = Math.min(searchHighlight, lines.length - 1);
-            lines.removeClass('highlighted');
-            lines[searchHighlight].addClass('highlighted');
+            navigateResults(e);
           }
         }
         break;
@@ -243,12 +257,30 @@ onLoad(() => {
       case 'ArrowUp': {
         if (tab === '#registration') {
           if (typeof(searchResultShown) === 'function' && searchResultShown()) {
-            let lines = $('.result-line');
             if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
             else --searchHighlight;
-            searchHighlight = Math.max(searchHighlight, 0);
-            lines.removeClass('highlighted');
-            lines[searchHighlight].addClass('highlighted');
+            navigateResults(e);
+          }
+        }
+        break;
+      }
+      case 'PageDown': {
+        if (tab === '#registration') {
+          if (typeof(searchResultShown) === 'function' && searchResultShown()) {
+            console.log(searchHighlight)
+            if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+            else searchHighlight += 12;
+            navigateResults(e);
+          }
+        }
+        break;
+      }
+      case 'PageUp': {
+        if (tab === '#registration') {
+          if (typeof(searchResultShown) === 'function' && searchResultShown()) {
+            if (typeof (searchHighlight) === 'undefined') searchHighlight = 0;
+            else searchHighlight -= 12;
+            navigateResults(e);
           }
         }
         break;
@@ -265,8 +297,16 @@ onLoad(() => {
         }
         break;
       }
+      case '+': {
+        if (tab === '#registration') {
+          if (!$('#player').hasClass('shown')) {
+            addPlayers();
+          }
+        }
+        break;
+      }
     }
-  });
+  }, true);
 
   // disable hash scrolling
   if (window.location.hash) {
