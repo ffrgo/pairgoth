@@ -25,7 +25,13 @@
           <span class="info"></span>
           <select name="country" placeholder="country">
             <option></option>
-#set($defaultCountry = $countries.country.first)
+#set($countryFromPreferredLanguage = $countries.country)
+#if($countryFromPreferredLanguage)
+  #set($defaultCountry = $countryFromPreferredLanguage.first)
+#else
+  ## Accept-Language could not be parsed
+  #set($defaultCountry = 'en')
+#end
 #foreach($country in $countries.countries)
             <option value="$country.key" #if($tour && $country.key.toLowerCase() == $tour.country.toLowerCase() || !$tour && $country.key.toLowerCase() == $defaultCountry.toLowerCase()) selected #end>$country.value</option>
 #end

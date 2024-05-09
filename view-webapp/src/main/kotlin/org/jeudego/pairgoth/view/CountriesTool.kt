@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.view
 
 import org.apache.velocity.tools.config.ValidScope
 import org.jeudego.pairgoth.web.WebappManager
+import org.slf4j.LoggerFactory
 import javax.servlet.http.HttpServletRequest
 
 @ValidScope("request")
@@ -19,12 +20,15 @@ class CountriesTool {
             countries[iso]?.let { name ->
                 Pair(iso, name)
             }
+        } ?: null.also {
+            logger.warn("could not get country from Accept-Language header: ${request.getHeader("Accept-Language")}")
         }
     }
 
     public fun getCountries() = countries.entries.sortedBy { it.value }
 
     companion object {
+        val logger = LoggerFactory.getLogger("view")
         private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)([a-z]{2}))?)(?:;q=([0-9.]+))?", RegexOption.IGNORE_CASE)
         public val countries = mapOf(
             "ad" to "Andorra",
