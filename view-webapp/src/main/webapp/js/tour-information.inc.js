@@ -182,7 +182,7 @@ onLoad(() => {
       komi: form.val('komi'),
       pairing: {
         type: form.val('pairing'),
-        // mmFloor: form.val('mmFloor'),
+        mmFloor: form.val('mmFloor'),
         mmBar: form.val('mmBar'),
         main: {
           firstSeed: form.val('firstSeed'),
