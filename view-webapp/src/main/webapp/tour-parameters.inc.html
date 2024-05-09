@@ -61,18 +61,18 @@
               <label>First seeding method</label>
               <label><input type="checkbox" name="firstSeedAddRating" value="true" #if($tour.pairing.main.firstSeedAddCrit == 'RATING') checked #end/> add a sorting on rating</label>
               <select name="firstSeed">
-                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
-                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
-                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.seedSystem1 == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
+                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.firstSeed == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
+                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.firstSeed == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
+                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.firstSeed == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
               </select>
             </div>
             <div class="roundbox field">
               <label>Second seeding method</label>
               <label><input type="checkbox" name="secondSeedAddRating" value="true" #if($tour.pairing.main.secondSeedAddCrit == 'RATING') checked #end/> add a sorting on rating</label>
               <select name="secondSeed">
-                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
-                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
-                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.seedSystem2 == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
+                <option value="SPLIT_AND_RANDOM" #if($tour.pairing.main.secondSeed == 'SPLIT_AND_RANDOM') selected #end>Split and random</option>
+                <option value="SPLIT_AND_SLIP" #if($tour.pairing.main.secondSeed == 'SPLIT_AND_SLIP') selected #end>Split and slip</option>
+                <option value="SPLIT_AND_FOLD" #if($tour.pairing.main.secondSeed == 'SPLIT_AND_FOLD') selected #end>Split and fold</option>
               </select>
             </div>
           </div>
