@@ -5,7 +5,7 @@
         <div class="eight wide field">
           <label>Name</label>
           <span class="info"></span>
-          <input type="text" name="name" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
+          <input type="text" name="name" spellcheck="false" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
         </div>
         <div class="right eight wide field">
           <label>Dates</label>
@@ -45,19 +45,19 @@
             </label>
           </div>
           <span class="info"></span>
-          <input name="location" type="text" placeholder="tournament location" value="#if($tour)$!tour.location#end"/>
+          <input name="location" type="text" placeholder="tournament location" spellcheck="false" value="#if($tour)$!tour.location#end"/>
         </div>
       </div>
       <div class="fields">
         <div class="eight wide field">
           <label>Director</label>
           <span class="info"></span>
-          <input type="text" name="director" placeholder="Tournament director" #if($tour) value="$!tour.director" #end/>
+          <input type="text" name="director" placeholder="Tournament director" spellcheck="false" #if($tour) value="$!tour.director" #end/>
         </div>
         <div class="right eight wide field">
           <label>Short name</label>
           <span class="info"></span>
-          <input type="text" name="shortName" required placeholder="yyyymmdd-city" #if($tour) value="$tour.shortName" #end/>
+          <input type="text" name="shortName" spellcheck="false" required placeholder="yyyymmdd-city" #if($tour) value="$tour.shortName" #end/>
         </div>
       </div>
     </div>
