@@ -15,7 +15,7 @@ class CountriesTool {
         country = request.getHeader("Accept-Language")?.let { header ->
             langHeaderParser.find(header)
         }?.let { match ->
-            match.groupValues.getOrNull(2)?.lowercase() ?: match.groupValues[1].lowercase()
+            match.groupValues.getOrNull(2)?.let { it.ifEmpty { null } }?.lowercase() ?: match.groupValues[1].lowercase()
         }?.let { iso ->
             countries[iso]?.let { name ->
                 Pair(iso, name)
