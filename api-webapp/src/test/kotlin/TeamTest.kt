@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.test.BasicTests.Companion.aPlayer
+import org.jeudego.pairgoth.test.BasicTests.Companion.aRengoTournament
 import org.jeudego.pairgoth.test.BasicTests.Companion.aTeamTournament
 import org.jeudego.pairgoth.test.BasicTests.Companion.anotherPlayer
 import org.junit.jupiter.api.Test
@@ -12,7 +13,7 @@ import kotlin.test.fail
 class TeamTest {
     @Test
     fun `team tournament, MacMahon`() {
-        var resp = TestAPI.post("/api/tour", aTeamTournament).asObject()
+        var resp = TestAPI.post("/api/tour", aRengoTournament).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val aTeamTournamentID = resp.getInt("id")
         resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", aPlayer).asObject()
@@ -27,7 +28,7 @@ class TeamTest {
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val aTeamID = resp.getInt("id") ?: error("no null allowed here")
         resp = TestAPI.get("/api/tour/$aTeamTournamentID/team/$aTeamID").asObject()
-        assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID]}""", resp.toString(), "expecting team description")
+        assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID],"rank":-3,"country":"FR"}""", resp.toString(), "expecting team description")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
         // nothing stops us in reusing players in different teams, at least for now...

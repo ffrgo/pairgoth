@@ -61,7 +61,25 @@ class BasicTests: TestBase() {
                 "method" to "SPLIT_AND_SLIP"
             )
         )
-
+        val aRengoTournament = Json.Object(
+            "type" to "RENGO2",
+            "name" to "Mon Tournoi par équipes",
+            "shortName" to "mon-tournoi-par-equipes",
+            "startDate" to "2023-05-20",
+            "endDate" to "2023-05-23",
+            "country" to "FR",
+            "location" to "Marseille",
+            "online" to true,
+            "timeSystem" to Json.Object(
+                "type" to "FISCHER",
+                "mainTime" to 1200,
+                "increment" to 10
+            ),
+            "rounds" to 2,
+            "pairing" to Json.Object(
+                "type" to "MAC_MAHON"
+            )
+        )
         val aTeamTournament = Json.Object(
             "type" to "TEAM2",
             "name" to "Mon Tournoi par équipes",
