@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.jeudego.pairgoth</groupId>
         <artifactId>engine-parent</artifactId>
-        <version>0.11</version>
+        <version>0.12</version>
     </parent>
     <artifactId>pairgoth-common</artifactId>
 
