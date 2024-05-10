@@ -100,9 +100,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     // SOS related functions given a score function
     val sos by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white]?.second ?: 0.0)
+            Pair(game.black, scores[game.white]?.second?.let { it - game.handicap } ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black]?.second ?: 0.0)
+            Pair(game.white, scores[game.black]?.second?.let { it + game.handicap } ?: 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }.mapValues { (id, score) ->
@@ -117,9 +117,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     // sos-1
     val sosm1 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white]?.second ?: 0.0)
+            Pair(game.black, scores[game.white]?.second?.let { it - game.handicap } ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black]?.second ?: 0.0)
+            Pair(game.white, scores[game.black]?.second?.let { it + game.handicap } ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues { (id, pairs) ->
@@ -135,9 +135,9 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
     // sos-2
     val sosm2 by lazy {
         (history.flatten().map { game ->
-            Pair(game.black, scores[game.white]?.second ?: 0.0)
+            Pair(game.black, scores[game.white]?.second?.let { it - game.handicap } ?: 0.0)
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black]?.second ?: 0.0)
+            Pair(game.white, scores[game.black]?.second?.let { it + game.handicap } ?: 0.0)
         }).groupBy {
             it.first
         }.mapValues { (id, pairs) ->
@@ -155,11 +155,11 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
         (history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white]?.second ?: 0.0 else 0.0)
+            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white]?.second?.let { it - game.handicap } ?: 0.0 else 0.0)
         } + history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black]?.second ?: 0.0 else 0.0)
+            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black]?.second?.let { it + game.handicap } ?: 0.0 else 0.0)
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
