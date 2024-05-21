@@ -5,7 +5,6 @@ import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.pairing.BasePairingHelper
 import org.jeudego.pairgoth.pairing.detRandom
 import org.jeudego.pairgoth.pairing.nonDetRandom
-import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.store.nextGameId
 import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
@@ -15,12 +14,7 @@ import org.jgrapht.graph.builder.GraphBuilder
 import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.*
 
 sealed class BaseSolver(
     round: Int,
@@ -40,8 +34,7 @@ sealed class BaseSolver(
         1.0 + // 1 is minimum value because 0 means "no matching allowed"
                 pairing.base.apply(p1, p2) +
                 pairing.main.apply(p1, p2) +
-                pairing.secondary.apply(p1, p2) +
-                pairing.geo.apply(p1, p2)
+                pairing.secondary.apply(p1, p2)
 
     open fun pairgothBlackWhite(p1: Pairable, p2: Pairable): Double {
         val hd1 = pairing.handicap.handicap(white = p1, black = p2)
@@ -108,7 +101,7 @@ sealed class BaseSolver(
                     this.println("mainDUDDCost=${dec.format(pairing.main.applyDUDD(p, q))}")
                     this.println("mainSeedCost=${dec.format(pairing.main.applySeeding(p, q))}")
                     this.println("secHandiCost=${dec.format(pairing.handicap.handicap(p, q))}")
-                    this.println("secGeoCost=${dec.format(pairing.geo.apply(p, q))}")
+                    this.println("secGeoCost=${dec.format(pairing.secondary.apply(p, q))}")
                     this.println("totalCost=${dec.format(openGothaWeight(p,q))}")
                     //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
 
@@ -414,10 +407,22 @@ sealed class BaseSolver(
     }
 
     open fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
-        var score = 0.0
-        // See Swiss with category for minimizing handicap criterion
 
-        // TODO understand where opengotha test if need to be applied
+        // Do we apply Secondary Criteria
+        // secCase = 0 : No player is above thresholds -> apply secondary criteria
+        // secCase = 1 : At least one player is above thresholds -> do not apply
+
+        var score = 0.0
+        var secCase = 0
+
+        val nbw2Threshold: Int
+        if (nbWinsThresholdActive) nbw2Threshold = round
+        else nbw2Threshold = 2 * round
+
+        if( (2*p1.main >= nbw2Threshold) ||
+            (2*p2.main >= nbw2Threshold) ) secCase = 1
+
+        if (secCase == 0) score = pairing.geo.apply(p1, p2)
 
         return score
     }

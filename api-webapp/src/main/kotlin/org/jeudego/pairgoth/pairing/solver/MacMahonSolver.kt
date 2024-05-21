@@ -32,6 +32,29 @@ class MacMahonSolver(round: Int,
         }
     }
 
+    override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
+
+        // Do we apply Secondary Criteria
+        // secCase = 0 : No player is above thresholds -> apply secondary criteria
+        // secCase = 1 : At least one player is above thresholds -> do not apply
+
+        var score = 0.0
+        var secCase = 0
+
+        val nbw2Threshold: Int
+        if (nbWinsThresholdActive) nbw2Threshold = round
+        else nbw2Threshold = 2 * round
+
+        if( (2*p1.main >= nbw2Threshold) ||
+            (2*p2.main >= nbw2Threshold) ||
+            (p1.main >= mmBar) ||
+            (p2.main >= mmBar) ) secCase = 1
+
+        if (secCase == 0) score = pairing.geo.apply(p1, p2)
+
+        return score
+    }
+
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {
         if (useMMS) {
             return pairable.mms.roundToInt() + Pairable.MIN_RANK
