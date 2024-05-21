@@ -456,4 +456,40 @@ class PairingTests: TestBase() {
         }
     }
 
+//    @Test
+//    fun `MMtest_Toulouse24`() {
+//        // read tournament with pairing
+//        val file = getTestFile("opengotha/pairings/Toulouse24_3R.xml")
+//        logger.info("read from file $file")
+//        val resource = file.readText(StandardCharsets.UTF_8)
+//        val resp = TestAPI.post("/api/tour", resource)
+//        val id = resp.asObject().getInt("id")
+//        val tournament = TestAPI.get("/api/tour/$id").asObject()
+//        logger.info(tournament.toString().slice(0..50) + "...")
+//        val players = TestAPI.get("/api/tour/$id/part").asArray()
+//        logger.info(players.toString().slice(0..50) + "...")
+//
+//        val pairingsOG = mutableListOf<String>()
+//        val round = 3
+//        val gamesOG = TestAPI.get("/api/tour/$id/res/$round").asArray()
+//        logger.info("games for round $round: {}", gamesOG.toString().slice(0..50) + "...")
+//        pairingsOG.add(gamesOG.toString())
+//
+//        TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+//
+//        val games: Json.Array
+//
+//        val playersList = mutableListOf<Long>()
+//        for (i in 0..37) playersList.add(players.getJson(i)!!.asObject()["id"] as Long)
+//        playersList.removeAt(30)
+//
+//        BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+//        games = TestAPI.post("/api/tour/$id/pair/$round", playersList).asArray()
+//        logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+//        //assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+//        assertTrue(compare_games(games, Json.parse(pairingsOG[0])!!.asArray()),"pairings for round $round differ")
+//        logger.info("Pairings for round $round match OpenGotha")
+//
+//    }
+
 }
