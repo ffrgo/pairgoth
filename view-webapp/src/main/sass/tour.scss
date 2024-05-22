@@ -186,7 +186,7 @@
     top: 100%;
     padding: 1em;
     overflow-y: auto;
-    &:empty {
+    &:empty, &.hidden {
       display: none;
     }
     .result-line {

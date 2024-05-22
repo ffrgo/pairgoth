@@ -6,18 +6,27 @@ let searchHighlight;
 let manualRating = false;
 let manualRank = false;
 
-function initSearch() {
-  let needle = $('#needle')[0].value.trim();
-  if (searchTimer) {
-    clearTimeout(searchTimer);
-  }
-  searchTimer = setTimeout(() => {
-    search(needle);
-  }, SEARCH_DELAY);
+function searchResultShown() {
+  return !(!searchResult || searchResult.length === 0 || $('#search-result').hasClass('hidden'));
 }
 
-function searchResultShown() {
-  return !(!searchResult || searchResult.length === 0)
+function browseScroll() {
+  let scrollTo = $('#needle')[0].value.trim();
+  while (scrollTo.length > 0) {
+    let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
+    if (target.length > 0) {
+      target[0].scrollIntoView({behavior: "smooth", block: "center"});
+      break;
+    }
+    scrollTo = scrollTo.substring(0, scrollTo.length - 1);
+  }
+}
+
+function clearSearch() {
+  $('#search-result').clear();
+  searchTimer = undefined;
+  searchResult = undefined;
+  searchHighlight = undefined;
 }
 
 function search(needle) {
@@ -28,17 +37,10 @@ function search(needle) {
       needle: needle,
       // aga: form.val('aga'),
       egf: form.val('egf'),
-      ffg: form.val('ffg'),
+      ffg: form.val('ffg')
     }
     let country = form.val('countryFilter');
     if (country) search.countryFilter = country;
-    let searchFormState = {
-      countryFilter: !!country,
-      // aga: search.aga,
-      egf: search.egf,
-      ffg: search.ffg
-    };
-    store('searchFormState', searchFormState);
     api.postJson('search', search)
       .then(result => {
         if (Array.isArray(result)) {
@@ -46,17 +48,7 @@ function search(needle) {
           let html = resultTemplate.render(result);
           $('#search-result')[0].innerHTML = html;
           if (needle === '*') {
-            setTimeout(() => {
-              let scrollTo = $('#needle')[0].value.trim();
-              while (scrollTo.length > 0) {
-                let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
-                if (target.length > 0) {
-                  target[0].scrollIntoView({ behavior: "smooth", block: "center" });
-                  break;
-                }
-                scrollTo = scrollTo.substring(0, scrollTo.length - 1);
-              }
-            }, 0);
+            setTimeout(() => browseScroll(), 0);
           } else {
             let scrollable = $('#player .popup-body');
             scrollable[0].scrollTop = 0;
@@ -64,11 +56,32 @@ function search(needle) {
         } else console.log(result);
       });
   } else {
-    $('#search-result').clear();
-    searchTimer = undefined;
-    searchResult = undefined;
-    searchHighlight = undefined;
+    // needle is empty (and by construction we can't be in browse mode) - clear search result
+    clearSearch();
   }
+}
+
+function initSearch() {
+  let needle = $('#needle')[0].value.trim();
+  if (searchTimer) {
+    clearTimeout(searchTimer);
+  }
+  searchTimer = setTimeout(() => {
+    let form = $('#search-form')[0];
+    let browsing = !!form.val('browse');
+    if (!browsing || !searchResult) {
+      search(browsing ? '*' : needle);
+    } else if (browsing) {
+      if (needle.length) {
+        $('#search-result').removeClass('hidden');
+        browseScroll();
+      } else {
+        $('#search-result').addClass('hidden');
+      }
+    } else {
+      $('#search-result').removeClass('hidden');
+    }
+  }, SEARCH_DELAY);
 }
 
 function parseRank(rank) {
@@ -108,19 +121,14 @@ function addPlayers() {
   // keep preliminary/final status
   let status = form.val('final') || false;
   form.reset();
-  // initial search checkboxes position
-  ['countryFilter', /* 'aga', */ 'egf', 'ffg'].forEach(id => {
-    let value = store(id);
-    let ctl = $(`#${id}`);
-    if (value !== null && typeof(value) !== 'undefined' && ctl.length !== 0) {
-      ctl[0].checked = value;
-    }
-  });
   form.val('final', status);
   $('#player').removeClass('edit').addClass('create');
   $('#register').removeClass('disabled');
   modal('player');
-  setTimeout(() => $('#needle').focus(), 100);
+  setTimeout(() => {
+    $('#needle').focus();
+
+  }, 100);
   store('addingPlayers', true);
 }
 
@@ -309,11 +317,11 @@ onLoad(() => {
   });
   $('#clear-search').on('click', e => {
     $('#needle')[0].value = '';
-    $('#search-result').clear();
+    initSearch();
   });
   let searchFormState = store('searchFormState')
   if (searchFormState) {
-    for (let id of ["countryFilter", /* "aga", */ "egf", "ffg"]) {
+    for (let id of ["countryFilter", /* "aga", */ "egf", "ffg", "browse"]) {
       let ctl = $(`#${id}`);
       if (ctl.length !== 0) {
         ctl[0].checked = searchFormState[id];
@@ -324,9 +332,20 @@ onLoad(() => {
     let chk = e.target.closest('.toggle');
     let checkbox = chk.find('input')[0];
     checkbox.checked = !checkbox.checked;
-    let id = checkbox.getAttribute('id');
-    let value = checkbox.checked;
-    store(id, value);
+    //
+    // let id = checkbox.getAttribute('id');
+    // let value = checkbox.checked;
+    // store(id, value);
+    let form = $('#search-form')[0];
+    let searchFormState = {
+      countryFilter: !!form.val('countryFilter'),
+      // aga: search.aga,
+      egf: !!form.val('egf'),
+      ffg: !!form.val('ffg'),
+      browse: !!form.val('browse')
+    };
+    store('searchFormState', searchFormState);
+    clearSearch();
     initSearch();
   });
   $('#reglist-mode').on('change', e => {
@@ -495,9 +514,6 @@ onLoad(() => {
         mmsCorrection: 0
       }));
     bulkUpdate(players);
-  });
-  $('#browse-players').on('click', e => {
-    search('*');
   });
   $('.player-fields').on('change input', e => {
     $('#register').removeClass('disabled');

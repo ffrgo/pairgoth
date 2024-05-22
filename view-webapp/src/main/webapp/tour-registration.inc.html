@@ -143,10 +143,14 @@
             <label>FFG</label>
           </div>
         </div>
-        <div class="two wide field">
-          <button id="browse-players" type="button" class="ui basic icon button">
-            <i class="sort alphabet down icon"></i>
-          </button>
+        <div class="two wide centered field">
+          <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
+            <input id="browse" name="browse" type="checkbox" value="true"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label><i class="sort alphabet down icon"></i></label>
+          </div>
         </div>
       </div>
     </form>
