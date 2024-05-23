@@ -5,6 +5,7 @@ import java.util.*
 
 abstract class BasePairingHelper(
     val round: Int,
+    val totalRounds: Int,
     history: List<List<Game>>, // History of all games played for each round
     var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     val pairing: PairingParams,

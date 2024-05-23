@@ -7,13 +7,14 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 class MacMahonSolver(round: Int,
+                     totalRounds: Int,
                      history: List<List<Game>>,
                      pairables: List<Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
                      usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int)  :
-    BaseSolver(round, history, pairables, pairingParams, placementParams, usedTables) {
+    BaseSolver(round, totalRounds, history, pairables, pairingParams, placementParams, usedTables) {
 
     override val scores: Map<ID, Pair<Double, Double>> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
@@ -42,13 +43,14 @@ class MacMahonSolver(round: Int,
         var secCase = 0
 
         val nbw2Threshold: Int
-        if (nbWinsThresholdActive) nbw2Threshold = round
-        else nbw2Threshold = 2 * round
+        if (nbWinsThresholdActive) nbw2Threshold = totalRounds
+        else nbw2Threshold = 2 * totalRounds
 
-        if( (2*p1.main >= nbw2Threshold) ||
-            (2*p2.main >= nbw2Threshold) ||
-            (p1.main >= mmBar) ||
-            (p2.main >= mmBar) ) secCase = 1
+        if( (2*p1.nbW >= nbw2Threshold) ||
+            (2*p2.nbW >= nbw2Threshold) ||
+            (p1.rank+p1.nbW >= mmBar) ||
+            (p2.rank+p2.nbW >= mmBar) ) secCase = 1
+        
 
         if (secCase == 0) score = pairing.geo.apply(p1, p2)
 

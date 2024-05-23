@@ -172,7 +172,7 @@ class Swiss(
 ): Pairing(SWISS, pairingParams, placementParams) {
     companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return SwissSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, tournament.usedTables(round)).pair()
+        return SwissSolver(round, tournament.rounds, tournament.historyBefore(round), pairables, pairingParams, placementParams, tournament.usedTables(round)).pair()
     }
 }
 
@@ -201,7 +201,7 @@ class MacMahon(
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return MacMahonSolver(round, tournament.historyBefore(round), pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar).pair()
+        return MacMahonSolver(round, tournament.rounds, tournament.historyBefore(round), pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar).pair()
     }
 }
 

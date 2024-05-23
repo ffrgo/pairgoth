@@ -18,12 +18,13 @@ import kotlin.math.*
 
 sealed class BaseSolver(
     round: Int,
+    totalRounds: Int,
     history: List<List<Game>>, // History of all games played for each round
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
     pairing: PairingParams,
     placement: PlacementParams,
     val usedTables: BitSet
-    ) : BasePairingHelper(round, history, pairables, pairing, placement) {
+    ) : BasePairingHelper(round, totalRounds, history, pairables, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -192,6 +193,7 @@ sealed class BaseSolver(
         val hd1 = pairing.handicap.handicap(white = p1, black = p2)
         val hd2 = pairing.handicap.handicap(white = p2, black = p1)
         val potentialHd: Int = max(hd1, hd2)
+
         val score = if (potentialHd == 0) {
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
@@ -416,11 +418,11 @@ sealed class BaseSolver(
         var secCase = 0
 
         val nbw2Threshold: Int
-        if (nbWinsThresholdActive) nbw2Threshold = round
-        else nbw2Threshold = 2 * round
+        if (nbWinsThresholdActive) nbw2Threshold = totalRounds
+        else nbw2Threshold = 2 * totalRounds
 
-        if( (2*p1.main >= nbw2Threshold) ||
-            (2*p2.main >= nbw2Threshold) ) secCase = 1
+        if( (2*p1.nbW >= nbw2Threshold) ||
+            (2*p2.nbW >= nbw2Threshold) ) secCase = 1
 
         if (secCase == 0) score = pairing.geo.apply(p1, p2)
 
