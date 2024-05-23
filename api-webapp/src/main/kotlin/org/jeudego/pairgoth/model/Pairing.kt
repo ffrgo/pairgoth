@@ -95,8 +95,7 @@ data class HandicapParams(
     // minimizeHandicap is a secondary criteria but moved here
     val weight: Double = 0.0, // Should be paiSeDefSecCrit for SwCat, 0 for others
     val useMMS: Boolean = true, // if useMMS is false, hd will be based on rank
-    // When one player in the game has a rank of at least hdNoHdRankThreshold,
-    // then the game will be without handicap
+    // Maximum rank used to compute handicap is rankThreshold
     val rankThreshold: Int = 0, // 0 is 1d
     val correction: Int = 1, // Handicap will be decreased by hdCorrection
     val ceiling: Int = 9, // Possible values are between 0 and 9

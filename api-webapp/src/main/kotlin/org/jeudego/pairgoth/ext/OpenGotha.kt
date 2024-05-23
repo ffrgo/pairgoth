@@ -106,7 +106,7 @@ object OpenGotha {
             handicap = HandicapParams(
                 weight = pairParams.paiSeMinimizeHandicap.toDouble(),
                 useMMS = handParams.hdBasedOnMMS.toBoolean(),
-                rankThreshold = Pairable.parseRank(pairParams.paiSeRankThreshold),
+                rankThreshold = Pairable.parseRank(handParams.hdNoHdRankThreshold),
                 correction = handParams.hdCorrection,
                 ceiling = handParams.hdCeiling
             )
