@@ -476,14 +476,23 @@ class PairingTests: TestBase() {
             pairingsOG.add(games.toString())
         }
 
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-        }
-
         var games: Json.Array
         var firstGameID: Int
         var lastGameID: Int
         val playersList = mutableListOf<Long>()
+
+        for (round in tournament.getInt("rounds")!! downTo 1) {
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/Toulouse2024_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
+            logger.info("Pairings for round $round match OpenGotha")
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+        }
 
         for (round in 1..6) {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
