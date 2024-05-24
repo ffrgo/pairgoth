@@ -35,24 +35,28 @@ class MacMahonSolver(round: Int,
 
     override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
 
-        // Do we apply Secondary Criteria?
-        // - no player is above thresholds -> apply secondary criteria
-        // - at least one player is above thresholds -> do not apply
+        // playersMeetCriteria = 0 : No player is above thresholds -> apply the full weight
+        // playersMeetCriteria = 1 : 1 player is above thresholds -> apply half the weight
+        // playersMeetCriteria = 2 : Both players are above thresholds -> do not apply weight
+
+        var playersMeetCriteria = 0
 
         val nbw2Threshold =
             if (nbWinsThresholdActive) totalRounds
             else 2 * totalRounds
 
-        val skipSecondary =
-            (2 * p1.nbW >= nbw2Threshold) ||
-            (2 * p2.nbW >= nbw2Threshold) ||
-            barThresholdActive && (
-                (p1.rank + p1.nbW >= mmBar) ||
-                (p2.rank + p2.nbW >= mmBar)
-            )
+        // Test whether each pairable meets one of the criteria
+        // subtract Pairable.MIN_RANK to thresholds to convert ranks to MMS score
+        if (2 * p1.nbW >= nbw2Threshold
+            || barThresholdActive && (p1.mms >= mmBar - Pairable.MIN_RANK)
+                || p1.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
-        return if (skipSecondary) 0.0
-            else pairing.geo.apply(p1, p2)
+        if (2 * p2.nbW >= nbw2Threshold
+            || barThresholdActive && (p2.mms >= mmBar - Pairable.MIN_RANK)
+            || p2.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
+
+        return if (playersMeetCriteria==2) 0.0
+            else 0.5*(2-playersMeetCriteria)*pairing.geo.apply(p1, p2)
     }
 
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {

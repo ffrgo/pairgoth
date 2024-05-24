@@ -410,23 +410,20 @@ sealed class BaseSolver(
 
     open fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
 
-        // Do we apply Secondary Criteria
-        // secCase = 0 : No player is above thresholds -> apply secondary criteria
-        // secCase = 1 : At least one player is above thresholds -> do not apply
+        // playersMeetCriteria = 0 : No player is above thresholds -> apply secondary criteria
+        // playersMeetCriteria = 1 : 1 player is above thresholds -> apply half the weight
+        // playersMeetCriteria = 2 : Both players is above thresholds -> apply the full weight
 
-        var score = 0.0
-        var secCase = 0
+        var playersMeetCriteria = 0
 
-        val nbw2Threshold: Int
-        if (nbWinsThresholdActive) nbw2Threshold = totalRounds
-        else nbw2Threshold = 2 * totalRounds
+        val nbw2Threshold =
+            if (nbWinsThresholdActive) totalRounds
+            else 2 * totalRounds
 
-        if( (2*p1.nbW >= nbw2Threshold) ||
-            (2*p2.nbW >= nbw2Threshold) ) secCase = 1
+        if (2*p1.nbW >= nbw2Threshold) playersMeetCriteria++
+        if (2*p2.nbW >= nbw2Threshold) playersMeetCriteria++
 
-        if (secCase == 0) score = pairing.geo.apply(p1, p2)
-
-        return score
+        return 0.5*playersMeetCriteria*pairing.geo.apply(p1, p2)
     }
 
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
