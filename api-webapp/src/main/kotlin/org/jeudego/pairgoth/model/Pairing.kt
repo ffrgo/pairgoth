@@ -6,7 +6,6 @@ import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.SPLIT_AND_SLIP
 import org.jeudego.pairgoth.model.PairingType.*
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
-import java.util.*
 import kotlin.math.min
 
 // base pairing parameters
@@ -69,7 +68,7 @@ data class MainCritParams(
 // secondary criterium parameters
 data class SecondaryCritParams(
     val barThresholdActive: Boolean = true, // Do not apply secondary criteria for players above bar
-    val rankThreshold: Int = 0, // Do not apply secondary criteria above 1D rank
+    val rankSecThreshold: Int = 0, // Do not apply secondary criteria above 1D rank
     val nbWinsThresholdActive: Boolean = true, // Do not apply secondary criteria when nbWins >= nbRounds / 2
     val defSecCrit: Double = MainCritParams.MAX_CATEGORIES_WEIGHT, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
 ) {
@@ -158,7 +157,7 @@ class Swiss(
         ),
         secondary = SecondaryCritParams(
             barThresholdActive = true,
-            rankThreshold = -30,
+            rankSecThreshold = -30,
             nbWinsThresholdActive = true,
             defSecCrit = MainCritParams.MAX_CATEGORIES_WEIGHT
         ),
@@ -269,14 +268,14 @@ fun MainCritParams.toJson() = Json.Object(
 
 fun SecondaryCritParams.Companion.fromJson(json: Json.Object, localDefault: SecondaryCritParams? = null) = SecondaryCritParams(
     barThresholdActive = json.getBoolean("barThreshold") ?: localDefault?.barThresholdActive ?: default.barThresholdActive,
-    rankThreshold = json.getInt("rankThreshold") ?: localDefault?.rankThreshold ?: default.rankThreshold,
+    rankSecThreshold = json.getInt("rankThreshold") ?: localDefault?.rankSecThreshold ?: default.rankSecThreshold,
     nbWinsThresholdActive = json.getBoolean("winsThreshold") ?: localDefault?.nbWinsThresholdActive ?: default.nbWinsThresholdActive,
     defSecCrit = json.getDouble("secWeight") ?: localDefault?.defSecCrit ?: default.defSecCrit
 )
 
 fun SecondaryCritParams.toJson() = Json.Object(
     "barThreshold" to barThresholdActive,
-    "rankThreshold" to rankThreshold,
+    "rankThreshold" to rankSecThreshold,
     "winsThreshold" to nbWinsThresholdActive,
     "secWeight" to defSecCrit
 )

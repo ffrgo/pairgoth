@@ -429,13 +429,6 @@ sealed class BaseSolver(
         return score
     }
 
-    open fun SecondaryCritParams.notNeeded(p1: Pairable, p2: Pairable) {
-        // secCase = 0 : No player is above thresholds
-        // secCase = 1 : One player is above thresholds
-        // secCase = 2 : Both players are above thresholds
-        // TODO understand where it is used
-    }
-
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
         val placementScoreRange = groupsCount
 
