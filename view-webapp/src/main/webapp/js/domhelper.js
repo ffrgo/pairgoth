@@ -159,7 +159,7 @@ NodeList.prototype.clear = function() {
   return this;
 }
 Element.prototype.clear = function() {
-  this.innerHTML = '';
+  while (this.firstChild) this.removeChild(this.lastChild);
   return this;
 }
 

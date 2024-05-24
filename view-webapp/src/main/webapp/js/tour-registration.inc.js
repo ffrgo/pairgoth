@@ -11,15 +11,24 @@ function searchResultShown() {
 }
 
 function browseScroll() {
-  let scrollTo = $('#needle')[0].value.trim();
-  while (scrollTo.length > 0) {
-    let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
-    if (target.length > 0) {
-      target[0].scrollIntoView({behavior: "smooth", block: "center"});
-      break;
+  spinner(true);
+  setTimeout(() => {
+    $('#search-result .result-line').removeClass('spotted');
+    let scrollTo = $('#needle')[0].value.trim();
+    while (scrollTo.length > 0) {
+      let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
+      if (target.length > 0) {
+        target.addClass('spotted');
+        let first = target[0];
+        first.scrollIntoView({behavior: "smooth", block: "center"});
+        searchHighlight = Array.prototype.indexOf.call(first.parentNode.children, first);
+        first.addClass('highlighted');
+        break;
+      } else searchHighlight = -1;
+      scrollTo = scrollTo.substring(0, scrollTo.length - 1);
     }
-    scrollTo = scrollTo.substring(0, scrollTo.length - 1);
-  }
+    spinner(false);
+  }, 0);
 }
 
 function clearSearch() {
@@ -50,6 +59,7 @@ function search(needle) {
           if (needle === '*') {
             setTimeout(() => browseScroll(), 0);
           } else {
+            $('#search-result').removeClass('hidden');
             let scrollable = $('#player .popup-body');
             scrollable[0].scrollTop = 0;
           }
@@ -70,6 +80,7 @@ function initSearch() {
     let form = $('#search-form')[0];
     let browsing = !!form.val('browse');
     if (!browsing || !searchResult) {
+      $('#search-result .result-line').removeClass('spotted');
       search(browsing ? '*' : needle);
     } else if (browsing) {
       if (needle.length) {
@@ -138,6 +149,7 @@ function bulkUpdate(players) {
 }
 
 function navigateResults(ev) {
+  console.log(`searchHighlight = ${searchHighlight}`);
   let lines = $('.result-line');
   lines.removeClass('highlighted');
   searchHighlight = Math.max(searchHighlight, 0);
@@ -158,9 +170,11 @@ function navigateResults(ev) {
       scrollContainer.scrollTop += (bottom - scrollBottom);
     }
   }
-  ev.preventDefault();
-  ev.cancelBubble = true;
-  ev.stopPropagation();
+  if (ev) {
+    ev.preventDefault();
+    ev.cancelBubble = true;
+    ev.stopPropagation();
+  }
 }
 
 let tableSort;
@@ -362,6 +376,7 @@ onLoad(() => {
     if (resultLine) {
       let index = e.target.closest('.result-line').data('index');
       fillPlayer(searchResult[index]);
+      return;
     }
     let tab = document.location.hash;
     if (store('addingPlayers') && tab === '#registration') {
