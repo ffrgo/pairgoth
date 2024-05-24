@@ -11,24 +11,21 @@ function searchResultShown() {
 }
 
 function browseScroll() {
-  spinner(true);
-  setTimeout(() => {
-    $('#search-result .result-line').removeClass('spotted');
-    let scrollTo = $('#needle')[0].value.trim();
-    while (scrollTo.length > 0) {
-      let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
-      if (target.length > 0) {
-        target.addClass('spotted');
-        let first = target[0];
-        first.scrollIntoView({behavior: "smooth", block: "center"});
-        searchHighlight = Array.prototype.indexOf.call(first.parentNode.children, first);
-        first.addClass('highlighted');
-        break;
-      } else searchHighlight = -1;
-      scrollTo = scrollTo.substring(0, scrollTo.length - 1);
+  $('#search-result .result-line').removeClass('spotted');
+  searchHighlight = -1;
+  let scrollTo = $('#needle')[0].value.trim();
+  while (scrollTo.length > 0) {
+    let target = $(`#search-result .result-line[data-name^="${scrollTo}"i]`);
+    if (target.length > 0) {
+      target.addClass('spotted');
+      let first = target[0];
+      first.scrollIntoView({behavior: "smooth", block: "center"});
+      searchHighlight = Array.prototype.indexOf.call(first.parentNode.children, first);
+      first.addClass('highlighted');
+      break;
     }
-    spinner(false);
-  }, 0);
+    scrollTo = scrollTo.substring(0, scrollTo.length - 1);
+  }
 }
 
 function clearSearch() {
