@@ -35,9 +35,9 @@ class MacMahonSolver(round: Int,
 
     override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
 
-        // Do we apply Secondary Criteria.
-        // No player is above thresholds -> apply secondary criteria
-        // At least one player is above thresholds -> do not apply
+        // Do we apply Secondary Criteria?
+        // - no player is above thresholds -> apply secondary criteria
+        // - at least one player is above thresholds -> do not apply
 
         val nbw2Threshold =
             if (nbWinsThresholdActive) totalRounds
@@ -46,8 +46,10 @@ class MacMahonSolver(round: Int,
         val skipSecondary =
             (2 * p1.nbW >= nbw2Threshold) ||
             (2 * p2.nbW >= nbw2Threshold) ||
-            (p1.rank + p1.nbW >= mmBar) ||
-            (p2.rank + p2.nbW >= mmBar)
+            barThresholdActive && (
+                (p1.rank + p1.nbW >= mmBar) ||
+                (p2.rank + p2.nbW >= mmBar)
+            )
 
         return if (skipSecondary) 0.0
             else pairing.geo.apply(p1, p2)

@@ -92,16 +92,16 @@ data class GeographicalParams(
 // handicap params
 data class HandicapParams(
     // minimizeHandicap is a secondary criteria but moved here
-    val weight: Double = 0.0, // Should be paiSeDefSecCrit for SwCat, 0 for others
+    val weight: Double = 0.0, // "Should be paiSeDefSecCrit for SwCat, 0 for others" ; unused for now, swiss with cats not implemented
     val useMMS: Boolean = true, // if useMMS is false, hd will be based on rank
     // Maximum rank used to compute handicap is rankThreshold
-    val rankThreshold: Int = 0, // 0 is 1d
+    val rankThreshold: Int = 0, // No handicap if at least one player is above this rank (0 is 1d)
     val correction: Int = 1, // Handicap will be decreased by hdCorrection
     val ceiling: Int = 9, // Possible values are between 0 and 9
 ) {
     companion object {
         val swissDefault = HandicapParams(
-            weight = 0.0, // TODO 'default disables handicap' => seems wrong, not used
+            weight = 0.0,
             useMMS = false,
             rankThreshold = -30, // 30k
             ceiling = 0)
