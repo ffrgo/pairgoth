@@ -55,8 +55,7 @@ class MacMahonSolver(round: Int,
             || barThresholdActive && (p2.mms >= mmBar - Pairable.MIN_RANK)
             || p2.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
-        return if (playersMeetCriteria==2) 0.0
-            else 0.5*(2-playersMeetCriteria)*pairing.geo.apply(p1, p2)
+        return pairing.geo.apply(p1, p2, playersMeetCriteria)
     }
 
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {

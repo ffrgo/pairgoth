@@ -423,10 +423,10 @@ sealed class BaseSolver(
         if (2*p1.nbW >= nbw2Threshold) playersMeetCriteria++
         if (2*p2.nbW >= nbw2Threshold) playersMeetCriteria++
 
-        return 0.5*playersMeetCriteria*pairing.geo.apply(p1, p2)
+        return pairing.geo.apply(p1, p2, playersMeetCriteria)
     }
 
-    fun GeographicalParams.apply(p1: Pairable, p2: Pairable): Double {
+    fun GeographicalParams.apply(p1: Pairable, p2: Pairable, playersMeetCriteria: Int): Double {
         val placementScoreRange = groupsCount
 
         val geoMaxCost = pairing.geo.avoidSameGeo
@@ -478,11 +478,15 @@ sealed class BaseSolver(
 
         // The concavity function is applied to geoRatio to get geoCost
         val dbGeoCost: Double = concavityFunction(geoRatio, geoMaxCost)
-        var score = pairing.main.scoreWeight - dbGeoCost
+        var geoNominalCost = pairing.main.scoreWeight - dbGeoCost
 
-        score = min(score, geoMaxCost)
+        if (geoNominalCost > geoMaxCost) geoNominalCost = geoMaxCost
 
-        return score
+        return when (playersMeetCriteria) {
+            2 -> geoMaxCost
+            1 -> 0.5 * (geoNominalCost + geoMaxCost)
+            else -> geoNominalCost
+        }
     }
 
     // Handicap functions
