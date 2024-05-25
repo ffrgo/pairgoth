@@ -330,33 +330,17 @@ sealed class BaseSolver(
                 // Do nothing
             } else if (scenario == 1) {
                 score += 1 * duddWeight
-            } else if (scenario == 2 || (scenario > 2 && !pairing.main.compensateDrawUpDown)) {
+            } else if (scenario != 2 && (scenario <= 2 || pairing.main.compensateDrawUpDown)) {
+                if (scenario == 3) {
+                    score += 3 * duddWeight
+                } else if (scenario == 4) {
+                    score += 4 * duddWeight
+                }
+            } else {
                 score += 2 * duddWeight
-            } else if (scenario == 3) {
-                score += 3 * duddWeight
-            } else if (scenario == 4) {
-                score += 4 * duddWeight
             }
-
-            /*if(p1.name == "Durand" && p2.name == "Aim") {
-                println("Names DU DD "+p1.nameSeed()+" "+p1_DU+" "+p1_DD+" "+p2.nameSeed()+" "+p2_DU+" "+p2_DD)
-                println("Names "+upperSP.nameSeed()+" "+upperSP.group+"   "+lowerSP.nameSeed()+" "+lowerSP.group)
-                println("DUDD scenario, GroupDiff = "+scenario.toString()+"  "+(upperSP.group-lowerSP.group).toString())
-                println("DUDD Upper/Lower modes = "+pairing.main.drawUpDownUpperMode.toString()+"  "+pairing.main.drawUpDownLowerMode.toString())
-                println("u/lSPgroupsize = "+uSPgroupSize.toString()+"   "+lSPgroupSize.toString())
-                println("u/lSPplaceingroup = "+upperSP.placeInGroup.first.toString()+"  "+lowerSP.placeInGroup.first.toString())
-                println("score = " + score.toString())
-            }*/
-
         }
-
-
-
-        // TODO adapt to Swiss with categories
-        /*// But, if players come from different categories, decrease score(added in 3.11)
-        val catGap: Int = Math.abs(p1.category(gps) - p2.category(gps))
-        score = score / (catGap + 1) / (catGap + 1) / (catGap + 1) / (catGap + 1)*/
-
+        if (score < 0.0) score = 0.0
         return score
     }
 
