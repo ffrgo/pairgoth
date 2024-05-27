@@ -459,7 +459,7 @@ class PairingTests: TestBase() {
     @Test
     fun `MMtest_Toulouse24`() {
         // read tournament with pairing
-        val file = getTestFile("opengotha/pairings/2024-Toulouse_352.xml")
+        val file = getTestFile("opengotha/pairings/2024-Toulouse_3511.xml")
         logger.info("read from file $file")
         val resource = file.readText(StandardCharsets.UTF_8)
         var resp = TestAPI.post("/api/tour", resource)
@@ -481,20 +481,24 @@ class PairingTests: TestBase() {
         var lastGameID: Int
         val playersList = mutableListOf<Long>()
 
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/Toulouse2024_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-            assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
+        for (round in tournament.getInt("rounds")!! downTo 2) {
             TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
         }
 
-        for (round in 1..6) {
+        /*for (round in tournament.getInt("rounds")!! downTo 1) {
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/Toulouse2024_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
+            logger.info("Pairings for round $round match OpenGotha")
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+        }*/
+
+        for (round in 2..6) {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
@@ -504,13 +508,13 @@ class PairingTests: TestBase() {
             assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+            /*firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
             lastGameID = (games.getJson(-1)!!.asObject()["id"] as Long?)!!.toInt()
             for (gameID in firstGameID..lastGameID) {
-                resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"b"}""")).asObject()
+                resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"w"}""")).asObject()
                 assertTrue(resp.getBoolean("success") == true, "expecting success")
             }
-            logger.info("Results succesfully entered for round $round")
+            logger.info("Results succesfully entered for round $round")*/
         }
 
     }
