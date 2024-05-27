@@ -266,7 +266,7 @@ sealed class BaseSolver(
         // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
         // Modifs V3.44.05 (ideas from Tuomo Salo)
 
-        if (Math.abs(p1.group - p2.group) < 4 && (p1.group != p2.group)) {
+        if (p1.group != p2.group) {
             // 5 scenarii
             // scenario = 0 : Both players have already been drawn in the same sense
             // scenario = 1 : One of the players has already been drawn in the same sense           
