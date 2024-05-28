@@ -501,9 +501,17 @@ class PairingTests: TestBase() {
             firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
             for (i in 0 until games.size) {
                 val gameID = firstGameID + i
-                val gameRes = pairingsOG[round-1].getJson(i)!!.asObject()["r"] as String?
-                resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
-                assertTrue(resp.getBoolean("success") == true, "expecting success")
+                // find corresponding game (matching white id)
+                for (j in 0 until games.size) {
+                    val gameOG = pairingsOG[round-1].getJson(j)!!.asObject()// ["r"] as String?
+                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]){
+                        val gameRes = gameOG["r"] as String?
+                        resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
+                        assertTrue(resp.getBoolean("success") == true, "expecting success")
+                        break
+                    }
+                }
+
             }
             logger.info("Results succesfully entered for round $round")
         }
