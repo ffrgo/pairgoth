@@ -74,15 +74,10 @@ sealed class Tournament <P: Pairable>(
         else mutableMapOf<ID, Game>().also { games.add(it) }
     fun lastRound() = max(1, games.size)
 
-    fun recomputeHdAndDUDD(round: Int, gameID: ID) {
+    fun recomputeDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
-        // TODO cleaner solver instantiation
         val history = historyBefore(round)
-        val solver = if (pairing is Swiss) {
-            SwissSolver(round, rounds, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round))
-        } else if (pairing is MacMahon) {
-            MacMahonSolver(round, rounds, history, pairables.values.toList(), pairing.pairingParams, pairing.placementParams, usedTables(round), pairing.mmFloor, pairing.mmBar)
-        } else throw Exception("Invalid tournament type")
+        val solver = pairing.solver(this, round, pairables.values.toList())
 
         // Recomputes DUDD and hd
         val game = games(round)[gameID]!!
@@ -90,6 +85,31 @@ sealed class Tournament <P: Pairable>(
         val black = solver.pairables.find { p-> p.id == game.black }!!
         game.drawnUpDown = solver.dudd(black, white)
         game.handicap = solver.hd(white = white, black = black)
+    }
+
+
+    /**
+     * Recompute DUDD for the specified round
+     */
+    fun recomputeDUDD(round: Int) {
+        // Instantiate solver with game history
+        val history = historyBefore(round)
+        val solver = pairing.solver(this, round, pairables.values.toList())
+        for (game in games(round).values) {
+            val white = solver.pairables.find { p-> p.id == game.white }!!
+            val black = solver.pairables.find { p-> p.id == game.black }!!
+            game.drawnUpDown = solver.dudd(black, white)
+        }
+    }
+
+
+    /**
+     * Recompute DUDD for all rounds
+      */
+    fun recomputeDUDD() {
+        for (round in 1..rounds) {
+            recomputeDUDD(round)
+        }
     }
 
     fun usedTables(round: Int): BitSet =

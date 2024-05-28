@@ -75,14 +75,14 @@ object PairingHandler: PairgothApiHandler {
                 listOf(it.black, it.white)
             }.toSet()
             if (game.result != Game.Result.UNKNOWN && (
-                        game.black != payload.getInt("b") ||
-                                game.white != payload.getInt("w") ||
-                                game.handicap != payload.getInt("h")
-                        )) badRequest("Game already has a result")
+                    game.black != payload.getInt("b") ||
+                    game.white != payload.getInt("w") ||
+                    game.handicap != payload.getInt("h")
+            )) badRequest("Game already has a result")
             game.black = payload.getID("b") ?: badRequest("missing black player id")
             game.white = payload.getID("w") ?: badRequest("missing white player id")
 
-            tournament.recomputeHdAndDUDD(round, game.id)
+            tournament.recomputeDUDD(round, game.id)
             val previousTable = game.table;
             // temporary
             //payload.getInt("dudd")?.let { game.drawnUpDown = it }

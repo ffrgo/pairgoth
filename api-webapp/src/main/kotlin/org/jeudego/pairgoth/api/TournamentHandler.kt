@@ -55,6 +55,7 @@ object TournamentHandler: PairgothApiHandler {
             is Element -> OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
+        tournament.recomputeDUDD()
         getStore(request).addTournament(tournament)
         tournament.dispatchEvent(TournamentAdded, request, tournament.toJson())
         return Json.Object("success" to true, "id" to tournament.id)
