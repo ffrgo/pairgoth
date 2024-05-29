@@ -94,9 +94,9 @@ abstract class BasePairingHelper(
     val Pairable.sosos: Double get() = historyHelper.sosos[id] ?: 0.0
     val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
     val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
-    fun Pairable.missedRounds(upToRound: Int, pairing: Set<ID>): Int = (1..upToRound).map { round ->
+    fun Pairable.missedRounds(): Int = (1 until round).map { round ->
         if (historyHelper.playersPerRound.getOrNull(round - 1)
-                ?.contains(id) == true || round == upToRound && pairing.contains(id)
+                ?.contains(id) == true
         ) 0 else 1
     }.sum()
 
