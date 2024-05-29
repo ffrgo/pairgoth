@@ -59,6 +59,8 @@ sealed class BaseSolver(
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 
         val dec = DecimalFormat("#.#")
+        val logger = LoggerFactory.getLogger("debug")
+        val debug = false
 
         weightsLogger?.apply {
             this.println("Round $round")
@@ -79,9 +81,8 @@ sealed class BaseSolver(
                     minWeight = weightForBye
                     chosenByePlayer = p
                 }
-                // println("choose Bye: " + p.nameSeed() + " mms2 " +2*p.main+"  "+ weightForBye)
             }
-            println("Bye player : " + chosenByePlayer.fullName())
+            if(debug) logger.info("Bye player : " + chosenByePlayer.fullName())
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
@@ -107,7 +108,6 @@ sealed class BaseSolver(
                     this.println("secGeoCost=${dec.format(pairing.secondary.apply(p, q))}")
                     this.println("totalCost=${dec.format(openGothaWeight(p,q))}")
                     //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
-
                 }
             }
         }
@@ -123,23 +123,15 @@ sealed class BaseSolver(
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
 
-        val DEBUG_EXPORT_WEIGHT = true
-        if (DEBUG_EXPORT_WEIGHT) {
-            /*println("DUDD debug")
-            println(nameSortedPairables[4].nameSeed() + "   " + nameSortedPairables[25].nameSeed())
-            pairing.main.applyDUDD(nameSortedPairables[25],nameSortedPairables[4], debug=true)
-            println("Standings debug: place Name group score sos sosos ranking rating")
-            for (p in pairingSortedPairables){
-                println(p.place.toString() + "   " + p.nameSeed() + "   " + p.group.toString() + "   " + p.main.toString() + "   " + p.sos.toString() + "   " + p.sosos.toString() + "   " + p.displayRank() + "   " + p.rating)
-            }*/
-            //println("Seeding debug")
-            //pairing.main.applySeeding(nameSortedPairables[20],nameSortedPairables[9], debug=true)
-            //pairing.main.applySeeding(nameSortedPairables[9],nameSortedPairables[20], debug=true)
+        if (debug) {
             var sumOfWeights = 0.0
-            //println("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
+            for (p in sortedPairables) {
+                logger.info("#${p.id} ${p.name} ${scores[p.id]?.first} ${scores[p.id]?.second} ${p.sos}")
+            }
+            logger.info("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
             for (it in sorted) {
 
-                println(it[0].fullName() + " " + it[0].place.toString()
+                logger.info(it[0].fullName() + " " + it[0].place.toString()
                                          + " " + it[0].id.toString()
                                          + " " + it[0].colorBalance.toString()
                                          + " " + it[0].group.toString()
@@ -155,9 +147,8 @@ sealed class BaseSolver(
                 sumOfWeights += weight(it[0], it[1])
             }
             val dec = DecimalFormat("#.#")
-            // println("sumOfWeights = " + dec.format(sumOfWeights))
+            logger.info("sumOfWeights = " + dec.format(sumOfWeights))
         }
-
         return result
     }
 
@@ -381,15 +372,6 @@ sealed class BaseSolver(
                     }
                 }
             }
-
-//            if(true){
-//                println("Names "+p1.nameSeed()+" "+p1.group+"   "+p2.nameSeed()+" "+p2.group)
-//                println("Seed Sytem = " + currentSeedSystem.toString())
-//                println("groupsize = "+p1.placeInGroup.second.toString()+"   "+p2.placeInGroup.second.toString()+"  "+groupSize)
-//                println("place in group p1 = "+cla1.toString()+"  p2 = "+cla2.toString())
-//                println("score = " + Math.round(score).toString())
-//                println("detrandom(p1,p2) = " + (maxSeedingWeight-detRandom(seedingWeight*0.2, p1, p2)).toString())
-//            }
         }
         return Math.round(score).toDouble()
     }
