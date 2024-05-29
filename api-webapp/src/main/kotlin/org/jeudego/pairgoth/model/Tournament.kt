@@ -76,7 +76,6 @@ sealed class Tournament <P: Pairable>(
 
     fun recomputeDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
-        val history = historyBefore(round)
         val solver = pairing.solver(this, round, pairables.values.toList())
 
         // Recomputes DUDD and hd
@@ -92,8 +91,8 @@ sealed class Tournament <P: Pairable>(
      * Recompute DUDD for the specified round
      */
     fun recomputeDUDD(round: Int) {
+        if (pairables.isEmpty() || games(1).isEmpty()) return;
         // Instantiate solver with game history
-        val history = historyBefore(round)
         val solver = pairing.solver(this, round, pairables.values.toList())
         for (game in games(round).values) {
             val white = solver.pairables.find { p-> p.id == game.white }!!
