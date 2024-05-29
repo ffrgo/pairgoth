@@ -49,12 +49,12 @@ class MacMahonSolver(round: Int,
         // subtract Pairable.MIN_RANK to thresholds to convert ranks to MMS score
         if (2 * p1.nbW >= nbw2Threshold
             // check if STARTING MMS is above MM bar (OpenGotha v3.52 behavior)
-            || barThresholdActive && ((p1.mms-p1.nbW) >= mmBar - Pairable.MIN_RANK)
+            || barThresholdActive && (p1.mmBase >= mmBar - Pairable.MIN_RANK)
                 || p1.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
         if (2 * p2.nbW >= nbw2Threshold
             // check if STARTING MMS is above MM bar (OpenGotha v3.52 behavior)
-            || barThresholdActive && ((p2.mms-p2.nbW) >= mmBar - Pairable.MIN_RANK)
+            || barThresholdActive && (p2.mmBase >= mmBar - Pairable.MIN_RANK)
             || p2.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
         return pairing.geo.apply(p1, p2, playersMeetCriteria)
@@ -68,7 +68,9 @@ class MacMahonSolver(round: Int,
         }
     }
 
+    // mmBase: starting Mac-Mahon score of the pairable
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
+    // mms: current Mac-Mahon score of the pairable
     val Pairable.mms: Double get() = scores[id]?.second ?: 0.0
 
     // CB TODO - configurable criteria
