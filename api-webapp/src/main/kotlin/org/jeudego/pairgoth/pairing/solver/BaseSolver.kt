@@ -17,8 +17,6 @@ import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.*
 
-val logger = LoggerFactory.getLogger("debug")
-
 sealed class BaseSolver(
     round: Int,
     totalRounds: Int,
@@ -87,13 +85,6 @@ sealed class BaseSolver(
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
-        }
-
-        if (round == 4) {
-            logger.info("@@@@@ Round 4 @@@@@")
-            for (p in sortedPairables) {
-                logger.info("#${p.id} ${p.name} ${scores[p.id]?.first} ${scores[p.id]?.second} ${p.sos}")
-            }
         }
 
         for (i in nameSortedPairables.indices) {
