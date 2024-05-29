@@ -12,33 +12,33 @@
         <Player agaExpirationDate="" agaId="" club="38Gr" country="FR" egfPin="" ffgLicence="2100064" ffgLicenceStatus="L" firstName="Romain" grade="5K" name="Durand" participating="11111111111111111111" rank="5K" rating="1835" ratingOrigin="FFG : -215" registeringStatus="FIN" smmsCorrection="0"/>
     </Players>
     <Games>
-        <Game blackPlayer="BONJEANROBIN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="1" whitePlayer="LEVEQUECAMILLE"/>
-        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="1" whitePlayer="BACARDATZROBIN"/>
-        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
-        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="2" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="2" whitePlayer="NOGUCHIMOTOKI"/>
-        <Game blackPlayer="MARECHALMORGANE" handicap="5" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="NOGUCHIMOTOKI"/>
-        <Game blackPlayer="DURANDROMAIN" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="3" whitePlayer="BONJEANROBIN"/>
+        <Game blackPlayer="NOGUCHIMOTOKI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="1" whitePlayer="LEVEQUECAMILLE"/>
+        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="1" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="2" whitePlayer="BONJEANROBIN"/>
+        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="2" whitePlayer="BONJEANROBIN"/>
+        <Game blackPlayer="MARECHALMORGANE" handicap="5" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="3" whitePlayer="MARECHALMORGANE"/>
         <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="1" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="DURANDROMAIN"/>
-        <Game blackPlayer="ROBINCLÉ" handicap="8" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="4" whitePlayer="RENDUQUENTIN"/>
-        <Game blackPlayer="NOGUCHIMOTOKI" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="1" whitePlayer="BACARDATZROBIN"/>
-        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
-        <Game blackPlayer="MARECHALMORGANE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="3" whitePlayer="DURANDROMAIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="8" knownColor="true" result="RESULT_WHITEWINS" roundNumber="5" tableNumber="4" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="RENDUQUENTIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="1" whitePlayer="NOGUCHIMOTOKI"/>
+        <Game blackPlayer="LEVEQUECAMILLE" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="2" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="MARECHALMORGANE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="3" whitePlayer="DURANDROMAIN"/>
         <Game blackPlayer="ROBINCLÉ" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="2" tableNumber="4" whitePlayer="GOLOUBKOVALEXANDRA"/>
-        <Game blackPlayer="RENDUQUENTIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="3" tableNumber="1" whitePlayer="NOGUCHIMOTOKI"/>
-        <Game blackPlayer="BACARDATZROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="3" tableNumber="2" whitePlayer="BONJEANROBIN"/>
-        <Game blackPlayer="ROBINCLÉ" handicap="5" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="3" whitePlayer="DURANDROMAIN"/>
+        <Game blackPlayer="NOGUCHIMOTOKI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="1" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="BONJEANROBIN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="4" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="3" whitePlayer="DURANDROMAIN"/>
         <Game blackPlayer="BONJEANROBIN" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="1" whitePlayer="NOGUCHIMOTOKI"/>
-        <Game blackPlayer="DURANDROMAIN" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="2" whitePlayer="BACARDATZROBIN"/>
-        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="3" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="3" whitePlayer="RENDUQUENTIN"/>
-        <Game blackPlayer="ROBINCLÉ" handicap="2" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="4" whitePlayer="MARECHALMORGANE"/>
+        <Game blackPlayer="GOLOUBKOVALEXANDRA" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="2" whitePlayer="RENDUQUENTIN"/>
+        <Game blackPlayer="DURANDROMAIN" handicap="4" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="3" whitePlayer="BACARDATZROBIN"/>
+        <Game blackPlayer="ROBINCLÉ" handicap="3" knownColor="true" result="RESULT_WHITEWINS" roundNumber="4" tableNumber="4" whitePlayer="MARECHALMORGANE"/>
     </Games>
     <ByePlayers>
         <ByePlayer player="ROBINCLÉ" roundNumber="1"/>
         <ByePlayer player="GOLOUBKOVALEXANDRA" roundNumber="3"/>
-        <ByePlayer player="MARECHALMORGANE" roundNumber="5"/>
+        <ByePlayer player="DURANDROMAIN" roundNumber="5"/>
     </ByePlayers>
     <TournamentParameterSet>
-        <GeneralParameterSet bInternet="false" basicTime="5" beginDate="2024-01-02" canByoYomiTime="300" complementaryTimeSystem="SUDDENDEATH" director="Theo" endDate="2024-01-02" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="1D" genMMFloor="20K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Marseillebb" name="Not so simple MM" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="5" shortName="notsimplemm" size="19" stdByoYomiTime="30"/>
+        <GeneralParameterSet bInternet="false" basicTime="5" beginDate="2024-01-02" canByoYomiTime="300" complementaryTimeSystem="SUDDENDEATH" director="Theo" endDate="2024-01-02" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="1D" genMMFloor="20K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Marseillebb" name="Not so simple MM" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="5" shortName="notsimplemm_3511" size="19" stdByoYomiTime="30"/>
         <HandicapParameterSet hdBasedOnMMS="true" hdCeiling="9" hdCorrection="1" hdNoHdRankThreshold="1D"/>
         <PlacementParameterSet>
             <PlacementCriteria>
