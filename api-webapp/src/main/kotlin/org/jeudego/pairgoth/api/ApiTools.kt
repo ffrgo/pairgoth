@@ -40,7 +40,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             it.value.let { pairable ->
                 val mmBase = pairable.mmBase()
                 val score = roundScore(mmBase +
-                        (nbW(pairable) ?: 0.0) + // TODO take tournament parameter into account
+                        (nbW(pairable) ?: 0.0) +
                         (1..round).map { round ->
                             if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
                         }.sum() * pairing.pairingParams.main.mmsValueAbsent)

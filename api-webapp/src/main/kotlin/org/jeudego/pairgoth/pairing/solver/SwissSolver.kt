@@ -7,11 +7,12 @@ class SwissSolver(round: Int,
                   totalRounds: Int,
                   history: List<List<Game>>,
                   pairables: List<Pairable>,
+                  pairablesMap: Map<ID, Pairable>,
                   pairingParams: PairingParams,
                   placementParams: PlacementParams,
                   usedTables: BitSet
 ):
-        BaseSolver(round, totalRounds, history, pairables, pairingParams, placementParams, usedTables) {
+    BaseSolver(round, totalRounds, history, pairables, pairablesMap, pairingParams, placementParams, usedTables) {
 
     // In a Swiss tournament the main criterion is the number of wins and already computed
 

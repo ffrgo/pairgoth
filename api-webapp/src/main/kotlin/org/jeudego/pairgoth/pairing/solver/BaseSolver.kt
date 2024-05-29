@@ -11,20 +11,24 @@ import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
+import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.*
+
+val logger = LoggerFactory.getLogger("debug")
 
 sealed class BaseSolver(
     round: Int,
     totalRounds: Int,
     history: List<List<Game>>, // History of all games played for each round
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
+    pairablesMap: Map<ID, Pairable>, // Map of all known pairables in this tournament
     pairing: PairingParams,
     placement: PlacementParams,
     val usedTables: BitSet
-    ) : BasePairingHelper(round, totalRounds, history, pairables, pairing, placement) {
+    ) : BasePairingHelper(round, totalRounds, history, pairables, pairablesMap, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -83,6 +87,13 @@ sealed class BaseSolver(
             nameSortedPairables.remove(chosenByePlayer)
             // Keep chosenByePlayer in pairingSortedPairables to be identical to opengotha
             pairingSortedPairables.remove(ByePlayer)
+        }
+
+        if (round == 4) {
+            logger.info("@@@@@ Round 4 @@@@@")
+            for (p in sortedPairables) {
+                logger.info("#${p.id} ${p.name} ${scores[p.id]?.first} ${scores[p.id]?.second} ${p.sos}")
+            }
         }
 
         for (i in nameSortedPairables.indices) {

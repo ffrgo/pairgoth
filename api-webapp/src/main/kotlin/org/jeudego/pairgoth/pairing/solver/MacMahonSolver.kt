@@ -10,11 +10,12 @@ class MacMahonSolver(round: Int,
                      totalRounds: Int,
                      history: List<List<Game>>,
                      pairables: List<Pairable>,
+                     pairablesMap: Map<ID, Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
                      usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int)  :
-    BaseSolver(round, totalRounds, history, pairables, pairingParams, placementParams, usedTables) {
+    BaseSolver(round, totalRounds, history, pairables, pairablesMap, pairingParams, placementParams, usedTables) {
 
     override val scores: Map<ID, Pair<Double, Double>> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
@@ -22,7 +23,7 @@ class MacMahonSolver(round: Int,
         pairablesMap.mapValues {
             it.value.let { pairable ->
                 val score = roundScore(pairable.mmBase +
-                        pairable.nbW + // TODO take tournament parameter into account
+                        pairable.nbW +
                         pairable.missedRounds(round, pairing) * pairingParams.main.mmsValueAbsent)
                 Pair(
                     if (pairingParams.main.sosValueAbsentUseBase) pairable.mmBase

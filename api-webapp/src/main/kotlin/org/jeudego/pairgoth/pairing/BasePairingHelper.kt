@@ -1,13 +1,13 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
-import java.util.*
 
 abstract class BasePairingHelper(
     val round: Int,
     val totalRounds: Int,
     history: List<List<Game>>, // History of all games played for each round
     var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
+    val pairablesMap: Map<ID, Pairable>, // Map of all known pairables for this tournament
     val pairing: PairingParams,
     val placement: PlacementParams,
     ) {
@@ -39,10 +39,6 @@ abstract class BasePairingHelper(
     // pairables sorted for pairing purposes
     protected val nameSortedPairables by lazy {
         pairables.sortedWith(::nameSort).toMutableList()
-    }
-
-    protected val pairablesMap by lazy {
-        pairables.associateBy { it.id }
     }
 
     // Generic parameters calculation
