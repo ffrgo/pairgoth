@@ -33,6 +33,10 @@ class MacMahonSolver(round: Int,
         }
     }
 
+    override fun computeWeightForBye(p: Pairable): Double{
+        return 2*scores[p.id]!!.second
+    }
+
     override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
 
         // playersMeetCriteria = 0 : No player is above thresholds -> apply the full weight

@@ -52,6 +52,10 @@ sealed class BaseSolver(
         // pairing.base.applyByeWeight(p1, p2) +
         pairing.handicap.color(p1, p2)
 
+    open fun computeWeightForBye(p: Pairable): Double{
+        return p.rank + 2*(p.main+p.rank)
+    }
+
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
         // The BYE player should have been added beforehand to make a number of pairables even.
@@ -75,7 +79,7 @@ sealed class BaseSolver(
             var weightForBye : Double
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
-                weightForBye = p.rank + 2*(p.main + p.rank)
+                weightForBye = computeWeightForBye(p)
                 if (p.id in historyHelper.byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
