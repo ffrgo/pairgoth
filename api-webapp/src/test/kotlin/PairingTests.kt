@@ -99,8 +99,6 @@ class PairingTests: TestBase() {
                 }
             }
         }
-
-        //return map1==map2
         return identical
     }
 
@@ -132,20 +130,68 @@ class PairingTests: TestBase() {
         return gamesPair==openGothaPair
     }
 
-    fun compare_string(string1:String, string2:String): String{
-        for (i in 0..string1.length) {
-            // Check if key exists in both
-            if (string1[i] != string2[i]) {
-                return "at position "+i.toString()+" "+string1.substring(i-10,i+2)+" != "+string2.substring(i-10,i+2)
-            }
+    fun test_from_XML(name:String){
+        // read tournament with pairing
+        val file = getTestFile("opengotha/pairings/$name.xml")
+        logger.info("read from file $file")
+        val resource = file.readText(StandardCharsets.UTF_8)
+        var resp = TestAPI.post("/api/tour", resource)
+        val id = resp.asObject().getInt("id")
+        val tournament = TestAPI.get("/api/tour/$id").asObject()
+        logger.info(tournament.toString().slice(0..50) + "...")
+        val players = TestAPI.get("/api/tour/$id/part").asArray()
+        logger.info(players.toString().slice(0..50) + "...")
+
+        // Get pairings (including results) from OpenGotha file
+        val pairingsOG = mutableListOf<Json.Array>()
+        for (round in 1..tournament.getInt("rounds")!!) {
+            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
+            pairingsOG.add(games)
         }
-        return "strings are identical"
+
+        // Delete pairings
+        for (round in tournament.getInt("rounds")!! downTo 1) {
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+        }
+
+        var games: Json.Array
+        var firstGameID: Int
+
+        for (round in 1..tournament.getInt("rounds")!!) {
+            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            // Call Pairgoth pairing solver to generate games
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+
+            // Compare weights with OpenGotha
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            // Compare pairings with OpenGotha
+            assertTrue(compare_games(games, pairingsOG[round - 1]), "pairings for round $round differ")
+            logger.info("Pairings for round $round match OpenGotha")
+
+            // Enter results extracted from OpenGotha
+            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+            for (i in 0 until pairingsOG[round - 1].size) {
+                val gameID = firstGameID + i
+                // find corresponding game (matching white id)
+                for (j in 0 until pairingsOG[round - 1].size) {
+                    val gameOG = pairingsOG[round - 1].getJson(j)!!.asObject()// ["r"] as String?
+                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
+                        val gameRes = gameOG["r"] as String?
+                        resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
+                        assertTrue(resp.getBoolean("success") == true, "expecting success")
+                        break
+                    }
+                }
+            }
+            logger.info("Results succesfully entered for round $round")
+        }
     }
 
     @Test
-    fun `008 simple swiss tournament`() {
+    fun `SwissTest simpleSwiss`() {
         // read tournament with pairing
-        var file = getTestFile("opengotha/pairings/simpleswiss_7R.xml")
+        var file = getTestFile("opengotha/pairings/simpleswiss.xml")
         logger.info("read from file $file")
         val resource = file.readText(StandardCharsets.UTF_8)
         var resp = TestAPI.post("/api/tour", resource)
@@ -188,7 +234,7 @@ class PairingTests: TestBase() {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
             logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simpleswiss/simpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
             assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
@@ -199,236 +245,25 @@ class PairingTests: TestBase() {
             }
             logger.info("Results succesfully entered for round $round")
         }
-
     }
 
     @Test
-    fun `009 not so simple swiss tournament`() {
-        // read tournament with pairing
-        var file = getTestFile("opengotha/pairings/notsosimpleswiss_10R.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
-        var resp = TestAPI.post("/api/tour", resource)
-        val id = resp.asObject().getInt("id")
-        val tournament = TestAPI.get("/api/tour/$id").asObject()
-        logger.info(tournament.toString().slice(0..50) + "...")
-        val players = TestAPI.get("/api/tour/$id/part").asArray()
-        logger.info(players.toString().slice(0..50) + "...")
-
-        val pairingsOG = mutableListOf<String>()
-        for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-            pairingsOG.add(games.toString())
-        }
-
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-        }
-
-        var games: Json.Array
-        var firstGameID: Int
-        val playersList = mutableListOf<Long>()
-
-        for (i in 0..34){
-            playersList.add(players.getJson(i)!!.asObject()["id"] as Long)
-        }
-
-        for (round in 1..10) {
-            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
-            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-
-            //games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array(playersList.filter{it != byePlayerList[round-1]})).asArray()
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/notsosimpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-            assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
-
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (gameID in firstGameID..firstGameID + 16) {
-                resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"b"}""")).asObject()
-                assertTrue(resp.getBoolean("success") == true, "expecting success")
-            }
-            logger.info("Results succesfully entered for round $round")
-        }
-
+    fun `SwissTest notSoSimpleSwiss`() {
+        test_from_XML("notsosimpleswiss")
     }
 
     @Test
-    fun `testSimpleMM`() {
-        // read tournament with pairing
-        val file = getTestFile("opengotha/pairings/simplemm.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
-        var resp = TestAPI.post("/api/tour", resource)
-        val id = resp.asObject().getInt("id")
-        val tournament = TestAPI.get("/api/tour/$id").asObject()
-        logger.info(tournament.toString().slice(0..50) + "...")
-        val players = TestAPI.get("/api/tour/$id/part").asArray()
-        logger.info(players.toString().slice(0..50) + "...")
-
-        // Get pairings (including results) from OpenGotha file
-        val pairingsOG = mutableListOf<Json.Array>()
-        for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            pairingsOG.add(games)
-        }
-
-        // Delete pairings
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-        }
-
-        var games: Json.Array
-        var firstGameID: Int
-
-        for (round in 1..5) {
-            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            // Call Pairgoth pairing solver to generate games
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-
-            // Compare weights with OpenGotha
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simplemm/simplemm_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-            // Compare pairings with OpenGotha
-            assertTrue(compare_games(games, pairingsOG[round - 1]), "pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
-
-            // Enter results extracted from OpenGotha
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (i in 0 until games.size) {
-                val gameID = firstGameID + i
-                // find corresponding game (matching white id)
-                for (j in 0 until games.size) {
-                    val gameOG = pairingsOG[round - 1].getJson(j)!!.asObject()// ["r"] as String?
-                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
-                        val gameRes = gameOG["r"] as String?
-                        resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
-                        assertTrue(resp.getBoolean("success") == true, "expecting success")
-                        break
-                    }
-                }
-            }
-            logger.info("Results succesfully entered for round $round")
-        }
+    fun `MMtest simpleMM`() {
+        test_from_XML("simplemm")
     }
 
     @Test
-    fun `testNotSimpleMM`() {
-        // read tournament with pairing
-        val file = getTestFile("opengotha/pairings/notsimplemm.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
-        var resp = TestAPI.post("/api/tour", resource)
-        val id = resp.asObject().getInt("id")
-        val tournament = TestAPI.get("/api/tour/$id").asObject()
-        logger.info(tournament.toString().slice(0..50) + "...")
-        val players = TestAPI.get("/api/tour/$id/part").asArray()
-        logger.info(players.toString().slice(0..50) + "...")
-
-        // Get pairings (including results) from OpenGotha file
-        val pairingsOG = mutableListOf<Json.Array>()
-        for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            pairingsOG.add(games)
-        }
-
-        // Delete pairings
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-        }
-
-        var games: Json.Array
-        var firstGameID: Int
-
-        for (round in 1..5) {
-            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            // Call Pairgoth pairing solver to generate games
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-
-            // Compare weights with OpenGotha
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/notsimplemm/notsimplemm_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-            // Compare pairings with OpenGotha
-            assertTrue(compare_games(games, pairingsOG[round - 1]), "pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
-
-            // Enter results extracted from OpenGotha
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (i in 0 until pairingsOG[round - 1].size) {
-                val gameID = firstGameID + i
-                // find corresponding game (matching white id)
-                for (j in 0 until pairingsOG[round - 1].size) {
-                    val gameOG = pairingsOG[round - 1].getJson(j)!!.asObject()// ["r"] as String?
-                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
-                        val gameRes = gameOG["r"] as String?
-                        resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
-                        assertTrue(resp.getBoolean("success") == true, "expecting success")
-                        break
-                    }
-                }
-            }
-            logger.info("Results succesfully entered for round $round")
-        }
+    fun `MMtest notSimpleMM`() {
+        test_from_XML("notsimplemm")
     }
 
     @Test
-    fun `MMtest_Toulouse24`() {
-        // read tournament with pairing
-        val file = getTestFile("opengotha/pairings/2024-Toulouse_3511.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
-        var resp = TestAPI.post("/api/tour", resource)
-        val id = resp.asObject().getInt("id")
-        val tournament = TestAPI.get("/api/tour/$id").asObject()
-        logger.info(tournament.toString().slice(0..50) + "...")
-        val players = TestAPI.get("/api/tour/$id/part").asArray()
-        logger.info(players.toString().slice(0..50) + "...")
-
-        // Get pairings (including results) from OpenGotha file
-        val pairingsOG = mutableListOf<Json.Array>()
-        for (round in 1..tournament.getInt("rounds")!!) {
-            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
-            pairingsOG.add(games)
-        }
-
-        // Delete pairings
-        for (round in tournament.getInt("rounds")!! downTo 1) {
-            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
-        }
-
-        var games: Json.Array
-        var firstGameID: Int
-
-        for (round in 1..6) {
-            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            // Call Pairgoth pairing solver to generate games
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-
-            // Compare weights with OpenGotha
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/Toulouse2024_weights_R$round.txt")), "Not matching opengotha weights for round $round")
-            // Compare pairings with OpenGotha
-            assertTrue(compare_games(games, pairingsOG[round - 1]), "pairings for round $round differ")
-            logger.info("Pairings for round $round match OpenGotha")
-
-            // Enter results extracted from OpenGotha
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (i in 0 until games.size) {
-                val gameID = firstGameID + i
-                // find corresponding game (matching white id)
-                for (j in 0 until games.size) {
-                    val gameOG = pairingsOG[round - 1].getJson(j)!!.asObject()// ["r"] as String?
-                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
-                        val gameRes = gameOG["r"] as String?
-                        resp = TestAPI.put("/api/tour/$id/res/$round", Json.parse("""{"id":$gameID,"result":"$gameRes"}""")).asObject()
-                        assertTrue(resp.getBoolean("success") == true, "expecting success")
-                        break
-                    }
-                }
-            }
-            logger.info("Results succesfully entered for round $round")
-        }
+    fun `MMtest Toulouse2024`() {
+        test_from_XML("Toulouse2024")
     }
 }
