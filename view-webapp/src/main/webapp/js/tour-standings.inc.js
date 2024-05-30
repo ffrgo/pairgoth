@@ -1,7 +1,6 @@
-function publish(format, extension) {
+function publish(format, extension, encoding) {
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
-  let encoding = $('#encoding')[0].value;
   let hdrs = headers();
   hdrs['Accept'] = `${format};charset=${encoding}`
   fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
@@ -10,9 +9,7 @@ function publish(format, extension) {
     if (resp.ok) return resp.arrayBuffer()
     else throw "publish error"
   }).then(bytes => {
-    let blob = new Blob(
-      encoding === 'utf-8' ? ['\uFEFF', bytes] : [bytes],
-      { type: `text/plain;charset=${encoding}` });
+    let blob = new Blob([bytes], { type: `text/plain;charset=${encoding}` });
     downloadFile(blob, `${shortName}.${extension}`);
     close_modal();
   }).catch(err => showError(err));
@@ -77,13 +74,13 @@ onLoad(() => {
   });
 */
   $('.publish-ffg').on('click', e => {
-    publish('application/ffg', 'tou');
+    publish('application/ffg', 'tou', 'iso-8859-1');
   });
   $('.publish-egf').on('click', e => {
-    publish('application/egf', 'h' + (typeof(correction) === 'number' && correction > 0 ? correction : 9 ));
+    publish('application/egf', 'h' + (typeof(correction) === 'number' && correction > 0 ? correction : 9 ), 'iso-8859-1');
   });
   $('.publish-csv').on('click', e => {
-    publish('text/csv', 'csv');
+    publish('text/csv', 'csv', 'utf-8');
   });
   $('.publish-html').on('click', e => {
     publishHtml();
