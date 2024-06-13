@@ -678,7 +678,11 @@
       }
     }
 
+    table { border-top: none; }
     table tr td, table tr th { page-break-inside:avoid; }
+    table thead th {
+        border-top: 1px solid rgba(34, 36, 38, .1);
+    }
     thead { display:table-header-group; }
     tfoot { display:table-footer-group; }
   }
