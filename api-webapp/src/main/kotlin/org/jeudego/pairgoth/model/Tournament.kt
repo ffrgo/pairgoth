@@ -95,9 +95,11 @@ sealed class Tournament <P: Pairable>(
         // Instantiate solver with game history
         val solver = pairing.solver(this, round, pairables.values.toList())
         for (game in games(round).values) {
-            val white = solver.pairables.find { p-> p.id == game.white }!!
-            val black = solver.pairables.find { p-> p.id == game.black }!!
-            game.drawnUpDown = solver.dudd(black, white)
+            if (game.black != 0 && game.white != 0) {
+                val white = solver.pairables.find { p-> p.id == game.white }!!
+                val black = solver.pairables.find { p-> p.id == game.black }!!
+                game.drawnUpDown = solver.dudd(black, white)
+            }
         }
     }
 
