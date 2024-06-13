@@ -17,7 +17,7 @@ POST, PUT and DELETE requests return either the 200 HTTP code with `{ "success":
 + /api/tour/#tid/team      GET POST            Team handling
 + /api/tour/#tid/team/#tid GET PUT DELETE      Team handling
 + /api/tour/#tid/pair/#rn  GET POST PUT DELETE Pairing
-+ /api/tour/#tid/res/#rn   GET PUT             Results
++ /api/tour/#tid/res/#rn   GET PUT DELETE      Results
 + /api/tour/#tid/standings GET                 Standings
 + /api/tour/#tid/stand/#rn GET                 Standings
 
@@ -135,6 +135,12 @@ POST, PUT and DELETE requests return either the 200 HTTP code with `{ "success":
     *input* `{ "id": #gid, "res": <result> }` with `res` being one of: `"w"`, `"b"`, `"="` (jigo), `"x"` (cancelled)
  
     *output* `{ "success": true }`
+
++ `DELETE /api/tour/#tip/res/#rn` Clear all results (put back all results to unknown)
+
+  *input* none
+
+  *output* `{ "success": true }`
 
 ## Standings
 

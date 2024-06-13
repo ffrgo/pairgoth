@@ -27,4 +27,14 @@ object ResultsHandler: PairgothApiHandler {
         tournament.dispatchEvent(Event.ResultUpdated, request, Json.Object("round" to round, "data" to game))
         return Json.Object("success" to true)
     }
+
+    override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
+        val tournament = getTournament(request)
+        val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
+        for (game in tournament.games(round).values) {
+            game.result = Game.Result.UNKNOWN
+        }
+        tournament.dispatchEvent(Event.ResultsCleared, request, Json.Object("round" to round))
+        return Json.Object("success" to true)
+    }
 }

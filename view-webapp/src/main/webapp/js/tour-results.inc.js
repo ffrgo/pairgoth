@@ -41,6 +41,15 @@ function setResult(id, result, previous) {
     })
 }
 
+function clearResults() {
+  api.deleteJson(`tour/${tour_id}/res/${activeRound}`)
+    .then(res => {
+      if (res !== 'error') {
+        document.location.reload();
+      }
+    })
+}
+
 const results = [ '?', 'w', 'b', '=', 'X', '#', '0' ];
 
 onLoad(()=>{
@@ -68,6 +77,11 @@ onLoad(()=>{
       $('#results-table tbody tr').filter(':not(:has(td.result[data-result="?"]))').addClass('filtered');
     } else {
       $('#results-table tbody tr').removeClass('filtered');
+    }
+  });
+  $('#clear-results').on('click', e => {
+    if (confirm($('#confirmation')[0].textContent)) {
+      clearResults();
     }
   });
 });
