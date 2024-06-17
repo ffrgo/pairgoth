@@ -27,7 +27,11 @@
   #stop
 #end
 #set($games = $utils.removeBye($roundPairing.games))
-#foreach($game in $games)
+#set($pages = ($games.size() + 3) / 4)
+#foreach($i in [1..$games.size()])
+  #set($j = ($i - 1) / 4 + (($i - 1) % 4) * $pages)
+  #if($j < $games.size())
+  #set($game = $games[$j])
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
   #if($foreach.index % 4 == 0)
@@ -36,7 +40,7 @@
 
     <div class="page-item">
       <div class="title">$tour.name</div>
-      <div class="subtitle">Result sheet</div>
+      <div class="subtitle"></div>
       <div class="details">
         <div>Table $game.t</div>
   #set($komi = $tour.komi)
@@ -70,6 +74,7 @@
   #if($foreach.index % 4 == 3)
   </div>
   #end
+#end
 #end
 </div>
 <script type="text/javascript">

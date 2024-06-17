@@ -2,6 +2,8 @@
 
 VERSION=$(grep '<version>' pom.xml | head -1 | egrep  -o '[0-9.]+')
 
+echo Installing Pairgoth version $VERSION
+
 mvn -DskipTests=true install
 
 if [ !-f "$HOME/.m2/repository/org/jeudego/pairgoth/pairgoth-common/$VERSION/pairgoth-common-$VERSION.jar" ]

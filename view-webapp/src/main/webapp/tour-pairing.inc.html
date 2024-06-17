@@ -58,7 +58,7 @@
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
             <div class="listitem game" data-id="$game.id">
-              <div class="table" data-value="$game.t">#$game.t</div>
+              <div class="table" data-value="$game.t">${game.t}.</div>
               <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
               <div class="levels">#if($white)#rank($white.rank)#end&nbsp;/&nbsp;#if($black)#rank($black.rank)#end</div>
               <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
@@ -71,6 +71,32 @@
       </div>
     </div>
   </div>
+#if($games.size())
+  <div id="print-pairings">
+    <table class="ui striped table">
+      <thead>
+      <tr>
+        <th>Tbl</th>
+        <th>White</th>
+        <th>Black</th>
+        <th>Hd</th>
+      </tr>
+      </thead>
+      <tbody>
+  #foreach($game in $games)
+    #set($white = $pmap[$game.w])
+    #set($black = $pmap[$game.b])
+      <tr>
+        <td>${game.t}</td>
+        <td class="left">#if($white)${white.name} ${white.firstname} (#rank($white.rank), $white.country $white.club)#{else}BIP#end</td>
+        <td class="left">#if($black)${black.name} ${black.firstname} (#rank($black.rank), $black.country $black.club)#{else}BIP#end</td>
+        <td>${game.h}</td>
+      </tr>
+  #end
+      </tbody>
+    </table>
+  </div>
+#end
 </div>
 
 <div id="edit-pairing" class="popup">

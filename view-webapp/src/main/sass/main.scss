@@ -520,11 +520,23 @@
 
   @media print {
 
+    @page {
+      size: A4;
+    }
+
     body {
       width: unset;
       height: unset;
       font-size: 0.65em;
       overflow: visible;
+    }
+
+    #center #inner > .section {
+      margin: 0 0.5em;
+    }
+
+    #players-list {
+      max-width: 98vw;
     }
 
     .roundbox {
@@ -537,12 +549,16 @@
       margin-top: 0.1em !important;
     }
 
-    #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview {
+    #header, #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview {
       display: none !important;
     }
 
     #center, #paired {
       overflow-y: hidden;
+    }
+
+    #paired {
+      display: none !important;
     }
 
     body {
@@ -558,22 +574,17 @@
             top: 0;
           }
         }
-
-        #paired {
+        #print-pairings {
           display: none !important;
         }
+
       }
 
       &:not(.nogame) {
-        #paired {
-          max-height: unset !important;
-          max-width: unset !important;
-          font-size: 1rem !important;
-          line-height: 1.1rem !important;
-          min-width: 60vw;
-
-          &::before {
-            top: 0;
+        #print-pairings {
+          display: table;
+          .left {
+            text-align: left;
           }
         }
 
@@ -596,7 +607,7 @@
         font-size: 1.4rem;
         line-height: 1.5rem;
         height: 24vh;
-        border-bottom: 1px dotted gray;
+        border-bottom: 2px dotted gray;
         display: flex;
         flex-flow: column nowrap;
         justify-content: space-evenly;
@@ -664,11 +675,21 @@
       color: black !important;
     }
 
-    .participation .ui.label {
+    #participation-stats {
+      display: none;
+    }
+
+    #players-list tr > :first-child {
+      display: none;
+    }
+
+    #players-list #players .participation .ui.label {
       background: none;
       border: none;
-      font-weight: bold;
-      min-width: unset;
+      font-size: 1rem !important;
+      min-width: unset !important;
+      min-height: unset !important;
+      padding: 0 !important;
       &.red {
         color: rgba(0,0,0,0);
         text-decoration: solid line-through black;
@@ -678,12 +699,37 @@
       }
     }
 
-    table { border-top: none; }
-    table tr td, table tr th { page-break-inside:avoid; }
-    table thead th {
-        border-top: 1px solid rgba(34, 36, 38, .1);
+    table {
+      border-top: none;
+      font-size: 1rem;
+      font-weight: bold;
+      tr td, tr th {
+        page-break-inside:avoid;
+        height: 2em;
+      }
+      thead {
+        display:table-header-group;
+        th {
+          border-top: 1px solid rgba(34, 36, 38, .1);
+          &:after {
+            display: none;
+          }
+        }
+      }
+      tfoot { display:table-footer-group; }
     }
-    thead { display:table-header-group; }
-    tfoot { display:table-footer-group; }
+    #results-table td.looser {
+      font-weight: normal;
+    }
+    #print-pairings table {
+      font-size: 1.2rem;
+    }
+    #pairing-round, #results-round, #standings-round {
+      font-size: 1.1rem;
+    }
+    #standings-table {
+      font-size: 0.70rem;
+    }
   }
+
 }

@@ -99,13 +99,13 @@
         background-color: #D0FFD0;
       }
       .participation {
-        white-space: nowrap;
+        /* white-space: nowrap; */
         .ui.label {
           cursor: pointer;
           font-size: 0.8rem;
           min-width: 2em;
           min-height: 2em;
-          padding: .5em !important;
+          padding: .5em;
           line-height: 1em;
           text-align: center;
           border-radius: 500rem;
@@ -360,7 +360,14 @@
         width: 6em;
       }
     }
-
+  }
+  #print-pairables {
+    width: 100%;
+    display: none;
+  }
+  #print-pairings {
+    width: 100%;
+    display: none;
   }
   .pairing-buttons {
     display: flex;
