@@ -520,10 +520,6 @@
 
   @media print {
 
-    @page {
-      size: A4;
-    }
-
     body {
       width: unset;
       height: unset;
