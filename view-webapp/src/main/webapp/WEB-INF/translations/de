@@ -1,0 +1,205 @@
+(docker required)	(docker erforderlich)
+(java required)	(java erforderlich)
+, allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	, erlaubt Ihnen, es beliebig anzupassen. Schicken Sie uns Ihre Verbesserungen gerne zurück!
+, the well known pairing system software developed by	, das wohlbekannte Paarungsprogramm entwickelt von
+, your Go Pairing Engine!	, Ihr Go-Paarungsprogramm!
+, last modified	, letzte Änderung:
+1st round seeding	Paarungsverfahren Runde 1
+: If you prefer convenience, you can simply use the	: Wenn Sie es bequem haben wollen, nutzen Sie gerne
+: This mode allows you to run	: Dieser Modus erlaubt Ihnen,
+: This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: Dieser Modus ist geeignet für große Ereignisse wie den Kongress, er erlaubt eine Voranmeldung von Spielern, das Eintragen von Ergebnissen und die Paaren von mehreren Rechnern gleichzeitig.
+: the	: das Projekt
+Add player	Hinzufügen
+Advanced parameters	Erweiterte Parameter
+At its core,	Grundsätzlich
+Browse	Browsen
+Byo-yomi periods	Byoyomi-Perioden
+Byo-yomi stones	Steine im Byoyomi
+Byo-yomi time	Byoyomi-Zeit
+Canadian byo-yomi	Kanadisches Byoyomi
+Cancel	Abbrechen
+Change	Ändern
+Chinese rules	Chinesische Regeln
+Choose format	Format auswählen
+Clone	Duplizieren
+Clone example tournament	Beispielturnier duplizieren
+Close	Schließen
+Club	Club
+Compile from the sources	Aus dem Quellcode übersetzen&nbsp;
+Country	Land
+Create	Anlegen
+Crit	Krit
+Ctr	Land
+Dates	Daten
+Delete	Löschen
+Director	Direktor
+Download	Herunterladen
+Download the standalone web interface module which suits your need, then follow	Die für Sie passende Web-Benutzerschnittstelle herunterladen, anschließend befolgen Sie
+Drop changes?	Änderungen verwerfen?
+Edit	Bearbeiten
+Encoding	Codierung
+Enter the magic word	Zauberwort eingeben
+Example tournament	Beispielturnier
+Export	Exportieren
+Export tournament	Turnier exportieren
+Family name	Familienname
+Filter	Filtern
+Filter...	Filtern…
+Final only	Endgültige Anmeldungen
+First name	Vorname
+Fischer timing	Fischerzeit
+French rules	Französische Regeln
+Given name	Vorname
+Goban	Gobrett
+Hd correction	Vorgabe
+No hd threshold	Ohne Vorgabe
+How to use	Verwendung
+Import	Importieren
+Import tournament	Turnier importieren
+Increment	Zusatz
+Individual players	Einzelspieler
+Information	Information
+Invalid tournament id	Ungültige Turnier-ID
+Japanese rules	Japanische Regeln
+Komi	Komi
+Launch	Starten
+Launch a pairing server	Einen Paarungsserver starten&nbsp;
+Launch a standalone instance	Ein eigenständiges Paarungssystem starten&nbsp;
+Location	Ort
+Log in	Anmelden
+Luc Vannier	Luc Vannier
+MM bar	MM-Bar
+Mac Mahon	Mac Mahon
+Mac Mahon groups	Mac-Mahon-Gruppen
+MacMahon	MacMahon
+Main time	Grundbedenkzeit
+Max time	Maximalzeit
+MM floor	Unterer MM-Bar
+Name	Name
+Nbw	Siege
+New Tournament	Neues Turnier
+New tournament	Neues Turnier
+Next rounds seeding	Setzliste für weitere Runden
+OpenGotha / Pairgoth file	OpenGotha/Pairgoth-Datei
+Pair	Paaren
+Pair-go tournament	Paar-Go-Turnier
+Pairing	Paarungen
+Pairings for round	Paarungen für Runde
+Participation	Teilnahme
+Preliminary and final	Vorangemeldet und endgültig
+Preliminary only	Vorangemeldet
+Publish	Veröffentlichen
+Publish standings	Stand veröffentlichen
+Rank	Rang
+Rating	Rating
+Reg	Anm.
+Register	Anmelden
+Registration	Anmeldung
+Rengo with 2 players teams	Rengo mit 2 Spielern pro Team
+Rengo with 3 players team	Rengo mit 3 Spielern pro Team
+Renumber	Neu durchnummerieren
+Required field	Pflichtfeld
+Reset	Zurücksetzen
+Results	Ergebnisse
+Results for round	Ergebnisse für Runde
+Round-robin	Jeder-gegen-jeden
+Rounds	Runden
+Rules	Regeln
+Search...	Suchen…
+Short name	Kurzname
+Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	Da das Projekt noch in der Betaphase ist, ist der Quellcode nur für Mitwirkende der FFG verfügbar. Wenn das auf Sie zutrifft, finden Sie den Code hier:
+Split and fold	Faltpaarung
+Split and random	Halbieren und zufällig
+Split and slip	Halbieren und verschieben
+Standard byo-yomi	Standard-Byoyomi
+Standings	Ergebnisse
+Standings after round	Ergebnisse nach Runde
+Stay in the browser	Im Browser bleiben
+Sudden death	Keine Bonuszeit
+Swiss	Schweizer System
+Team of 2 individual players	Team aus 2 Einzelspielern
+Team of 3 individual players	Team aus 3 Einzelspielern
+Team of 4 individual players	Team aus 4 Einzelspielern
+Team of 5 individual players	Team aus 5 Einzelspielern
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server on port 8080 to which you can connect using a browser.	Das ist die beste Möglichkeit, wenn Sie die Paarung auf dem lokalen Rechner machen wollen oder unabhängig vom Internet sein wollen. Pairgoth starten einen lokalen Webserver auf Port 8080, zu dem Sie sich mit einem Browser verbinden können.
+Time system	Zeitsystem
+Tournament director	Turnierdirektor
+Tournament name	Name des Turniers
+Tournament type	Art des Turniers
+Unpair	Paarung zurücknehmen
+Unregister	Anmeldung zurücknehmen
+Unregister this player?	Diesen Spieler aus der Anmeldung rausnehmen?
+Update	Aktualisieren
+We offer you the flexibility to use	Wir bieten mehrere Nutzungsmöglichkeiten
+Welcome to	Willkommen bei
+What is	Was ist
+Your feedback is most welcome!	Wir freuen uns auf Ihr Feedback!
+and uses the same algorithm and parameters internally, as well as import and export features towards its format.	und nutzt intern denselben Algorithmus und Turnierparameter, sowie Import und Export in das eigene Format.
+apache licence	Apache-Lizenz
+black	schwarz
+Black	Schwarz
+club	club
+country	land
+d	d
+end date	Enddatum
+first name	Vorname
+from	aus
+games )	Spiele)
+h	h
+in a way that best suits your needs. Here are your options:	wie Sie es am besten gebrauchen können. Das sind Ihre Möglichkeiten:
+instance graciously hosted by the French Go Federation.	Installation, kostenlos bereitgestellt vom Französischen Go-Verband
+is a Go tournament pairing engine designed to make your tournament experience effortless.	ist ein Paarungsprogramm für Goturniere, mit dem Ziel, dass das Turnier reibungslos abläuft.
+is the successor of	ist der Nachfolder von
+k	k
+last name	Nachname
+on your local computer.	auf Ihrem lokalen Rechner.
+online tournament	Onlineturnier
+opengotha	OpenGotha
+or	oder
+pairable players	verfügbare Spieler
+pairable,	verfügbare,
+pairgoth	pairgoth
+pairing system, ideal for championships with no handicap games, as well as the	Paarungssystem, ideal für Meisterschaften ohne Vorgabepartien, sowie das
+pairing system, more suited for classical tournaments and cups. Future versions will support more pairing systems and more features.	Paarungssystem, besser geeignet für klassische Turniere. Zukünftige Versionen werden weitere Turnierarten und andere Features unterstützen.
+project is fully open source, and under the very permissive	Projekt ist vollständig Open-Source und unter der freigiebigen
+result	Ergebnis
+result sheets	Ergebnisblätter
+sources	Quellen
+sources on github	Quellen auf GitHub
+standalone, web interface	unabhängig, Webschnittstelle
+standalone, web interface, via docker	unabhängig, Webschnittstelle, via Docker
+start date	Startdatum
+table	Brett
+the configuration guide	der Konfigurationsleitfaden
+to	bis
+tournament location	Turnierort
+unpairable players	nicht verfügbare Spieler
+unpairable,	nicht verfügbare,
+supports the	unterstützt das
+white	weiß
+White	Weiß
+white vs. black	Weiß gegen Schwarz
+confirmed.	bestätigt.
+Note that login to this instance is reserved to French federation actors plus several external people at our discretion. Send us	Der Zugriff auf diesen Dienst ist für Aktive des Französischen Goverbands und einige externe Personen reserviert. Senden Sie uns
+yyyymmdd-city	jjjjmmtt-stadt
+an email	eine E-Mail
+to request an access.	um einen Zugang zu bekommen.
+(not yet available)	(noch nicht verfügbar)
+Log in using	Verbinden mit
+(reserved to FFG actors)	(reserviert für Aktive des FFG)
+Log in using an email	Einloggen mit E-Mail
+password	Passwort
+Warning: publishing partial results at round	Vorsicht: Veröffentlichung von unvollständigen Ergebnissen aus Runde
+out of	von
+For any further help or question, contact us	Für weitere Hilfe oder bei Fragen, kontaktieren Sie uns
+by email	per E-Mail
+or	oder
+on our discord channel	auf unserem Discord-Kanal
+standalone installer for Windows with Java included	Windows-Installation, inklusive Java
+(please ensure that your Windows user has administrative rights).	(benötigt einen Windows-Benutzer mit Administratorrechten).
+AGA rules	AGA-Regeln
+initialized from rating	Aus dem Rating übernommen
+You can join the	Sie können sich für die
+Pairgoth mailing list	Pairgoth-Mailingliste anmelden,
+to be notified about updates and to discuss the software.	um Infos zu Updates zu bekommen und über das Programm zu diskutieren.
+(give us a star if you have a github account!)	(geben Sie uns einen Stern, wenn Sie ein GitHub-Konto haben!)

@@ -170,7 +170,7 @@ class Translator private constructor(private val iso: String) {
         private val translators = ConcurrentHashMap<String, Translator>()
         fun getTranslator(iso: String) = translators.getOrPut(iso) { Translator(iso) }
 
-        val providedLanguages = setOf("en", "fr", "kr")
+        val providedLanguages = setOf("en", "fr", "kr", "de")
         const val defaultLanguage = "en"
         const val defaultLocale = "en"
 
