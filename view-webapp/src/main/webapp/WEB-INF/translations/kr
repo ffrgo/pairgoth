@@ -1,233 +1,245 @@
-(docker required)       (도커 필요)
-(java required)         (자바 필요)
-, allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	, 다양한 방식으로 조정할 수 있습니다. 개선 사항을 공유하는 것을 잊지 마세요!
-, the well known pairing system software developed by	, 에서 개발한 유명한 매칭 시스템 소프트웨어
-, your Go Pairing Engine!	, 당신의 바둑 매칭 엔진!
-, last modified	, 마지막 수정:
-1st round seeding	1차 라운드 시드 배정
-: If you prefer convenience, you can simply use the	: 편리함을 선호한다면, 간단히 사용할 수 있습니다
-: This mode allows you to run	: 이 모드는 실행할 수 있게 해줍니다
-: This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: 이 모드는 대회와 같은 큰 바둑 이벤트에 가장 적합하며, 여러 작업장에서 동시에 선수 등록, 결과 입력 및 매칭 관리를 할 수 있습니다.
-: the	: 프로젝트
-Add player	플레이어 추가
-Advanced parameters	고급 매개변수
+(docker required)	(Docker 필요)
+(java required)	(Java 필요)
+, allowing you to tweak it in any possible way. Be sure to contribute back your enhancements!	하에 배포되어 자유롭게 수정할 수 있습니다. 개선 및 건의 사항을 전달해 주시면 감사하겠습니다!
+, the well known pairing system software developed by	의 후속작으로,
+, your Go Pairing Engine!	에 오신 것을 환영합니다!
+, last modified	, 마지막 수정
+1st round seeding	1라운드 매칭
+: If you prefer convenience, you can simply use the	: 프랑스 바둑 연맹이 제공하는
+: This mode allows you to run	: 이 모드는 로컬 컴퓨터에서
+: This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: 이 모드는 큰 바둑 대회인 콩그레스와 같은 행사에 가장 적합합니다. 여러 컴퓨터에서 선수 등록, 결과 입력 및 매칭 관리를 할 수 있습니다.
+: the	:
+Add player	선수 추가
+Advanced parameters	고급 설정
 At its core,	핵심적으로,
-Browse	탐색
-Byo-yomi periods	초읽기 기간
-Byo-yomi stones	초읽기 돌
+Browse	파일 선택
+Byo-yomi periods	초읽기 횟수
+Byo-yomi stones	주기당 돌 수
 Byo-yomi time	초읽기 시간
-Canadian byo-yomi	캐나다식 초읽기
+Canadian byo-yomi	캐나다식
 Cancel	취소
 Change	변경
-Chinese rules	중국 규칙
+Chinese rules	중국식
 Choose format	형식 선택
 Clone	복제
-Clone example tournament	예제 토너먼트 복제
+Clone example tournament	예제 대회 복제
 Close	닫기
-Club	클럽
-Compile from the sources	소스에서 컴파일
-Country	국가
-Create	생성
-Crit	평가
-Ctr	국가
+Club	소속
+Compile from the sources	소스에서 컴파일하기
+Country	국적
+Create	만들기
+Crit	기준
+Ctr	국적
 Dates	날짜
 Delete	삭제
-Director	디렉터
-Download	다운로드
-Download the standalone web interface module which suits your need, then follow	필요에 맞는 독립형 웹 인터페이스 모듈을 다운로드한 후, 따라하세요
-Drop changes?	변경 사항을 버리시겠습니까?
+Director	감독
+Download	 
+Download _BLANK_WINDOWS	Java 포함 Windows용
+Download the standalone web interface module which suits your need, then follow	독립 실행형 웹 인터페이스 모듈을 다운로드하여, 
+Drop changes?	변경 사항을 폐기하시겠습니까?
 Edit	편집
 Encoding	인코딩
-Enter the magic word	마법의 단어 입력
-Example tournament	예제 토너먼트
+Enter the magic word	매직 워드 입력
+Example tournament	예제 대회
 Export	내보내기
-Export tournament	토너먼트 내보내기
+Export tournament	대회 내보내기
 Family name	성
 Filter	필터
-Filter...	필터…
-Final only	최종만
+Filter...	필터링...
+Final only	최종 등록
 First name	이름
-Fischer timing	피셔 타이밍
-French rules	프랑스 규칙
+Fischer timing	피셔 방식
+French rules	프랑스식
 Given name	이름
 Goban	바둑판
-Hd correction	HD 보정
-No hd threshold	HD 임계값 없음
-How to use	사용 방법
+Hd correction	핸디캡
+No hd threshold	핸디캡 미적용 기준
+How to use	 
+? _BLANK_HOWTOUSE	사용 방법은 ?
 Import	가져오기
-Import tournament	토너먼트 가져오기
-Increment	증가
-Individual players	개별 플레이어
+Import tournament	대회 가져오기
+Increment	시간 증가분
+Individual players	1인 선수
 Information	정보
-Invalid tournament id	잘못된 토너먼트 ID
-Japanese rules	일본 규칙
+Invalid tournament id	유효하지 않은 대회 ID입니다
+Japanese rules	일본식
 Komi	덤
-Launch	시작
-Launch a pairing server	매칭 서버 시작
-Launch a standalone instance	독립형 인스턴스 시작
-Location	위치
+Launch	 
+_BLANK_LAUNCH	실행
+Launch a pairing server	매칭 서버 실행하기
+Launch a standalone instance	독립 실행형 인스턴스 실행하기
+Location	장소
 Log in	로그인
-Luc Vannier	루크 바니에
-MM bar	MM 막대
-Mac Mahon	맥 마혼
-Mac Mahon groups	맥 마혼 그룹
-MacMahon	맥마혼
-Main time	주요 시간
+Luc Vannier	 
+MM bar	MM 바
+Mac Mahon	맥마흔
+Mac Mahon groups	맥마흔 그룹
+MacMahon	맥마흔
+Main time	제한 시간
 Max time	최대 시간
 MM floor	MM 바닥
 Name	이름
-Nbw	흑백수
-New Tournament	새 토너먼트
-New tournament	새 토너먼트
-Next rounds seeding	다음 라운드 시드 배정
+Nbw	승
+New Tournament	새 대회
+New tournament	새 대회
+Next rounds seeding	다음 라운드 순워
 OpenGotha / Pairgoth file	OpenGotha / Pairgoth 파일
-Pair	매칭
-Pair-go tournament	페어고 토너먼트
-Pairing	매칭
+Pair	매칭하기
+Pair-go tournament	패어바둑 대회
+Pairing	매칭 시스템
 Pairings for round	라운드 매칭
-Participation	참여
-Preliminary and final	예비 및 최종
-Preliminary only	예비만
-Publish	발행
-Publish standings	순위 발행
-Rank	순위
-Rating	평점
+Participation	참가
+Preliminary and final	모든 등록
+Preliminary only	예비 등록
+Publish	게시
+Publish standings	순위 게시
+Rank	기력
+Rating	레이팅
 Reg	등록
 Register	등록
 Registration	등록
-Rengo with 2 players teams	2인 팀 렝고
-Rengo with 3 players team	3인 팀 렝고
-Renumber	재번호 매기기
-Required field	필수 항목
+Rengo with 2 players teams	2인 팀
+Rengo with 3 players team	3인 팀
+Renumber	번호 다시 매기기
+Required field	필수 필드
 Reset	재설정
 Results	결과
 Results for round	라운드 결과
 Round-robin	라운드 로빈
 Rounds	라운드
 Rules	규칙
-Search... 검색…
+Search...	검색…
 Short name	단축 이름
-Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	프로젝트가 아직 베타 버전이므로 소스는 FFG 관계자에게만 제공됩니다. 해당되면 여기에서 소스에 접근할 수 있습니다:
-Split and fold	분할 및 접기
-Split and random	분할 및 무작위
-Split and slip	분할 및 이동
-Standard byo-yomi	표준 초읽기
+Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	
+Split and fold	스플릿 앤 폴드
+Split and random	스플릿 앤 랜덤
+Split and slip	스플릿 앤 슬립
+Standard byo-yomi	초일기
 Standings	순위
 Standings after round	라운드 후 순위
-Stay in the browser	브라우저에 머무르기
-Sudden death	서든 데스
+Stay in the browser	브라우저에서 사용하기
+Sudden death	절대 방식
 Swiss	스위스
 Team of 2 individual players	2인 팀
 Team of 3 individual players	3인 팀
 Team of 4 individual players	4인 팀
 Team of 5 individual players	5인 팀
-That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server on port 8080 to which you can connect using a browser.	로컬에서 실행하거나 인터넷 없이 매칭을 수행하고 싶을 때 가장 좋은 옵션입니다. Pairgoth는 포트 8080에서 로컬 웹 서버를 시작하며, 브라우저를 사용하여 연결할 수 있습니다.
-Time system	시간 시스템
-Tournament director	토너먼트 디렉터
-Tournament name	토너먼트 이름
-Tournament type	토너먼트 유형
-Unpair	매칭 해제
+That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server on port 8080 to which you can connect using a browser.	로컬에서 실행하는 것이 더 편하거나 인터넷 없이 매칭을 하고 싶을 때 가장 좋은 옵션입니다. Pairgoth는 포트 8080에서 로컬 웹 서버를 실행하며, 이를 브라우저를 통해 연결할 수 있습니다.
+Time system	제한 시간 방식
+Tournament director	대회 감독
+Tournament name	대회 이름
+Tournament type	대회 유형
+Unpair	매칭 취소
 Unregister	등록 해제
-Unregister this player?	이 플레이어의 등록을 해제하시겠습니까?
+Unregister this player?	이 선수를 등록 해제하시겠습니까?
 Update	업데이트
-We offer you the flexibility to use	사용의 유연성을 제공합니다
-Welcome to	환영합니다
-What is	무엇인가
-Your feedback is most welcome!	피드백을 환영합니다!
-and uses the same algorithm and parameters internally, as well as import and export features towards its format.	내부적으로 동일한 알고리즘과 매개변수를 사용하며, 형식으로의 가져오기 및 내보내기 기능을 제공합니다.
+We offer you the flexibility to use	저희는 여러분의 필요에 맞게
+Welcome to	여러분의 바둑 매칭 엔진
+What is	
+_BLANK_WHATIS	란 무엇인가?
+Your feedback is most welcome!	여러분의 피드백은 언제나 환영입니다!
+and uses the same algorithm and parameters internally, as well as import and export features towards its format.	내부적으로 동일한 알고리즘과 매개변수를 사용하며, 해당 형식으로의 가져오기 및 내보내기 기능을 지원합니다.
 apache licence	아파치 라이선스
 black	흑
 Black	흑
-club	클럽
-country	국가
+club	소속
+country	국적
 d	단
 end date	종료 날짜
 first name	이름
 from	부터
-games )	게임 )
-h	시간
-in a way that best suits your needs. Here are your options:	필요에 가장 잘 맞는 방식으로. 여기에 옵션이 있습니다:
-instance graciously hosted by the French Go Federation.	프랑스 바둑 연맹에서 친절히 호스팅하는 인스턴스입니다.
-is a Go tournament pairing engine designed to make your tournament experience effortless.	토너먼트 경험을 쉽게 만들기 위해 설계된 바둑 토너먼트 매칭 엔진입니다.
-is the successor of	의 후속작입니다
+games )	판
+h	h
+in a way that best suits your needs. Here are your options:	사용할 수 있게 하고자 합니다. 다음은 선택할 수 있는 옵션들입니다:
+instance graciously hosted by the French Go Federation.	인스턴스를 편하게 사용하실 수 있습니다.
+is a Go tournament pairing engine designed to make your tournament experience effortless.	는 여러분의 바둑 대회 경험을 손쉽게 만들어 주는 바둑 대회 매칭 엔진입니다.
+is the successor of	는<a href="http://vannier.info/jeux/accueil.htm">Luc Vannier</a>가 개발한 잘 알려진 매칭 시스템 소프트웨어인 
 k	급
 last name	성
-on your local computer.	로컬 컴퓨터에서.
-online tournament	온라인 토너먼트
+on your local computer.	를 실행할 수 있게 해줍니다.
+online tournament	온라인 대회
 opengotha	OpenGotha
 or	또는
-pairable players	매칭 가능한 플레이어
+pairable players	매칭 가능한 선수
 pairable,	매칭 가능,
 pairgoth	pairgoth
-pairing system, ideal for championships with no handicap games, as well as the	핸디캡 없는 챔피언십 및 다음과 같은 매칭 시스템에 이상적입니다
-pairing system, more suited for classical tournaments and cups. Future versions will support more pairing systems and more features.	클래식 토너먼트 및 컵에 더 적합한 매칭 시스템. 향후 버전에서는 더 많은 매칭 시스템 및 기능을 지원할 것입니다.
-project is fully open source, and under the very permissive	프로젝트는 완전 오픈 소스이며 매우 관대한
+pairing system, ideal for championships with no handicap games, as well as the	매칭 시스템과, 일반 대회 및 컵에 더 적합한
+pairing system, more suited for classical tournaments and cups. Future versions will support more pairing systems and more features.	매칭 시스템을 지원합니다. 향후 버전에서는 더 많은 매칭 시스템과 기능을 지원할 예정입니다.
+project is fully open source, and under the very permissive	프로젝트는 완전히 오픈 소스이며,
 result	결과
 result sheets	결과 시트
 sources	소스
-sources on github	Github의 소스
-standalone, web interface	독립형 웹 인터페이스
-standalone, web interface, via docker	독립형 웹 인터페이스, 도커를 통해
+sources on github	소스를 확인해 보세요
+_BLANK_GITHUB	Github에서
+standalone, web interface	독립 실행형, 웹 인터페이스 다운로드
+standalone, web interface, via docker	독립 실행형, 웹 인터페이스 다운로드, Docker를 통한 실행
 start date	시작 날짜
 table	테이블
-the configuration guide	구성 가이드
-to	에게
-tournament location	토너먼트 위치
-unpairable players	매칭 불가능한 플레이어
-unpairable,	매칭 불가,
-supports the	지원을 포함한
+the configuration guide	구성 가이드를 따라하세요
+to	까지
+tournament location	대회 워치
+unpairable players	매칭 불가능한 선수
+unpairable,	매칭 불가능,
+supports the	는 접바둑이 없는 챔피언십일 경우에 잘 맞는
 white	백
 White	백
 white vs. black	백 vs 흑
-confirmed.	확인됨.
-Note that login to this instance is reserved to French federation actors plus several external people at our discretion. Send us	이 인스턴스에 로그인하는 것은 FFG 관계자 및 재량에 따라 몇몇 외부인에게만 허용됩니다. 보내주세요
-yyyymmdd-city	yyyyMMdd-도시
+confirmed.	확인됨
+Note that login to this instance is reserved to French federation actors plus several external people at our discretion. Send us	이 인스턴스에 로그인하는 것은 프랑스 연맹 관계자와 당사의 재량에 따라 선택된 외부인에게만 허용됩니다. 접근을 요청하려면
+yyyymmdd-city	yyyymmdd-도시
 an email	이메일
-to request an access.	액세스를 요청하려면.
-(not yet available)	(아직 사용 불가)
+to request an access.	을 보내주세요.
+(not yet available)	(현재 제공되지 않음).
 Log in using	사용하여 로그인
-(reserved to FFG actors)	(FFG 관계자 전용)
+(reserved to FFG actors)	(FFG 관계자에게만 허용)
 Log in using an email	이메일로 로그인
 password	비밀번호
-Warning: publishing partial results at round	경고: 라운드에서 부분 결과를 발표
-out of	에서
-For any further help or question, contact us	추가 도움이나 질문이 있으면, 문의하세요
-by email	이메일로
-or	또는
-on our discord channel	우리의 디스코드 채널에서
-standalone installer for Windows with Java included	Java가 포함된 Windows용 독립형 설치 프로그램
-(please ensure that your Windows user has administrative rights).	(Windows 사용자가 관리자 권한이 있는지 확인하세요).
-AGA rules	AGA 규칙
-initialized from rating	등급에서 초기화됨
-You can join the	참여할 수 있습니다
+Warning: publishing partial results at round	
+out of	중에서
+For any further help or question, contact us	추가적인 도움이 필요하시거나 질문이 있으시면
+by email	이메일
+or	이나
+on our discord channel	디스코드
+. _BLANK_CONTACT	채널을 통해 문의해 주시기 바랍니다.
+standalone installer for Windows with Java included	독립 실행형 설치 프로그램 다운로드
+(please ensure that your Windows user has administrative rights).	(Windows 사용자가 관리자 권한을 가지고 있는지 확인하세요).
+AGA rules	AGA
+initialized from rating	레이팅 기준으로 초기화됨
+You can join the	 
 Pairgoth mailing list	Pairgoth 메일링 리스트
-to be notified about updates and to discuss the software.	업데이트 알림 및 소프트웨어 논의를 위해.
-(give us a star if you have a github account!)	(Github 계정이 있으면 스타를 주세요!)"
+to be notified about updates and to discuss the software.	에 등록하여 업데이트 알림을 받고, 소프트웨어에 대해 논의하세요.
+(give us a star if you have a github account!)	(Github 계정이 있으시면 별을 눌러 주세요!).
+clear results	결과 지우기
+choisir un fichier	파일 선택
+aucun fichier choisi	선택된 파일 않음
+Round	라운드
+Participants	참가자
+Paired	매칭된
 Base parameters	기본 설정
 Main parameters	주요 설정
 Secondary parameters	부가 설정
 Geographical parameters	지리적 설정
 Handicap parameters	핸디캡 설정
 deterministic randomness	결정적 무작위성
-balance white and black	흑백 균형 맞추기
-Round	 
+balance white and black	
+Round 	 
 down	내림
 up	올림
 NBW/MMS score	라운드 NBW/MMS
 Special Mac Mahon handling for players absent from a round	라운드에 참가하지 않은 선수들을 위한 특별 맥마흔 처리
 MMS score for non-played rounds:	참가되지 않은 라운드의 MMS :
-SOS for non-played rounds:	참가되지 않은 라운드의 SOS: 선수의
+SOS for non-played rounds: base MMS 	참가되지 않은 라운드의 SOS: 선수의
 of player	 
 base MMS	MMS 기본
 base MMS + rounds/2	MMS 기본 + 라운드/2
 Seeding methods inside groups of same score	동일 점수 그룹 내 매칭 방법
-Apply first seeding method up to round	 
+Apply first seeding method up to round	
 _BLANK_SEEDING	라운드까지 첫 번째 매칭 방법 적용
 First seeding method	첫 번째 매칭 방법
 Second seeding method	두 번째 매칭 방법
 add a sorting on rating	레이팅 정렬 추가
 Draw-up / draw-down between groups of same score	동일 점수 그룹 간의 상위/하위 매칭
-try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then	이전의 상위/하위 매칭을 하위/상위 매칭으로 보상 시도한 뒤,
+try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then	이전의 상위/하위 매칭을 하위/상위 매칭으로 보상 시도한 뒤, 
 pair a player in the	상위 그룹의 
 top	상
 middle	중
@@ -235,13 +247,12 @@ bottom	하
 of the upper group with a player in the	위 선수와 하위 그룹의
 of the lower group	위 선수를 매칭
 Do not apply secondary criteria for:	부가 기준을 적용하지 않음:
-players with a MMS equal to or stronger than	MMS가
-_BLANK_AFTER_RANK_THRESHOLD_	이상인 선수
+players with a MMS equal to or stronger than    	MMS가
+_BLANK_AFTER_RANK_THRESHOLD_    	이상인 선수
 players who won at least half of their games	둔 판의 절반 이상을 이긴 선수
 players above the Mac Mahon bar	맥마흔 바 이상인 선수
-_BLANK_COUNTRY_PREFIX Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
-_BLANK_CLUB_PREFIX Prefer a score gap of	동일 클럽 선수끼리 매칭하는 것보다 
+Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
 rather than pairing players of the same country.	점 차이를 선호
-rather than pairing players of the same club.	점 차이를 선호
+rather than pairing players of the same club.	동일 클럽 선수끼리 매칭하는 것보다 3점 차이를 선호
 use MMS rather than rank for handicap	핸디캡에는 랭킹 대신 MMS 사용
 Handicap ceiling:	핸디캡 상한:
