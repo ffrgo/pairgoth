@@ -140,7 +140,7 @@ black	흑
 Black	흑
 club	클럽
 country	국가
-d	일
+d	단
 end date	종료 날짜
 first name	이름
 from	부터
@@ -150,7 +150,7 @@ in a way that best suits your needs. Here are your options:	필요에 가장 잘
 instance graciously hosted by the French Go Federation.	프랑스 바둑 연맹에서 친절히 호스팅하는 인스턴스입니다.
 is a Go tournament pairing engine designed to make your tournament experience effortless.	토너먼트 경험을 쉽게 만들기 위해 설계된 바둑 토너먼트 매칭 엔진입니다.
 is the successor of	의 후속작입니다
-k	킬로
+k	급
 last name	성
 on your local computer.	로컬 컴퓨터에서.
 online tournament	온라인 토너먼트
@@ -203,3 +203,45 @@ You can join the	참여할 수 있습니다
 Pairgoth mailing list	Pairgoth 메일링 리스트
 to be notified about updates and to discuss the software.	업데이트 알림 및 소프트웨어 논의를 위해.
 (give us a star if you have a github account!)	(Github 계정이 있으면 스타를 주세요!)"
+Base parameters	기본 설정
+Main parameters	주요 설정
+Secondary parameters	부가 설정
+Geographical parameters	지리적 설정
+Handicap parameters	핸디캡 설정
+deterministic randomness	결정적 무작위성
+balance white and black	흑백 균형 맞추기
+Round	 
+down	내림
+up	올림
+NBW/MMS score	라운드 NBW/MMS
+Special Mac Mahon handling for players absent from a round	라운드에 참가하지 않은 선수들을 위한 특별 맥마흔 처리
+MMS score for non-played rounds:	참가되지 않은 라운드의 MMS :
+SOS for non-played rounds:	참가되지 않은 라운드의 SOS: 선수의
+of player	 
+base MMS	MMS 기본
+base MMS + rounds/2	MMS 기본 + 라운드/2
+Seeding methods inside groups of same score	동일 점수 그룹 내 매칭 방법
+Apply first seeding method up to round	 
+_BLANK_SEEDING	라운드까지 첫 번째 매칭 방법 적용
+First seeding method	첫 번째 매칭 방법
+Second seeding method	두 번째 매칭 방법
+add a sorting on rating	레이팅 정렬 추가
+Draw-up / draw-down between groups of same score	동일 점수 그룹 간의 상위/하위 매칭
+try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then	이전의 상위/하위 매칭을 하위/상위 매칭으로 보상 시도한 뒤,
+pair a player in the	상위 그룹의 
+top	상
+middle	중
+bottom	하
+of the upper group with a player in the	위 선수와 하위 그룹의
+of the lower group	위 선수를 매칭
+Do not apply secondary criteria for:	부가 기준을 적용하지 않음:
+players with a MMS equal to or stronger than	MMS가
+_BLANK_AFTER_RANK_THRESHOLD_	이상인 선수
+players who won at least half of their games	둔 판의 절반 이상을 이긴 선수
+players above the Mac Mahon bar	맥마흔 바 이상인 선수
+_BLANK_COUNTRY_PREFIX Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
+_BLANK_CLUB_PREFIX Prefer a score gap of	동일 클럽 선수끼리 매칭하는 것보다 
+rather than pairing players of the same country.	점 차이를 선호
+rather than pairing players of the same club.	점 차이를 선호
+use MMS rather than rank for handicap	핸디캡에는 랭킹 대신 MMS 사용
+Handicap ceiling:	핸디캡 상한:

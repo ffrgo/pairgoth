@@ -54,7 +54,7 @@
         <div class="title"><i class="dropdown icon"></i>Seeding methods inside groups of same score</div>
         <div class="content">
           <div class="field">
-            <label>Apply first seeding method up to round <input name="firstSeedLastRound" type="number" min="1" value="$tour.pairing.main.firstSeedLastRound"/></label>
+            <label>Apply first seeding method up to round <input name="firstSeedLastRound" type="number" min="1" value="$tour.pairing.main.firstSeedLastRound"/> _BLANK_SEEDING </label>
           </div>
           <div class="inline fields">
             <div class="roundbox field">
@@ -80,7 +80,9 @@
         <div class="title"><i class="dropdown icon"></i>Draw-up / draw-down between groups of same score</div>
         <div class="content">
           <div class="inline fields">
-            <label><input type="checkbox" name="upDownCompensate" value="true" #if($tour.pairing.main.upDownCompensate) checked #end/> try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then</label>
+            <label>
+            <span><input type="checkbox" name="upDownCompensate" value="true" #if($tour.pairing.main.upDownCompensate) checked #end/></span>
+	    try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then</label>
           </div>
           <div class="inline fields">
             <label>
@@ -107,7 +109,7 @@
       <div class="field">
         <label>Do not apply secondary criteria for:</label>
         <label>
-          •&nbsp;players with a MMS equal to or stronger than
+	  <span>•&nbsp;</span>players with a MMS equal to or stronger than
           <select name="rankThreshold">
 #set($rankThreshold = $tour.pairing.secondary.rankThreshold)
 #levels($rankThreshold)
@@ -115,11 +117,11 @@
           _BLANK_AFTER_RANK_THRESHOLD_
         </label>
         <label>
-          •&nbsp;<input name="winsThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.winsThreshold) checked #end/>
-          players who won at least half of their games
+          <span>•&nbsp;<input name="winsThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.winsThreshold) checked #end/> </span>
+	  players who won at least half of their games
         </label>
         <label>
-          •&nbsp;<input name="barThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.barThreshold) checked #end/>
+	  <span>•&nbsp;<input name="barThreshold" type="checkbox" class="inline" value="true" #if($tour.pairing.secondary.barThreshold) checked #end/></span>
           players above the Mac Mahon bar
         </label>
       </div>
@@ -128,14 +130,14 @@
     <div class="content">
       <div class="field">
         <label>
-          Prefer a score gap of
+          _BLANK_COUNTRY_PREFIX Prefer a score gap of
           <input type="number" name="mmsDiffCountry" min="0" value="$tour.pairing.geo.mmsDiffCountry"/>
           rather than pairing players of the same country.
         </label>
       </div>
       <div class="field">
         <label>
-          Prefer a score gap of
+          _BLANK_CLUB_PREFIX Prefer a score gap of
           <input type="number" name="mmsDiffClub" min="0" value="$tour.pairing.geo.mmsDiffClub"/>
           rather than pairing players of the same club.
         </label>
