@@ -1,13 +1,16 @@
 #macro(twoDigits $value)$strings.leftPad($value, 2, '0')#end
 #macro(toHMS $value)#if($value)#set($hh = $value / 3600)#set($mm = ($value % 3600) / 60)#set($ss = $value % 60)#twoDigits($hh):#twoDigits($mm):#twoDigits($ss)#end#end
 #macro(levels $sel)
+  #set($dSuffix = $translate.translate('d'))
+  #set($kSuffix = $translate.translate('k'))
   #foreach($d in [8..0])
     #set($dan = $d + 1)
-    #set($disp = "${dan}d")
+    #set($disp = "$dan$dSuffix")
     <option value="$d" #if("$!sel" != "" && $sel == $d)selected#end>$disp</option>
   #end
   #foreach($k in [-1..-30])
-    #set($disp = "${math.abs($k)}k")
+    #set($kyu = $math.abs($k))
+    #set($disp = "$kyu$kSuffix")
     <option value="$k" #if($sel && $sel == $k)selected#end>$disp</option>
   #end
 #end
