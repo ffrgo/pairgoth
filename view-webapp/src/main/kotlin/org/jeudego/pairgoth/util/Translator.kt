@@ -21,12 +21,14 @@ import kotlin.io.path.useDirectoryEntries
 
 class Translator private constructor(private val iso: String) {
 
-    fun translate(enText: String) = translations[iso]?.get(enText) ?: enText.also {
-        reportMissingTranslation(enText)
-    }
+    fun translate(enText: String) =
+        translations[iso]?.get(enText) ?: enText.let {
+            it.replace(Regex("_BLANK_\\w+"), "")
+        }.also {
+            reportMissingTranslation(enText)
+        }
 
     fun translate(uri: String, template: Template): Template? {
-        if (iso == "en") return template
         val key = Pair(uri, iso)
         var translated = translatedTemplates[key]
         if (translated != null && translated.lastModified < template.lastModified) {
@@ -39,12 +41,25 @@ class Translator private constructor(private val iso: String) {
                 if (translated == null) {
                     translated = template.clone() as Template
                     val data: SimpleNode = translated!!.data as SimpleNode
-                    translateNode(data)
+                    if (iso == "en") {
+                        stripComments(data)
+                    } else {
+                        translateNode(data)
+                    }
                     translatedTemplates[key] = translated!!
                 }
             }
         }
         return translated
+    }
+
+    private fun stripComments(node: SimpleNode) {
+        if (node is ASTText) {
+            node.text = node.text.replace(Regex("_BLANK_\\w+"), "")
+        }
+        else for (i in 0 until node.jjtGetNumChildren()) {
+            stripComments(node.jjtGetChild(i) as SimpleNode)
+        }
     }
 
     private fun translateNode(node: SimpleNode, ignoringInput: String? = null): String? {
