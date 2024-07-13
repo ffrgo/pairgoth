@@ -31,10 +31,10 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                         player["origin"] = "EGF"
                         // override rank with rating equivalent
                         player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
-                            val rank = (rating - 2050.0) / 100.0
+                            val adjusted = rating - 2050;
                             player["rank"] =
-                                if (rank < 0) "${-floor(rank).toInt()}k"
-                                else "${ceil(rank + 0.00001).toInt()}d"
+                                if (adjusted < 0) "${-(adjusted - 99) / 100}k"
+                                else "${(adjusted + 100) / 100}d"
                         }
                         if ("UK" == player.getString("country")) {
                             player["country"] = "GB"
