@@ -278,4 +278,12 @@ onLoad(() => {
   shortName.on('input', e => {
     manualShortName = true;
   });
+
+  $('select[name="pairing"]').on('change', e => {
+    let pairing = e.target.value.toLowerCase();
+    if (pairing === 'mms') $('#tournament-infos .mms').removeClass('hidden');
+    else $('#tournament-infos .mms').addClass('hidden');
+    if (pairing === 'swiss') $('#tournament-infos .swiss').removeClass('hidden');
+    else $('#tournament-infos .swiss').addClass('hidden');
+  });
 });
