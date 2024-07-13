@@ -5,6 +5,8 @@ import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.ceil
+import kotlin.math.floor
 
 object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
@@ -29,7 +31,10 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                         player["origin"] = "EGF"
                         // override rank with rating equivalent
                         player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
-                            player["rank"] = ((rating - 2050)/100).let { if (it < 0) "${-it+1}k" else "${it+1}d" }
+                            val rank = (rating - 2050.0) / 100.0
+                            player["rank"] =
+                                if (rank < 0) "${-floor(rank).toInt()}k"
+                                else "${ceil(rank + 0.00001).toInt()}d"
                         }
                         if ("UK" == player.getString("country")) {
                             player["country"] = "GB"
