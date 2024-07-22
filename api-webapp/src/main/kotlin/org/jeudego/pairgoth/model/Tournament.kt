@@ -132,8 +132,10 @@ sealed class Tournament <P: Pairable>(
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
             }
-            changed = changed || game.table != nextTable
-            game.table = nextTable++
+            if (game.table != 0) {
+                changed = changed || game.table != nextTable
+                game.table = nextTable++
+            }
         }
         return changed
     }
