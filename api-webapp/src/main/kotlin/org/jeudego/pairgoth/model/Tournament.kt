@@ -132,8 +132,10 @@ sealed class Tournament <P: Pairable>(
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
             }
-            changed = changed || game.table != nextTable
-            game.table = nextTable++
+            if (game.table != 0) {
+                changed = changed || game.table != nextTable
+                game.table = nextTable++
+            }
         }
         return changed
     }
@@ -143,7 +145,7 @@ sealed class Tournament <P: Pairable>(
 
     fun stats() = (0..rounds - 1).map { index ->
         Json.Object(
-            "participants" to pairables.values.count { !it.skip.contains(index + 1) },
+            "participants" to pairables.values.count { it.final && !it.skip.contains(index + 1) },
             "paired" to (games.getOrNull(index)?.values?.flatMap { listOf(it.black, it.white) }?.count { it != 0 } ?: 0),
             "games" to (games.getOrNull(index)?.values?.count() ?: 0),
             "ready" to (games.getOrNull(index)?.values?.count { it.result != Game.Result.UNKNOWN } ?: 0)
