@@ -139,7 +139,11 @@ class FileStore(pathStr: String): Store {
                 entry.toFile()
             }.firstOrNull()
         }?.let { file ->
-            val dest = path.resolve(filename + "-${timestamp}").toFile()
+            val history = path.resolve("history").toFile()
+            if (!history.exists() && !history.mkdir()) {
+                throw Error("cannot create 'history' sub-directory")
+            }
+            val dest = path.resolve("history/${filename}-${timestamp}").toFile()
             if (dest.exists()) {
                 // it means the user performed several actions in the same second...
                 // drop the last occurrence
@@ -157,6 +161,10 @@ class FileStore(pathStr: String): Store {
         val filename = tournament.filename()
         val file = path.resolve(filename).toFile()
         if (!file.exists()) throw Error("File $filename does not exist")
-        file.renameTo(path.resolve(filename + "-${timestamp}").toFile())
+        val history = path.resolve("history").toFile()
+        if (!history.exists() || !history.mkdir()) {
+            throw Error("cannot create 'history' sub-directory")
+        }
+        file.renameTo(path.resolve("history/${filename}-${timestamp}").toFile())
     }
 }
