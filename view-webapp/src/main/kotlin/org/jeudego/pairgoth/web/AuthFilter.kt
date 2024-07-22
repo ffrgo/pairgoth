@@ -57,7 +57,7 @@ class AuthFilter: Filter {
             chain.doFilter(req, resp)
         } else {
             // TODO - protection against brute force attacks
-            if (uri.endsWith("/index")) {
+            if (uri.endsWith("/index") && auth == "oauth") {
                 response.sendRedirect("/index-ffg")
             } else {
                 response.sendRedirect("/login")

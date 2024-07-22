@@ -89,7 +89,7 @@
         <div class="four wide field">
           <label>Pairing</label>
           <span class="info"></span>
-          <select name="pairing">
+          <select name="pairing" #if($tour)disabled#end>
             <option value="MAC_MAHON" #if(!$tour || $tour.pairing.type == 'MAC_MAHON') selected #end>Mac Mahon</option>
             <option value="SWISS" #if($tour && $tour.pairing.type == 'SWISS') selected #end>Swiss</option>
             ## TODO <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') selected #end>Round-robin</option>
