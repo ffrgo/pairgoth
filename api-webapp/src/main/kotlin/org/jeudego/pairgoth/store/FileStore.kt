@@ -162,7 +162,7 @@ class FileStore(pathStr: String): Store {
         val file = path.resolve(filename).toFile()
         if (!file.exists()) throw Error("File $filename does not exist")
         val history = path.resolve("history").toFile()
-        if (!history.exists() || !history.mkdir()) {
+        if (!history.exists() && !history.mkdir()) {
             throw Error("cannot create 'history' sub-directory")
         }
         file.renameTo(path.resolve("history/${filename}-${timestamp}").toFile())
