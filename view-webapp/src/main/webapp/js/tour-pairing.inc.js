@@ -1,12 +1,31 @@
 let focused = undefined;
 
 function pair(parts) {
-  api.postJson(`tour/${tour_id}/pair/${activeRound}`, parts)
-    .then(rst => {
-      if (rst !== 'error') {
-        document.location.reload();
-      }
-    });
+
+  let doWork = () => {
+    api.postJson(`tour/${tour_id}/pair/${activeRound}`, parts)
+      .then(rst => {
+        if (rst !== 'error') {
+          document.location.reload();
+        }
+      });
+  }
+
+  let tablesExclusionControl = $('#exclude-tables');
+  let value = tablesExclusionControl[0].value;
+  let origValue = tablesExclusionControl.data('orig');
+  if (value === origValue) {
+    // tables exclusion value did not change
+    doWork();
+  } else {
+    // tables exclusion value has change, we must save it first
+    api.putJson(`tour/${tour_id}`, { round: activeRound, excludeTables: value })
+      .then(rst => {
+        if (rst !== 'error') {
+          doWork();
+        }
+      });
+  }
 }
 
 function unpair(games) {

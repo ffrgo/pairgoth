@@ -22,6 +22,14 @@
       <button class="ui floating choose-round next-round button">&raquo;</button>
     </div>
     <div class="pairing-stats nobreak">( $pairables.size() pairable, $games.size() games )</div>
+    <div class="tables-exclusion">
+#if($tour.tablesExclusion && $round <= $tour.tablesExclusion.size())
+  #set($tablesExclusion = $!tour.tablesExclusion[$round - 1])
+#else
+  #set($tablesExclusion = '')
+#end
+      Exclude table numbers: <input type="text" id="exclude-tables" name="exclude-tables" placeholder="ex: 1-34, 38, 45-77" data-orig="$tablesExclusion" value="$tablesExclusion"/>
+    </div>
     <div id="pairing-lists">
       <div id="pairing-left">
         <div id="pairables" class="multi-select" title="pairable players">

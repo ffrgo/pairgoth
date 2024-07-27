@@ -6,8 +6,6 @@ import com.republicate.kson.toJsonArray
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
-import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
@@ -30,7 +28,8 @@ sealed class Tournament <P: Pairable>(
     val pairing: Pairing,
     val rules: Rules = Rules.FRENCH,
     val gobanSize: Int = 19,
-    val komi: Double = 7.5
+    val komi: Double = 7.5,
+    val tablesExclusion: MutableList<String> = mutableListOf()
 ) {
     companion object {}
     enum class Type(val playersNumber: Int, val individual: Boolean = true) {
@@ -170,8 +169,9 @@ class StandardTournament(
     pairing: Pairing,
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
-    komi: Double = 7.5
-): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+    komi: Double = 7.5,
+    tablesExclusion: MutableList<String> = mutableListOf()
+): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
     override val players get() = _pairables
 }
 
@@ -192,8 +192,9 @@ class TeamTournament(
     pairing: Pairing,
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
-    komi: Double = 7.5
-): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+    komi: Double = 7.5,
+    tablesExclusion: MutableList<String> = mutableListOf()
+): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
     companion object {
         private val epsilon = 0.0001
     }
@@ -267,7 +268,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
             )
         else
             TeamTournament(
@@ -286,7 +288,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
             )
     json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
@@ -326,7 +329,8 @@ fun Tournament<*>.toJson() = Json.MutableObject(
     "gobanSize" to gobanSize,
     "timeSystem" to timeSystem.toJson(),
     "rounds" to rounds,
-    "pairing" to pairing.toJson()
+    "pairing" to pairing.toJson(),
+    "tablesExclusion" to tablesExclusion.toJsonArray()
 )
 
 fun Tournament<*>.toFullJson(): Json.Object {

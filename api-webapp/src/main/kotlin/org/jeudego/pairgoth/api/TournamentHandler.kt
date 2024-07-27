@@ -67,18 +67,32 @@ object TournamentHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
-        val updated = Tournament.fromJson(payload, tournament)
-        // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
-        updated.players.putAll(tournament.players)
-        if (tournament is TeamTournament && updated is TeamTournament) {
-            updated.teams.putAll(tournament.teams)
+        // specific handling for 'excludeTables'
+        if (payload.containsKey("excludeTables")) {
+            val tablesExclusion = payload.getString("excludeTables") ?: badRequest("missing 'excludeTables'")
+            validateTablesExclusion(tablesExclusion)
+            val round = payload.getInt("round") ?: badRequest("missing 'round'")
+            while (tournament.tablesExclusion.size < round) tournament.tablesExclusion.add("")
+            tournament.tablesExclusion[round - 1] = tablesExclusion
+            tournament.dispatchEvent(TournamentUpdated, request, tournament.toJson())
+        } else {
+            val updated = Tournament.fromJson(payload, tournament)
+            // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
+            updated.players.putAll(tournament.players)
+            if (tournament is TeamTournament && updated is TeamTournament) {
+                updated.teams.putAll(tournament.teams)
+            }
+            for (round in 1..tournament.lastRound()) updated.games(round).apply {
+                clear()
+                putAll(tournament.games(round))
+            }
+            updated.dispatchEvent(TournamentUpdated, request, updated.toJson())
         }
-        for (round in 1..tournament.lastRound()) updated.games(round).apply {
-            clear()
-            putAll(tournament.games(round))
-        }
-        updated.dispatchEvent(TournamentUpdated, request, updated.toJson())
         return Json.Object("success" to true)
+    }
+
+    private fun validateTablesExclusion(exclusion: String) {
+        if (!tablesExclusionValidator.matches(exclusion)) badRequest("invalid tables exclusion pattern")
     }
 
     override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
@@ -87,4 +101,6 @@ object TournamentHandler: PairgothApiHandler {
         tournament.dispatchEvent(TournamentDeleted, request, Json.Object("id" to tournament.id))
         return Json.Object("success" to true)
     }
+
+    private val tablesExclusionValidator = Regex("^(?:(?:\\s+|,)*\\d+(?:-\\d+)?)*$")
 }
