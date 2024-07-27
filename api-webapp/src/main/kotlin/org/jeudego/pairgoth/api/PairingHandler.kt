@@ -103,6 +103,7 @@ object PairingHandler: PairgothApiHandler {
             if (payload.containsKey("h")) game.handicap = payload.getString("h")?.toIntOrNull() ?:  badRequest("invalid handicap")
             if (payload.containsKey("t")) {
                 game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
+                game.forcedTable = true
             }
             tournament.dispatchEvent(GameUpdated, request, Json.Object("round" to round, "game" to game.toJson()))
             if (game.table != previousTable) {

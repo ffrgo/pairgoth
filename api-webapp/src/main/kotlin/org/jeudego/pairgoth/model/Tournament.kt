@@ -130,11 +130,18 @@ sealed class Tournament <P: Pairable>(
         var changed = false
         var nextTable = 1
         val excluded = excludedTables(round)
-        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy(orderBY).forEach { game ->
-            while (excluded.contains(nextTable)) ++nextTable
+        val forcedTablesGames = games(round).values.filter { game -> game.forcedTable && (pivot == null || game != pivot && game.table != pivot.table) }
+        val forcedTables = forcedTablesGames.map { game -> game.table }.toSet()
+        val excludedAndForced = excluded union forcedTables
+        games(round).values
+            .filter { game -> pivot?.let { pivot.id != game.id } ?: true }
+            .filter { game -> !forcedTablesGames.contains(game) }
+            .sortedBy(orderBY)
+            .forEach { game ->
+            while (excludedAndForced.contains(nextTable)) ++nextTable
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
-                while (excluded.contains(nextTable)) ++nextTable
+                while (excludedAndForced.contains(nextTable)) ++nextTable
             }
             if (game.table != 0) {
                 changed = changed || game.table != nextTable
