@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.api.TournamentHandler.dispatchEvent
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
@@ -38,6 +39,7 @@ object PairingHandler: PairgothApiHandler {
         if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
         val payload = getArrayPayload(request)
         if (payload.isEmpty()) badRequest("nobody to pair")
+        // CB TODO - change convention to empty array for all players
         val allPlayers = payload.size == 1 && payload[0] == "all"
         //if (!allPlayers && tournament.pairing.type == PairingType.SWISS) badRequest("Swiss pairing requires all pairable players")
         val playing = (tournament.games(round).values).flatMap {
@@ -57,6 +59,10 @@ object PairingHandler: PairgothApiHandler {
                 } ?: badRequest("invalid pairable id: #$id")
             }
         val games = tournament.pair(round, pairables)
+
+        // always renumber table to take table exclusion into account
+        tournament.renumberTables(round)
+
         val ret = games.map { it.toJson() }.toJsonArray()
         tournament.dispatchEvent(GamesAdded, request, Json.Object("round" to round, "games" to ret))
         return ret
@@ -122,6 +128,14 @@ object PairingHandler: PairgothApiHandler {
             return Json.Object("success" to true)
         } else {
             // without id, it's a table renumbering
+            if (payload.containsKey("excludeTables")) {
+                val tablesExclusion = payload.getString("excludeTables") ?: badRequest("missing 'excludeTables'")
+                TournamentHandler.validateTablesExclusion(tablesExclusion)
+                while (tournament.tablesExclusion.size < round) tournament.tablesExclusion.add("")
+                tournament.tablesExclusion[round - 1] = tablesExclusion
+                tournament.dispatchEvent(TournamentUpdated, request, tournament.toJson())
+            }
+
             val sortedPairables = tournament.getSortedPairables(round)
             val sortedMap = sortedPairables.associateBy {
                 it.getID()!!

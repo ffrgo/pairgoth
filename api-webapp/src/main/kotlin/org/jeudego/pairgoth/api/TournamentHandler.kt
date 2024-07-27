@@ -91,7 +91,7 @@ object TournamentHandler: PairgothApiHandler {
         return Json.Object("success" to true)
     }
 
-    private fun validateTablesExclusion(exclusion: String) {
+    internal fun validateTablesExclusion(exclusion: String) {
         if (!tablesExclusionValidator.matches(exclusion)) badRequest("invalid tables exclusion pattern")
     }
 

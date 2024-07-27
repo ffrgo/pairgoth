@@ -6,10 +6,12 @@ import com.republicate.kson.toJsonArray
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -127,9 +129,12 @@ sealed class Tournament <P: Pairable>(
     fun renumberTables(round: Int, pivot: Game? = null, orderBY: (Game) -> Int = ::defaultGameOrderBy): Boolean {
         var changed = false
         var nextTable = 1
+        val excluded = excludedTables(round)
         games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy(orderBY).forEach { game ->
+            while (excluded.contains(nextTable)) ++nextTable
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
+                while (excluded.contains(nextTable)) ++nextTable
             }
             if (game.table != 0) {
                 changed = changed || game.table != nextTable
@@ -150,6 +155,22 @@ sealed class Tournament <P: Pairable>(
             "ready" to (games.getOrNull(index)?.values?.count { it.result != Game.Result.UNKNOWN } ?: 0)
         )
     }.toJsonArray()
+
+    fun excludedTables(round: Int): Set<Int> {
+        if (round > tablesExclusion.size) return emptySet()
+        val excluded = mutableSetOf<Int>()
+        val parser = Regex("(\\d+)(?:-(\\d+))?")
+        parser.findAll(tablesExclusion[round - 1]).forEach { match ->
+            val left = match.groupValues[1].toInt()
+            val right = match.groupValues[2].let { if (it.isEmpty()) left else it.toInt() }
+            var t = left
+            do {
+                excluded.add(t)
+                ++t
+            } while (t <= right)
+        }
+        return excluded
+    }
 }
 
 // standard tournament of individuals

@@ -38,7 +38,14 @@ function unpair(games) {
 }
 
 function renumberTables() {
-  api.putJson(`tour/${tour_id}/pair/${activeRound}`, {})
+  let payload = {}
+  let tablesExclusionControl = $('#exclude-tables');
+  let value = tablesExclusionControl[0].value;
+  let origValue = tablesExclusionControl.data('orig');
+  if (value !== origValue) {
+    payload['excludeTables'] = value;
+  }
+  api.putJson(`tour/${tour_id}/pair/${activeRound}`, payload)
     .then(rst => {
       if (rst !== 'error') {
         document.location.reload();
