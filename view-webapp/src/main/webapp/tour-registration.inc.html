@@ -6,6 +6,26 @@
   #set($pmap = $utils.toMap($teams))
 #end
 
+## CB TODO - why limit to INDIVIDUAL here?
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
+  #set($mmbase = $api.get("tour/${params.id}/standings/0"))
+  #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
+    #if($mmbase.error)
+      #set($error = $mmbase.error)
+    #else
+      #set($error = $mmbase.message)
+    #end
+<script type="text/javascript">
+  onLoad(() => {
+    showError("$error")
+  });
+</script>
+    #set($mmbase = [])
+  #end
+  #set($mmsMap = $utils.getMmsMap($mmbase))
+  #set($mmsPlayersMap = $utils.getMmsPlayersMap($mmbase))
+#end
+
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
     <div id="list-header">
@@ -41,6 +61,9 @@
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
+#if($tour.pairing.type == 'MAC_MAHON')
+          <th>MMS</th>
+#end
           <th>Participation</th>
         </thead>
         <tbody>
@@ -61,6 +84,9 @@
   #end
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
             <td>$part.rating</td>
+#if($tour.pairing.type == 'MAC_MAHON')
+            <td>$mmsPlayersMap[$part.id]</td>
+#end
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
               <div class="participation">
   #foreach($round in [1..$tour.rounds])
@@ -249,21 +275,6 @@
   </div>
 </div>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
-  #set($mmbase = $api.get("tour/${params.id}/standings/0"))
-  #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
-    #if($mmbase.error)
-      #set($error = $mmbase.error)
-    #else
-      #set($error = $mmbase.message)
-    #end
-<script type="text/javascript">
-  onLoad(() => {
-    showError("$error")
-  });
-</script>
-    #set($mmbase = [])
-  #end
-  #set($mmsMap = $utils.getMmsMap($mmbase))
 <div id="macmahon-groups" class="wide popup">
   <div class="popup-body">
     <div class="popup-content">

@@ -74,6 +74,11 @@ class PairgothTool {
             }
         }
 
+    fun getMmsPlayersMap(pairables: Collection<Json.Object>) =
+        pairables.associate { part ->
+            Pair(part.getLong("id"), part.getDouble("MMS")?.toLong())
+        }
+
     fun removeBye(games: Collection<Json.Object>) =
         games.filter {
             it.getInt("b")!! != 0 && it.getInt("w")!! != 0
