@@ -675,9 +675,10 @@
       display: none;
     }
 
-    #players-list tr > :first-child {
-      display: none;
-    }
+    /* should final/preliminary column be printed? */
+    /* #players-list tr > :first-child {           */
+    /*   display: none;                            */
+    /* }                                           */
 
     #players-list #players .participation .ui.label {
       background: none;
