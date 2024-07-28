@@ -114,11 +114,17 @@ sealed class Tournament <P: Pairable>(
         }
     }
 
-    fun usedTables(round: Int): BitSet =
-        games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
+    fun usedTables(round: Int): BitSet {
+        val assigned = games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
             acc.set(table)
             acc
         }
+        val excluded = excludedTables(round)
+        for (table in excluded) {
+            assigned.set(table)
+        }
+        return assigned
+    }
 
     private fun defaultGameOrderBy(game: Game): Int {
         val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE

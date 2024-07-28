@@ -60,9 +60,6 @@ object PairingHandler: PairgothApiHandler {
             }
         val games = tournament.pair(round, pairables)
 
-        // always renumber table to take table exclusion into account
-        tournament.renumberTables(round)
-
         val ret = games.map { it.toJson() }.toJsonArray()
         tournament.dispatchEvent(GamesAdded, request, Json.Object("round" to round, "games" to ret))
         return ret
