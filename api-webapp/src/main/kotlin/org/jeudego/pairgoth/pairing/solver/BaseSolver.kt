@@ -487,7 +487,8 @@ sealed class BaseSolver(
         var hd = input
         // TODO - validate that "correction" is >= 0 (or modify the UI and the following code to handle the <0 case)
         if (hd >= correction) hd -= correction
-        else if (hd < 0) hd = max(hd + correction, 0)
+        // TODO - Following line seems buggy... Get rid of it! What as the purpose?!
+        // else if (hd < 0) hd = max(hd + correction, 0)
         else hd = 0
         // Clamp handicap with ceiling
         hd = min(hd, ceiling)
