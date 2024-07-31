@@ -69,7 +69,8 @@ object PairingHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)
-        if (round != tournament.lastRound()) badRequest("cannot edit pairings in other rounds but the last")
+        // TODO - check in next line commented out: following founds can exist, but be empty...
+        // if (round != tournament.lastRound()) badRequest("cannot edit pairings in other rounds but the last")
         val payload = getObjectPayload(request)
         if (payload.containsKey("id")) {
             val gameId = payload.getInt("id") ?: badRequest("invalid game id")
