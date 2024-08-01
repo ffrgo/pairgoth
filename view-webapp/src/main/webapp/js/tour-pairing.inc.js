@@ -54,6 +54,7 @@ function renumberTables() {
 }
 
 function editGame(game) {
+  // CB TODO - those should be data attributes of the parent game tag
   let t = game.find('.table');
   let w = game.find('.white');
   let b = game.find('.black');
@@ -61,6 +62,7 @@ function editGame(game) {
 
   let form = $('#pairing-form')[0];
   form.val('id', game.data('id'));
+  form.val('prev-table', t.data('value'));
   form.val('t', t.data('value'));
   form.val('w', w.data('id'));
   $('#edit-pairing-white').text(w.text());
@@ -187,6 +189,12 @@ onLoad(()=>{
       w: form.val('w'),
       b: form.val('b'),
       h: form.val('h')
+    }
+    let prevTable = form.val('prev-table');
+    if (prevTable !== game.t && $(`.t[data-table="${game.t}"]`).length > 0) {
+      if (!confirm(`This change will trigger a tables renumbering because the destination table #${game.t} is not empty. Proceed?`)) {
+        return;
+      }
     }
     api.putJson(`tour/${tour_id}/pair/${activeRound}`, game)
       .then(game => {

@@ -95,7 +95,7 @@
     #set($white = $pmap[$game.w])
     #set($black = $pmap[$game.b])
       <tr>
-        <td>${game.t}</td>
+        <td class="t" data-table="${game.t}">${game.t}</td>
         <td class="left">#if($white)${white.name} ${white.firstname} (#rank($white.rank), $white.country $white.club)#{else}BIP#end</td>
         <td class="left">#if($black)${black.name} ${black.firstname} (#rank($black.rank), $black.country $black.club)#{else}BIP#end</td>
         <td>${game.h}</td>
@@ -111,6 +111,7 @@
   <div class="popup-body">
     <form id="pairing-form" class="ui form edit">
       <input type="hidden" name="id"/>
+      <input type="hidden" name="prev-table"/>
       <div class="popup-content">
         <div class="inline fields">
           <div class="field">
