@@ -28,12 +28,18 @@
 #end
 #set($games = $utils.removeBye($roundPairing.games))
 #set($pages = ($games.size() + 3) / 4)
-#foreach($i in [1..$games.size()])
+#set($items = $pages * 4)
+#foreach($i in [1..$items])
   #set($j = ($i - 1) / 4 + (($i - 1) % 4) * $pages)
   #if($j < $games.size())
-  #set($game = $games[$j])
-  #set($white = $pmap[$game.w])
-  #set($black = $pmap[$game.b])
+    #set($game = $games[$j])
+    #set($white = $pmap[$game.w])
+    #set($black = $pmap[$game.b])
+  #else
+    #set($game = { 't': 'xxx', 'h': 'xxx' })
+    #set($white = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
+    #set($black = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
+  #end
   #if($foreach.index % 4 == 0)
   <div class="page">
   #end
@@ -74,7 +80,6 @@
   #if($foreach.index % 4 == 3)
   </div>
   #end
-#end
 #end
 </div>
 <script type="text/javascript">
