@@ -105,23 +105,30 @@ object PairingHandler: PairgothApiHandler {
             }
             tournament.dispatchEvent(GameUpdated, request, Json.Object("round" to round, "game" to game.toJson()))
             if (game.table != previousTable) {
-                val sortedPairables = tournament.getSortedPairables(round)
-                val sortedMap = sortedPairables.associateBy {
-                    it.getID()!!
-                }
-                val changed = tournament.renumberTables(round, game) { game ->
-                    val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
-                    val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
-                    (whitePosition + blackPosition)
-                }
-                if (changed) {
-                    val games = tournament.games(round).values.sortedBy {
-                        if (it.table == 0) Int.MAX_VALUE else it.table
+                val tableWasOccupied = ( tournament.games(round).values.find { g -> g != game && g.table == game.table } != null )
+                if (tableWasOccupied) {
+                    // some renumbering is necessary
+                    val sortedPairables = tournament.getSortedPairables(round)
+                    val sortedMap = sortedPairables.associateBy {
+                        it.getID()!!
                     }
-                    tournament.dispatchEvent(
-                        TablesRenumbered, request,
-                        Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()))
-                    )
+                    val changed = tournament.renumberTables(round, game) { game ->
+                        val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
+                        val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
+                        (whitePosition + blackPosition)
+                    }
+                    if (changed) {
+                        val games = tournament.games(round).values.sortedBy {
+                            if (it.table == 0) Int.MAX_VALUE else it.table
+                        }
+                        tournament.dispatchEvent(
+                            TablesRenumbered, request,
+                            Json.Object(
+                                "round" to round,
+                                "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())
+                            )
+                        )
+                    }
                 }
             }
             return Json.Object("success" to true)
