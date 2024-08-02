@@ -25,6 +25,7 @@ function publishHtml() {
 }
 
 onLoad(() => {
+  new Tablesort($('#standings-table')[0]);
   $('.criterium').on('click', e => {
     let alreadyOpen = e.target.closest('select');
     if (alreadyOpen) return;
