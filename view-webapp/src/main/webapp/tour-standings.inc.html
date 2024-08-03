@@ -85,7 +85,7 @@
     #elseif($rst.contains('-'))
       #set($rst = "<i>$rst</i>")
     #end
-          <td class="nobreak" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
+          <td class="nobreak game-result" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
   #end
   #foreach($crit in $tour.pairing.placement)
           <td>$number.format('0.#', $part[$crit])</td>

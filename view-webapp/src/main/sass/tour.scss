@@ -405,6 +405,14 @@
     margin-top: 0.2em;
   }
 
+  .bottom-pairing-actions {
+    margin-top: 0.2em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 0.2em;
+  }
+
   .tables-exclusion {
     margin-top: 0.2em;
   }
@@ -474,6 +482,19 @@
   }
   #standings-container {
     max-width: 95vw;
+  }
+
+  td.game-result {
+    position: relative;
+    .title-popup {
+      position: absolute;
+      top: 90%;
+      background: silver;
+      padding: 4px;
+      left: 10%;
+      white-space: nowrap;
+      z-index: 2;
+    }
   }
 
   .ui.steps {
