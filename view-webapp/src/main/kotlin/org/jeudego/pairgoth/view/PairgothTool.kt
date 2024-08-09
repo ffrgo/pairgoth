@@ -26,6 +26,7 @@ class PairgothTool {
         "RATING" to "Rating",
         "NBW" to "Number of wins", // Number win
         "MMS" to "Mac Mahon score", // Macmahon score
+        "SCOREX" to "Score X", // Score X
         // TODO "STS" to "Strasbourg score", // Strasbourg score
         // TODO "CPS" to "Cup score", // Cup score
 

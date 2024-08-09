@@ -33,6 +33,15 @@ class MacMahonSolver(round: Int,
         }
     }
 
+    override val scoresX: Map<ID, Double> by lazy {
+        require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
+        pairablesMap.mapValues {
+            it.value.let { pairable ->
+                roundScore(pairable.mmBase + pairable.nbW)
+            }
+        }
+    }
+
     override fun computeWeightForBye(p: Pairable): Double{
         return 2*scores[p.id]!!.second
     }
@@ -76,6 +85,7 @@ class MacMahonSolver(round: Int,
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
     // mms: current Mac-Mahon score of the pairable
     val Pairable.mms: Double get() = scores[id]?.second ?: 0.0
+    val Pairable.scoreX: Double get() = scoresX[id] ?: 0.0
 
     // CB TODO - configurable criteria
     val mainScoreMin = mmFloor + PLA_SMMS_SCORE_MIN - Pairable.MIN_RANK
@@ -83,6 +93,7 @@ class MacMahonSolver(round: Int,
     override val mainLimits get() = Pair(mainScoreMin.toDouble(), mainScoreMax.toDouble())
     override fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.MMS -> pairable.mms
+        Criterion.SCOREX -> pairable.scoreX
         Criterion.SOSM -> pairable.sos
         Criterion.SOSOSM -> pairable.sosos
         Criterion.SOSMM1 -> pairable.sosm1

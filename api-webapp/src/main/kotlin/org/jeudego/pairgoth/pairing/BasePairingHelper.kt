@@ -13,11 +13,12 @@ abstract class BasePairingHelper(
     ) {
 
     abstract val scores: Map<ID, Pair<Double, Double>>
+    abstract val scoresX: Map<ID, Double>
     val historyHelper =
         if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(
             history
         ) { scores }
-        else HistoryHelper(history) { scores }
+        else HistoryHelper(history, scoresGetter = { scores }, scoresXGetter = { scoresX })
 
     // Extend pairables with members from all rounds
 

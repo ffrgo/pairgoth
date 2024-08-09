@@ -34,7 +34,9 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
         else ceil(score - epsilon)
     }
 
-    val historyHelper = HistoryHelper(historyBefore(round + 1)) {
+    val historyHelper = HistoryHelper(
+        historyBefore(round + 1),
+        scoresGetter = {
         if (pairing.type == PairingType.SWISS) wins.mapValues { Pair(0.0, it.value) }
         else pairables.mapValues {
             it.value.let { pairable ->
@@ -51,7 +53,16 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
                 )
             }
         }
-    }
+    },
+        scoresXGetter = {
+            if (pairing.type == PairingType.SWISS) wins.mapValues { it.value }
+            else pairables.mapValues {
+                it.value.let { pairable ->
+                    roundScore(pairable.mmBase() + (nbW(pairable) ?: 0.0))
+                }
+            }
+        }
+    )
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
@@ -63,6 +74,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.RATING -> pairables.mapValues { it.value.rating }
             Criterion.NBW -> historyHelper.wins
             Criterion.MMS -> historyHelper.mms
+            Criterion.SCOREX -> historyHelper.scoresX
             Criterion.STS -> StandingsHandler.nullMap
             Criterion.CPS -> StandingsHandler.nullMap
 
