@@ -26,13 +26,19 @@ Authentication: `none`, `sesame` for a shared unique password, `oauth` for email
 auth = none
 ```
 
+When running in client or server mode, if `auth` is not `none`, the following extra property is needed:
+
+```
+auth.shared_secret = <16 ascii characters string>
+```
+
 ## webapp connector
 
 Pairgoth webapp connector configuration.
 
 ```
 webapp.protocol = http
-webapp.interface = localhost
+webapp.host = localhost
 webapp.port = 8080
 webapp.context = /
 webapp.external.url = http://localhost:8080
@@ -44,7 +50,7 @@ Pairgoth API connector configuration.
 
 ```
 api.protocol = http
-api.interface = localhost
+api.host = localhost
 api.port = 8085
 api.context = /api
 api.external.url = http://localhost:8085/api
