@@ -82,7 +82,8 @@
   #else
             <td>$!part.egf</td>
   #end
-            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
+  ## display MMS correction on the screen, but not when printed
+            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
             <td>$part.rating</td>
 #if($tour.pairing.type == 'MAC_MAHON')
             <td>$mmsPlayersMap[$part.id]</td>
