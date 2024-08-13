@@ -5,6 +5,7 @@ import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.api.TournamentHandler.dispatchEvent
 import org.jeudego.pairgoth.model.Game
+import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
@@ -108,27 +109,7 @@ object PairingHandler: PairgothApiHandler {
                 val tableWasOccupied = ( tournament.games(round).values.find { g -> g != game && g.table == game.table } != null )
                 if (tableWasOccupied) {
                     // some renumbering is necessary
-                    val sortedPairables = tournament.getSortedPairables(round)
-                    val sortedMap = sortedPairables.associateBy {
-                        it.getID()!!
-                    }
-                    val changed = tournament.renumberTables(round, game) { game ->
-                        val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
-                        val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
-                        (whitePosition + blackPosition)
-                    }
-                    if (changed) {
-                        val games = tournament.games(round).values.sortedBy {
-                            if (it.table == 0) Int.MAX_VALUE else it.table
-                        }
-                        tournament.dispatchEvent(
-                            TablesRenumbered, request,
-                            Json.Object(
-                                "round" to round,
-                                "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())
-                            )
-                        )
-                    }
+                    renumberTables(request, tournament, round, game)
                 }
             }
             return Json.Object("success" to true)
@@ -142,26 +123,35 @@ object PairingHandler: PairgothApiHandler {
                 tournament.dispatchEvent(TournamentUpdated, request, tournament.toJson())
             }
 
-            val sortedPairables = tournament.getSortedPairables(round)
-            val sortedMap = sortedPairables.associateBy {
-                it.getID()!!
-            }
-            val changed = tournament.renumberTables(round, null) { game ->
-                val whitePosition = sortedMap[game.white]?.getInt("num") ?: Int.MIN_VALUE
-                val blackPosition = sortedMap[game.black]?.getInt("num") ?: Int.MIN_VALUE
-                (whitePosition + blackPosition)
-            }
-            if (changed) {
-                val games = tournament.games(round).values.sortedBy {
-                    if (it.table == 0) Int.MAX_VALUE else it.table
-                }
-                tournament.dispatchEvent(
-                    TablesRenumbered, request,
-                    Json.Object("round" to round, "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()))
-                )
-            }
+            renumberTables(request, tournament, round)
+
             return Json.Object("success" to true)
         }
+    }
+
+    private fun renumberTables(request: HttpServletRequest, tournament: Tournament<*>, round: Int, pivot: Game? = null) {
+        val sortedPairables = tournament.getSortedPairables(round)
+        val sortedMap = sortedPairables.associateBy {
+            it.getID()!!
+        }
+        val changed = tournament.renumberTables(round, pivot) { gm ->
+            val whitePosition = sortedMap[gm.white]?.getInt("num") ?: Int.MIN_VALUE
+            val blackPosition = sortedMap[gm.black]?.getInt("num") ?: Int.MIN_VALUE
+            (whitePosition + blackPosition)
+        }
+        if (changed) {
+            val games = tournament.games(round).values.sortedBy {
+                if (it.table == 0) Int.MAX_VALUE else it.table
+            }
+            tournament.dispatchEvent(
+                TablesRenumbered, request,
+                Json.Object(
+                    "round" to round,
+                    "games" to games.map { it.toJson() }.toCollection(Json.MutableArray())
+                )
+            )
+        }
+
     }
 
     override fun delete(request: HttpServletRequest, response: HttpServletResponse): Json {
