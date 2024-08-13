@@ -18,7 +18,7 @@ abstract class BasePairingHelper(
         if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(
             history
         ) { scores }
-        else HistoryHelper(history, scoresGetter = { scores }, scoresXGetter = { scoresX })
+        else HistoryHelper(history) { scores }
 
     // Extend pairables with members from all rounds
 

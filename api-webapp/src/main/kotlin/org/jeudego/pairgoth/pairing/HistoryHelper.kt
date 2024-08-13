@@ -6,12 +6,7 @@ import org.jeudego.pairgoth.model.Game.Result.*
 open class HistoryHelper(
     protected val history: List<List<Game>>,
     // scoresGetter() returns Pair(absentSosValueForOthers, score) where score is nbw for Swiss, mms for MM, ...
-    scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>,
-    // scoresXGetter(), defined by default as score
-    scoresXGetter: HistoryHelper.()-> Map<ID, Double> = {
-            scoresGetter().mapValues { entry -> entry.value.second
-        }
-}) {
+    scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
 
     // List of all the pairables ID present in the history
     val allPairables = history.flatten()
@@ -33,7 +28,9 @@ open class HistoryHelper(
     }
 
     val scoresX by lazy {
-        scoresXGetter()
+        scoresGetter().mapValues { entry ->
+            entry.value.first + (wins[entry.key] ?: 0.0)
+        }
     }
 
     // Generic helper functions

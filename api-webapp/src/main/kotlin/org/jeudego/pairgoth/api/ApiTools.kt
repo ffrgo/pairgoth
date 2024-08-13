@@ -34,9 +34,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         else ceil(score - epsilon)
     }
 
-    val historyHelper = HistoryHelper(
-        historyBefore(round + 1),
-        scoresGetter = {
+    val historyHelper = HistoryHelper(historyBefore(round + 1)) {
         if (pairing.type == PairingType.SWISS) wins.mapValues { Pair(0.0, it.value) }
         else pairables.mapValues {
             it.value.let { pairable ->
@@ -53,16 +51,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
                 )
             }
         }
-    },
-        scoresXGetter = {
-            if (pairing.type == PairingType.SWISS) wins.mapValues { it.value }
-            else pairables.mapValues {
-                it.value.let { pairable ->
-                    roundScore(pairable.mmBase() + (nbW(pairable) ?: 0.0))
-                }
-            }
-        }
-    )
+    }
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
