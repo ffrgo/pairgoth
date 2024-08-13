@@ -20,7 +20,7 @@ import kotlin.math.roundToInt
 
 //  TODO CB avoid code redundancy with solvers
 
-fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
+fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
     fun Pairable.mmBase(): Double {
         if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
@@ -66,6 +66,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
+    if (type == Tournament.Type.INDIVIDUAL && pairing.type == PairingType.MAC_MAHON && !neededCriteria.contains(Criterion.MMS)) neededCriteria.add(Criterion.MMS)
     val criteria = neededCriteria.map { crit ->
         crit.name to when (crit) {
             Criterion.NONE -> StandingsHandler.nullMap
@@ -100,7 +101,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.DC -> StandingsHandler.nullMap
         }
     }
-    val pairables = pairables.values.filter { it.final }.map { it.toDetailedJson() }
+    val pairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
     pairables.forEach { player ->
         for (crit in criteria) {
             player[crit.first] = (crit.second[player.getID()] ?: 0.0).toInt()

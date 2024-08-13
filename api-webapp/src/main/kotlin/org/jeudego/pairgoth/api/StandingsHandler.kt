@@ -32,8 +32,9 @@ object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: ApiHandler.badRequest("invalid round number")
+        val includePreliminary = request.getParameter("include_preliminary")?.let { it.toBoolean() } ?: false
 
-        val sortedPairables = tournament.getSortedPairables(round)
+        val sortedPairables = tournament.getSortedPairables(round, includePreliminary)
         val sortedMap = sortedPairables.associateBy {
             it.getID()!!
         }

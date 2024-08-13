@@ -8,7 +8,7 @@
 
 ## Team players do not have an individual MMS
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
-  #set($mmbase = $api.get("tour/${params.id}/standings/0"))
+  #set($mmbase = $api.get("tour/${params.id}/standings/0?include_preliminary=true"))
   #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
     #if($mmbase.error)
       #set($error = $mmbase.error)
@@ -86,7 +86,7 @@
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
             <td>$part.rating</td>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
-            <td>$mmsPlayersMap[$part.id]</td>
+            <td>$!mmsPlayersMap[$part.id]</td>
 #end
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
               <div class="participation">
