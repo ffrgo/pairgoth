@@ -34,6 +34,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         else ceil(score - epsilon)
     }
 
+    // CB TODO - factorize history helper creation between here and solver classes
     val historyHelper = HistoryHelper(historyBefore(round + 1)) {
         if (pairing.type == PairingType.SWISS) wins.mapValues { Pair(0.0, it.value) }
         else pairables.mapValues {

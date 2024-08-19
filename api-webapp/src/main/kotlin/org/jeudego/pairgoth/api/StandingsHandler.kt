@@ -92,6 +92,9 @@ object StandingsHandler: PairgothApiHandler {
                 response.contentType = "text/plain;charset=${encoding}"
                 val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
                 if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
+                if (neededCriteria.first() == SCOREX) {
+                    neededCriteria.add(1, MMS)
+                }
                 exportToEGFFormat(tournament, sortedPairables, neededCriteria, writer)
                 writer.flush()
                 return null

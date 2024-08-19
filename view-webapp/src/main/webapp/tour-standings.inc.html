@@ -60,7 +60,14 @@
 #foreach($r in [1..$round])
         <th>R$r</th>
 #end
+#set($criteres = [])
 #foreach($crit in $tour.pairing.placement)
+   #set($junk = $criteres.add($crit))
+#end
+#if($criteres[0] == 'SCOREX')
+  #set($junk = $criteres.add(1, 'MMS'))
+#end
+#foreach($crit in $criteres)
         <th>$crit</th>
 #end
       </thead>
@@ -87,7 +94,7 @@
     #end
           <td class="nobreak game-result" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
   #end
-  #foreach($crit in $tour.pairing.placement)
+  #foreach($crit in $criteres)
           <td>$number.format('0.#', $part[$crit])</td>
   #end
         </tr>
