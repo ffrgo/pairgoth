@@ -26,7 +26,20 @@
 #if($tour)
   #set($round = $math.toInteger($!params.round))
   #if(!$round)
-    #set($round = 1)
+    #set($lastCompleteRound = 0)
+    #foreach($r in [1..$tour.rounds])
+      #set($stats = $tour.stats[$r - 1])
+      #if($stats.ready == $stats.games)
+        #set($lastCompleteRound = $r)
+      #else
+        #break
+      #end
+    #end
+    #if($lastCompleteRound)
+      #set($round = $math.min($lastCompleteRound + 1, $tour.rounds))
+    #else
+      #set($round = 1)
+    #end
   #else
     #set($round = $math.min($math.max($round, 1), $tour.rounds))
   #end
