@@ -523,6 +523,21 @@
     cursor: pointer;
   }
 
+  @media screen {
+    #players-list {
+      font-size: smaller;
+    }
+    .multi-select .listitem {
+      font-size: smaller;
+    }
+    #results-list {
+      font-size: smaller;
+    }
+    #standings-container {
+      font-size: smaller;
+    }
+  }
+
   @media print {
 
     body {
