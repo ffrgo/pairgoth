@@ -73,7 +73,7 @@
       </thead>
       <tbody>
 #foreach($part in $standings)
-        <tr>
+        <tr data-id="$part.id">
           <td>$part.num</td>
           <td>$part.place</td>
           <td>$esc.html($part.name)#if($part.firstname) $esc.html($part.firstname)#end</td>
@@ -86,6 +86,8 @@
     #set($opp_num = $math.toLong($rst))
     #if($opp_num)
       #set($opponent = $!smap[$opp_num])
+    #else
+      #set($opponent = false)
     #end
     #if($rst.contains('+'))
       #set($rst = "<b>$rst</b>")

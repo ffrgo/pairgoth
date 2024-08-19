@@ -44,6 +44,9 @@
           <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>
 #end
         </div>
+        <div id="previous_games" class="hidden multi-select">
+
+        </div>
       </div>
       <div id="pairing-right">
         <div class="pairing-buttons">
@@ -185,3 +188,8 @@
     </form>
   </div>
 </div>
+
+## For dynamic texts to be translated, they must be somewhere in the html source.
+## TODO - gather all "text only" nodes like this somewhere
+<div id="previous_games_prefix" class="hidden">Games of </div>
+<div id="previous_games_postfix" class="hidden"></div>

@@ -108,12 +108,38 @@ function updatePairable() {
     });
 }
 
+function showOpponents(player) {
+  let id = player.data('id');
+  let games = $(`#standings-table tbody tr[data-id="${id}"] .game-result`)
+  if (games.length) {
+    let title = `${$('#previous_games_prefix').text()}${player.innerText.replace('\n', ' ')}${$('#previous_games_postfix').text()}`;
+    $('#unpairables').addClass('hidden');
+    $('#previous_games')[0].setAttribute('title', title);
+    $('#previous_games')[0].clearChildren();
+    $('#previous_games').removeClass('hidden');
+    for (let r = 0; r < activeRound; ++r) {
+      let game = games[r]
+      let opponent = game.getAttribute('title');
+      if (!opponent) opponent = '';
+      let result = game.text().replace(/^\d+/, '');
+      let listitem = `<div data-id="${id}" class="listitem"><span>R${r+1}</span><span>${opponent}</span><span>${result}</span></div>`
+      $('#previous_games')[0].insertAdjacentHTML('beforeend', listitem);
+    }
+  }
+}
+
+function hideOpponents() {
+  $('#unpairables').removeClass('hidden');
+  $('#previous_games').addClass('hidden');
+}
+
 onLoad(()=>{
   // note - this handler is also in use for lists on Mac Mahon super groups and teams pages
   $('.listitem').on('click', e => {
     let listitem = e.target.closest('.listitem');
     let box = e.target.closest('.multi-select');
-    if (e.shiftKey && typeof(focused) !== 'undefined') {
+    let focusedBox = focused ? focused.closest('.multi-select') : undefined;
+    if (e.shiftKey && typeof(focused) !== 'undefined' && box.getAttribute('id') === focusedBox.getAttribute('id')) {
       let from = focused.index('.listitem');
       let to = listitem.index('.listitem');
       if (from > to) {
@@ -130,10 +156,12 @@ onLoad(()=>{
       if (e.detail === 1) {
         // single click
         focused = listitem.toggleClass('selected').attr('draggable', listitem.hasClass('selected'));
+        if (box.getAttribute('id') === 'pairables') showOpponents(focused)
       } else if (listitem.closest('#pairing-lists')) {
         // on pairing page
         if (listitem.closest('#paired')) {
           // double click
+          hideOpponents()
           focused = listitem.attr('draggable', listitem.hasClass('selected'));
           editGame(focused);
         } else if (listitem.closest('#pairables')) {
@@ -203,10 +231,11 @@ onLoad(()=>{
         }
       });
   });
-  $('.multi-select').on('dblclick', e => {
-    let box = e.target.closest('.multi-select');
+  document.on('dblclick', e => {
     if (!e.target.closest('.listitem')) {
-      box.find('.listitem').removeClass('selected');
+      $('.listitem').removeClass('selected');
+      focused = undefined;
+      hideOpponents()
     }
   });
   $('#update-pairable').on('click', e => {

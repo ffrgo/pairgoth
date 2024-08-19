@@ -91,6 +91,7 @@
 
   #players-list {
     max-width: 95vw;
+    font-size: smaller;
     #players {
       tr.filtered {
         display: none;
@@ -331,6 +332,7 @@
       gap: 1em;
       cursor: pointer;
       user-select: none;
+      font-size: smaller;
       &:hover {
         background-color: rgba(50, 50, 50, .2);
       }
@@ -377,7 +379,7 @@
     gap: 1em;
     max-width: max(10em, 20vw);
   }
-  #unpairables {
+  #unpairables, #previous_games {
     display: flex;
     flex-flow: column nowrap;
     min-height: 10vh;
@@ -424,6 +426,7 @@
   }
 
   #results-list {
+    font-size: smaller;
     text-align: center;
     .player, .result {
       background-color: unset;
@@ -481,6 +484,7 @@
     }
   }
   #standings-container {
+    font-size: smaller;
     max-width: 95vw;
   }
 
