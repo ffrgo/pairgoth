@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.ext
 
 import jakarta.xml.bind.JAXBContext
 import jakarta.xml.bind.JAXBElement
+import org.apache.commons.text.StringEscapeUtils
 import java.time.LocalDate
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.opengotha.TournamentType
@@ -35,7 +36,8 @@ object OpenGotha {
         else -> throw Error("Invalid seed system: $str")
     }
 
-    private fun String.titlecase(locale: Locale = Locale.ROOT) = lowercase(locale).replaceFirstChar { it.titlecase(locale) }
+    private fun String.titleCase(locale: Locale = Locale.ROOT) = lowercase(locale).replaceFirstChar { it.titlecase(locale) }
+    private fun String.escapeXML() = StringEscapeUtils.escapeXml11(this)
 
     private fun MainCritParams.SeedMethod.format() = toString().replace("_", "")
 
@@ -225,7 +227,7 @@ object OpenGotha {
                     player as Player
                 }.joinToString("\n") { player -> 
                     """<Player agaExpirationDate="" agaId="" club="${
-                        player.club
+                        player.club.escapeXML()
                     }" country="${
                         player.country
                     }" egfPin="${
@@ -233,11 +235,11 @@ object OpenGotha {
                     }" ffgLicence="${
                         player.externalIds[DatabaseId.FFG] ?: ""
                     }" ffgLicenceStatus="" firstName="${
-                        player.firstname
+                        player.firstname.escapeXML()
                     }" grade="${
                         player.displayRank()
                     }" name="${
-                        player.name
+                        player.name.escapeXML()
                     }" participating="${
                         (1..20).map { 
                             if (player.skip.contains(it)) 0 else 1 
@@ -255,7 +257,6 @@ object OpenGotha {
             }
             </Players>
             <Games>
-            // TODO - table number is not any more kinda random like this
             ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
                     games.values.mapNotNull { game ->
                         if (game.black == 0 || game.white == 0) null
@@ -264,9 +265,11 @@ object OpenGotha {
                 }.joinToString("\n") { (round, game) ->
                     """<Game blackPlayer="${
                         (tournament.pairables[game.black]!! as Player).let { black ->
-                            "${black.name.replace(" ", "")}${black.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
+                            "${black.name.replace(" ", "")}${black.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH).escapeXML() // Use Locale.ENGLISH to transform é to É    
                         }
-                    }" handicap="0" knownColor="true" result="${
+                    }" handicap="${
+                        game.handicap
+                    }" knownColor="true" result="${
                         when (game.result) {
                             Game.Result.UNKNOWN, Game.Result.CANCELLED -> "RESULT_UNKNOWN"
                             Game.Result.BLACK -> "RESULT_BLACKWINS"
@@ -281,7 +284,7 @@ object OpenGotha {
                         game.table
                     }" whitePlayer="${
                         (tournament.pairables[game.white]!! as Player).let { white ->
-                            "${white.name}${white.firstname}".uppercase(Locale.ENGLISH) // Use Locale.ENGLISH to transform é to É    
+                            "${white.name.replace(" ", "")}${white.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH).escapeXML() // Use Locale.ENGLISH to transform é to É    
                         }
                     }"/>"""
                 }
@@ -304,12 +307,27 @@ object OpenGotha {
             }
             </ByePlayer>
             <TournamentParameterSet>
-            <GeneralParameterSet bInternet="${tournament.online}" basicTime="${tournament.timeSystem.mainTime / 60}" beginDate="${tournament.startDate}" canByoYomiTime="${tournament.timeSystem.byoyomi}" complementaryTimeSystem="${when(tournament.timeSystem.type) {
+            <GeneralParameterSet bInternet="${
+                tournament.online
+            }" basicTime="${
+                tournament.timeSystem.mainTime / 60
+            }" beginDate="${
+                tournament.startDate
+            }" canByoYomiTime="${
+                tournament.timeSystem.byoyomi
+            }" complementaryTimeSystem="${
+                when(tournament.timeSystem.type) {
                 TimeSystem.TimeSystemType.SUDDEN_DEATH -> "SUDDENDEATH"
                 TimeSystem.TimeSystemType.JAPANESE -> "STDBYOYOMI"
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
-            } }" director="${tournament.director}" endDate="${tournament.endDate}" fischerTime="${tournament.timeSystem.increment}" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
+            } }" director="${
+                tournament.director.escapeXML()
+            }" endDate="${
+                tournament.endDate
+            }" fischerTime="${
+                tournament.timeSystem.increment
+            }" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="${
                 displayRank(
                     if (tournament.pairing is MacMahon) tournament.pairing.mmBar else 8
                 ).uppercase(Locale.ROOT)
@@ -321,18 +339,94 @@ object OpenGotha {
             (tournament.pairing.pairingParams.main.mmsValueAbsent * 2).roundToInt()
             }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="${
                 tournament.pairing.pairingParams.main.roundDownScore
-            }" komi="${tournament.komi}" location="${tournament.location}" name="${tournament.name}" nbMovesCanTime="${tournament.timeSystem.stones}" numberOfCategories="1" numberOfRounds="${tournament.rounds}" shortName="${tournament.shortName}" size="${tournament.gobanSize}" stdByoYomiTime="${tournament.timeSystem.byoyomi}"/>
-            <HandicapParameterSet hdBasedOnMMS="${tournament.pairing.pairingParams.handicap.useMMS}" hdCeiling="${tournament.pairing.pairingParams.handicap.ceiling}" hdCorrection="${tournament.pairing.pairingParams.handicap.correction}" hdNoHdRankThreshold="${displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)}"/>
+            }" komi="${
+                tournament.komi
+            }" location="${
+                tournament.location.escapeXML()
+            }" name="${
+                tournament.name.escapeXML()
+            }" nbMovesCanTime="${
+                tournament.timeSystem.stones
+            }" numberOfCategories="1" numberOfRounds="${
+                tournament.rounds
+            }" shortName="${
+                tournament.shortName
+            }" size="${
+                tournament.gobanSize
+            }" stdByoYomiTime="${
+                tournament.timeSystem.byoyomi
+            }"/>
+            <HandicapParameterSet hdBasedOnMMS="${
+                tournament.pairing.pairingParams.handicap.useMMS
+            }" hdCeiling="${
+                tournament.pairing.pairingParams.handicap.ceiling
+            }" hdCorrection="${
+                tournament.pairing.pairingParams.handicap.correction
+            }" hdNoHdRankThreshold="${
+                displayRank(tournament.pairing.pairingParams.handicap.rankThreshold)
+            }"/>
             <PlacementParameterSet>
             <PlacementCriteria>
             ${
                 (0..5).map {
-                    """<PlacementCriterion name="${tournament.pairing.placementParams.criteria.getOrNull(it)?.name ?: "NULL"}" number="${it + 1}"/>"""
+                    """<PlacementCriterion name="${
+                        tournament.pairing.placementParams.criteria.getOrNull(it)?.name ?: "NULL"
+                    }" number="${it + 1}"/>"""
                 }
             }
             </PlacementCriteria>
             </PlacementParameterSet>
-            <PairingParameterSet paiBaAvoidDuplGame="${tournament.pairing.pairingParams.base.dupWeight.toLong()}" paiBaBalanceWB="${tournament.pairing.pairingParams.base.colorBalanceWeight.toLong()}" paiBaDeterministic="${tournament.pairing.pairingParams.base.deterministic}" paiBaRandom="${tournament.pairing.pairingParams.base.random.toLong()}" paiMaAdditionalPlacementCritSystem1="${tournament.pairing.pairingParams.main.additionalPlacementCritSystem1.toString().titlecase()}" paiMaAdditionalPlacementCritSystem2="${tournament.pairing.pairingParams.main.additionalPlacementCritSystem2.toString().titlecase()}" paiMaAvoidMixingCategories="${tournament.pairing.pairingParams.main.categoriesWeight.toLong()}" paiMaCompensateDUDD="${tournament.pairing.pairingParams.main.compensateDrawUpDown}" paiMaDUDDLowerMode="${tournament.pairing.pairingParams.main.drawUpDownLowerMode.toString().substring(0, 3)}" paiMaDUDDUpperMode="${tournament.pairing.pairingParams.main.drawUpDownUpperMode.toString().substring(0, 3)}" paiMaDUDDWeight="${tournament.pairing.pairingParams.main.drawUpDownWeight.toLong()}" paiMaLastRoundForSeedSystem1="${tournament.pairing.pairingParams.main.lastRoundForSeedSystem1}" paiMaMaximizeSeeding="${tournament.pairing.pairingParams.main.seedingWeight.toLong()}" paiMaMinimizeScoreDifference="${tournament.pairing.pairingParams.main.scoreWeight.toLong()}" paiMaSeedSystem1="${tournament.pairing.pairingParams.main.seedSystem1.format()}" paiMaSeedSystem2="${tournament.pairing.pairingParams.main.seedSystem2.format()}" paiSeAvoidSameGeo="${tournament.pairing.pairingParams.geo.avoidSameGeo.toLong()}" paiSeBarThresholdActive="${tournament.pairing.pairingParams.secondary.barThresholdActive}" paiSeDefSecCrit="${tournament.pairing.pairingParams.secondary.defSecCrit.toLong()}" paiSeMinimizeHandicap="${tournament.pairing.pairingParams.handicap.weight.toLong()}" paiSeNbWinsThresholdActive="${tournament.pairing.pairingParams.secondary.nbWinsThresholdActive}" paiSePreferMMSDiffRatherThanSameClub="${tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameClub}" paiSePreferMMSDiffRatherThanSameCountry="${tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameCountry}" paiSeRankThreshold="${displayRank(tournament.pairing.pairingParams.secondary.rankSecThreshold).uppercase()}" paiStandardNX1Factor="${tournament.pairing.pairingParams.base.nx1}"/>
+            <PairingParameterSet paiBaAvoidDuplGame="${
+                tournament.pairing.pairingParams.base.dupWeight.toLong()
+            }" paiBaBalanceWB="${
+                tournament.pairing.pairingParams.base.colorBalanceWeight.toLong()
+            }" paiBaDeterministic="${
+                tournament.pairing.pairingParams.base.deterministic
+            }" paiBaRandom="${
+                tournament.pairing.pairingParams.base.random.toLong()
+            }" paiMaAdditionalPlacementCritSystem1="${
+                tournament.pairing.pairingParams.main.additionalPlacementCritSystem1.toString().titleCase()
+            }" paiMaAdditionalPlacementCritSystem2="${
+                tournament.pairing.pairingParams.main.additionalPlacementCritSystem2.toString().titleCase()
+            }" paiMaAvoidMixingCategories="${
+                tournament.pairing.pairingParams.main.categoriesWeight.toLong()
+            }" paiMaCompensateDUDD="${
+                tournament.pairing.pairingParams.main.compensateDrawUpDown
+            }" paiMaDUDDLowerMode="${
+                tournament.pairing.pairingParams.main.drawUpDownLowerMode.toString().substring(0, 3)
+            }" paiMaDUDDUpperMode="${
+                tournament.pairing.pairingParams.main.drawUpDownUpperMode.toString().substring(0, 3)
+            }" paiMaDUDDWeight="${
+                tournament.pairing.pairingParams.main.drawUpDownWeight.toLong()
+            }" paiMaLastRoundForSeedSystem1="${
+                tournament.pairing.pairingParams.main.lastRoundForSeedSystem1
+            }" paiMaMaximizeSeeding="${
+                tournament.pairing.pairingParams.main.seedingWeight.toLong()
+            }" paiMaMinimizeScoreDifference="${
+                tournament.pairing.pairingParams.main.scoreWeight.toLong()
+            }" paiMaSeedSystem1="${
+                tournament.pairing.pairingParams.main.seedSystem1.format()
+            }" paiMaSeedSystem2="${
+                tournament.pairing.pairingParams.main.seedSystem2.format()
+            }" paiSeAvoidSameGeo="${
+                tournament.pairing.pairingParams.geo.avoidSameGeo.toLong()
+            }" paiSeBarThresholdActive="${
+                tournament.pairing.pairingParams.secondary.barThresholdActive
+            }" paiSeDefSecCrit="${
+                tournament.pairing.pairingParams.secondary.defSecCrit.toLong()
+            }" paiSeMinimizeHandicap="${
+                tournament.pairing.pairingParams.handicap.weight.toLong()
+            }" paiSeNbWinsThresholdActive="${
+                tournament.pairing.pairingParams.secondary.nbWinsThresholdActive
+            }" paiSePreferMMSDiffRatherThanSameClub="${
+                tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameClub
+            }" paiSePreferMMSDiffRatherThanSameCountry="${
+                tournament.pairing.pairingParams.geo.preferMMSDiffRatherThanSameCountry
+            }" paiSeRankThreshold="${
+                displayRank(tournament.pairing.pairingParams.secondary.rankSecThreshold).uppercase()
+            }" paiStandardNX1Factor="${
+                tournament.pairing.pairingParams.base.nx1
+            }"/>
             <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
             <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
             </TournamentParameterSet>
