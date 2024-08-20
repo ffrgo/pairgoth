@@ -70,6 +70,13 @@ onLoad(()=>{
     let newResult = results[(index + 1)%results.length];
     setResult(gameId, newResult, oldResult);
   });
+  $('#results-table .result').on('dblclick', e => {
+    let cell = e.target.closest('.result');
+    let gameId = e.target.closest('tr').data('id');
+    let oldResult = cell.data('result');
+    let newResult = '?';
+    setResult(gameId, newResult, oldResult);
+  });
   $('#results-filter').on('click', e => {
     let filter = $('#results-filter input')[0];
     filter.checked = !filter.checked;
