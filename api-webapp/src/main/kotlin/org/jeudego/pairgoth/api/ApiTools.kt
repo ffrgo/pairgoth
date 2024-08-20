@@ -2,11 +2,9 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
-import org.jeudego.pairgoth.model.DatabaseId
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.model.Pairable.Companion.MIN_RANK
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
@@ -17,7 +15,6 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
 
 //  TODO CB avoid code redundancy with solvers
 
@@ -125,12 +122,23 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     return sortedPairables
 }
 
-fun Tournament<*>.populateResultsArray(sortedPairables: List<Json.Object>, round: Int = rounds) {
-    // fill result
+fun Tournament<*>.populateFrozenStandings(sortedPairables: List<Json.Object>, round: Int = rounds) {
     val sortedMap = sortedPairables.associateBy {
         it.getID()!!
     }
 
+    // refresh name, firstname, club and level
+    sortedMap.forEach { (id, player) ->
+        val mutable = player as Json.MutableObject
+        val live = players[id]!!
+        mutable["name"] = live.name
+        mutable["firstname"] = live.firstname
+        mutable["club"] = live.club
+        mutable["rating"] = live.rating
+        mutable["rank"] = live.rank
+    }
+
+    // fill result
     for (r in 1..round) {
         games(r).values.forEach { game ->
             val white = if (game.white != 0) sortedMap[game.white] else null
