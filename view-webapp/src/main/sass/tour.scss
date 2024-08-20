@@ -483,6 +483,10 @@
   #standings-container {
     max-width: 95vw;
   }
+  
+  #standings-table thead tr th {
+    z-index: 10;
+  }
 
   td.game-result {
     position: relative;
