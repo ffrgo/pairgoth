@@ -105,6 +105,12 @@
     </table>
   </div>
   <div class="right form-actions">
+#if(!$tour.frozen && $round == $tour.rounds)
+    <button id="freeze" class="ui orange floating right labeled icon button">
+      <i class="snowflake plane outline icon"></i>
+      Freeze
+    </button>
+#end
     <button id="publish" class="ui yellow floating right labeled icon button">
       <i class="paper plane outline icon"></i>
       Publish

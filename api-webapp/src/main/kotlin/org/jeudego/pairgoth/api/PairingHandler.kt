@@ -3,7 +3,6 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.api.TournamentHandler.dispatchEvent
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
@@ -66,7 +65,7 @@ object PairingHandler: PairgothApiHandler {
         return ret
     }
 
-    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         // only allow last round (if players have not been paired in the last round, it *may* be possible to be more laxist...)

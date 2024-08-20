@@ -34,6 +34,7 @@ object TournamentHandler: PairgothApiHandler {
                                     // additional attributes for the webapp
                                     json["stats"] = tour.stats()
                                     json["teamSize"] = tour.type.playersNumber
+                                    json["frozen"] = tour.frozen != null
                                 }
                             }
                         } ?: badRequest("no tournament with id #${id}")
@@ -61,7 +62,7 @@ object TournamentHandler: PairgothApiHandler {
         return Json.Object("success" to true, "id" to tournament.id)
     }
 
-    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
         // CB TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
         val payload = getObjectPayload(request)

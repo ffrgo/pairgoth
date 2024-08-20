@@ -29,7 +29,7 @@ object TeamHandler: PairgothApiHandler {
         return Json.Object("success" to true, "id" to team.id)
     }
 
-    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json {
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid player selector")

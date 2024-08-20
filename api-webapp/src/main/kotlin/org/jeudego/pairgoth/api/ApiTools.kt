@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.DatabaseId
+import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.Pairable.Companion.MIN_RANK
@@ -32,6 +33,10 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
         else ceil(score - epsilon)
+    }
+
+    if (frozen != null) {
+        return ArrayList(frozen!!.map { it -> it as Json.Object })
     }
 
     // CB TODO - factorize history helper creation between here and solver classes
@@ -116,5 +121,50 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         it.value.forEach { p -> p["place"] = place }
         place += it.value.size
     }
+
     return sortedPairables
+}
+
+fun Tournament<*>.populateResultsArray(sortedPairables: List<Json.Object>, round: Int = rounds) {
+    // fill result
+    val sortedMap = sortedPairables.associateBy {
+        it.getID()!!
+    }
+
+    for (r in 1..round) {
+        games(r).values.forEach { game ->
+            val white = if (game.white != 0) sortedMap[game.white] else null
+            val black = if (game.black != 0) sortedMap[game.black] else null
+            val whiteNum = white?.getInt("num") ?: 0
+            val blackNum = black?.getInt("num") ?: 0
+            val whiteColor = if (black == null) "" else "w"
+            val blackColor = if (white == null) "" else "b"
+            val handicap = if (game.handicap == 0) "" else "${game.handicap}"
+            assert(white != null || black != null)
+            if (white != null) {
+                val mark =  when (game.result) {
+                    Game.Result.UNKNOWN -> "?"
+                    Game.Result.BLACK, Game.Result.BOTHLOOSE -> "-"
+                    Game.Result.WHITE, Game.Result.BOTHWIN -> "+"
+                    Game.Result.JIGO, Game.Result.CANCELLED -> "="
+                }
+                val results = white.getArray("results") as Json.MutableArray
+                results[r - 1] =
+                    if (blackNum == 0) "0$mark"
+                    else "$blackNum$mark/$whiteColor$handicap"
+            }
+            if (black != null) {
+                val mark =  when (game.result) {
+                    Game.Result.UNKNOWN -> "?"
+                    Game.Result.BLACK, Game.Result.BOTHWIN -> "+"
+                    Game.Result.WHITE, Game.Result.BOTHLOOSE -> "-"
+                    Game.Result.JIGO, Game.Result.CANCELLED -> "="
+                }
+                val results = black.getArray("results") as Json.MutableArray
+                results[r - 1] =
+                    if (whiteNum == 0) "0$mark"
+                    else "$whiteNum$mark/$blackColor$handicap"
+            }
+        }
+    }
 }

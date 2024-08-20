@@ -24,6 +24,16 @@ function publishHtml() {
   close_modal();
 }
 
+function freeze() {
+  api.put(`tour/${tour_id}/standings/${activeRound}`, {}
+  ).then(resp => {
+    if (resp.ok) {
+      document.location.reload();
+    }
+    else throw "freeze error"
+  }).catch(err => showError(err));
+}
+
 onLoad(() => {
   new Tablesort($('#standings-table')[0]);
   $('.criterium').on('click', e => {
@@ -85,5 +95,8 @@ onLoad(() => {
   });
   $('.publish-html').on('click', e => {
     publishHtml();
+  });
+  $('#freeze').on('click', e => {
+    freeze()
   });
 });

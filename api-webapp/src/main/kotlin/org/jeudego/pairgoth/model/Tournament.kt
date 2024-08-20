@@ -52,6 +52,9 @@ sealed class Tournament <P: Pairable>(
     protected val _pairables = mutableMapOf<ID, P>()
     val pairables: Map<ID, Pairable> get() = _pairables
 
+    // frozen standings
+    var frozen: Json.Array? = null
+
     // pairing
     fun pair(round: Int, pairables: List<Pairable>): List<Game> {
         // Minimal check on round number.
@@ -335,7 +338,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             tournament.teams[team.getID("id")!!] = tournament.teamFromJson(team)
         }
     }
-    (json["games"] as Json.Array?)?.forEachIndexed { i, arr ->
+    json.getArray("games")?.forEachIndexed { i, arr ->
         val round = i + 1
         val tournamentGames = tournament.games(round)
         val games = arr as Json.Array
@@ -343,6 +346,9 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             val game = obj as Json.Object
             tournamentGames[game.getID("id")!!] = Game.fromJson(game)
         }
+    }
+    json.getArray("frozen")?.also {
+        tournament.frozen = it
     }
     return tournament
 }
@@ -374,5 +380,8 @@ fun Tournament<*>.toFullJson(): Json.Object {
         json["teams"] = Json.Array(teams.values.map { it.toJson() })
     }
     json["games"] = Json.Array((1..lastRound()).mapTo(Json.MutableArray()) { round -> games(round).values.mapTo(Json.MutableArray()) { it.toJson() } });
+    if (frozen != null) {
+        json["frozen"] = frozen
+    }
     return json
 }
