@@ -97,6 +97,8 @@ onLoad(() => {
     publishHtml();
   });
   $('#freeze').on('click', e => {
-    freeze()
+    if (confirm("Once frozen, names, levels and even pairings can be changed, but the scores and the standings will stay the same. Freeze the standings?")) {
+      freeze()
+    }
   });
 });
