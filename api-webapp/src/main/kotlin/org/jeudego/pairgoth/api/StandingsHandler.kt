@@ -27,7 +27,7 @@ import kotlin.collections.ArrayList
 object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
-        val round = getSubSelector(request)?.toIntOrNull() ?: ApiHandler.badRequest("invalid round number")
+        val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
         val includePreliminary = request.getParameter("include_preliminary")?.let { it.toBoolean() } ?: false
 
         val sortedPairables = tournament.getSortedPairables(round, includePreliminary)
