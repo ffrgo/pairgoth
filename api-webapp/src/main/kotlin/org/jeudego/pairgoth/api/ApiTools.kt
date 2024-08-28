@@ -76,7 +76,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.SOSWM2 -> historyHelper.sosm2
             Criterion.SODOSW -> historyHelper.sodos
             Criterion.SOSOSW -> historyHelper.sosos
-            Criterion.CUSSW -> historyHelper.cumScore
+            Criterion.CUSSW -> if (round == 0) StandingsHandler.nullMap else historyHelper.cumScore
             Criterion.SOSM -> historyHelper.sos
             Criterion.SOSMM1 -> historyHelper.sosm1
             Criterion.SOSMM2 -> historyHelper.sosm2
