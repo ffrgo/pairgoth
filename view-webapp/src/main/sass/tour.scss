@@ -87,6 +87,8 @@
     flex-flow: row wrap;
     justify-content: space-between;
     margin: 0 1em;
+    align-items: baseline;
+    gap: 0.5em;
   }
 
   #players-list {
