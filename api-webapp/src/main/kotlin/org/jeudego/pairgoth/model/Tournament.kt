@@ -369,9 +369,15 @@ fun Tournament<*>.toJson() = Json.MutableObject(
     "gobanSize" to gobanSize,
     "timeSystem" to timeSystem.toJson(),
     "rounds" to rounds,
-    "pairing" to pairing.toJson(),
-    "tablesExclusion" to tablesExclusion.toJsonArray()
-)
+    "pairing" to pairing.toJson()
+).also { tour ->
+    if (tablesExclusion.isNotEmpty()) {
+        tour["tablesExclusion"] = tablesExclusion.toJsonArray()
+    }
+    if (frozen != null) {
+        tour["frozen"] = frozen
+    }
+}
 
 fun Tournament<*>.toFullJson(): Json.Object {
     val json = toJson()
@@ -380,6 +386,9 @@ fun Tournament<*>.toFullJson(): Json.Object {
         json["teams"] = Json.Array(teams.values.map { it.toJson() })
     }
     json["games"] = Json.Array((1..lastRound()).mapTo(Json.MutableArray()) { round -> games(round).values.mapTo(Json.MutableArray()) { it.toJson() } });
+    if (tablesExclusion.isNotEmpty()) {
+        json["tablesExclusion"] = tablesExclusion.toJsonArray()
+    }
     if (frozen != null) {
         json["frozen"] = frozen
     }

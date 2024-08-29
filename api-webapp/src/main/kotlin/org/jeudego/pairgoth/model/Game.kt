@@ -38,16 +38,17 @@ data class Game(
 
 // serialization
 
-fun Game.toJson() = Json.Object(
+fun Game.toJson() = Json.MutableObject(
     "id" to id,
     "t" to table,
     "w" to white,
     "b" to black,
     "h" to handicap,
-    "r" to "${result.symbol}",
-    "dd" to drawnUpDown,
-    "ft" to forcedTable
-)
+    "r" to "${result.symbol}"
+).also { game ->
+    if (drawnUpDown != 0) game["dd"] = drawnUpDown
+    if (forcedTable) game["ft"] = true
+}
 
 fun Game.Companion.fromJson(json: Json.Object) = Game(
     id = json.getID("id") ?: throw Error("missing game id"),
