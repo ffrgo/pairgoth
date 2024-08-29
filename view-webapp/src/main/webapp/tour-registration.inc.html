@@ -53,11 +53,12 @@
           <th>First name</th>
           <th>Country</th>
           <th>Club</th>
-##if($tour.country == 'FR')
-##          <th>FFG</th>
-##else
+#if($utils.showRatings('egf', $tour.country.toLowerCase()))
           <th>PIN</th>
-##end
+#end
+#if($utils.showRatings('ffg', $tour.country.toLowerCase()))
+          <th>FFG</th>
+#end
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
@@ -77,10 +78,11 @@
             <td>$part.firstname</td>
             <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
-  #if($tour.country == 'FR')
+  #if($utils.showRatings('egf', $tour.country.toLowerCase()))
+            <td>$!part.egf </td>
+  #end
+  #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
             <td>$!part.ffg</td>
-  #else
-            <td>$!part.egf</td>
   #end
   ## display MMS correction on the screen, but not when printed
             <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
@@ -135,7 +137,15 @@
           </div>
         </div>
 #end
-        <div class="needle eight wide field">
+#set($needleWidth = 12)
+#if($utils.displayRatings('egf', $tour.country.toLowerCase()))
+  #set($needleWidth = $needleWidth - 2)
+#end
+#if($utils.displayRatings('ffg', $tour.country.toLowerCase()))
+  #set($needleWidth = $needleWidth - 2)
+#end
+#set($cssWidth = { 8: 'eight', 10: 'ten', 12: 'twelve' })
+        <div class="needle $cssWidth[$needleWidth] wide field">
           <div class="ui icon input">
             <input id="needle" name="needle" type="text" placeholder="Search..." spellcheck="false">
             <i id="clear-search" class="clickable close icon"></i>
@@ -152,6 +162,7 @@
           </div>
         </div>
 *#
+#if($utils.displayRatings('egf', $tour.country.toLowerCase()))
         <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.egf|'no egf ratings'}">
             <input id="egf" name="egf" type="checkbox" checked value="true"/>
@@ -161,6 +172,8 @@
             <label>EGF</label>
           </div>
         </div>
+#end
+#if($utils.displayRatings('ffg', $tour.country.toLowerCase()))
         <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
             <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
@@ -170,8 +183,9 @@
             <label>FFG</label>
           </div>
         </div>
+#end
         <div class="two wide centered field">
-          <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
+          <div class="toggle" title="browse">
             <input id="browse" name="browse" type="checkbox" value="true"/>
             <div class="search-param checkbox">
               <div class="circle"></div>

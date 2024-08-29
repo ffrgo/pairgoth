@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.view
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.ratings.RatingsManager
+import org.jeudego.pairgoth.web.WebappManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -110,4 +111,8 @@ class PairgothTool {
         }.toSet()
         return players.filter { p -> !teamed.contains(p.getLong("id")) }
     }
+
+    // EGF ratings
+    fun displayRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
+    fun showRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
 }

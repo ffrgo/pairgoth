@@ -85,3 +85,35 @@ Logging configuration.
 logger.level = info
 logger.format = [%level] %ip [%logger] %message
 ```
+
+## ratings
+
+Ratings configuration. `<ratings>` stands for `egf` or `ffg` in the following.
+
+### freeze ratings date
+
+If the following property is given:
+
+```
+ratings.<ratings>.file = ...
+```
+
+then the given ratings file will be used (it must use the Pairgoth ratings json format). If not, the corresponding ratings will be automatically downloaded and stored into `ratings/EGF-yyyymmdd.json` or `ratings/FFG-yyyymmdd.json`.
+
+The typical use case, for a big tournament lasting several days or a congress, is to let Pairgoth download the latest expected ratings, then to add this property to freeze the ratings at a specific date.
+
+### enable or disable ratings
+
+Whether to display the EGF or FFG ratings button in the Add Player popup:
+
+```
+ratings.<ratings>.enable = true | false
+```
+
+Whether to show the ratings player IDs on the registration page:
+
+```
+ratings.<ratings>.show = true | false
+```
+
+For a tournament in France, both are true for `ffg` by default, false otherwise.
