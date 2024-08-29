@@ -480,7 +480,7 @@ sealed class BaseSolver(
         val epsilon = 0.00001
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.main.roundDownScore) floor(score + epsilon)
-        else ceil(score - epsilon)
+        else round(2 * score) / 2
     }
 
     open fun HandicapParams.clamp(input: Int): Int {

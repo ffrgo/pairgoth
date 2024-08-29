@@ -256,3 +256,4 @@ rather than pairing players of the same country.	점 차이를 선호
 rather than pairing players of the same club.	동일 클럽 선수끼리 매칭하는 것보다 3점 차이를 선호
 use MMS rather than rank for handicap	핸디캡에는 랭킹 대신 MMS 사용
 Handicap ceiling:	핸디캡 상한:
+round down NBW/MMS score	라운드 내림 라운드 NBW/MMS

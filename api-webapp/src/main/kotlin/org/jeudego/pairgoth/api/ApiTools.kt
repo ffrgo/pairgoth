@@ -15,6 +15,7 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.round
 
 //  TODO CB avoid code redundancy with solvers
 
@@ -29,7 +30,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         val epsilon = 0.00001
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
-        else ceil(score - epsilon)
+        else round(2 * score) / 2
     }
 
     if (frozen != null) {
@@ -45,7 +46,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
                 val score = roundScore(mmBase +
                         (nbW(pairable) ?: 0.0) +
                         (1..round).map { round ->
-                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
+                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
                         }.sum() * pairing.pairingParams.main.mmsValueAbsent)
                 Pair(
                     if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
@@ -96,7 +97,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     val pairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
     pairables.forEach { player ->
         for (crit in criteria) {
-            player[crit.first] = (crit.second[player.getID()] ?: 0.0).toInt()
+            player[crit.first] = crit.second[player.getID()] ?: 0.0
         }
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }

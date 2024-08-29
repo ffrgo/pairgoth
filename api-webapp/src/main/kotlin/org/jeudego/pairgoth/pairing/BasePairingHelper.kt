@@ -48,7 +48,7 @@ abstract class BasePairingHelper(
     // Decide each pairable group based on the main criterion
     protected val groupsCount get() = 1 + (mainLimits.second - mainLimits.first).toInt()
     private val _groups by lazy {
-        pairables.associate { pairable -> Pair(pairable.id, pairable.main.toInt()) }
+        pairables.associate { pairable -> Pair(pairable.id, (pairable.main * 2).toInt() / 2) }
     }
 
     // place (among sorted pairables)

@@ -14,14 +14,7 @@
 #if($tour.pairing.type == 'MAC_MAHON')
       <div class="inline fields">
         <div class="field">
-          <label>
-            Round
-            <select name="roundDownScore">
-              <option value="true" #if($tour.pairing.main.roundDownScore) selected #end>down</option>
-              <option value="false" #if(!$tour.pairing.main.roundDownScore) selected #end>up</option>
-            </select>
-            NBW/MMS score
-          </label>
+          <label><input type="checkbox" name="roundDownScore" value="true" #if($tour.pairing.main.roundDownScore) checked #end>&nbsp;round down NBW/MMS score</label>
         </div>
       </div>
 #end
