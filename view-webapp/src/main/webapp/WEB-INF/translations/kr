@@ -221,6 +221,10 @@ Secondary parameters	부가 설정
 Geographical parameters	지리적 설정
 Handicap parameters	핸디캡 설정
 deterministic randomness	결정적 무작위성
+Randomness	무작위성
+none	없음
+deterministic	없음
+non-deterministic	비결정론적
 balance white and black	
 Round 	 
 down	내림
