@@ -224,17 +224,17 @@ onLoad(() => {
     let tour = {
       pairing: {
         base: {
-          deterministic: form.val('deterministic'),
-          colorBalanceWeight: form.val('colorBalance') ? 1000000.0 : 0.0 // TODO use client side boolean
+          randomness: form.val('randomness'),
+          colorBalance: form.val('colorBalance')
         },
         main: {
           mmsValueAbsent: form.val('mmsValueAbsent'),
           roundDownScore: form.val('roundDownScore'),
           sosValueAbsentUseBase: form.val('sosValueAbsentUseBase'),
           firstSeedLastRound: form.val('firstSeedLastRound'),
-          firstSeedAddCrit: form.val('firstSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
+          firstSeedAddRating: form.val('firstSeedAddRating'),
           firstSeed: form.val('firstSeed'),
-          secondSeedAddCrit: form.val('secondSeedAddRating') ? 'RATING' : 'NONE', // TODO use client side boolean
+          secondSeedAddRating: form.val('secondSeedAddRating'),
           secondSeed: form.val('secondSeed'),
           upDownCompensate: form.val('upDownCompensate'),
           upDownUpperMode: form.val('upDownUpperMode'),

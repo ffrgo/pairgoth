@@ -2,9 +2,11 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonObject
+import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.ext.OpenGotha
+import org.jeudego.pairgoth.model.BaseCritParams
 import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
@@ -65,7 +67,7 @@ object TournamentHandler: PairgothApiHandler {
     override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
         // CB TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
-        val payload = getObjectPayload(request)
+        val payload = getObjectPayload(request).toMutableJsonObject()
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
         // specific handling for 'excludeTables'
@@ -77,6 +79,46 @@ object TournamentHandler: PairgothApiHandler {
             tournament.tablesExclusion[round - 1] = tablesExclusion
             tournament.dispatchEvent(TournamentUpdated, request, tournament.toJson())
         } else {
+            // translate client-side conventions to actual parameters
+            val base = payload.getObject("pairing")?.getObject("base") as Json.MutableObject?
+            if (base != null) {
+                base.getString("randomness")?.let { randomness ->
+                    when (randomness) {
+                        "none" -> {
+                            base["random"] = 0.0
+                            base["deterministic"] = true
+                        }
+                        "deterministic" -> {
+                            base["random"] = BaseCritParams.MAX_RANDOM
+                            base["deterministic"] = true
+                        }
+                        "non-deterministic" -> {
+                            base["random"] = BaseCritParams.MAX_RANDOM
+                            base["deterministic"] = false
+                        }
+                        else -> badRequest("invalid randomness parameter: $randomness")
+                    }
+                }
+                base.getBoolean("colorBalance")?.let { colorBalance ->
+                    base["colorBalanceWeight"] =
+                        if (colorBalance) BaseCritParams.MAX_COLOR_BALANCE
+                        else 0.0
+                }
+            }
+            val main = payload.getObject("pairing")?.getObject("main") as Json.MutableObject?
+            if (main != null) {
+                main.getBoolean("firstSeedAddRating")?.let { firstSeedAddRating ->
+                    main["firstSeedAddCrit"] =
+                        if (firstSeedAddRating) "RATING"
+                        else "NONE"
+                }
+                main.getBoolean("secondSeedAddRating")?.let { secondSeedAddRating ->
+                    main["secondSeedAddCrit"] =
+                        if (secondSeedAddRating) "RATING"
+                        else "NONE"
+                }
+            }
+            // prepare updated tournament version
             val updated = Tournament.fromJson(payload, tournament)
             // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
             updated.players.putAll(tournament.players)
