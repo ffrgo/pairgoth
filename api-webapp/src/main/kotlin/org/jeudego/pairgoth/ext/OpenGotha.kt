@@ -221,7 +221,7 @@ object OpenGotha {
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="$now">
+            <Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="$now" dataVersion="201">
             <Players>
             ${tournament.pairables.values.map { player ->
                     player as Player
@@ -293,16 +293,16 @@ object OpenGotha {
             <ByePlayer>
             ${
                 (1..tournament.lastRound()).map { round ->
-                    tournament.games(round).values.firstNotNullOfOrNull { g -> 
-                        if (g.black == 0 || g.white == 0) g else null
-                    }?.let {
+                    tournament.games(round).values.filter { g ->
+                        g.black == 0 || g.white == 0
+                    }.map {
                         tournament.pairables[
-                            if (it.black == 0) it.white
-                            else it.black
+                                if (it.black == 0) it.white
+                                else it.black
                         ] as Player
-                    }?.let { p ->
+                    }.map { p ->
                         "<ByePlayer player=\"${p.name.replace(" ", "")}${p.firstname.replace(" ", "")}\" roundNumber=\"${round}\"/>"
-                    }
+                    }.joinToString("\n")
                 }.joinToString("\n")
             }
             </ByePlayer>
