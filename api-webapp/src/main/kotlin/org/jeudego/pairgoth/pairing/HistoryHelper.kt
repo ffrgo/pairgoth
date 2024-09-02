@@ -5,13 +5,8 @@ import org.jeudego.pairgoth.model.Game.Result.*
 
 open class HistoryHelper(
     protected val history: List<List<Game>>,
-    // scoresGetter() returns Pair(absentSosValueForOthers, score) where score is nbw for Swiss, mms for MM, ...
+    // scoresGetter() returns Pair(sos value for missed rounds, score) where score is nbw for Swiss, mms for MM, ...
     scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
-
-    // List of all the pairables ID present in the history
-    val allPairables = history.flatten()
-        .map { game -> listOf(game.white, game.black) }
-        .flatten().distinct()
 
     private val Game.blackScore get() = when (result) {
         BLACK, BOTHWIN -> 1.0
@@ -76,12 +71,12 @@ open class HistoryHelper(
         }
     }
 
-    // Set of all implied players for each round
+    // Set of all implied players for each round (warning: does comprise games with BIP)
     val playersPerRound: List<Set<ID>> by lazy {
         history.map {
             it.fold(mutableSetOf<ID>()) { acc, next ->
-                acc.add(next.white)
-                acc.add(next.black)
+                if(next.white != 0) acc.add(next.white)
+                if (next.black != 0) acc.add(next.black)
                 acc
             }
         }
@@ -106,20 +101,30 @@ open class HistoryHelper(
     // define mms to be a synonym of scores
     val mms by lazy { scores.mapValues { it -> it.value.second } }
 
-    // SOS related functions given a score function
     val sos by lazy {
-        (history.flatten().map { game ->
-            Pair(game.black, scores[game.white]?.second?.let { it - game.handicap } ?: 0.0)
+        val historySos = (history.flatten().map { game ->
+            Pair(
+                game.black,
+                if (game.white == 0) scores[game.black]?.first ?: 0.0
+                else scores[game.white]?.second?.let { it - game.handicap } ?: 0.0
+            )
         } + history.flatten().map { game ->
-            Pair(game.white, scores[game.black]?.second?.let { it + game.handicap } ?: 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
+            Pair(
+                game.white,
+                if (game.black == 0) scores[game.white]?.first ?: 0.0
+                else scores[game.black]?.second?.let { it + game.handicap } ?: 0.0
+            )
+        }).groupingBy {
+            it.first
+        }.fold(0.0) { acc, next ->
             acc + next.second
-        }.mapValues { (id, score) ->
-            // "If the player does not participate in a round, the opponent's score is replaced by the starting score of the player himself."
-            score + playersPerRound.sumOf { players ->
-                if (players.contains(id)) 0.0
-                else scores[id]?.first ?: 0.0
+        }
+
+        scores.mapValues { (id, pair) ->
+            (historySos[id] ?: 0.0) + playersPerRound.sumOf {
+                if (it.contains(id)) 0.0 else pair.first
             }
+
         }
     }
 
@@ -177,23 +182,24 @@ open class HistoryHelper(
     // sosos
     val sosos by lazy {
         val currentRound = history.size
-        (history.flatten().filter { game ->
-            game.white != 0 // Remove games against byePlayer
-        }.map { game ->
+        val historySosos = (history.flatten().map { game ->
             Pair(game.black, sos[game.white] ?: 0.0)
-        } + history.flatten().filter { game ->
-            game.white != 0 // Remove games against byePlayer
-        }.map { game ->
+        } + history.flatten().map { game ->
             Pair(game.white, sos[game.black] ?: 0.0)
-        }).groupingBy { it.first }.fold(0.0) { acc, next ->
+        }).groupingBy {
+            it.first
+        }.fold(0.0) { acc, next ->
             acc + next.second
-        }.mapValues { (id, sosos) ->
-            sosos + playersPerRound.sumOf { players ->
-                if (players.contains(id)) 0.0
-                else (scores[id]?.first ?: 0.0) * currentRound
+        }
+
+        scores.mapValues { (id, pair) ->
+            (historySosos[id] ?: 0.0) + playersPerRound.sumOf {
+                if (it.contains(id)) 0.0 else pair.first * currentRound
             }
+
         }
     }
+
 
     // cumulative score
     val cumScore by lazy {
