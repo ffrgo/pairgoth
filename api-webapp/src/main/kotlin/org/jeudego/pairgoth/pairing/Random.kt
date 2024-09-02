@@ -13,7 +13,8 @@ fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
     var nR = "$name1$name2".mapIndexed { i, c ->
         c.code.toDouble() * (i + 1)
     }.sum() * 1234567 % (max + 1)
-    if (inverse) nR = max - nR
+    // we want the symmetry
+    // if (inverse) nR = max - nR
     return nR
 }
 
