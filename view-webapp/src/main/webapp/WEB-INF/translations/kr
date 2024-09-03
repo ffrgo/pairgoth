@@ -4,7 +4,7 @@
 , the well known pairing system software developed by	의 후속작으로,
 , your Go Pairing Engine!	에 오신 것을 환영합니다!
 , last modified	, 마지막 수정
-1st round seeding	1라운드 매칭
+1st round seeding	1라운드 시드 배정
 : If you prefer convenience, you can simply use the	: 프랑스 바둑 연맹이 제공하는
 : This mode allows you to run	: 이 모드는 로컬 컴퓨터에서
 : This mode is the best suited for big Go events like congresses, it allows to register players, enter results and manage pairing from several workstations at once.	: 이 모드는 큰 바둑 대회인 콩그레스와 같은 행사에 가장 적합합니다. 여러 컴퓨터에서 선수 등록, 결과 입력 및 매칭 관리를 할 수 있습니다.
@@ -14,12 +14,12 @@ Advanced parameters	고급 설정
 At its core,	핵심적으로,
 Browse	파일 선택
 Byo-yomi periods	초읽기 횟수
-Byo-yomi stones	주기당 돌 수
+Byo-yomi stones	착수 횟수
 Byo-yomi time	초읽기 시간
-Canadian byo-yomi	캐나다식
+Canadian byo-yomi	캐나다식 초읽기
 Cancel	취소
 Change	변경
-Chinese rules	중국식
+Chinese rules	중국 규칙
 Choose format	형식 선택
 Clone	복제
 Clone example tournament	예제 대회 복제
@@ -27,19 +27,19 @@ Close	닫기
 Club	소속
 Compile from the sources	소스에서 컴파일하기
 Country	국적
-Create	만들기
+Create	생성
 Crit	기준
 Ctr	국적
 Dates	날짜
 Delete	삭제
-Director	감독
+Director	진행자
 Download	 
 Download _BLANK_WINDOWS	Java 포함 Windows용
 Download the standalone web interface module which suits your need, then follow	독립 실행형 웹 인터페이스 모듈을 다운로드하여, 
 Drop changes?	변경 사항을 폐기하시겠습니까?
 Edit	편집
 Encoding	인코딩
-Enter the magic word	매직 워드 입력
+Enter the magic word	마법의 단어 입력
 Example tournament	예제 대회
 Export	내보내기
 Export tournament	대회 내보내기
@@ -52,14 +52,14 @@ Fischer timing	피셔 방식
 French rules	프랑스식
 Given name	이름
 Goban	바둑판
-Hd correction	핸디캡
-No hd threshold	핸디캡 미적용 기준
+Hd correction	핸디캡 보정
+No hd threshold	핸디캡 임계값 없음
 How to use	 
 ? _BLANK_HOWTOUSE	사용 방법은 ?
 Import	가져오기
 Import tournament	대회 가져오기
 Increment	시간 증가분
-Individual players	1인 선수
+Individual players	개인 선수
 Information	정보
 Invalid tournament id	유효하지 않은 대회 ID입니다
 Japanese rules	일본식
@@ -82,7 +82,7 @@ Name	이름
 Nbw	승
 New Tournament	새 대회
 New tournament	새 대회
-Next rounds seeding	다음 라운드 순워
+Next rounds seeding	다음 라운드 시드 배정
 OpenGotha / Pairgoth file	OpenGotha / Pairgoth 파일
 Pair	매칭하기
 Pair-go tournament	패어바둑 대회
@@ -101,7 +101,7 @@ Registration	등록
 Rengo with 2 players teams	2인 팀
 Rengo with 3 players team	3인 팀
 Renumber	번호 다시 매기기
-Required field	필수 필드
+Required field	필수 항목
 Reset	재설정
 Results	결과
 Results for round	라운드 결과
@@ -109,16 +109,16 @@ Round-robin	라운드 로빈
 Rounds	라운드
 Rules	규칙
 Search...	검색…
-Short name	단축 이름
+Short name	단축명
 Since the project is still in beta, the sources are only available to FFG actors. If that's your case, you can access the sources here:	
-Split and fold	스플릿 앤 폴드
-Split and random	스플릿 앤 랜덤
+Split and fold	분할 및 접기
+Split and random	분할 및 무작위
 Split and slip	스플릿 앤 슬립
-Standard byo-yomi	초일기
+Standard byo-yomi	초읽기
 Standings	순위
 Standings after round	라운드 후 순위
 Stay in the browser	브라우저에서 사용하기
-Sudden death	절대 방식
+Sudden death	서든 데스
 Swiss	스위스
 Team of 2 individual players	2인 팀
 Team of 3 individual players	3인 팀
@@ -126,7 +126,7 @@ Team of 4 individual players	4인 팀
 Team of 5 individual players	5인 팀
 That's the best option if you feel more comfortable when running locally or whenever you want to be able to do the pairing without internet. Pairgoth will launch a local web server on port 8080 to which you can connect using a browser.	로컬에서 실행하는 것이 더 편하거나 인터넷 없이 매칭을 하고 싶을 때 가장 좋은 옵션입니다. Pairgoth는 포트 8080에서 로컬 웹 서버를 실행하며, 이를 브라우저를 통해 연결할 수 있습니다.
 Time system	제한 시간 방식
-Tournament director	대회 감독
+Tournament director	대회 담당자
 Tournament name	대회 이름
 Tournament type	대회 유형
 Unpair	매칭 취소
@@ -145,11 +145,11 @@ Black	흑
 club	소속
 country	국적
 d	단
-end date	종료 날짜
+end date	종료일
 first name	이름
 from	부터
 games )	판
-h	h
+h	시간
 in a way that best suits your needs. Here are your options:	사용할 수 있게 하고자 합니다. 다음은 선택할 수 있는 옵션들입니다:
 instance graciously hosted by the French Go Federation.	인스턴스를 편하게 사용하실 수 있습니다.
 is a Go tournament pairing engine designed to make your tournament experience effortless.	는 여러분의 바둑 대회 경험을 손쉽게 만들어 주는 바둑 대회 매칭 엔진입니다.
@@ -177,7 +177,7 @@ start date	시작 날짜
 table	테이블
 the configuration guide	구성 가이드를 따라하세요
 to	까지
-tournament location	대회 워치
+tournament location	대회 위치
 unpairable players	매칭 불가능한 선수
 unpairable,	매칭 불가능,
 supports the	는 접바둑이 없는 챔피언십일 경우에 잘 맞는
@@ -203,18 +203,18 @@ on our discord channel	디스코드
 . _BLANK_CONTACT	채널을 통해 문의해 주시기 바랍니다.
 standalone installer for Windows with Java included	독립 실행형 설치 프로그램 다운로드
 (please ensure that your Windows user has administrative rights).	(Windows 사용자가 관리자 권한을 가지고 있는지 확인하세요).
-AGA rules	AGA
-initialized from rating	레이팅 기준으로 초기화됨
+AGA rules	미국바둑협회 규칙
+initialized from rating	레이팅 기준으로 초기화
 You can join the	 
 Pairgoth mailing list	Pairgoth 메일링 리스트
 to be notified about updates and to discuss the software.	에 등록하여 업데이트 알림을 받고, 소프트웨어에 대해 논의하세요.
 (give us a star if you have a github account!)	(Github 계정이 있으시면 별을 눌러 주세요!).
 Clear results	결과 지우기
 choisir un fichier	파일 선택
-aucun fichier choisi	선택된 파일 않음
+aucun fichier choisi	선택된 파일 없음
 Round	라운드
 Participants	참가자
-Paired	매칭된
+Paired	매칭됨
 Base parameters	기본 설정
 Main parameters	주요 설정
 Secondary parameters	부가 설정
@@ -226,17 +226,17 @@ Round
 down	내림
 up	올림
 NBW/MMS score	라운드 NBW/MMS
-Special Mac Mahon handling for players absent from a round	라운드에 참가하지 않은 선수들을 위한 특별 맥마흔 처리
-MMS score for non-played rounds:	참가되지 않은 라운드의 MMS :
-SOS for non-played rounds: base MMS 	참가되지 않은 라운드의 SOS: 선수의
+Special Mac Mahon handling for players absent from a round	라운드에 불참한 선수들에게 특별 맥마흔 처리
+MMS score for non-played rounds:	불참한 라운드의 MMS :
+SOS for non-played rounds: base MMS 	불참한 라운드의 SOS: 선수의 기본 MMS
 of player	 
-base MMS	MMS 기본
-base MMS + rounds/2	MMS 기본 + 라운드/2
-Seeding methods inside groups of same score	동일 점수 그룹 내 매칭 방법
+base MMS	기본 MMS
+base MMS + rounds/2	기본 MMS + 라운드/2
+Seeding methods inside groups of same score	동일 점수 그룹 내 시드 배정 방법
 Apply first seeding method up to round	
 _BLANK_SEEDING	라운드까지 첫 번째 매칭 방법 적용
-First seeding method	첫 번째 매칭 방법
-Second seeding method	두 번째 매칭 방법
+First seeding method	첫 번째 시드 배정 방법
+Second seeding method	두 번째 시드 배정 방법
 add a sorting on rating	레이팅 정렬 추가
 Draw-up / draw-down between groups of same score	동일 점수 그룹 간의 상위/하위 매칭
 try to compensate a previous draw-up/draw-down by a draw-down/draw-up, then	이전의 상위/하위 매칭을 하위/상위 매칭으로 보상 시도한 뒤, 
@@ -249,7 +249,7 @@ of the lower group	위 선수를 매칭
 Do not apply secondary criteria for:	부가 기준을 적용하지 않음:
 players with a MMS equal to or stronger than    	MMS가
 _BLANK_AFTER_RANK_THRESHOLD_    	이상인 선수
-players who won at least half of their games	둔 판의 절반 이상을 이긴 선수
+players who won at least half of their games	절반 이상을 이긴 선수
 players above the Mac Mahon bar	맥마흔 바 이상인 선수
 Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
 rather than pairing players of the same country.	점 차이를 선호
