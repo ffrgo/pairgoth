@@ -41,6 +41,7 @@ Edit	편집
 Encoding	인코딩
 Enter the magic word	마법의 단어 입력
 Example tournament	예제 대회
+Exclude table numbers:	테이블 번호 제외:
 Export	내보내기
 Export tournament	대회 내보내기
 Family name	성
@@ -52,6 +53,7 @@ Fischer timing	피셔 방식
 French rules	프랑스식
 Given name	이름
 Goban	바둑판
+Handicap	핸디캡
 Hd correction	핸디캡 보정
 No hd threshold	핸디캡 임계값 없음
 How to use	 
@@ -119,6 +121,8 @@ Standings	순위
 Standings after round	라운드 후 순위
 Stay in the browser	브라우저에서 사용하기
 Sudden death	서든 데스
+Surround winner's name or ½-½	승자의 이름 또는 0.5 - 0.5을 둘러싸기
+Signature:	서명:
 Swiss	스위스
 Team of 2 individual players	2인 팀
 Team of 3 individual players	3인 팀
@@ -148,7 +152,7 @@ d	단
 end date	종료일
 first name	이름
 from	부터
-games )	판
+games )	판 )
 h	시간
 in a way that best suits your needs. Here are your options:	사용할 수 있게 하고자 합니다. 다음은 선택할 수 있는 옵션들입니다:
 instance graciously hosted by the French Go Federation.	인스턴스를 편하게 사용하실 수 있습니다.
@@ -175,6 +179,7 @@ standalone, web interface	독립 실행형, 웹 인터페이스 다운로드
 standalone, web interface, via docker	독립 실행형, 웹 인터페이스 다운로드, Docker를 통한 실행
 start date	시작 날짜
 table	테이블
+Table	테이블
 the configuration guide	구성 가이드를 따라하세요
 to	까지
 tournament location	대회 위치
@@ -194,7 +199,7 @@ Log in using	사용하여 로그인
 (reserved to FFG actors)	(FFG 관계자에게만 허용)
 Log in using an email	이메일로 로그인
 password	비밀번호
-Warning: publishing partial results at round	
+Warning: publishing partial results at round	경고: 라운드에서 부분 결과를 게시합니다
 out of	중에서
 For any further help or question, contact us	추가적인 도움이 필요하시거나 질문이 있으시면
 by email	이메일
@@ -214,6 +219,7 @@ choisir un fichier	파일 선택
 aucun fichier choisi	선택된 파일 없음
 Round	라운드
 Participants	참가자
+participants,	참가자,
 Paired	매칭됨
 Base parameters	기본 설정
 Main parameters	주요 설정
@@ -221,14 +227,18 @@ Secondary parameters	부가 설정
 Geographical parameters	지리적 설정
 Handicap parameters	핸디캡 설정
 deterministic randomness	결정적 무작위성
-balance white and black	
+Randomness:	무작위성
+none	없음
+deterministic	결정적
+non-deterministic	비결정론적
+balance white and black	점 차이를 선호
 Round 	 
 down	내림
 up	올림
 NBW/MMS score	라운드 NBW/MMS
 Special Mac Mahon handling for players absent from a round	라운드에 불참한 선수들에게 특별 맥마흔 처리
-MMS score for non-played rounds:	불참한 라운드의 MMS :
-SOS for non-played rounds: base MMS 	불참한 라운드의 SOS: 선수의 기본 MMS
+MMS score for non-played rounds:	불참한 라운드의 MMS:
+SOS for non-played rounds:	불참한 라운드의 SOS:
 of player	 
 base MMS	기본 MMS
 base MMS + rounds/2	기본 MMS + 라운드/2
@@ -247,12 +257,14 @@ bottom	하
 of the upper group with a player in the	위 선수와 하위 그룹의
 of the lower group	위 선수를 매칭
 Do not apply secondary criteria for:	부가 기준을 적용하지 않음:
-players with a MMS equal to or stronger than    	MMS가
-_BLANK_AFTER_RANK_THRESHOLD_    	이상인 선수
+players with a MMS equal to or stronger than	MMS가
+_BLANK_AFTER_RANK_THRESHOLD_	이상인 선수
 players who won at least half of their games	절반 이상을 이긴 선수
 players above the Mac Mahon bar	맥마흔 바 이상인 선수
-Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
+_BLANK_COUNTRY_PREFIX Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
+_BLANK_CLUB_PREFIX Prefer a score gap of	동일 클럽 선수끼리 매칭하는 것보다
 rather than pairing players of the same country.	점 차이를 선호
-rather than pairing players of the same club.	동일 클럽 선수끼리 매칭하는 것보다 3점 차이를 선호
+rather than pairing players of the same club.	점 차이를 선호
 use MMS rather than rank for handicap	핸디캡에는 랭킹 대신 MMS 사용
 Handicap ceiling:	핸디캡 상한:
+round down NBW/MMS score	라운드 내림 라운드 NBW/MMS
