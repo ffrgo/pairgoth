@@ -87,6 +87,8 @@
     flex-flow: row wrap;
     justify-content: space-between;
     margin: 0 1em;
+    align-items: baseline;
+    gap: 0.5em;
   }
 
   #players-list {
@@ -377,7 +379,7 @@
     gap: 1em;
     max-width: max(10em, 20vw);
   }
-  #unpairables {
+  #unpairables, #previous_games {
     display: flex;
     flex-flow: column nowrap;
     min-height: 10vh;
@@ -402,6 +404,18 @@
   }
 
   .result-sheets {
+    margin-top: 0.2em;
+  }
+
+  .bottom-pairing-actions {
+    margin-top: 0.2em;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 0.2em;
+  }
+
+  .tables-exclusion {
     margin-top: 0.2em;
   }
 
@@ -470,6 +484,23 @@
   }
   #standings-container {
     max-width: 95vw;
+  }
+  
+  #standings-table thead tr th {
+    z-index: 10;
+  }
+
+  td.game-result {
+    position: relative;
+    .title-popup {
+      position: absolute;
+      top: 90%;
+      background: silver;
+      padding: 4px;
+      left: 10%;
+      white-space: nowrap;
+      z-index: 2;
+    }
   }
 
   .ui.steps {

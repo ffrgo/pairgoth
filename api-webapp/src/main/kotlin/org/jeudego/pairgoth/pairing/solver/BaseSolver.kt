@@ -480,14 +480,15 @@ sealed class BaseSolver(
         val epsilon = 0.00001
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.main.roundDownScore) floor(score + epsilon)
-        else ceil(score - epsilon)
+        else round(2 * score) / 2
     }
 
     open fun HandicapParams.clamp(input: Int): Int {
         var hd = input
         // TODO - validate that "correction" is >= 0 (or modify the UI and the following code to handle the <0 case)
         if (hd >= correction) hd -= correction
-        else if (hd < 0) hd = max(hd + correction, 0)
+        // TODO - Following line seems buggy... Get rid of it! What as the purpose?!
+        // else if (hd < 0) hd = max(hd + correction, 0)
         else hd = 0
         // Clamp handicap with ceiling
         hd = min(hd, ceiling)

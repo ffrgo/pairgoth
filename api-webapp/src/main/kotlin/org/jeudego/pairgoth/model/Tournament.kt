@@ -6,12 +6,12 @@ import com.republicate.kson.toJsonArray
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
-import org.jeudego.pairgoth.pairing.solver.SwissSolver
+import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
 import java.util.*
+import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -30,7 +30,8 @@ sealed class Tournament <P: Pairable>(
     val pairing: Pairing,
     val rules: Rules = Rules.FRENCH,
     val gobanSize: Int = 19,
-    val komi: Double = 7.5
+    val komi: Double = 7.5,
+    val tablesExclusion: MutableList<String> = mutableListOf()
 ) {
     companion object {}
     enum class Type(val playersNumber: Int, val individual: Boolean = true) {
@@ -50,6 +51,9 @@ sealed class Tournament <P: Pairable>(
     // pairables per id
     protected val _pairables = mutableMapOf<ID, P>()
     val pairables: Map<ID, Pairable> get() = _pairables
+
+    // frozen standings
+    var frozen: Json.Array? = null
 
     // pairing
     fun pair(round: Int, pairables: List<Pairable>): List<Game> {
@@ -113,11 +117,17 @@ sealed class Tournament <P: Pairable>(
         }
     }
 
-    fun usedTables(round: Int): BitSet =
-        games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
+    fun usedTables(round: Int): BitSet {
+        val assigned = games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
             acc.set(table)
             acc
         }
+        val excluded = excludedTables(round)
+        for (table in excluded) {
+            assigned.set(table)
+        }
+        return assigned
+    }
 
     private fun defaultGameOrderBy(game: Game): Int {
         val whiteRank = pairables[game.white]?.rating ?: Int.MIN_VALUE
@@ -128,9 +138,19 @@ sealed class Tournament <P: Pairable>(
     fun renumberTables(round: Int, pivot: Game? = null, orderBY: (Game) -> Int = ::defaultGameOrderBy): Boolean {
         var changed = false
         var nextTable = 1
-        games(round).values.filter{ game -> pivot?.let { pivot.id != game.id } ?: true }.sortedBy(orderBY).forEach { game ->
+        val excluded = excludedTables(round)
+        val forcedTablesGames = games(round).values.filter { game -> game.forcedTable && (pivot == null || game != pivot && game.table != pivot.table) }
+        val forcedTables = forcedTablesGames.map { game -> game.table }.toSet()
+        val excludedAndForced = excluded union forcedTables
+        games(round).values
+            .filter { game -> pivot?.let { pivot.id != game.id } ?: true }
+            .filter { game -> !forcedTablesGames.contains(game) }
+            .sortedBy(orderBY)
+            .forEach { game ->
+            while (excludedAndForced.contains(nextTable)) ++nextTable
             if (pivot != null && nextTable == pivot.table) {
                 ++nextTable
+                while (excludedAndForced.contains(nextTable)) ++nextTable
             }
             if (game.table != 0) {
                 changed = changed || game.table != nextTable
@@ -151,6 +171,22 @@ sealed class Tournament <P: Pairable>(
             "ready" to (games.getOrNull(index)?.values?.count { it.result != Game.Result.UNKNOWN } ?: 0)
         )
     }.toJsonArray()
+
+    fun excludedTables(round: Int): Set<Int> {
+        if (round > tablesExclusion.size) return emptySet()
+        val excluded = mutableSetOf<Int>()
+        val parser = Regex("(\\d+)(?:-(\\d+))?")
+        parser.findAll(tablesExclusion[round - 1]).forEach { match ->
+            val left = match.groupValues[1].toInt()
+            val right = match.groupValues[2].let { if (it.isEmpty()) left else it.toInt() }
+            var t = left
+            do {
+                excluded.add(t)
+                ++t
+            } while (t <= right)
+        }
+        return excluded
+    }
 }
 
 // standard tournament of individuals
@@ -170,8 +206,9 @@ class StandardTournament(
     pairing: Pairing,
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
-    komi: Double = 7.5
-): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+    komi: Double = 7.5,
+    tablesExclusion: MutableList<String> = mutableListOf()
+): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
     override val players get() = _pairables
 }
 
@@ -192,8 +229,9 @@ class TeamTournament(
     pairing: Pairing,
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
-    komi: Double = 7.5
-): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi) {
+    komi: Double = 7.5,
+    tablesExclusion: MutableList<String> = mutableListOf()
+): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
     companion object {
         private val epsilon = 0.0001
     }
@@ -267,7 +305,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
             )
         else
             TeamTournament(
@@ -286,7 +325,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing")
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
             )
     json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
@@ -298,7 +338,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             tournament.teams[team.getID("id")!!] = tournament.teamFromJson(team)
         }
     }
-    (json["games"] as Json.Array?)?.forEachIndexed { i, arr ->
+    json.getArray("games")?.forEachIndexed { i, arr ->
         val round = i + 1
         val tournamentGames = tournament.games(round)
         val games = arr as Json.Array
@@ -306,6 +346,9 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             val game = obj as Json.Object
             tournamentGames[game.getID("id")!!] = Game.fromJson(game)
         }
+    }
+    json.getArray("frozen")?.also {
+        tournament.frozen = it
     }
     return tournament
 }
@@ -327,7 +370,14 @@ fun Tournament<*>.toJson() = Json.MutableObject(
     "timeSystem" to timeSystem.toJson(),
     "rounds" to rounds,
     "pairing" to pairing.toJson()
-)
+).also { tour ->
+    if (tablesExclusion.isNotEmpty()) {
+        tour["tablesExclusion"] = tablesExclusion.toJsonArray()
+    }
+    if (frozen != null) {
+        tour["frozen"] = frozen
+    }
+}
 
 fun Tournament<*>.toFullJson(): Json.Object {
     val json = toJson()
@@ -336,5 +386,11 @@ fun Tournament<*>.toFullJson(): Json.Object {
         json["teams"] = Json.Array(teams.values.map { it.toJson() })
     }
     json["games"] = Json.Array((1..lastRound()).mapTo(Json.MutableArray()) { round -> games(round).values.mapTo(Json.MutableArray()) { it.toJson() } });
+    if (tablesExclusion.isNotEmpty()) {
+        json["tablesExclusion"] = tablesExclusion.toJsonArray()
+    }
+    if (frozen != null) {
+        json["frozen"] = frozen
+    }
     return json
 }

@@ -194,6 +194,12 @@ function downloadFile(blob, filename) {
   document.body.removeChild(link);
 }
 
+function isTouchDevice() {
+  return (('ontouchstart' in window) ||
+    (navigator.maxTouchPoints > 0) ||
+    (navigator.msMaxTouchPoints > 0));
+}
+
 onLoad(() => {
   $('button.close').on('click', e => {
     close_modal();
@@ -342,4 +348,28 @@ onLoad(() => {
     let dialog = e.target.closest('.popup');
     if (!dialog) close_modal();
   });
+
+  if (isTouchDevice()) {
+    $("[title]").on('click', e => {
+      let item = e.target.closest('[title]');
+      let title = item.getAttribute('title');
+      let popup = item.find('.title-popup')
+      if (popup.length === 0) {
+        item.insertAdjacentHTML('beforeend', `<span class="title-popup">${title}</span>`);
+      } else {
+        item.removeChild(popup[0]);
+      }
+    });
+  }
 });
+
+// Element.clearChildren method
+if( typeof Element.prototype.clearChildren === 'undefined' ) {
+  Object.defineProperty(Element.prototype, 'clearChildren', {
+    configurable: true,
+    enumerable: false,
+    value: function() {
+      while(this.firstChild) this.removeChild(this.lastChild);
+    }
+  });
+}

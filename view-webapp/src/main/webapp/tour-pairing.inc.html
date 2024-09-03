@@ -22,6 +22,14 @@
       <button class="ui floating choose-round next-round button">&raquo;</button>
     </div>
     <div class="pairing-stats nobreak">( $pairables.size() pairable, $games.size() games )</div>
+    <div class="tables-exclusion">
+#if($tour.tablesExclusion && $round <= $tour.tablesExclusion.size())
+  #set($tablesExclusion = $!tour.tablesExclusion[$round - 1])
+#else
+  #set($tablesExclusion = '')
+#end
+      Exclude table numbers: <input type="text" id="exclude-tables" name="exclude-tables" placeholder="ex: 1-34, 38, 45-77" data-orig="$tablesExclusion" value="$tablesExclusion"/>
+    </div>
     <div id="pairing-lists">
       <div id="pairing-left">
         <div id="pairables" class="multi-select" title="pairable players">
@@ -35,6 +43,9 @@
   #set($part = $pmap[$p])
           <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>
 #end
+        </div>
+        <div id="previous_games" class="hidden multi-select">
+
         </div>
       </div>
       <div id="pairing-right">
@@ -87,7 +98,7 @@
     #set($white = $pmap[$game.w])
     #set($black = $pmap[$game.b])
       <tr>
-        <td>${game.t}</td>
+        <td class="t" data-table="${game.t}">${game.t}</td>
         <td class="left">#if($white)${white.name} ${white.firstname} (#rank($white.rank), $white.country $white.club)#{else}BIP#end</td>
         <td class="left">#if($black)${black.name} ${black.firstname} (#rank($black.rank), $black.country $black.club)#{else}BIP#end</td>
         <td>${game.h}</td>
@@ -103,6 +114,7 @@
   <div class="popup-body">
     <form id="pairing-form" class="ui form edit">
       <input type="hidden" name="id"/>
+      <input type="hidden" name="prev-table"/>
       <div class="popup-content">
         <div class="inline fields">
           <div class="field">
@@ -176,3 +188,8 @@
     </form>
   </div>
 </div>
+
+## For dynamic texts to be translated, they must be somewhere in the html source.
+## TODO - gather all "text only" nodes like this somewhere
+<div id="previous_games_prefix" class="hidden">Games of </div>
+<div id="previous_games_postfix" class="hidden"></div>

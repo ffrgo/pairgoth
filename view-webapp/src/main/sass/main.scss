@@ -281,8 +281,13 @@
     vertical-align: baseline;
   }
 
-  .ui.striped.table>tbody>tr:nth-child(2n),.ui.striped.table>tr:nth-child(2n) {
-    background-color: rgba(0,0,50,.1)
+  .ui.striped.table > tbody > tr:nth-child(2n), .ui.striped.table > tr:nth-child(2n) {
+    background-color: inherit;
+    //background-color: rgba(0,0,50,.1)
+  }
+
+  .ui.striped.table > tbody > tr:nth-child(2n of :not(.filtered)), .ui.striped.table > tr:nth-child(2n of :not(.filtered)) {
+    background-color: rgba(0, 0, 50, 0.1);
   }
 
   .form-actions {
@@ -303,7 +308,7 @@
   }
 
   .hidden {
-    display: none;
+    display: none !important;
   }
 
   .roundbox {
@@ -518,6 +523,21 @@
     cursor: pointer;
   }
 
+  @media screen {
+    #players-list {
+      font-size: smaller;
+    }
+    .multi-select .listitem {
+      font-size: smaller;
+    }
+    #results-list {
+      font-size: smaller;
+    }
+    #standings-container {
+      font-size: smaller;
+    }
+  }
+
   @media print {
 
     body {
@@ -545,7 +565,8 @@
       margin-top: 0.1em !important;
     }
 
-    #header, #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview {
+    /* TODO - plenty of those elements could just use the .noprint class */
+    #header, #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview, .tables-exclusion, .button, .noprint {
       display: none !important;
     }
 
@@ -675,9 +696,10 @@
       display: none;
     }
 
-    #players-list tr > :first-child {
-      display: none;
-    }
+    /* should final/preliminary column be printed? */
+    /* #players-list tr > :first-child {           */
+    /*   display: none;                            */
+    /* }                                           */
 
     #players-list #players .participation .ui.label {
       background: none;
@@ -725,6 +747,9 @@
     }
     #standings-table {
       font-size: 0.70rem;
+    }
+    .title-popup {
+      display: none;
     }
   }
 

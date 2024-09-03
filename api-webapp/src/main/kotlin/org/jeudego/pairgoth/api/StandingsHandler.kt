@@ -4,76 +4,35 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.Criterion.*
-import org.jeudego.pairgoth.model.Game.Result.*
 import org.jeudego.pairgoth.model.ID
-import org.jeudego.pairgoth.model.MacMahon
-import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.adjustedTime
 import org.jeudego.pairgoth.model.displayRank
-import org.jeudego.pairgoth.model.getID
-import org.jeudego.pairgoth.model.historyBefore
-import org.jeudego.pairgoth.pairing.HistoryHelper
-import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import java.io.PrintWriter
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
-import kotlin.math.max
-import kotlin.math.min
 import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
+import org.jeudego.pairgoth.model.toJson
+import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.WebappManager
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
+import java.text.Normalizer
+import java.util.*
+import kotlin.collections.ArrayList
 
 object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
-        val round = getSubSelector(request)?.toIntOrNull() ?: ApiHandler.badRequest("invalid round number")
+        val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
+        val includePreliminary = request.getParameter("include_preliminary")?.let { it.toBoolean() } ?: false
 
-        val sortedPairables = tournament.getSortedPairables(round)
-        val sortedMap = sortedPairables.associateBy {
-            it.getID()!!
-        }
+        val sortedPairables = tournament.getSortedPairables(round, includePreliminary)
+        tournament.populateFrozenStandings(sortedPairables, round)
 
-        for (r in 1..round) {
-            tournament.games(r).values.forEach { game ->
-                val white = if (game.white != 0) sortedMap[game.white] else null
-                val black = if (game.black != 0) sortedMap[game.black] else null
-                val whiteNum = white?.getInt("num") ?: 0
-                val blackNum = black?.getInt("num") ?: 0
-                val whiteColor = if (black == null) "" else "w"
-                val blackColor = if (white == null) "" else "b"
-                val handicap = if (game.handicap == 0) "" else "${game.handicap}"
-                assert(white != null || black != null)
-                if (white != null) {
-                    val mark =  when (game.result) {
-                        UNKNOWN -> "?"
-                        BLACK, BOTHLOOSE -> "-"
-                        WHITE, BOTHWIN -> "+"
-                        JIGO, CANCELLED -> "="
-                    }
-                    val results = white.getArray("results") as Json.MutableArray
-                    results[r - 1] =
-                        if (blackNum == 0) "0$mark"
-                        else "$blackNum$mark/$whiteColor$handicap"
-                }
-                if (black != null) {
-                    val mark =  when (game.result) {
-                        UNKNOWN -> "?"
-                        BLACK, BOTHWIN -> "+"
-                        WHITE, BOTHLOOSE -> "-"
-                        JIGO, CANCELLED -> "="
-                    }
-                    val results = black.getArray("results") as Json.MutableArray
-                    results[r - 1] =
-                        if (whiteNum == 0) "0$mark"
-                        else "$whiteNum$mark/$blackColor$handicap"
-                }
-            }
-        }
         val acceptHeader = request.getHeader("Accept") as String?
         val accept = acceptHeader?.substringBefore(";")
         val acceptEncoding = acceptHeader?.substringAfter(";charset=", "utf-8") ?: "utf-8"
@@ -91,6 +50,9 @@ object StandingsHandler: PairgothApiHandler {
                 response.contentType = "text/plain;charset=${encoding}"
                 val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
                 if (!neededCriteria.contains(NBW)) neededCriteria.add(NBW)
+                if (neededCriteria.first() == SCOREX) {
+                    neededCriteria.add(1, MMS)
+                }
                 exportToEGFFormat(tournament, sortedPairables, neededCriteria, writer)
                 writer.flush()
                 return null
@@ -161,13 +123,18 @@ ${
         "${
             player.getString("num")!!.padStart(4, ' ')
         } ${
-            "${player.getString("name")} ${player.getString("firstname") ?: ""}".padEnd(30, ' ').take(30)
+            "${
+                player.getString("name")?.toSnake(true)
+                
+            } ${
+                player.getString("firstname")?.toSnake() ?: ""
+            }".padEnd(30, ' ').take(30)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
             player.getString("country")?.uppercase() ?: ""
         } ${
-            (player.getString("club") ?: "").padStart(4).take(4)
+            (player.getString("club") ?: "").toSnake().padStart(4).take(4)
         } ${
             criteria.joinToString(" ") { numFormat.format(player.getDouble(it.name)!!).let { if (it.contains('.')) it else "$it  " }.padStart(7, ' ') }
         }  ${
@@ -179,6 +146,24 @@ ${
 }
 """
         writer.println(ret)
+    }
+
+    private fun String.toSnake(upper: Boolean = false): String {
+        val sanitized = sanitizeISO()
+        val parts = sanitized.trim().split(Regex("(?:\\s|\\xA0)+"))
+        val snake = parts.joinToString("_") { part ->
+            if (upper) part.uppercase(Locale.ROOT)
+            else part.capitalize()
+        }
+        return snake
+    }
+
+    private fun String.sanitizeISO(): String {
+        val ret = Normalizer.normalize(this, Normalizer.Form.NFD)
+        return ret.replace(Regex("\\p{M}"), "")
+            // some non accented letters give problems in ISO, there may be other
+            .replace('Ð', 'D')
+            .replace('ø', 'o')
     }
 
     private fun exportToFFGFormat(tournament: Tournament<*>, lines: List<Json.Object>, writer: PrintWriter) {
@@ -209,14 +194,14 @@ ${
         "${
             player.getString("num")!!.padStart(4, ' ')
         } ${
-            "${player.getString("name")} ${player.getString("firstname") ?: ""}".padEnd(24, ' ').take(24)
+            "${player.getString("name")?.toSnake(true)} ${player.getString("firstname")?.toSnake() ?: ""}".padEnd(24, ' ').take(24)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
             player.getString("ffg") ?: "       "
         } ${
             if (player.getString("country") == "FR")
-                (player.getString("club") ?: "").padEnd(4).take(4)
+                (player.getString("club") ?: "").toSnake().padEnd(4).take(4)
             else
                 (player.getString("country") ?: "").padEnd(4).take(4)
         } ${
@@ -262,6 +247,14 @@ ${
                 tournament.pairing.placementParams.criteria.joinToString(";") { line.getString(it.name) ?: "" }
             }")
         }
+    }
+
+    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
+        val tournament = getTournament(request)
+        val sortedPairables = tournament.getSortedPairables(tournament.rounds)
+        tournament.frozen = sortedPairables.toJsonArray()
+        tournament.dispatchEvent(Event.TournamentUpdated, request, tournament.toJson())
+        return Json.Object("status" to "ok")
     }
 
     private val numFormat = DecimalFormat("###0.#")

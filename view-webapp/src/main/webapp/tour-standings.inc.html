@@ -45,6 +45,10 @@
     </script>
   #set($standings = [])
 #end
+#set($smap = {})
+#foreach($part in $standings)
+  #set($smap[$part.num] = $part)
+#end
     <table id="standings-table" class="ui striped table">
       <thead>
         <th>Num</th>
@@ -56,31 +60,45 @@
 #foreach($r in [1..$round])
         <th>R$r</th>
 #end
+#set($criteres = [])
 #foreach($crit in $tour.pairing.placement)
+   #set($junk = $criteres.add($crit))
+#end
+#if($criteres[0] == 'SCOREX')
+  #set($junk = $criteres.add(1, 'MMS'))
+#end
+#foreach($crit in $criteres)
         <th>$crit</th>
 #end
       </thead>
       <tbody>
 #foreach($part in $standings)
-        <tr>
+        <tr data-id="$part.id">
           <td>$part.num</td>
           <td>$part.place</td>
-          <td>$part.name#if($part.firstname) $part.firstname#end</td>
+          <td>$esc.html($part.name)#if($part.firstname) $esc.html($part.firstname)#end</td>
           <td data-sort="$part.rank">#rank($part.rank)</td>
           <td>#if($part.country)$part.country#end</td>
           <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
   #foreach($r in [0..$mx])
     #set($rst = $part.results[$r])
+    #set($opp_num = $math.toLong($rst))
+    #if($opp_num)
+      #set($opponent = $!smap[$opp_num])
+    #else
+      #set($opponent = false)
+    #end
     #if($rst.contains('+'))
       #set($rst = "<b>$rst</b>")
     #elseif($rst.contains('-'))
       #set($rst = "<i>$rst</i>")
     #end
-          <td class="nobreak">$rst</td>
+          <td class="nobreak game-result" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
   #end
-  #foreach($crit in $tour.pairing.placement)
-          <td>$number.format('0.#', $part[$crit])</td>
+  #foreach($crit in $criteres)
+    #set($value = "$number.format('0.#', $part[$crit])")
+          <td data-sort="$value">$value.replace('.5', '½')</td>
   #end
         </tr>
 #end
@@ -88,6 +106,12 @@
     </table>
   </div>
   <div class="right form-actions">
+#if(!$tour.frozen && $round == $tour.rounds)
+    <button id="freeze" class="ui orange floating right labeled icon button">
+      <i class="snowflake plane outline icon"></i>
+      Freeze
+    </button>
+#end
     <button id="publish" class="ui yellow floating right labeled icon button">
       <i class="paper plane outline icon"></i>
       Publish

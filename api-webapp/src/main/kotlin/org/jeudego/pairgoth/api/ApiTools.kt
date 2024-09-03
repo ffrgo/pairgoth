@@ -2,10 +2,9 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
-import org.jeudego.pairgoth.model.DatabaseId
+import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.model.Pairable.Companion.MIN_RANK
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
@@ -16,11 +15,11 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
+import kotlin.math.round
 
 //  TODO CB avoid code redundancy with solvers
 
-fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
+fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
     fun Pairable.mmBase(): Double {
         if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
@@ -31,9 +30,14 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
         val epsilon = 0.00001
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
-        else ceil(score - epsilon)
+        else round(2 * score) / 2
     }
 
+    if (frozen != null) {
+        return ArrayList(frozen!!.map { it -> it as Json.Object })
+    }
+
+    // CB TODO - factorize history helper creation between here and solver classes
     val historyHelper = HistoryHelper(historyBefore(round + 1)) {
         if (pairing.type == PairingType.SWISS) wins.mapValues { Pair(0.0, it.value) }
         else pairables.mapValues {
@@ -42,7 +46,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
                 val score = roundScore(mmBase +
                         (nbW(pairable) ?: 0.0) +
                         (1..round).map { round ->
-                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0 else 1
+                            if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
                         }.sum() * pairing.pairingParams.main.mmsValueAbsent)
                 Pair(
                     if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
@@ -55,6 +59,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
+    if (type == Tournament.Type.INDIVIDUAL && pairing.type == PairingType.MAC_MAHON && !neededCriteria.contains(Criterion.MMS)) neededCriteria.add(Criterion.MMS)
     val criteria = neededCriteria.map { crit ->
         crit.name to when (crit) {
             Criterion.NONE -> StandingsHandler.nullMap
@@ -63,6 +68,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.RATING -> pairables.mapValues { it.value.rating }
             Criterion.NBW -> historyHelper.wins
             Criterion.MMS -> historyHelper.mms
+            Criterion.SCOREX -> historyHelper.scoresX
             Criterion.STS -> StandingsHandler.nullMap
             Criterion.CPS -> StandingsHandler.nullMap
 
@@ -71,7 +77,7 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.SOSWM2 -> historyHelper.sosm2
             Criterion.SODOSW -> historyHelper.sodos
             Criterion.SOSOSW -> historyHelper.sosos
-            Criterion.CUSSW -> historyHelper.cumScore
+            Criterion.CUSSW -> if (round == 0) StandingsHandler.nullMap else historyHelper.cumScore
             Criterion.SOSM -> historyHelper.sos
             Criterion.SOSMM1 -> historyHelper.sosm1
             Criterion.SOSMM2 -> historyHelper.sosm2
@@ -88,10 +94,10 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
             Criterion.DC -> StandingsHandler.nullMap
         }
     }
-    val pairables = pairables.values.filter { it.final }.map { it.toDetailedJson() }
+    val pairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
     pairables.forEach { player ->
         for (crit in criteria) {
-            player[crit.first] = (crit.second[player.getID()] ?: 0.0).toInt()
+            player[crit.first] = crit.second[player.getID()] ?: 0.0
         }
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }
@@ -113,5 +119,61 @@ fun Tournament<*>.getSortedPairables(round: Int): List<Json.Object> {
         it.value.forEach { p -> p["place"] = place }
         place += it.value.size
     }
+
     return sortedPairables
+}
+
+fun Tournament<*>.populateFrozenStandings(sortedPairables: List<Json.Object>, round: Int = rounds) {
+    val sortedMap = sortedPairables.associateBy {
+        it.getID()!!
+    }
+
+    // refresh name, firstname, club and level
+    sortedMap.forEach { (id, player) ->
+        val mutable = player as Json.MutableObject
+        val live = players[id]!!
+        mutable["name"] = live.name
+        mutable["firstname"] = live.firstname
+        mutable["club"] = live.club
+        mutable["rating"] = live.rating
+        mutable["rank"] = live.rank
+    }
+
+    // fill result
+    for (r in 1..round) {
+        games(r).values.forEach { game ->
+            val white = if (game.white != 0) sortedMap[game.white] else null
+            val black = if (game.black != 0) sortedMap[game.black] else null
+            val whiteNum = white?.getInt("num") ?: 0
+            val blackNum = black?.getInt("num") ?: 0
+            val whiteColor = if (black == null) "" else "w"
+            val blackColor = if (white == null) "" else "b"
+            val handicap = if (game.handicap == 0) "" else "${game.handicap}"
+            assert(white != null || black != null)
+            if (white != null) {
+                val mark =  when (game.result) {
+                    Game.Result.UNKNOWN -> "?"
+                    Game.Result.BLACK, Game.Result.BOTHLOOSE -> "-"
+                    Game.Result.WHITE, Game.Result.BOTHWIN -> "+"
+                    Game.Result.JIGO, Game.Result.CANCELLED -> "="
+                }
+                val results = white.getArray("results") as Json.MutableArray
+                results[r - 1] =
+                    if (blackNum == 0) "0$mark"
+                    else "$blackNum$mark/$whiteColor$handicap"
+            }
+            if (black != null) {
+                val mark =  when (game.result) {
+                    Game.Result.UNKNOWN -> "?"
+                    Game.Result.BLACK, Game.Result.BOTHWIN -> "+"
+                    Game.Result.WHITE, Game.Result.BOTHLOOSE -> "-"
+                    Game.Result.JIGO, Game.Result.CANCELLED -> "="
+                }
+                val results = black.getArray("results") as Json.MutableArray
+                results[r - 1] =
+                    if (whiteNum == 0) "0$mark"
+                    else "$whiteNum$mark/$blackColor$handicap"
+            }
+        }
+    }
 }

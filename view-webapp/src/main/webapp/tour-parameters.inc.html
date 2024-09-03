@@ -3,7 +3,14 @@
     <div class="title"><i class="dropdown icon"></i>Base parameters</div>
     <div class="content">
       <div class="field">
-        <label><input type="checkbox" name="deterministic" value="true" #if($tour.pairing.base.deterministic) checked #end>&nbsp;deterministic randomness</label>
+        <label>
+          Randomness:
+          <select name="randomness">
+            <option value="none" #if($tour.pairing.base.random == 0.0)selected#end>none</option>
+            <option value="deterministic" #if($tour.pairing.base.random != 0.0 && $tour.pairing.base.deterministic)selected#end>deterministic</option>
+            <option value="non-deterministic" #if($tour.pairing.base.random != 0.0 && !$tour.pairing.base.deterministic)selected#end>non-deterministic</option>
+          </select>
+        </label>
       </div>
       <div class="field">
         <label><input type="checkbox" name="colorBalance" value="true" #if($tour.pairing.base.colorBalanceWeight) checked #end>&nbsp;balance white and black</label>
@@ -14,14 +21,7 @@
 #if($tour.pairing.type == 'MAC_MAHON')
       <div class="inline fields">
         <div class="field">
-          <label>
-            Round
-            <select name="roundDownScore">
-              <option value="true" #if($tour.pairing.main.roundDownScore) selected #end>down</option>
-              <option value="false" #if(!$tour.pairing.main.roundDownScore) selected #end>up</option>
-            </select>
-            NBW/MMS score
-          </label>
+          <label><input type="checkbox" name="roundDownScore" value="true" #if($tour.pairing.main.roundDownScore) checked #end>&nbsp;round down NBW/MMS score</label>
         </div>
       </div>
 #end

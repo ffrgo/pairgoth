@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.view
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.ratings.RatingsManager
+import org.jeudego.pairgoth.web.WebappManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -26,6 +27,7 @@ class PairgothTool {
         "RATING" to "Rating",
         "NBW" to "Number of wins", // Number win
         "MMS" to "Mac Mahon score", // Macmahon score
+        "SCOREX" to "Score X", // Score X
         // TODO "STS" to "Strasbourg score", // Strasbourg score
         // TODO "CPS" to "Cup score", // Cup score
 
@@ -74,6 +76,11 @@ class PairgothTool {
             }
         }
 
+    fun getMmsPlayersMap(pairables: Collection<Json.Object>) =
+        pairables.associate { part ->
+            Pair(part.getLong("id"), part.getDouble("MMS")?.toLong())
+        }
+
     fun removeBye(games: Collection<Json.Object>) =
         games.filter {
             it.getInt("b")!! != 0 && it.getInt("w")!! != 0
@@ -104,4 +111,8 @@ class PairgothTool {
         }.toSet()
         return players.filter { p -> !teamed.contains(p.getLong("id")) }
     }
+
+    // EGF ratings
+    fun displayRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
+    fun showRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
 }

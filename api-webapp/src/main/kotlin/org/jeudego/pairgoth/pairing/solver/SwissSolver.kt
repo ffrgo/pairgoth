@@ -20,8 +20,7 @@ class SwissSolver(round: Int,
         historyHelper.wins.mapValues {
             Pair(0.0, it.value) }
     }
-    //
-    // get() by lazy { historyHelper.wins }
+    override val scoresX: Map<ID, Double> get() = scores.mapValues { it.value.second }
 
     override val mainLimits = Pair(0.0, round - 1.0)
 }

@@ -24,7 +24,18 @@ function publishHtml() {
   close_modal();
 }
 
+function freeze() {
+  api.put(`tour/${tour_id}/standings/${activeRound}`, {}
+  ).then(resp => {
+    if (resp.ok) {
+      document.location.reload();
+    }
+    else throw "freeze error"
+  }).catch(err => showError(err));
+}
+
 onLoad(() => {
+  new Tablesort($('#standings-table')[0]);
   $('.criterium').on('click', e => {
     let alreadyOpen = e.target.closest('select');
     if (alreadyOpen) return;
@@ -84,5 +95,10 @@ onLoad(() => {
   });
   $('.publish-html').on('click', e => {
     publishHtml();
+  });
+  $('#freeze').on('click', e => {
+    if (confirm("Once frozen, names, levels and even pairings can be changed, but the scores and the standings will stay the same. Freeze the standings?")) {
+      freeze()
+    }
   });
 });

@@ -3,7 +3,10 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
 
-open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
+open class HistoryHelper(
+    protected val history: List<List<Game>>,
+    // scoresGetter() returns Pair(absentSosValueForOthers, score) where score is nbw for Swiss, mms for MM, ...
+    scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
 
     // List of all the pairables ID present in the history
     val allPairables = history.flatten()
@@ -22,6 +25,12 @@ open class HistoryHelper(protected val history: List<List<Game>>, scoresGetter: 
 
     private val scores by lazy {
         scoresGetter()
+    }
+
+    val scoresX by lazy {
+        scoresGetter().mapValues { entry ->
+            entry.value.first + (wins[entry.key] ?: 0.0)
+        }
     }
 
     // Generic helper functions

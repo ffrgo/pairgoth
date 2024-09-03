@@ -6,6 +6,26 @@
   #set($pmap = $utils.toMap($teams))
 #end
 
+## Team players do not have an individual MMS
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
+  #set($mmbase = $api.get("tour/${params.id}/standings/0?include_preliminary=true"))
+  #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
+    #if($mmbase.error)
+      #set($error = $mmbase.error)
+    #else
+      #set($error = $mmbase.message)
+    #end
+<script type="text/javascript">
+  onLoad(() => {
+    showError("$error")
+  });
+</script>
+    #set($mmbase = [])
+  #end
+  #set($mmsMap = $utils.getMmsMap($mmbase))
+  #set($mmsPlayersMap = $utils.getMmsPlayersMap($mmbase))
+#end
+
 <div class="tab-content" id="registration-tab">
   <div id="reg-view">
     <div id="list-header">
@@ -33,14 +53,18 @@
           <th>First name</th>
           <th>Country</th>
           <th>Club</th>
-##if($tour.country == 'FR')
-##          <th>FFG</th>
-##else
+#if($utils.showRatings('egf', $tour.country.toLowerCase()))
           <th>PIN</th>
-##end
+#end
+#if($utils.showRatings('ffg', $tour.country.toLowerCase()))
+          <th>FFG</th>
+#end
           <th>Rank</th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
+          <th>MMS</th>
+#end
           <th>Participation</th>
         </thead>
         <tbody>
@@ -54,13 +78,18 @@
             <td>$part.firstname</td>
             <td>$part.country.toUpperCase()</td>
             <td>$part.club</td>
-  #if($tour.country == 'FR')
-            <td>$!part.ffg</td>
-  #else
-            <td>$!part.egf</td>
+  #if($utils.showRatings('egf', $tour.country.toLowerCase()))
+            <td>$!part.egf </td>
   #end
-            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection) (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)#end</td>
+  #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
+            <td>$!part.ffg</td>
+  #end
+  ## display MMS correction on the screen, but not when printed
+            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
             <td>$part.rating</td>
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
+            <td>$!mmsPlayersMap[$part.id]</td>
+#end
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
               <div class="participation">
   #foreach($round in [1..$tour.rounds])
@@ -108,7 +137,15 @@
           </div>
         </div>
 #end
-        <div class="needle eight wide field">
+#set($needleWidth = 12)
+#if($utils.displayRatings('egf', $tour.country.toLowerCase()))
+  #set($needleWidth = $needleWidth - 2)
+#end
+#if($utils.displayRatings('ffg', $tour.country.toLowerCase()))
+  #set($needleWidth = $needleWidth - 2)
+#end
+#set($cssWidth = { 8: 'eight', 10: 'ten', 12: 'twelve' })
+        <div class="needle $cssWidth[$needleWidth] wide field">
           <div class="ui icon input">
             <input id="needle" name="needle" type="text" placeholder="Search..." spellcheck="false">
             <i id="clear-search" class="clickable close icon"></i>
@@ -125,6 +162,7 @@
           </div>
         </div>
 *#
+#if($utils.displayRatings('egf', $tour.country.toLowerCase()))
         <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.egf|'no egf ratings'}">
             <input id="egf" name="egf" type="checkbox" checked value="true"/>
@@ -134,6 +172,8 @@
             <label>EGF</label>
           </div>
         </div>
+#end
+#if($utils.displayRatings('ffg', $tour.country.toLowerCase()))
         <div class="two wide centered field">
           <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
             <input id="ffg" name="ffg" type="checkbox" checked value="true"/>
@@ -143,8 +183,9 @@
             <label>FFG</label>
           </div>
         </div>
+#end
         <div class="two wide centered field">
-          <div class="toggle" title="${utils.ratingsDates.ffg|'no ffg ratings'}">
+          <div class="toggle" title="browse">
             <input id="browse" name="browse" type="checkbox" value="true"/>
             <div class="search-param checkbox">
               <div class="circle"></div>
@@ -249,21 +290,6 @@
   </div>
 </div>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
-  #set($mmbase = $api.get("tour/${params.id}/standings/0"))
-  #if($mmbase.isObject() && ($mmbase.error || $mmbase.message))
-    #if($mmbase.error)
-      #set($error = $mmbase.error)
-    #else
-      #set($error = $mmbase.message)
-    #end
-<script type="text/javascript">
-  onLoad(() => {
-    showError("$error")
-  });
-</script>
-    #set($mmbase = [])
-  #end
-  #set($mmsMap = $utils.getMmsMap($mmbase))
 <div id="macmahon-groups" class="wide popup">
   <div class="popup-body">
     <div class="popup-content">
