@@ -40,6 +40,7 @@ Edit	Éditer
 Encoding	Encodage
 Enter the magic word	Entrer le mot magique
 Example tournament	Tournoi
+Exclude table numbers:	Exclure les numéros de table :
 Export	Exporter
 Export tournament	Exporter le tournoi
 Family name	Nom de famille
@@ -83,6 +84,7 @@ Next rounds seeding	Méthode rondes suivantes
 OpenGotha / Pairgoth file	Fichier OpenGotha / Pairgoth
 Pair	Apparier
 Pair-go tournament	Tournoi de pair-go
+Paired	Appariés
 Pairing	Appariements
 Pairings for round	Appariements pour la ronde
 Participation	Participation
@@ -104,6 +106,7 @@ Results	Résultats
 Results for round	Résultats pour la ronde
 Round-robin	Toutes rondes
 Rounds	Rondes
+Round	Ronde
 Rules	Règles
 Search... Chercher…
 Short name	Nom de code
@@ -169,6 +172,8 @@ sources on github	sources sur github
 standalone, web interface	indépendant, interface web
 standalone, web interface, via docker	indépendant, interface web, via docker
 start date	date de début
+Surround winner's name or ½-½	Entourer le nom du vainqueur ou ½-½
+Signature:	Signature :
 table	table
 the configuration guide	le guide de configuration
 to	au
