@@ -3,6 +3,7 @@ package org.jeudego.pairgoth.test
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.ID
+import org.jeudego.pairgoth.model.displayRank
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.pairing.solver.BaseSolver
 import org.jeudego.pairgoth.store.MemoryStore
@@ -128,6 +129,16 @@ class PairingTests: TestBase() {
         return gamesPair==openGothaPair
     }
 
+    fun formatPlayer(p: Json.Object): String {
+        val player = p as Json.Object
+        return "${p.getString("name")} ${p.getString("firstname")} ${displayRank(p.getInt("rank")!!)}"
+    }
+
+    fun formatGame(playersMap: Map<Long, String>, g: Any?): String {
+        val game = g as Json.Object
+        return "${g.getInt("t")}. white ${playersMap[g.getLong("w")!!] ?: "BIP"} vs. black ${playersMap[g.getLong("b")!!] ?: "BIP"} h${g.getInt("h") ?: 0}"
+    }
+
     fun test_from_XML(name:String){
         // read tournament with pairing
         val file = getTestFile("opengotha/pairings/$name.xml")
@@ -164,7 +175,27 @@ class PairingTests: TestBase() {
             // Compare weights with OpenGotha
             assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
             // Compare pairings with OpenGotha
-            assertTrue(compare_games(games, pairingsOG[round - 1]), "pairings for round $round differ")
+            val gamesDoMatch = compare_games(games, pairingsOG[round - 1])
+            if (!gamesDoMatch) {
+                // give a nice error message
+                val playersMap = players.associate { p ->
+                    val player = p as Json.Object
+                    Pair(player.getLong("id")!!, formatPlayer(player))
+                }
+                logger.info("Expected opengotha pairing:\n${
+                    pairingsOG[round - 1].joinToString("\n") {
+                        val game = it as Json.Object    
+                        formatGame(playersMap, game)
+                    }
+                }")
+                logger.info("Actual pairgoth pairing:\n${
+                    games.joinToString("\n") {
+                        val game = it as Json.Object
+                        formatGame(playersMap, game)
+                    }
+                }")
+            }
+            assertTrue(gamesDoMatch, "pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
             // Enter results extracted from OpenGotha
