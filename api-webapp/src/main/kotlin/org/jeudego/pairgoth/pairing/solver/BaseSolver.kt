@@ -195,12 +195,6 @@ sealed class BaseSolver(
         val potentialHd: Int = max(hd1, hd2)
 
         val score = if (potentialHd == 0) {
-            if (round == 4 && (
-                        p1.fullName() == "Marechal Morgane" && p2.fullName() == "Goloubkov Alexandra"
-                        || p2.fullName() == "Marechal Morgane" && p1.fullName() == "Goloubkov Alexandra"
-                    )) {
-                println("@@@@ BP color balance")
-            }
             val wb1: Int = p1.colorBalance
             val wb2: Int = p2.colorBalance
             if (wb1 * wb2 < 0) colorBalanceWeight
