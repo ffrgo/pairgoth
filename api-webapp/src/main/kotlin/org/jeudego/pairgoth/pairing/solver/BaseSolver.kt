@@ -127,7 +127,7 @@ sealed class BaseSolver(
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
-        if (chosenByePlayer != ByePlayer) result += Game(id = nextGameId, table = 0, white = ByePlayer.id, black = chosenByePlayer.id, result = Game.Result.fromSymbol('b'))
+        if (chosenByePlayer != ByePlayer) result += Game(id = nextGameId, table = 0, white = chosenByePlayer.id, black = ByePlayer.id, result = Game.Result.fromSymbol('w'))
 
         if (debug) {
             var sumOfWeights = 0.0
@@ -186,6 +186,7 @@ sealed class BaseSolver(
     }
 
     open fun BaseCritParams.applyColorBalance(p1: Pairable, p2: Pairable): Double {
+        if (p1.id == 0 || p2.id == 0) return 0.0
         // This cost is never applied if potential Handicap != 0
         // It is fully applied if wbBalance(sP1) and wbBalance(sP2) are strictly of different signs
         // It is half applied if one of wbBalance is 0 and the other is >=2
@@ -507,9 +508,9 @@ sealed class BaseSolver(
     open fun HandicapParams.color(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
         val hd = pairing.handicap.handicap(white = p1, black = p2)
-        if(hd==0){
+        if (hd == 0) {
             if (p1.colorBalance > p2.colorBalance) {
-                score = - 1.0
+                score = -1.0
             } else if (p1.colorBalance < p2.colorBalance) {
                 score = 1.0
             } else { // choose color from a det random
