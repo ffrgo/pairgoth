@@ -181,6 +181,7 @@ object OpenGotha {
                 canonicMap.put("${player.name.replace(" ", "")}${player.firstName.replace(" ", "")}".uppercase(Locale.ENGLISH), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
+        // import games
         val gamesPerRound = ogTournament.games.game.groupBy {
             it.roundNumber
         }.entries.sortedBy { it.key }.map {
@@ -206,6 +207,16 @@ object OpenGotha {
         gamesPerRound.forEachIndexed { index, games ->
             tournament.games(index + 1).putAll(games)
         }
+        // import bye players
+        if (ogTournament.byePlayers != null) {
+            for (byePlayer in ogTournament.byePlayers.byePlayer) {
+                val playerId = canonicMap[byePlayer.player] ?: throw Error("player not found: ${byePlayer.player}")
+                val round = byePlayer.roundNumber
+                val game = Game(id = nextGameId, table = 0, white = playerId, black = 0, result = Game.Result.WHITE)
+                tournament.games(round)[game.id] = game
+            }
+        }
+
         return tournament
     }
 

@@ -56,7 +56,7 @@
   </xs:complexType>
   <xs:complexType name="ByePlayersType">
     <xs:sequence>
-      <xs:element type="ByePlayerType" name="ByePlayer"/>
+      <xs:element type="ByePlayerType" name="ByePlayer" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="GeneralParameterSetType">
