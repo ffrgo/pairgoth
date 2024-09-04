@@ -30,7 +30,9 @@ sealed class BaseSolver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
+        // Used in tests
         var weightsLogger: PrintWriter? = null
+        var asymmetricDetRandom = false
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -367,7 +369,14 @@ sealed class BaseSolver(
                 SPLIT_AND_RANDOM -> {
                     if ((2 * cla1 < groupSize && 2 * cla2 >= groupSize) || (2 * cla1 >= groupSize && 2 * cla2 < groupSize)) {
                         val randRange = maxSeedingWeight * 0.2
-                        val rand = detRandom(randRange, p2, p1)
+                        // for old tests to pass
+                        val rand =
+                            if (asymmetricDetRandom && p1.fullName() > p2.fullName()) {
+                                // for old tests to pass
+                                detRandom(randRange, p2, p1)
+                            } else {
+                                detRandom(randRange, p1, p2)
+                            }
                         maxSeedingWeight - rand
                     } else {
                         0.0

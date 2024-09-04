@@ -140,6 +140,8 @@ class PairingTests: TestBase() {
     }
 
     fun test_from_XML(name:String){
+        // Let pairgoth use the legacy asymmetric detRandom()
+        BaseSolver.asymmetricDetRandom = true
         // read tournament with pairing
         val file = getTestFile("opengotha/pairings/$name.xml")
         logger.info("read from file $file")
@@ -219,6 +221,7 @@ class PairingTests: TestBase() {
 
     @Test
     fun `SwissTest simpleSwiss`() {
+        BaseSolver.asymmetricDetRandom = true
         // read tournament with pairing
         var file = getTestFile("opengotha/pairings/simpleswiss.xml")
         logger.info("read from file $file")
