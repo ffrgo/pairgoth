@@ -29,7 +29,7 @@
     #set($lastCompleteRound = 0)
     #foreach($r in [1..$tour.rounds])
       #set($stats = $tour.stats[$r - 1])
-      #if($stats.ready == $stats.games)
+      #if($stats.games > 0 && $stats.ready == $stats.games)
         #set($lastCompleteRound = $r)
       #else
         #break
