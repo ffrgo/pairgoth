@@ -54,6 +54,7 @@ class CountriesTool {
             "bj" to "Benin",
             "bl" to "Saint Barthélemy",
             "bm" to "Bermuda",
+            "bn" to "Brunei",
             "bo" to "Bolivia",
             "br" to "Brazil",
             "bs" to "Bahamas",
