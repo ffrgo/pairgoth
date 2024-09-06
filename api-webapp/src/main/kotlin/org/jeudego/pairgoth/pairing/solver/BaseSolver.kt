@@ -425,7 +425,9 @@ sealed class BaseSolver(
 
         // Same club and club group (TODO club group)
         var clubRatio = 0.0
-        val commonClub = p1.club == p2.club
+        // To match OpenGotha, only do a case insensitive comparison of the first four characters.
+        // But obviously, there is a margin of improvement here towards some way of normalizing clubs.
+        val commonClub = p1.club?.take(4)?.uppercase() == p2.club?.take(4)?.uppercase()
         val commonGroup = false // TODO
 
         if (commonGroup && !commonClub) {

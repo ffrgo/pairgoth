@@ -27,78 +27,80 @@ class PairingTests: TestBase() {
         MemoryStore.reset()
     }
 
-    fun compare_weights(file1: File, file2: File, skipSeeding: Boolean = false):Boolean {
-        BaseSolver.weightsLogger!!.flush()
-        // Maps to store name pairs and costs
-        val map1 = HashMap<Pair<String, String>, List<Double>>()
-        val map2 = HashMap<Pair<String, String>, List<Double>>()
-        var count: Int = 1
+    companion object {
+        fun compare_weights(file1: File, file2: File, skipSeeding: Boolean = false):Boolean {
+            BaseSolver.weightsLogger!!.flush()
+            // Maps to store name pairs and costs
+            val map1 = HashMap<Pair<String, String>, List<Double>>()
+            val map2 = HashMap<Pair<String, String>, List<Double>>()
+            var count: Int = 1
 
-        for (file in listOf(file1, file2)) {
+            for (file in listOf(file1, file2)) {
 
-            // Read lines
-            val lines = file.readLines()
+                // Read lines
+                val lines = file.readLines()
 
-            // Store headers
-            val header1 = lines[0]
-            val header2 = lines[1]
+                // Store headers
+                val header1 = lines[0]
+                val header2 = lines[1]
 
-            logger.info("Reading weights file "+file)
+                logger.info("Reading weights file "+file)
 
-            // Loop through sections
-            for (i in 2..lines.size-1 step 12) {
-                // Get name pair
-                val name1 = lines[i].split("=")[1]
-                val name2 = lines[i+1].split("=")[1]
+                // Loop through sections
+                for (i in 2..lines.size-1 step 12) {
+                    // Get name pair
+                    val name1 = lines[i].split("=")[1]
+                    val name2 = lines[i+1].split("=")[1]
 
-                // Nested loop over costs
-                val costs = mutableListOf<Double>()
-                for (j in i + 2..i + 11) {
-                    val parts = lines[j].split("=")
-                    costs.add(parts[1].toDouble())
+                    // Nested loop over costs
+                    val costs = mutableListOf<Double>()
+                    for (j in i + 2..i + 11) {
+                        val parts = lines[j].split("=")
+                        costs.add(parts[1].toDouble())
+                    }
+
+                    val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
+                    // Add to map
+                    if (count == 1) {
+                        map1[tmp_pair] = costs
+                    } else {
+                        map2[tmp_pair] = costs
+                    }
                 }
+                count += 1
 
-                val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
-                // Add to map
-                if (count == 1) {
-                    map1[tmp_pair] = costs
-                } else {
-                    map2[tmp_pair] = costs
+            }
+
+            var identical = true
+            for ((key, value) in map1) {
+                // Check if key exists in both
+                if (map2.containsKey(key)) {
+                    // Compare values
+                    //logger.info("Comparing $key")
+                    val isValid = if (!skipSeeding) {
+                        abs(value!![9] - map2[key]!![9])>10 && identical==true
+                    } else {
+                        abs((value!![9]-value!![6]-value!![5]) - (map2[key]!![9]-map2[key]!![6]-map2[key]!![5]))>10 && identical==true
+                    }
+                    if (isValid) {
+                        // Key exists but values differ - print key
+                        logger.info("Difference found at $key")
+                        logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
+                        logger.info("baseRandomCost        =   "+value!![1].toString()+"   "+map2[key]!![1].toString())
+                        logger.info("baseBWBalanceCost     =   "+value!![2].toString()+"   "+map2[key]!![2].toString())
+                        logger.info("mainCategoryCost      =   "+value!![3].toString()+"   "+map2[key]!![3].toString())
+                        logger.info("mainScoreDiffCost     =   "+value!![4].toString()+"   "+map2[key]!![4].toString())
+                        logger.info("mainDUDDCost          =   "+value!![5].toString()+"   "+map2[key]!![5].toString())
+                        logger.info("mainSeedCost          =   "+value!![6].toString()+"   "+map2[key]!![6].toString())
+                        logger.info("secHandiCost          =   "+value!![7].toString()+"   "+map2[key]!![7].toString())
+                        logger.info("secGeoCost            =   "+value!![8].toString()+"   "+map2[key]!![8].toString())
+                        logger.info("totalCost             =   "+value!![9].toString()+"   "+map2[key]!![9].toString())
+                        identical = false
+                    }
                 }
             }
-            count += 1
-
+            return identical
         }
-
-        var identical = true
-        for ((key, value) in map1) {
-            // Check if key exists in both
-            if (map2.containsKey(key)) {
-                // Compare values
-                //logger.info("Comparing $key")
-                val isValid = if (!skipSeeding) {
-                    abs(value!![9] - map2[key]!![9])>10 && identical==true
-                } else {
-                    abs((value!![9]-value!![6]-value!![5]) - (map2[key]!![9]-map2[key]!![6]-map2[key]!![5]))>10 && identical==true
-                }
-                if (isValid) {
-                    // Key exists but values differ - print key
-                    logger.info("Difference found at $key")
-                    logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
-                    logger.info("baseRandomCost        =   "+value!![1].toString()+"   "+map2[key]!![1].toString())
-                    logger.info("baseBWBalanceCost     =   "+value!![2].toString()+"   "+map2[key]!![2].toString())
-                    logger.info("mainCategoryCost      =   "+value!![3].toString()+"   "+map2[key]!![3].toString())
-                    logger.info("mainScoreDiffCost     =   "+value!![4].toString()+"   "+map2[key]!![4].toString())
-                    logger.info("mainDUDDCost          =   "+value!![5].toString()+"   "+map2[key]!![5].toString())
-                    logger.info("mainSeedCost          =   "+value!![6].toString()+"   "+map2[key]!![6].toString())
-                    logger.info("secHandiCost          =   "+value!![7].toString()+"   "+map2[key]!![7].toString())
-                    logger.info("secGeoCost            =   "+value!![8].toString()+"   "+map2[key]!![8].toString())
-                    logger.info("totalCost             =   "+value!![9].toString()+"   "+map2[key]!![9].toString())
-                    identical = false
-                }
-            }
-        }
-        return identical
     }
 
     fun compare_games(games:Json.Array, opengotha:Json.Array, skipColor: Boolean = false): Boolean{
