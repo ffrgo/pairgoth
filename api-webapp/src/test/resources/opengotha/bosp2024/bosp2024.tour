@@ -1,0 +1,1279 @@
+{
+  "id" : 117,
+  "type" : "INDIVIDUAL",
+  "name" : "4th Bogazici Go Tournament",
+  "shortName" : "bosp2024",
+  "startDate" : "2024-07-06",
+  "endDate" : "2024-07-07",
+  "director" : "Barkin Celebican",
+  "country" : "tr",
+  "location" : "Istanbul",
+  "online" : false,
+  "komi" : 6.5,
+  "rules" : "JAPANESE",
+  "gobanSize" : 19,
+  "timeSystem" : {
+    "type" : "CANADIAN",
+    "mainTime" : 2700,
+    "byoyomi" : 300,
+    "stones" : 25
+  },
+  "rounds" : 5,
+  "pairing" : {
+    "type" : "MAC_MAHON",
+    "base" : {
+      "nx1" : 0.5,
+      "dupWeight" : 5.0E14,
+      "random" : 0.0,
+      "deterministic" : true,
+      "colorBalanceWeight" : 1000000.0
+    },
+    "main" : {
+      "catWeight" : 0.0,
+      "scoreWeight" : 1.0E11,
+      "upDownWeight" : 1.0E8,
+      "upDownCompensate" : true,
+      "upDownLowerMode" : "TOP",
+      "upDownUpperMode" : "BOTTOM",
+      "maximizeSeeding" : 5000000.0,
+      "firstSeedLastRound" : 2,
+      "firstSeed" : "SPLIT_AND_SLIP",
+      "secondSeed" : "SPLIT_AND_SLIP",
+      "firstSeedAddCrit" : "RATING",
+      "secondSeedAddCrit" : "NONE",
+      "mmsValueAbsent" : 0.5,
+      "roundDownScore" : true,
+      "sosValueAbsentUseBase" : true
+    },
+    "secondary" : {
+      "barThreshold" : true,
+      "rankThreshold" : 0,
+      "winsThreshold" : false,
+      "secWeight" : 1.0E11
+    },
+    "geo" : {
+      "weight" : 1.0E11,
+      "mmsDiffCountry" : 1,
+      "mmsDiffClubGroup" : 3,
+      "mmsDiffClub" : 3
+    },
+    "handicap" : {
+      "weight" : 0.0,
+      "useMMS" : true,
+      "threshold" : -30,
+      "correction" : 0,
+      "ceiling" : 9
+    },
+    "placement" : [
+      "MMS",
+      "SOSM",
+      "SOSOSM"
+    ],
+    "mmFloor" : -20,
+    "mmBar" : 0
+  },
+  "players" : [
+    {
+      "id" : 1,
+      "name" : "Kose",
+      "firstname" : "Dogac",
+      "rating" : 2300,
+      "rank" : 2,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "14825052\n"
+    },
+    {
+      "id" : 2,
+      "name" : "Akkol",
+      "firstname" : "Ertug",
+      "rating" : 2100,
+      "rank" : 0,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "10633920\n"
+    },
+    {
+      "id" : 3,
+      "name" : "Nemlioglu",
+      "firstname" : "Mete_Riza",
+      "rating" : 1700,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "19301381\n"
+    },
+    {
+      "id" : 4,
+      "name" : "Arikan",
+      "firstname" : "Ugur",
+      "rating" : 2300,
+      "rank" : 2,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "17374423\n"
+    },
+    {
+      "id" : 5,
+      "name" : "Cal",
+      "firstname" : "Atakan",
+      "rating" : 1400,
+      "rank" : -7,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "16537213\n"
+    },
+    {
+      "id" : 6,
+      "name" : "Naiboglu",
+      "firstname" : "Omer",
+      "rating" : 2100,
+      "rank" : 0,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19413075\n"
+    },
+    {
+      "id" : 7,
+      "name" : "Elitok",
+      "firstname" : "Kursat",
+      "rating" : 2100,
+      "rank" : 0,
+      "country" : "TR",
+      "club" : "Esk",
+      "final" : false,
+      "egf" : "18598701\n"
+    },
+    {
+      "id" : 8,
+      "name" : "Pektezol",
+      "firstname" : "Arda_Serdar",
+      "rating" : 1200,
+      "rank" : -9,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "20137469\n"
+    },
+    {
+      "id" : 9,
+      "name" : "Sahin",
+      "firstname" : "Omer_Ersin",
+      "rating" : 400,
+      "rank" : -17,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : false,
+      "egf" : "20601031\n"
+    },
+    {
+      "id" : 10,
+      "name" : "Gencer",
+      "firstname" : "Oguz",
+      "rating" : 800,
+      "rank" : -13,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "19786536\n"
+    },
+    {
+      "id" : 11,
+      "name" : "Kurter",
+      "firstname" : "Eren",
+      "rating" : 2200,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : false,
+      "egf" : "14274513\n"
+    },
+    {
+      "id" : 12,
+      "name" : "Orakoglu",
+      "firstname" : "Onder",
+      "rating" : 1800,
+      "rank" : -3,
+      "country" : "TR",
+      "club" : "Esk",
+      "final" : false,
+      "egf" : "17398271\n"
+    },
+    {
+      "id" : 13,
+      "name" : "Oral",
+      "firstname" : "Alican",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "17601364\n"
+    },
+    {
+      "id" : 14,
+      "name" : "Tiryaki",
+      "firstname" : "Mehmet_Emre",
+      "rating" : 1650,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19601406\n"
+    },
+    {
+      "id" : 15,
+      "name" : "Kose",
+      "firstname" : "Ege",
+      "rating" : 2200,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "17401153\n"
+    },
+    {
+      "id" : 16,
+      "name" : "Kilic",
+      "firstname" : "Hayri",
+      "rating" : 2100,
+      "rank" : 0,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "13737526\n"
+    },
+    {
+      "id" : 17,
+      "name" : "Kulubecioglu",
+      "firstname" : "Ali",
+      "rating" : 1900,
+      "rank" : -2,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19250198\n"
+    },
+    {
+      "id" : 18,
+      "name" : "Aksut",
+      "firstname" : "Husrev",
+      "rating" : 2400,
+      "rank" : 3,
+      "country" : "TR",
+      "club" : "Ant",
+      "final" : true,
+      "egf" : "14649943\n"
+    },
+    {
+      "id" : 19,
+      "name" : "Taskin",
+      "firstname" : "Gozde",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "15462832\n"
+    },
+    {
+      "id" : 20,
+      "name" : "Onder",
+      "firstname" : "Berat",
+      "rating" : 1700,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Esk",
+      "final" : false,
+      "egf" : "16998751\n"
+    },
+    {
+      "id" : 21,
+      "name" : "Gursen",
+      "firstname" : "Ilknur",
+      "rating" : 1400,
+      "rank" : -7,
+      "country" : "TR",
+      "club" : "Can",
+      "final" : true,
+      "skip" : [
+        3,
+        5
+      ],
+      "egf" : "19049041\n"
+    },
+    {
+      "id" : 22,
+      "name" : "Adal",
+      "firstname" : "Birand",
+      "rating" : 2300,
+      "rank" : 2,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : false,
+      "egf" : "15250015\n"
+    },
+    {
+      "id" : 23,
+      "name" : "Oren",
+      "firstname" : "Ulas",
+      "rating" : 2500,
+      "rank" : 4,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "16298832\n"
+    },
+    {
+      "id" : 24,
+      "name" : "Suleymanoglu",
+      "firstname" : "Serap",
+      "rating" : 1900,
+      "rank" : -2,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "17625938\n"
+    },
+    {
+      "id" : 25,
+      "name" : "Cansev",
+      "firstname" : "Doruk",
+      "rating" : 1800,
+      "rank" : -3,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "20325569\n"
+    },
+    {
+      "id" : 26,
+      "name" : "Ozenir",
+      "firstname" : "Kerem",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ada",
+      "final" : false,
+      "egf" : "14398637\n"
+    },
+    {
+      "id" : 27,
+      "name" : "Berdibek",
+      "firstname" : "Kerem",
+      "rating" : 1300,
+      "rank" : -8,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : false,
+      "egf" : "20174968\n"
+    },
+    {
+      "id" : 28,
+      "name" : "Guntav",
+      "firstname" : "Irmak",
+      "rating" : 1700,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Izm",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "19237812\n"
+    },
+    {
+      "id" : 29,
+      "name" : "Oncel",
+      "firstname" : "Ayse_Nil",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19286806\n"
+    },
+    {
+      "id" : 30,
+      "name" : "Ustunel",
+      "firstname" : "Ayse_Mercan",
+      "rating" : -400,
+      "rank" : -25,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        1,
+        2,
+        3
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 31,
+      "name" : "Burc",
+      "firstname" : "Volkan",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "14098854\n"
+    },
+    {
+      "id" : 32,
+      "name" : "Yildirim",
+      "firstname" : "Ufuk_Emre",
+      "rating" : 2200,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "17350432\n"
+    },
+    {
+      "id" : 33,
+      "name" : "Urkmez",
+      "firstname" : "Gun",
+      "rating" : 1700,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "17313428\n"
+    },
+    {
+      "id" : 34,
+      "name" : "Uner",
+      "firstname" : "Berke",
+      "rating" : 2200,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "18398193\n"
+    },
+    {
+      "id" : 35,
+      "name" : "Ergun",
+      "firstname" : "Ege",
+      "rating" : 1000,
+      "rank" : -11,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19650961\n"
+    },
+    {
+      "id" : 36,
+      "name" : "Akcer",
+      "firstname" : "Aksel_Deniz",
+      "rating" : -400,
+      "rank" : -25,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 37,
+      "name" : "Goktas",
+      "firstname" : "Mehmet_Ali",
+      "rating" : 1600,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "17601804\n"
+    },
+    {
+      "id" : 38,
+      "name" : "Topdemir",
+      "firstname" : "Uraz",
+      "rating" : -500,
+      "rank" : -26,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 39,
+      "name" : "Duman",
+      "firstname" : "Caglayan",
+      "rating" : 2200,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Izm",
+      "final" : false,
+      "egf" : "16586196\n"
+    },
+    {
+      "id" : 40,
+      "name" : "Arik",
+      "firstname" : "Ilayda",
+      "rating" : 400,
+      "rank" : -17,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "20562201\n"
+    },
+    {
+      "id" : 41,
+      "name" : "Cetin",
+      "firstname" : "Mert",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "20462189\n"
+    },
+    {
+      "id" : 42,
+      "name" : "Karadenizli",
+      "firstname" : "Yunus_Koral",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 43,
+      "name" : "Karaismailoglu",
+      "firstname" : "Lara_Elis",
+      "rating" : -400,
+      "rank" : -25,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "\n"
+    },
+    {
+      "id" : 44,
+      "name" : "Kacan",
+      "firstname" : "Huseyin",
+      "rating" : 1500,
+      "rank" : -6,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "20350561\n"
+    },
+    {
+      "id" : 45,
+      "name" : "Kasikci",
+      "firstname" : "Leyla",
+      "rating" : 1700,
+      "rank" : -4,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "16013932\n"
+    },
+    {
+      "id" : 46,
+      "name" : "Acar",
+      "firstname" : "Orhan",
+      "rating" : 1800,
+      "rank" : -3,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "15649810\n"
+    },
+    {
+      "id" : 47,
+      "name" : "Ergin",
+      "firstname" : "Dogukan",
+      "rating" : 1200,
+      "rank" : -9,
+      "country" : "TR",
+      "club" : "Izm",
+      "final" : false,
+      "egf" : "19298059\n"
+    },
+    {
+      "id" : 48,
+      "name" : "Guvercin",
+      "firstname" : "Kaya",
+      "rating" : 800,
+      "rank" : -13,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "20449473\n"
+    },
+    {
+      "id" : 49,
+      "name" : "Akdag",
+      "firstname" : "Elif",
+      "rating" : 1000,
+      "rank" : -11,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "20537715\n"
+    },
+    {
+      "id" : 50,
+      "name" : "Ruzgar",
+      "firstname" : "Ege_Tuna",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 51,
+      "name" : "Birbiri",
+      "firstname" : "Can_Deniz",
+      "rating" : -400,
+      "rank" : -25,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 52,
+      "name" : "Yazici",
+      "firstname" : "Naz",
+      "rating" : 300,
+      "rank" : -18,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "19086628\n"
+    },
+    {
+      "id" : 53,
+      "name" : "Guney",
+      "firstname" : "Mete",
+      "rating" : -300,
+      "rank" : -24,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "20433589\n"
+    },
+    {
+      "id" : 54,
+      "name" : "Kilic",
+      "firstname" : "Ilbige",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        3
+      ],
+      "egf" : "20349615\n"
+    },
+    {
+      "id" : 55,
+      "name" : "Ercetin",
+      "firstname" : "Ahmet_Kerem",
+      "rating" : 1300,
+      "rank" : -8,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "20137953\n"
+    },
+    {
+      "id" : 56,
+      "name" : "Gurses",
+      "firstname" : "Kizil_Kaplan",
+      "rating" : 400,
+      "rank" : -17,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "18550301\n"
+    },
+    {
+      "id" : 57,
+      "name" : "Aydin",
+      "firstname" : "Ahmet_Emir",
+      "rating" : 1100,
+      "rank" : -10,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "18586304\n"
+    },
+    {
+      "id" : 58,
+      "name" : "Senol",
+      "firstname" : "Onat",
+      "rating" : -450,
+      "rank" : -25,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        1,
+        2,
+        3,
+        5
+      ],
+      "egf" : "\n"
+    },
+    {
+      "id" : 59,
+      "name" : "Tutan",
+      "firstname" : "Cagan",
+      "rating" : 600,
+      "rank" : -15,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "18325219\n"
+    },
+    {
+      "id" : 60,
+      "name" : "Sahin",
+      "firstname" : "Yaman",
+      "rating" : -700,
+      "rank" : -28,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "\n"
+    },
+    {
+      "id" : 61,
+      "name" : "Bozkurt",
+      "firstname" : "Tayga",
+      "rating" : 500,
+      "rank" : -16,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "18325197\n"
+    },
+    {
+      "id" : 62,
+      "name" : "Dogan",
+      "firstname" : "Asmin",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "19250781\n"
+    },
+    {
+      "id" : 63,
+      "name" : "Gungor",
+      "firstname" : "Alize",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "egf" : "20133465\n"
+    },
+    {
+      "id" : 64,
+      "name" : "Ertok",
+      "firstname" : "Ege",
+      "rating" : 100,
+      "rank" : -20,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : false,
+      "skip" : [
+        1
+      ],
+      "egf" : "20425460\n"
+    },
+    {
+      "id" : 65,
+      "name" : "Bozkurt",
+      "firstname" : "Osman",
+      "rating" : 500,
+      "rank" : -16,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "skip" : [
+        1,
+        2,
+        3,
+        4
+      ],
+      "egf" : "18598294\n"
+    },
+    {
+      "id" : 66,
+      "name" : "Brisson",
+      "firstname" : "Claude",
+      "rating" : 1800,
+      "rank" : -3,
+      "country" : "FR",
+      "club" : "13M",
+      "final" : true,
+      "skip" : [
+        4,
+        5
+      ],
+      "egf" : "13513291\n"
+    },
+    {
+      "id" : 67,
+      "name" : "Celebican",
+      "firstname" : "Barkin",
+      "rating" : 2100,
+      "rank" : 0,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "13701534\n"
+    },
+    {
+      "id" : 69,
+      "name" : "Coban",
+      "firstname" : "Erdi",
+      "rating" : 2150,
+      "rank" : 1,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "17001798"
+    },
+    {
+      "id" : 71,
+      "name" : "Yilmaz",
+      "firstname" : "Sarp_Ege",
+      "rating" : 1550,
+      "rank" : -5,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : true,
+      "egf" : "19233280"
+    },
+    {
+      "id" : 73,
+      "name" : "Kaya",
+      "firstname" : "Toprak_Iskender",
+      "rating" : 1350,
+      "rank" : -7,
+      "country" : "TR",
+      "club" : "Ank",
+      "final" : true,
+      "egf" : "19437561"
+    },
+    {
+      "id" : 75,
+      "name" : "Akpinar",
+      "firstname" : "Emre_Kuzey",
+      "rating" : 450,
+      "rank" : -16,
+      "country" : "TR",
+      "club" : "Ist",
+      "final" : true,
+      "egf" : "19249769"
+    }
+  ],
+  "games" : [
+    [
+      {
+        "id" : 2,
+        "t" : 1,
+        "w" : 34,
+        "b" : 23,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 3,
+        "t" : 2,
+        "w" : 32,
+        "b" : 18,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 4,
+        "t" : 3,
+        "w" : 6,
+        "b" : 4,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 5,
+        "t" : 4,
+        "w" : 67,
+        "b" : 1,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 6,
+        "t" : 5,
+        "w" : 15,
+        "b" : 69,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 7,
+        "t" : 6,
+        "w" : 17,
+        "b" : 24,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 8,
+        "t" : 7,
+        "w" : 28,
+        "b" : 46,
+        "h" : 0,
+        "r" : "b",
+        "dd" : -1
+      },
+      {
+        "id" : 9,
+        "t" : 8,
+        "w" : 66,
+        "b" : 25,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 10,
+        "t" : 9,
+        "w" : 14,
+        "b" : 71,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 11,
+        "t" : 10,
+        "w" : 29,
+        "b" : 21,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 12,
+        "t" : 11,
+        "w" : 55,
+        "b" : 73,
+        "h" : 0,
+        "r" : "w",
+        "dd" : -1
+      },
+      {
+        "id" : 13,
+        "t" : 12,
+        "w" : 57,
+        "b" : 8,
+        "h" : 0,
+        "r" : "w",
+        "dd" : -1
+      },
+      {
+        "id" : 14,
+        "t" : 13,
+        "w" : 35,
+        "b" : 49,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 15,
+        "t" : 14,
+        "w" : 48,
+        "b" : 59,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 1
+      },
+      {
+        "id" : 16,
+        "t" : 15,
+        "w" : 61,
+        "b" : 75,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 17,
+        "t" : 16,
+        "w" : 56,
+        "b" : 50,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 18,
+        "t" : 17,
+        "w" : 41,
+        "b" : 36,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 19,
+        "t" : 18,
+        "w" : 42,
+        "b" : 51,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 21,
+        "t" : 19,
+        "w" : 54,
+        "b" : 38,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 44,
+        "t" : 0,
+        "w" : 0,
+        "b" : 53,
+        "h" : 0,
+        "r" : "b"
+      }
+    ],
+    [
+      {
+        "id" : 46,
+        "t" : 1,
+        "w" : 23,
+        "b" : 69,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 47,
+        "t" : 2,
+        "w" : 18,
+        "b" : 17,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 48,
+        "t" : 3,
+        "w" : 1,
+        "b" : 6,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 49,
+        "t" : 4,
+        "w" : 4,
+        "b" : 34,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 50,
+        "t" : 5,
+        "w" : 15,
+        "b" : 32,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 51,
+        "t" : 6,
+        "w" : 46,
+        "b" : 67,
+        "h" : 0,
+        "r" : "b",
+        "dd" : -1
+      },
+      {
+        "id" : 52,
+        "t" : 7,
+        "w" : 24,
+        "b" : 66,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 53,
+        "t" : 8,
+        "w" : 25,
+        "b" : 71,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 54,
+        "t" : 9,
+        "w" : 14,
+        "b" : 28,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 55,
+        "t" : 10,
+        "w" : 73,
+        "b" : 29,
+        "h" : 0,
+        "r" : "b",
+        "dd" : -1
+      },
+      {
+        "id" : 56,
+        "t" : 11,
+        "w" : 21,
+        "b" : 55,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 57,
+        "t" : 12,
+        "w" : 8,
+        "b" : 35,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 1
+      },
+      {
+        "id" : 58,
+        "t" : 13,
+        "w" : 49,
+        "b" : 57,
+        "h" : 0,
+        "r" : "b",
+        "dd" : -1
+      },
+      {
+        "id" : 59,
+        "t" : 14,
+        "w" : 48,
+        "b" : 61,
+        "h" : 0,
+        "r" : "b",
+        "dd" : 1
+      },
+      {
+        "id" : 60,
+        "t" : 15,
+        "w" : 59,
+        "b" : 56,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 61,
+        "t" : 16,
+        "w" : 75,
+        "b" : 41,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 62,
+        "t" : 17,
+        "w" : 38,
+        "b" : 42,
+        "h" : 0,
+        "r" : "w"
+      },
+      {
+        "id" : 63,
+        "t" : 18,
+        "w" : 53,
+        "b" : 54,
+        "h" : 0,
+        "r" : "w",
+        "dd" : 1
+      },
+      {
+        "id" : 64,
+        "t" : 19,
+        "w" : 51,
+        "b" : 36,
+        "h" : 0,
+        "r" : "b"
+      },
+      {
+        "id" : 65,
+        "t" : 0,
+        "w" : 0,
+        "b" : 50,
+        "h" : 0,
+        "r" : "b"
+      }
+    ],
+    [],
+    [],
+    []
+  ]
+}
