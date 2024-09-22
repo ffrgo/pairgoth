@@ -392,7 +392,7 @@ sealed class BaseSolver(
 
         // playersMeetCriteria = 0 : No player is above thresholds -> apply secondary criteria
         // playersMeetCriteria = 1 : 1 player is above thresholds -> apply half the weight
-        // playersMeetCriteria = 2 : Both players is above thresholds -> apply the full weight
+        // playersMeetCriteria = 2 : Both players are above thresholds -> apply the full weight
 
         var playersMeetCriteria = 0
 
