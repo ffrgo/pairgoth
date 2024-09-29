@@ -89,7 +89,7 @@ onLoad(() => {
         $('#periods').addClass('hidden');
         $('#stones').addClass('hidden');
         break;
-      case 'STANDARD':
+      case 'JAPANESE':
         $('#increment').addClass('hidden');
         $('#maxTime').addClass('hidden');
         $('#byoyomi').removeClass('hidden');

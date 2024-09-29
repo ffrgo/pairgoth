@@ -181,7 +181,7 @@
           <select name="timeSystemType">
             <option value="FISCHER" #if(!$tour || $tour.timeSystem.type == 'FISCHER') selected #end>Fischer timing</option>
             <option value="CANADIAN" #if($tour && $tour.timeSystem.type == 'CANADIAN') selected #end>Canadian byo-yomi</option>
-            <option value="STANDARD" #if($tour && $tour.timeSystem.type == 'STANDARD') selected #end>Standard byo-yomi</option>
+            <option value="JAPANESE" #if($tour && $tour.timeSystem.type == 'JAPANESE') selected #end>Japanese byo-yomi</option>
             <option value="SUDDEN_DEATH" #if($tour && $tour.timeSystem.type == 'SUDDEN_DEATH') selected #end>Sudden death</option>
           </select>
         </div>
@@ -200,12 +200,12 @@
           <span class="info"></span>
           <input name="maxTime" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.maxTime" != '' && "$!tour.timeSystem.maxTime" != '-1' && "$!tour.timeSystem.maxTime" != '0')#toHMS($tour.timeSystem.maxTime)#end"/>
         </div>
-        <div id="byoyomi" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN' && $tour.timeSystem.type != 'STANDARD')hidden#end">
+        <div id="byoyomi" class="three wide field #if(!$tour || $tour.timeSystem.type != 'CANADIAN' && $tour.timeSystem.type != 'JAPANESE')hidden#end">
           <label>Byo-yomi time</label>
           <span class="info"></span>
           <input name="byoyomi" type="text" class="duration" value="#if($tour && "$!tour.timeSystem.byoyomi" != "")#toHMS($tour.timeSystem.byoyomi)#{else}00:05:00#end"/>
         </div>
-        <div id="periods" class="three wide field #if(!$tour || $tour.timeSystem.type != 'STANDARD')hidden#end">
+        <div id="periods" class="three wide field #if(!$tour || $tour.timeSystem.type != 'JAPANESE')hidden#end">
           <label>Byo-yomi periods</label>
           <span class="info"></span>
           <input name="periods" type="number" min="0" value="#if($tour && "$!tour.timeSystem.periods" != "")$tour.timeSystem.periods#{else}3#end"/>
