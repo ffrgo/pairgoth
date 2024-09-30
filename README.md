@@ -4,7 +4,7 @@ Welcome to Pairgoth, your Go Pairing Engine!
 
 Pairgoth is a Go tournament pairing engine designed to make your tournament experience effortless. pairgoth is the successor of [opengotha](https://github.com/lucvannier/opengotha), the well known pairing system software developed by [Luc Vannier](http://vannier.info/jeux/accueil.htm) and uses the same algorithm internally, as well as import and export features towards its format.
 
-Pairgoth supports the Swiss pairing system, ideal for championships with no handicap games, as well as the MacMahon pairing system, more suited for classical tournaments and cups. It is still in a beta stage. Future versions will support more pairing systems and more features. Your feedback is most welcome!
+Pairgoth supports the Swiss pairing system, ideal for championships with no handicap games, as well as the McMahon pairing system, more suited for classical tournaments and cups. It is still in a beta stage. Future versions will support more pairing systems and more features. Your feedback is most welcome!
 
 ## How to use
 
