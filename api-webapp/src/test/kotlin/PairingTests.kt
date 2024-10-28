@@ -1,10 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.ID
-import org.jeudego.pairgoth.model.displayRank
-import org.jeudego.pairgoth.model.fromJson
+import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.pairing.solver.BaseSolver
 import org.jeudego.pairgoth.store.MemoryStore
 import org.jeudego.pairgoth.store.lastPlayerId
@@ -14,6 +11,7 @@ import java.io.File
 import java.io.FileWriter
 import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
+import java.text.DecimalFormat
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -139,6 +137,60 @@ class PairingTests: TestBase() {
     fun formatGame(playersMap: Map<Long, String>, g: Any?): String {
         val game = g as Json.Object
         return "${g.getInt("t")}. white ${playersMap[g.getLong("w")!!] ?: "BIP"} vs. black ${playersMap[g.getLong("b")!!] ?: "BIP"} h${g.getInt("h") ?: 0}"
+    }
+
+    fun compute_sumOfWeight_OG(file: File, opengotha: Json.Array, players: Json.Array): Double{
+        // Map to store name pairs and costs
+        val map = HashMap<Pair<String, String>, List<Double>>()
+
+        // Read lines
+        val lines = file.readLines()
+
+        // Store headers
+        val header1 = lines[0]
+        val header2 = lines[1]
+
+        logger.info("Reading weights file "+file)
+
+        // Loop through sections
+        for (i in 2..lines.size-1 step 12) {
+            // Get name pair
+            val name1 = lines[i].split("=")[1]
+            val name2 = lines[i+1].split("=")[1]
+
+            // Nested loop over costs
+            val costs = mutableListOf<Double>()
+            for (j in i + 2..i + 11) {
+                val parts = lines[j].split("=")
+                costs.add(parts[1].toDouble())
+            }
+
+            val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
+            // Add to map
+            map[tmp_pair] = costs
+        }
+
+        val mapNamesID = HashMap<Int?, String>()
+        for (i in 0 until players.size) {
+            val tmpPairable = players.getJson(i)!!.asObject()
+            val id: Int? = tmpPairable.getID("id")
+            val name = tmpPairable.getString("name")+" "+tmpPairable.getString("firstname")
+            mapNamesID[id] = name
+        }
+
+        var sumOfWeights = 0.0
+        for (i in 0 until opengotha.size) {
+            val tmpOG = Game.fromJson(opengotha.getJson(i)!!.asObject().let {
+                Json.MutableObject(it).set("t", 0) // hack to fill the table to make fromJson() happy
+            })
+            val name1 = mapNamesID[tmpOG.white]!!
+            val name2 = mapNamesID[tmpOG.black]!!
+            val namePair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
+            val cost = map[namePair]!![9]
+            sumOfWeights += cost
+        }
+
+        return sumOfWeights
     }
 
     fun test_from_XML(name:String){
@@ -300,4 +352,85 @@ class PairingTests: TestBase() {
     fun `MMtest Toulouse2024`() {
         test_from_XML("Toulouse2024")
     }
+
+    @Test
+    fun `SwissTest KPMCSplitbug`() {
+        // Let pairgoth use the legacy asymmetric detRandom()
+        BaseSolver.asymmetricDetRandom = true
+        // read tournament with pairing
+        val name = "20240921-KPMC-Splitbug"
+        val file = getTestFile("opengotha/pairings/$name.xml")
+        logger.info("read from file $file")
+        val resource = file.readText(StandardCharsets.UTF_8)
+        var resp = TestAPI.post("/api/tour", resource)
+        val id = resp.asObject().getInt("id")
+        val tournament = TestAPI.get("/api/tour/$id").asObject()
+        logger.info(tournament.toString().slice(0..50) + "...")
+        val players = TestAPI.get("/api/tour/$id/part").asArray()
+        logger.info(players.toString().slice(0..50) + "...")
+
+        // Set the rounds on which to perform the pairings test
+        val minRound = 2
+        val maxRound = 2
+
+        // Get pairings (including results) from OpenGotha file
+        val pairingsOG = mutableListOf<Json.Array>()
+        for (round in minRound..maxRound) {
+            val games = TestAPI.get("/api/tour/$id/res/$round").asArray()
+            pairingsOG.add(games)
+        }
+
+        // Delete pairings
+        for (round in maxRound downTo minRound) {
+            TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
+        }
+
+        val dec = DecimalFormat("#.#")
+
+        var games: Json.Array
+        var firstGameID: Int
+
+        for (round in minRound..maxRound) {
+            val sumOfWeightsOG = compute_sumOfWeight_OG(getTestFile("opengotha/$name/$name" + "_weights_R$round.txt"), pairingsOG[round - minRound], players)
+
+            BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            // Call Pairgoth pairing solver to generate games
+            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+
+            logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
+            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+
+            // Compare weights with OpenGotha
+            assertTrue(
+                compare_weights(
+                    getOutputFile("weights.txt"),
+                    getTestFile("opengotha/$name/$name" + "_weights_R$round.txt")
+                ), "Not matching opengotha weights for round $round"
+            )
+            // Compare pairings with OpenGotha
+            assertTrue(compare_games(games, pairingsOG[round - minRound]), "pairings for round $round differ")
+            logger.info("Pairings for round $round match OpenGotha")
+
+            // Enter results extracted from OpenGotha
+            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+            for (i in 0 until pairingsOG[round - minRound].size) {
+                val gameID = firstGameID + i
+                // find corresponding game (matching white id)
+                for (j in 0 until pairingsOG[round - 1].size) {
+                    val gameOG = pairingsOG[round - minRound].getJson(j)!!.asObject()// ["r"] as String?
+                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
+                        val gameRes = gameOG["r"] as String?
+                        resp = TestAPI.put(
+                            "/api/tour/$id/res/$round",
+                            Json.parse("""{"id":$gameID,"result":"$gameRes"}""")
+                        ).asObject()
+                        assertTrue(resp.getBoolean("success") == true, "expecting success")
+                        break
+                    }
+                }
+            }
+            logger.info("Results succesfully entered for round $round")
+        }
+    }
+
 }
