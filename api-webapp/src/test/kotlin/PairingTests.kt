@@ -26,48 +26,43 @@ class PairingTests: TestBase() {
     }
 
     companion object {
+        fun create_weights_map(file: File): HashMap<Pair<String, String>, List<Double>> {
+            val map = HashMap<Pair<String, String>, List<Double>>()
+
+            // Read lines
+            val lines = file.readLines()
+
+            // Store headers
+            val header1 = lines[0]
+            val header2 = lines[1]
+
+            logger.info("Reading weights file "+file)
+
+            // Loop through sections
+            for (i in 2..lines.size-1 step 12) {
+                // Get name pair
+                val name1 = lines[i].split("=")[1]
+                val name2 = lines[i+1].split("=")[1]
+
+                // Nested loop over costs
+                val costs = mutableListOf<Double>()
+                for (j in i + 2..i + 11) {
+                    val parts = lines[j].split("=")
+                    costs.add(parts[1].toDouble())
+                }
+
+                val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
+                // Add to map
+                map[tmp_pair] = costs
+            }
+            return map
+        }
+
         fun compare_weights(file1: File, file2: File, skipSeeding: Boolean = false):Boolean {
             BaseSolver.weightsLogger!!.flush()
             // Maps to store name pairs and costs
-            val map1 = HashMap<Pair<String, String>, List<Double>>()
-            val map2 = HashMap<Pair<String, String>, List<Double>>()
-            var count: Int = 1
-
-            for (file in listOf(file1, file2)) {
-
-                // Read lines
-                val lines = file.readLines()
-
-                // Store headers
-                val header1 = lines[0]
-                val header2 = lines[1]
-
-                logger.info("Reading weights file "+file)
-
-                // Loop through sections
-                for (i in 2..lines.size-1 step 12) {
-                    // Get name pair
-                    val name1 = lines[i].split("=")[1]
-                    val name2 = lines[i+1].split("=")[1]
-
-                    // Nested loop over costs
-                    val costs = mutableListOf<Double>()
-                    for (j in i + 2..i + 11) {
-                        val parts = lines[j].split("=")
-                        costs.add(parts[1].toDouble())
-                    }
-
-                    val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
-                    // Add to map
-                    if (count == 1) {
-                        map1[tmp_pair] = costs
-                    } else {
-                        map2[tmp_pair] = costs
-                    }
-                }
-                count += 1
-
-            }
+            val map1 = create_weights_map(file1)
+            val map2 = create_weights_map(file2)
 
             var identical = true
             for ((key, value) in map1) {
@@ -141,34 +136,7 @@ class PairingTests: TestBase() {
 
     fun compute_sumOfWeight_OG(file: File, opengotha: Json.Array, players: Json.Array): Double{
         // Map to store name pairs and costs
-        val map = HashMap<Pair<String, String>, List<Double>>()
-
-        // Read lines
-        val lines = file.readLines()
-
-        // Store headers
-        val header1 = lines[0]
-        val header2 = lines[1]
-
-        logger.info("Reading weights file "+file)
-
-        // Loop through sections
-        for (i in 2..lines.size-1 step 12) {
-            // Get name pair
-            val name1 = lines[i].split("=")[1]
-            val name2 = lines[i+1].split("=")[1]
-
-            // Nested loop over costs
-            val costs = mutableListOf<Double>()
-            for (j in i + 2..i + 11) {
-                val parts = lines[j].split("=")
-                costs.add(parts[1].toDouble())
-            }
-
-            val tmp_pair = if (name1 > name2) Pair(name1,name2) else Pair(name2,name1)
-            // Add to map
-            map[tmp_pair] = costs
-        }
+        val map = create_weights_map(file)
 
         val mapNamesID = HashMap<Int?, String>()
         for (i in 0 until players.size) {
@@ -396,7 +364,7 @@ class PairingTests: TestBase() {
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             // Call Pairgoth pairing solver to generate games
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
-
+            
             logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
             logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
 
