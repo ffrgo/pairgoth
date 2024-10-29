@@ -74,6 +74,15 @@ abstract class BasePairingHelper(
         }.toMap()
     }
 
+	// number of players in the biggest club and the biggest country
+	// this can be used to disable geocost if there is a majority of players from the same country or club
+	protected val biggestClubSize by lazy {
+		pairables.groupingBy { it.club }.eachCount().values.maxOrNull()!!
+	}
+	protected val biggestCountrySize by lazy {
+		pairables.groupingBy { it.club }.eachCount().values.maxOrNull()!!
+	}
+
     // already paired players map
     protected fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
 

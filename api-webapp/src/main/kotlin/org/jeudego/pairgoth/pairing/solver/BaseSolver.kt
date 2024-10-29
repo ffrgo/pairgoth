@@ -412,7 +412,6 @@ sealed class BaseSolver(
         // playersMeetCriteria = 2 : Both players are above thresholds -> apply the full weight
 
         var playersMeetCriteria = 0
-
         val nbw2Threshold =
             if (nbWinsThresholdActive) totalRounds
             else 2 * totalRounds
@@ -429,8 +428,14 @@ sealed class BaseSolver(
         val geoMaxCost = pairing.geo.avoidSameGeo
         //val geoMaxCost = 100000000000.0
 
-        val countryFactor = preferMMSDiffRatherThanSameCountry
-        val clubFactor: Int = preferMMSDiffRatherThanSameClub
+		val countryFactor: Int = if (biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
+			preferMMSDiffRatherThanSameCountry
+		else
+			0
+		val clubFactor: Int = if (biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
+			preferMMSDiffRatherThanSameClub
+		else
+			0
         //val groupFactor: Int = preferMMSDiffRatherThanSameClubsGroup
 
         // Same country
