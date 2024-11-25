@@ -132,27 +132,30 @@ sealed class BaseSolver(
         if (debug) {
             var sumOfWeights = 0.0
 
-            logger.info(String.format("%-30s", "Name")
+            logger.info(String.format("%-20s", "Name")
                     + " " + String.format("%-4s", "ID")
-                    + " " + String.format("%-4s", "MMS")
+                    + " " + String.format("%-4s", "iniS")
+                    + " " + String.format("%-4s", "curS")
                     + " " + String.format("%-4s", "SOS")
             )
+
             for (p in sortedPairables) {
-                logger.info(String.format("%-30s", p.name)
+                logger.info(String.format("%-20s", p.name.substring(0, min(p.name.length, 18)))
                         + " " + String.format("%-4s", p.id)
+                        + " " + String.format("%-4s", scores[p.id]?.first)
                         + " " + String.format("%-4s", scores[p.id]?.second)
                         + " " + String.format("%-4s", p.sos)
                 )
             }
 
 
-            logger.info(String.format("%-30s", "Name")
+            logger.info(String.format("%-20s", "Name")
                     + " " + String.format("%-3s", "plc")
                     + " " + String.format("%-3s", "ID")
                     + " " + String.format("%-3s", "col")
                     + " " + String.format("%-3s", "grp")
                     + " " + String.format("%-10s", "DUDD")
-                    + " vs " + String.format("%-30s", "Name")
+                    + " vs " + String.format("%-20s", "Name")
                     + " " + String.format("%-3s", "plc")
                     + " " + String.format("%-3s", "ID")
                     + " " + String.format("%-3s", "col")
@@ -162,13 +165,13 @@ sealed class BaseSolver(
 
             for (it in sorted) {
 
-                logger.info(String.format("%-30s", it[0].fullName())
+                logger.info(String.format("%-20s", it[0].fullName().substring(0, min(it[0].fullName().length, 18)))
                         + " " + String.format("%-3s", it[0].place.toString())
                         + " " + String.format("%-3s", it[0].id.toString())
                         + " " + String.format("%-3s", it[0].colorBalance.toString())
                         + " " + String.format("%-3s", it[0].group.toString())
                         + " " + String.format("%-10s", it[0].drawnUpDown.toString())
-                        + " vs " + String.format("%-30s", it[1].fullName())
+                        + " vs " + String.format("%-20s", it[1].fullName().substring(0, min(it[1].fullName().length, 18)))
                         + " " + String.format("%-3s", it[1].place.toString())
                         + " " + String.format("%-3s", it[1].id.toString())
                         + " " + String.format("%-3s", it[1].colorBalance.toString())
