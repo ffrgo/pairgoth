@@ -66,7 +66,7 @@ sealed class BaseSolver(
 
         val dec = DecimalFormat("#.#")
         val logger = LoggerFactory.getLogger("debug")
-        val debug = false
+        val debug = true
 
         weightsLogger?.apply {
             this.println("Round $round")
@@ -131,23 +131,49 @@ sealed class BaseSolver(
 
         if (debug) {
             var sumOfWeights = 0.0
+
+            logger.info(String.format("%-30s", "Name")
+                    + " " + String.format("%-4s", "ID")
+                    + " " + String.format("%-4s", "MMS")
+                    + " " + String.format("%-4s", "SOS")
+            )
             for (p in sortedPairables) {
-                logger.info("#${p.id} ${p.name} ${scores[p.id]?.first} ${scores[p.id]?.second} ${p.sos}")
+                logger.info(String.format("%-30s", p.name)
+                        + " " + String.format("%-4s", p.id)
+                        + " " + String.format("%-4s", scores[p.id]?.second)
+                        + " " + String.format("%-4s", p.sos)
+                )
             }
-            logger.info("name place ID colorBal group DUDD vs name place ID colorBal group DUDD")
+
+
+            logger.info(String.format("%-30s", "Name")
+                    + " " + String.format("%-3s", "plc")
+                    + " " + String.format("%-3s", "ID")
+                    + " " + String.format("%-3s", "col")
+                    + " " + String.format("%-3s", "grp")
+                    + " " + String.format("%-10s", "DUDD")
+                    + " vs " + String.format("%-30s", "Name")
+                    + " " + String.format("%-3s", "plc")
+                    + " " + String.format("%-3s", "ID")
+                    + " " + String.format("%-3s", "col")
+                    + " " + String.format("%-3s", "grp")
+                    + " " + String.format("%-10s", "DUDD")
+            )
+
             for (it in sorted) {
 
-                logger.info(it[0].fullName() + " " + it[0].place.toString()
-                                         + " " + it[0].id.toString()
-                                         + " " + it[0].colorBalance.toString()
-                                         + " " + it[0].group.toString()
-                                         + " " + it[0].drawnUpDown.toString()
-                                      + " vs " + it[1].fullName()
-                                         + " " + it[1].place.toString()
-                                         + " " + it[1].id.toString()
-                                         + " " + it[1].colorBalance.toString()
-                                         + " " + it[1].group.toString()
-                                         + " " + it[1].drawnUpDown.toString()
+                logger.info(String.format("%-30s", it[0].fullName())
+                        + " " + String.format("%-3s", it[0].place.toString())
+                        + " " + String.format("%-3s", it[0].id.toString())
+                        + " " + String.format("%-3s", it[0].colorBalance.toString())
+                        + " " + String.format("%-3s", it[0].group.toString())
+                        + " " + String.format("%-10s", it[0].drawnUpDown.toString())
+                        + " vs " + String.format("%-30s", it[1].fullName())
+                        + " " + String.format("%-3s", it[1].place.toString())
+                        + " " + String.format("%-3s", it[1].id.toString())
+                        + " " + String.format("%-3s", it[1].colorBalance.toString())
+                        + " " + String.format("%-3s", it[1].group.toString())
+                        + " " + String.format("%-10s", it[1].drawnUpDown.toString())
                 )
 
                 sumOfWeights += weight(it[0], it[1])
