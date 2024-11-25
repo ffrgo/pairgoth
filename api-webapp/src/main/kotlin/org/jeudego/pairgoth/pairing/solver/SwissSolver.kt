@@ -24,4 +24,8 @@ class SwissSolver(round: Int,
     override val scoresX: Map<ID, Double> get() = scores.mapValues { it.value.second }
 
     override val mainLimits = Pair(0.0, round - 1.0)
+
+    override fun computeWeightForBye(p: Pairable): Double{
+        return p.rank + 40*p.main
+    }
 }

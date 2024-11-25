@@ -55,7 +55,8 @@ sealed class BaseSolver(
         pairing.handicap.color(p1, p2)
 
     open fun computeWeightForBye(p: Pairable): Double{
-        return p.rank + 2*(p.main+p.rank)
+        // The weightForBye function depends on the system type (Mac-Mahon or Swiss), default value is 0.0
+        return 0.0
     }
 
     fun pair(): List<Game> {
