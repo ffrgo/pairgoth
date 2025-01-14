@@ -67,7 +67,7 @@ sealed class BaseSolver(
 
         val dec = DecimalFormat("#.#")
         val logger = LoggerFactory.getLogger("debug")
-        val debug = true
+        val debug = false
 
         weightsLogger?.apply {
             this.println("Round $round")
