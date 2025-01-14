@@ -1,160 +1,156 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-            <Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="20241013015914" dataVersion="201">
-            <Players>
-            <Player agaExpirationDate="" agaId="" club="China" country="CN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tianyi #2" grade="7d" name="Liu" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Chinese Taipei" country="TW" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Chen-en #3" grade="7d" name="Chung" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Hong Kong C." country="HK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Chi Hin #4" grade="6d" name="Chan" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="India" country="IN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Saranraj #5" grade="6k" name="Nambusubramaniyan" participating="10000001111111111111" rank="6k" rating="1450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Indonesia" country="ID" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Wiliam #6" grade="2k" name="Wijaya" participating="11111111111111111111" rank="2k" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Iran" country="IR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Hoorya #7" grade="1d" name="Ranjbar" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Japan" country="JP" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tsubasa #8" grade="7d" name="Kawaguchi" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Korea" country="KR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tae-heon #9" grade="7d" name="Kim" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Krygyz Republic" country="KG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ilim #10" grade="2k" name="Baratbaev" participating="11111111111111111111" rank="2k" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Brunei" country="BN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Alimin #1" grade="2d" name="Haidar" participating="11111111111111111111" rank="2d" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Macau C." country="MO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="In Hang #11" grade="5d" name="Sam" participating="11111111111111111111" rank="5d" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Malaysia" country="MY" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Song He #12" grade="5d" name="Kwee" participating="11111111111111111111" rank="5d" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Philippines" country="PH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Sunshine #13" grade="5k" name="Basinang" participating="11111111111111111111" rank="5k" rating="1550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Singapore" country="SG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Weichen #14" grade="6d" name="Jiang" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Thailand" country="TH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Wichrich #15" grade="6d" name="Karuehawanit" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Vietnam" country="VN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Quynh Anh #16" grade="6d" name="Ha" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Australia" country="AU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="James Andrew #47" grade="3d" name="Kaaden" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Austria" country="AT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Lilly #17" grade="1k" name="Hu" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Belgium" country="BE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Joost #18" grade="2k" name="Vannieuwenhuyse" participating="11111111111111111111" rank="2k" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Canada" country="CA" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Yongfei #58" grade="7d" name="Ge" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Croatia" country="HR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tadej Petar #19" grade="2d" name="Tukara" participating="11111111111111111111" rank="2d" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Czech Republic" country="CZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Leon #20" grade="3d" name="Defer" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Denmark" country="DK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ulrik #21" grade="4d" name="Bro-Jorgensen" participating="11111111111111111111" rank="4d" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Dominican Republic" country="DO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pascal Alejandro #59" grade="1k" name="Nunez Mariot" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Finland" country="FI" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ville #22" grade="4d" name="Vaataja" participating="11111111111111111111" rank="4d" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="France" country="FR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Denis #23" grade="6d" name="Karadaban" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Germany" country="DE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Martin Andreas #24" grade="5d" name="Ruzicka" participating="11111111111111111111" rank="5d" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Hungary" country="HU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Zalan #25" grade="1d" name="Makany" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Ireland" country="IE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Stephen #26" grade="1k" name="Nulty" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Israel" country="IL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tal #27" grade="5d" name="Michaeli" participating="11111111111111111111" rank="5d" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Italy" country="IT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Davide #28" grade="1d" name="Grasso" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Kazakhstan" country="KZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Roman #29" grade="6k" name="Tyumenev" participating="11111111111111111111" rank="6k" rating="1450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Lithuania" country="LT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tumelis #30" grade="3d" name="Giedrius" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Luxembourg" country="LU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Andreas Maximilian #31" grade="4d" name="Gotzfried" participating="11111111111111111111" rank="4d" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Madagascar" country="MG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Nirina #46" grade="1d" name="Ravelomanantsoa" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Netherlands" country="NL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Rob #32" grade="7d" name="van Zeist" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="New Zealand" country="NZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Do-young #48" grade="6d" name="Kim" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Norway" country="NO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pal Harald #33" grade="3d" name="Sannes" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Poland" country="PL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Cezary Tomasz #34" grade="5d" name="Czernecki" participating="11111111111111111111" rank="5d" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Portugal" country="PT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pedro #35" grade="1k" name="Carmona" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Romania" country="RO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Denis #36" grade="6d" name="Dobranis" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Serbia" country="RS" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Mihajlo #37" grade="2d" name="Andelic" participating="11111111111111111111" rank="2d" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Slovakia" country="SK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Peter #38" grade="2d" name="Smolarik" participating="11111111111111111111" rank="2d" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Slovenia" country="SI" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Klancisar #39" grade="3d" name="Tim" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Spain" country="ES" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pedro #40" grade="1k" name="Mendez Fleitas" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Sweden" country="SE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Anton #41" grade="3d" name="Silfver" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Switzerland" country="CH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Duy James #42" grade="1d" name="Nguyen" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Turkiye" country="TR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Husrev #43" grade="4d" name="Aksut" participating="11111111111111111111" rank="4d" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="U.S.A." country="US" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tianyuan #60" grade="6d" name="Zhang" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Ukraine" country="UA" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Valerii #44" grade="7d" name="Krushelnytskyi" participating="11111111111111111111" rank="7d" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="United Kingdom" country="GB" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ho-yeung #45" grade="6d" name="Woo" participating="11111111111111111111" rank="6d" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Argentina" country="AR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Jose Gabriel #49" grade="4k" name="Viviano" participating="11111111111111111111" rank="4k" rating="1650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Brazil" country="BR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Paulo #50" grade="5k" name="Camargo" participating="11111111111111111111" rank="5k" rating="1550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Chile" country="CL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Jose #51" grade="1d" name="Gomez" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Columbia" country="CO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Brandal #52" grade="3d" name="Henao" participating="11111111111111111111" rank="3d" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Ecuador" country="EC" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Susana #53" grade="1k" name="Sanchez" participating="11111111111111111111" rank="1k" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Guatemala" country="GT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Carlos Adrian #54" grade="4k" name="Ramirez Alvarez" participating="11111111111111111111" rank="4k" rating="1650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Mexico" country="MX" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Sebastian #55" grade="4d" name="Rios" participating="11111111111111111111" rank="4d" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Venezuela" country="VE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Manuel Ernesto #57" grade="1d" name="Azuaje Alamo" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-<Player agaExpirationDate="" agaId="" club="Peru" country="PE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Kenyi #56" grade="1d" name="Kina" participating="11111111111111111111" rank="1d" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
-            </Players>
-            <Games>
-            <Game blackPlayer="SANNESPALHARALD#33" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="1" whitePlayer="CHUNGCHEN-EN#3"/>
-<Game blackPlayer="SILFVERANTON#41" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="2" whitePlayer="GEYONGFEI#58"/>
-<Game blackPlayer="TIMKLANCISAR#39" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="KAWAGUCHITSUBASA#8"/>
-<Game blackPlayer="KRUSHELNYTSKYIVALERII#44" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="ANDELICMIHAJLO#37"/>
-<Game blackPlayer="LIUTIANYI#2" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="5" whitePlayer="HAIDARALIMIN#1"/>
-<Game blackPlayer="KIMTAE-HEON#9" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="6" whitePlayer="SMOLARIKPETER#38"/>
-<Game blackPlayer="VANZEISTROB#32" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="7" whitePlayer="TUKARATADEJPETAR#19"/>
-<Game blackPlayer="CHANCHIHIN#4" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="8" whitePlayer="AZUAJEALAMOMANUELERNESTO#57"/>
-<Game blackPlayer="GOMEZJOSE#51" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="9" whitePlayer="DOBRANISDENIS#36"/>
-<Game blackPlayer="HAQUYNHANH#16" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="10" whitePlayer="GRASSODAVIDE#28"/>
-<Game blackPlayer="KINAKENYI#56" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="11" whitePlayer="JIANGWEICHEN#14"/>
-<Game blackPlayer="MAKANYZALAN#25" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="12" whitePlayer="KARADABANDENIS#23"/>
-<Game blackPlayer="NGUYENDUYJAMES#42" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="13" whitePlayer="KARUEHAWANITWICHRICH#15"/>
-<Game blackPlayer="RANJBARHOORYA#7" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="14" whitePlayer="KIMDO-YOUNG#48"/>
-<Game blackPlayer="WOOHO-YEUNG#45" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="15" whitePlayer="RAVELOMANANTSOANIRINA#46"/>
-<Game blackPlayer="ZHANGTIANYUAN#60" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="16" whitePlayer="CARMONAPEDRO#35"/>
-<Game blackPlayer="HULILLY#17" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="17" whitePlayer="CZERNECKICEZARYTOMASZ#34"/>
-<Game blackPlayer="MENDEZFLEITASPEDRO#40" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="18" whitePlayer="KWEESONGHE#12"/>
-<Game blackPlayer="NULTYSTEPHEN#26" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="19" whitePlayer="MICHAELITAL#27"/>
-<Game blackPlayer="RUZICKAMARTINANDREAS#24" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="20" whitePlayer="NUNEZMARIOTPASCALALEJANDRO#59"/>
-<Game blackPlayer="SANCHEZSUSANA#53" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="21" whitePlayer="SAMINHANG#11"/>
-<Game blackPlayer="BARATBAEVILIM#10" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="22" whitePlayer="AKSUTHUSREV#43"/>
-<Game blackPlayer="VANNIEUWENHUYSEJOOST#18" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="23" whitePlayer="BRO-JORGENSENULRIK#21"/>
-<Game blackPlayer="WIJAYAWILIAM#6" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="24" whitePlayer="GOTZFRIEDANDREASMAXIMILIAN#31"/>
-<Game blackPlayer="RIOSSEBASTIAN#55" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="25" whitePlayer="RAMIREZALVAREZCARLOSADRIAN#54"/>
-<Game blackPlayer="VIVIANOJOSEGABRIEL#49" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="26" whitePlayer="VAATAJAVILLE#22"/>
-<Game blackPlayer="DEFERLEON#20" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="27" whitePlayer="BASINANGSUNSHINE#13"/>
-<Game blackPlayer="GIEDRIUSTUMELIS#30" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="28" whitePlayer="CAMARGOPAULO#50"/>
-<Game blackPlayer="NAMBUSUBRAMANIYANSARANRAJ#5" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="29" whitePlayer="HENAOBRANDAL#52"/>
-<Game blackPlayer="TYUMENEVROMAN#29" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="30" whitePlayer="KAADENJAMESANDREW#47"/>
-<Game blackPlayer="CHUNGCHEN-EN#3" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="1" whitePlayer="WOOHO-YEUNG#45"/>
-<Game blackPlayer="GEYONGFEI#58" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="2" whitePlayer="ZHANGTIANYUAN#60"/>
-<Game blackPlayer="KAWAGUCHITSUBASA#8" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="3" whitePlayer="RUZICKAMARTINANDREAS#24"/>
-<Game blackPlayer="KWEESONGHE#12" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="4" whitePlayer="KIMTAE-HEON#9"/>
-<Game blackPlayer="MICHAELITAL#27" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="5" whitePlayer="KRUSHELNYTSKYIVALERII#44"/>
-<Game blackPlayer="SAMINHANG#11" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="6" whitePlayer="LIUTIANYI#2"/>
-<Game blackPlayer="AKSUTHUSREV#43" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="7" whitePlayer="VANZEISTROB#32"/>
-<Game blackPlayer="GOTZFRIEDANDREASMAXIMILIAN#31" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="8" whitePlayer="CHANCHIHIN#4"/>
-<Game blackPlayer="DOBRANISDENIS#36" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="9" whitePlayer="RIOSSEBASTIAN#55"/>
-<Game blackPlayer="VAATAJAVILLE#22" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="10" whitePlayer="HAQUYNHANH#16"/>
-<Game blackPlayer="JIANGWEICHEN#14" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="11" whitePlayer="DEFERLEON#20"/>
-<Game blackPlayer="KARADABANDENIS#23" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="12" whitePlayer="GIEDRIUSTUMELIS#30"/>
-<Game blackPlayer="KARUEHAWANITWICHRICH#15" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="13" whitePlayer="HENAOBRANDAL#52"/>
-<Game blackPlayer="KIMDO-YOUNG#48" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="14" whitePlayer="VANNIEUWENHUYSEJOOST#18"/>
-<Game blackPlayer="CZERNECKICEZARYTOMASZ#34" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="15" whitePlayer="TYUMENEVROMAN#29"/>
-<Game blackPlayer="BRO-JORGENSENULRIK#21" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="16" whitePlayer="NGUYENDUYJAMES#42"/>
-<Game blackPlayer="KAADENJAMESANDREW#47" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="17" whitePlayer="RANJBARHOORYA#7"/>
-<Game blackPlayer="RAVELOMANANTSOANIRINA#46" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="18" whitePlayer="SANNESPALHARALD#33"/>
-<Game blackPlayer="CARMONAPEDRO#35" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="19" whitePlayer="SILFVERANTON#41"/>
-<Game blackPlayer="HULILLY#17" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="20" whitePlayer="TIMKLANCISAR#39"/>
-<Game blackPlayer="ANDELICMIHAJLO#37" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="21" whitePlayer="MENDEZFLEITASPEDRO#40"/>
-<Game blackPlayer="HAIDARALIMIN#1" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="22" whitePlayer="NULTYSTEPHEN#26"/>
-<Game blackPlayer="SMOLARIKPETER#38" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="23" whitePlayer="SANCHEZSUSANA#53"/>
-<Game blackPlayer="TUKARATADEJPETAR#19" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="24" whitePlayer="BARATBAEVILIM#10"/>
-<Game blackPlayer="AZUAJEALAMOMANUELERNESTO#57" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="25" whitePlayer="WIJAYAWILIAM#6"/>
-<Game blackPlayer="NUNEZMARIOTPASCALALEJANDRO#59" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="26" whitePlayer="GOMEZJOSE#51"/>
-<Game blackPlayer="GRASSODAVIDE#28" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="27" whitePlayer="VIVIANOJOSEGABRIEL#49"/>
-<Game blackPlayer="RAMIREZALVAREZCARLOSADRIAN#54" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="28" whitePlayer="KINAKENYI#56"/>
-<Game blackPlayer="BASINANGSUNSHINE#13" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="29" whitePlayer="MAKANYZALAN#25"/>
-            </Games>
-            <ByePlayer>
-            
-
-
-
-
-
-
-            </ByePlayer>
-            <TournamentParameterSet>
-            <GeneralParameterSet bInternet="false" basicTime="40" beginDate="2024-09-20" canByoYomiTime="0" complementaryTimeSystem="FISCHER" director="Arnold Kim" endDate="2024-09-27" fischerTime="20" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location=" Taebaek" name="19th KPMC Split bug" nbMovesCanTime="0" numberOfCategories="1" numberOfRounds="7" shortName="20240921-KPMC-Splitbug" size="19" stdByoYomiTime="0"/>
-            <HandicapParameterSet hdBasedOnMMS="false" hdCeiling="0" hdCorrection="1" hdNoHdRankThreshold="1d"/>
-            <PlacementParameterSet>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="20250114100931" dataVersion="201">
+    <Players>
+        <Player agaExpirationDate="" agaId="" club="Domi" country="DO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pascal Alejandro #59" grade="1K" name="Nunez Mariot" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="U.S." country="US" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tianyuan #60" grade="6D" name="Zhang" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Mexi" country="MX" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Sebastian #55" grade="4D" name="Rios" participating="11111111111111111111" rank="4D" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Indi" country="IN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Saranraj #5" grade="6K" name="Nambusubramaniyan" participating="10000001111111111111" rank="6K" rating="1450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Ukra" country="UA" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Valerii #44" grade="7D" name="Krushelnytskyi" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Finl" country="FI" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ville #22" grade="4D" name="Vaataja" participating="11111111111111111111" rank="4D" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Colu" country="CO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Brandal #52" grade="3D" name="Henao" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Ital" country="IT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Davide #28" grade="1D" name="Grasso" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Sing" country="SG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Weichen #14" grade="6D" name="Jiang" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Slov" country="SK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Peter #38" grade="2D" name="Smolarik" participating="11111111111111111111" rank="2D" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Croa" country="HR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tadej Petar #19" grade="2D" name="Tukara" participating="11111111111111111111" rank="2D" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Guat" country="GT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Carlos Adrian #54" grade="4K" name="Ramirez Alvarez" participating="11111111111111111111" rank="4K" rating="1650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Chin" country="CN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tianyi #2" grade="7D" name="Liu" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Chin" country="TW" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Chen-en #3" grade="7D" name="Chung" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Luxe" country="LU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Andreas Maximilian #31" grade="4D" name="Gotzfried" participating="11111111111111111111" rank="4D" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Mala" country="MY" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Song He #12" grade="5D" name="Kwee" participating="11111111111111111111" rank="5D" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Belg" country="BE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Joost #18" grade="2K" name="Vannieuwenhuyse" participating="11111111111111111111" rank="2K" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Arge" country="AR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Jose Gabriel #49" grade="4K" name="Viviano" participating="11111111111111111111" rank="4K" rating="1650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Cana" country="CA" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Yongfei #58" grade="7D" name="Ge" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Braz" country="BR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Paulo #50" grade="5K" name="Camargo" participating="11111111111111111111" rank="5K" rating="1550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Indo" country="ID" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Wiliam #6" grade="2K" name="Wijaya" participating="11111111111111111111" rank="2K" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Swit" country="CH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Duy James #42" grade="1D" name="Nguyen" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Kore" country="KR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tae-heon #9" grade="7D" name="Kim" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Aust" country="AT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Lilly #17" grade="1K" name="Hu" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Chil" country="CL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Jose #51" grade="1D" name="Gomez" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Neth" country="NL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Rob #32" grade="7D" name="van Zeist" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Slov" country="SI" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Klancisar #39" grade="3D" name="Tim" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Fran" country="FR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Denis #23" grade="6D" name="Karadaban" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Turk" country="TR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Husrev #43" grade="4D" name="Aksut" participating="11111111111111111111" rank="4D" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Germ" country="DE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Martin Andreas #24" grade="5D" name="Ruzicka" participating="11111111111111111111" rank="5D" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Vene" country="VE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Manuel Ernesto #57" grade="1D" name="Azuaje Alamo" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Spai" country="ES" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pedro #40" grade="1K" name="Mendez Fleitas" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Hong" country="HK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Chi Hin #4" grade="6D" name="Chan" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Norw" country="NO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pal Harald #33" grade="3D" name="Sannes" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Lith" country="LT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tumelis #30" grade="3D" name="Giedrius" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Iran" country="IR" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Hoorya #7" grade="1D" name="Ranjbar" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Thai" country="TH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Wichrich #15" grade="6D" name="Karuehawanit" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Kryg" country="KG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ilim #10" grade="2K" name="Baratbaev" participating="11111111111111111111" rank="2K" rating="1850" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Maca" country="MO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="In Hang #11" grade="5D" name="Sam" participating="11111111111111111111" rank="5D" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Ecua" country="EC" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Susana #53" grade="1K" name="Sanchez" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Aust" country="AU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="James Andrew #47" grade="3D" name="Kaaden" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Hung" country="HU" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Zalan #25" grade="1D" name="Makany" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="New " country="NZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Do-young #48" grade="6D" name="Kim" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Swed" country="SE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Anton #41" grade="3D" name="Silfver" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Isra" country="IL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tal #27" grade="5D" name="Michaeli" participating="11111111111111111111" rank="5D" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Unit" country="GB" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ho-yeung #45" grade="6D" name="Woo" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Denm" country="DK" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Ulrik #21" grade="4D" name="Bro-Jorgensen" participating="11111111111111111111" rank="4D" rating="2350" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Czec" country="CZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Leon #20" grade="3D" name="Defer" participating="11111111111111111111" rank="3D" rating="2250" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Irel" country="IE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Stephen #26" grade="1K" name="Nulty" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Roma" country="RO" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Denis #36" grade="6D" name="Dobranis" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Japa" country="JP" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Tsubasa #8" grade="7D" name="Kawaguchi" participating="11111111111111111111" rank="7D" rating="2650" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Serb" country="RS" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Mihajlo #37" grade="2D" name="Andelic" participating="11111111111111111111" rank="2D" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Kaza" country="KZ" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Roman #29" grade="6K" name="Tyumenev" participating="11111111111111111111" rank="6K" rating="1450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Pola" country="PL" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Cezary Tomasz #34" grade="5D" name="Czernecki" participating="11111111111111111111" rank="5D" rating="2450" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Viet" country="VN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Quynh Anh #16" grade="6D" name="Ha" participating="11111111111111111111" rank="6D" rating="2550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Brun" country="BN" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Alimin #1" grade="2D" name="Haidar" participating="11111111111111111111" rank="2D" rating="2150" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Port" country="PT" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Pedro #35" grade="1K" name="Carmona" participating="11111111111111111111" rank="1K" rating="1950" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Phil" country="PH" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Sunshine #13" grade="5K" name="Basinang" participating="11111111111111111111" rank="5K" rating="1550" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Peru" country="PE" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Kenyi #56" grade="1D" name="Kina" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+        <Player agaExpirationDate="" agaId="" club="Mada" country="MG" egfPin="" ffgLicence="" ffgLicenceStatus="" firstName="Nirina #46" grade="1D" name="Ravelomanantsoa" participating="11111111111111111111" rank="1D" rating="2050" ratingOrigin="" registeringStatus="FIN" smmsCorrection="0"/>
+    </Players>
+    <Games>
+        <Game blackPlayer="SANNESPALHARALD#33" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="1" whitePlayer="CHUNGCHEN-EN#3"/>
+        <Game blackPlayer="CARMONAPEDRO#35" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="25" whitePlayer="SILFVERANTON#41"/>
+        <Game blackPlayer="SILFVERANTON#41" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="2" whitePlayer="GEYONGFEI#58"/>
+        <Game blackPlayer="KAADENJAMESANDREW#47" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="26" whitePlayer="RANJBARHOORYA#7"/>
+        <Game blackPlayer="TIMKLANCISAR#39" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="KAWAGUCHITSUBASA#8"/>
+        <Game blackPlayer="NUNEZMARIOTPASCALALEJANDRO#59" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="27" whitePlayer="TIMKLANCISAR#39"/>
+        <Game blackPlayer="KRUSHELNYTSKYIVALERII#44" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="ANDELICMIHAJLO#37"/>
+        <Game blackPlayer="RAVELOMANANTSOANIRINA#46" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="28" whitePlayer="SANNESPALHARALD#33"/>
+        <Game blackPlayer="LIUTIANYI#2" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="5" whitePlayer="HAIDARALIMIN#1"/>
+        <Game blackPlayer="BRO-JORGENSENULRIK#21" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="29" whitePlayer="NGUYENDUYJAMES#42"/>
+        <Game blackPlayer="KIMTAE-HEON#9" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="6" whitePlayer="SMOLARIKPETER#38"/>
+        <Game blackPlayer="VANZEISTROB#32" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="7" whitePlayer="TUKARATADEJPETAR#19"/>
+        <Game blackPlayer="CHANCHIHIN#4" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="8" whitePlayer="AZUAJEALAMOMANUELERNESTO#57"/>
+        <Game blackPlayer="GOMEZJOSE#51" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="9" whitePlayer="DOBRANISDENIS#36"/>
+        <Game blackPlayer="HAQUYNHANH#16" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="10" whitePlayer="GRASSODAVIDE#28"/>
+        <Game blackPlayer="KINAKENYI#56" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="11" whitePlayer="JIANGWEICHEN#14"/>
+        <Game blackPlayer="MAKANYZALAN#25" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="12" whitePlayer="KARADABANDENIS#23"/>
+        <Game blackPlayer="NGUYENDUYJAMES#42" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="13" whitePlayer="KARUEHAWANITWICHRICH#15"/>
+        <Game blackPlayer="RANJBARHOORYA#7" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="14" whitePlayer="KIMDO-YOUNG#48"/>
+        <Game blackPlayer="WOOHO-YEUNG#45" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="15" whitePlayer="RAVELOMANANTSOANIRINA#46"/>
+        <Game blackPlayer="ZHANGTIANYUAN#60" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="16" whitePlayer="CARMONAPEDRO#35"/>
+        <Game blackPlayer="HULILLY#17" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="17" whitePlayer="CZERNECKICEZARYTOMASZ#34"/>
+        <Game blackPlayer="MENDEZFLEITASPEDRO#40" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="18" whitePlayer="KWEESONGHE#12"/>
+        <Game blackPlayer="NULTYSTEPHEN#26" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="19" whitePlayer="MICHAELITAL#27"/>
+        <Game blackPlayer="RUZICKAMARTINANDREAS#24" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="20" whitePlayer="NUNEZMARIOTPASCALALEJANDRO#59"/>
+        <Game blackPlayer="SANCHEZSUSANA#53" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="21" whitePlayer="SAMINHANG#11"/>
+        <Game blackPlayer="BARATBAEVILIM#10" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="22" whitePlayer="AKSUTHUSREV#43"/>
+        <Game blackPlayer="VANNIEUWENHUYSEJOOST#18" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="23" whitePlayer="BRO-JORGENSENULRIK#21"/>
+        <Game blackPlayer="WIJAYAWILIAM#6" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="24" whitePlayer="GOTZFRIEDANDREASMAXIMILIAN#31"/>
+        <Game blackPlayer="RIOSSEBASTIAN#55" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="25" whitePlayer="RAMIREZALVAREZCARLOSADRIAN#54"/>
+        <Game blackPlayer="VIVIANOJOSEGABRIEL#49" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="26" whitePlayer="VAATAJAVILLE#22"/>
+        <Game blackPlayer="DEFERLEON#20" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="27" whitePlayer="BASINANGSUNSHINE#13"/>
+        <Game blackPlayer="GIEDRIUSTUMELIS#30" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="28" whitePlayer="CAMARGOPAULO#50"/>
+        <Game blackPlayer="NAMBUSUBRAMANIYANSARANRAJ#5" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="29" whitePlayer="HENAOBRANDAL#52"/>
+        <Game blackPlayer="TYUMENEVROMAN#29" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="30" whitePlayer="KAADENJAMESANDREW#47"/>
+        <Game blackPlayer="GOTZFRIEDANDREASMAXIMILIAN#31" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="1" whitePlayer="CHANCHIHIN#4"/>
+        <Game blackPlayer="JIANGWEICHEN#14" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="2" whitePlayer="DEFERLEON#20"/>
+        <Game blackPlayer="DOBRANISDENIS#36" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="3" whitePlayer="RIOSSEBASTIAN#55"/>
+        <Game blackPlayer="KARADABANDENIS#23" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="4" whitePlayer="GIEDRIUSTUMELIS#30"/>
+        <Game blackPlayer="VAATAJAVILLE#22" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="5" whitePlayer="HAQUYNHANH#16"/>
+        <Game blackPlayer="HENAOBRANDAL#52" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="6" whitePlayer="WOOHO-YEUNG#45"/>
+        <Game blackPlayer="KARUEHAWANITWICHRICH#15" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="7" whitePlayer="VANNIEUWENHUYSEJOOST#18"/>
+        <Game blackPlayer="KIMDO-YOUNG#48" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="8" whitePlayer="TYUMENEVROMAN#29"/>
+        <Game blackPlayer="AKSUTHUSREV#43" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="9" whitePlayer="VANZEISTROB#32"/>
+        <Game blackPlayer="CHUNGCHEN-EN#3" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="10" whitePlayer="ZHANGTIANYUAN#60"/>
+        <Game blackPlayer="GEYONGFEI#58" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="11" whitePlayer="CZERNECKICEZARYTOMASZ#34"/>
+        <Game blackPlayer="KAWAGUCHITSUBASA#8" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="12" whitePlayer="RUZICKAMARTINANDREAS#24"/>
+        <Game blackPlayer="KWEESONGHE#12" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="13" whitePlayer="KIMTAE-HEON#9"/>
+        <Game blackPlayer="MICHAELITAL#27" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="14" whitePlayer="KRUSHELNYTSKYIVALERII#44"/>
+        <Game blackPlayer="SAMINHANG#11" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="15" whitePlayer="LIUTIANYI#2"/>
+        <Game blackPlayer="AZUAJEALAMOMANUELERNESTO#57" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="16" whitePlayer="BARATBAEVILIM#10"/>
+        <Game blackPlayer="BASINANGSUNSHINE#13" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="17" whitePlayer="MAKANYZALAN#25"/>
+        <Game blackPlayer="RAMIREZALVAREZCARLOSADRIAN#54" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="18" whitePlayer="GOMEZJOSE#51"/>
+        <Game blackPlayer="GRASSODAVIDE#28" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="19" whitePlayer="WIJAYAWILIAM#6"/>
+        <Game blackPlayer="KINAKENYI#56" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="20" whitePlayer="VIVIANOJOSEGABRIEL#49"/>
+        <Game blackPlayer="ANDELICMIHAJLO#37" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="21" whitePlayer="HULILLY#17"/>
+        <Game blackPlayer="HAIDARALIMIN#1" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="22" whitePlayer="MENDEZFLEITASPEDRO#40"/>
+        <Game blackPlayer="SMOLARIKPETER#38" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="23" whitePlayer="NULTYSTEPHEN#26"/>
+        <Game blackPlayer="TUKARATADEJPETAR#19" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="24" whitePlayer="SANCHEZSUSANA#53"/>
+    </Games>
+    <TournamentParameterSet>
+        <GeneralParameterSet bInternet="false" basicTime="40" beginDate="2024-09-20" canByoYomiTime="300" complementaryTimeSystem="FISCHER" director="Arnold Kim" endDate="2024-09-27" fischerTime="20" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location=" Taebaek" name="19th KPMC Split bug" nbMovesCanTime="5" numberOfCategories="1" numberOfRounds="7" shortName="20240921-KPMC-Splitbug_OG240904" size="19" stdByoYomiTime="5"/>
+        <HandicapParameterSet hdBasedOnMMS="false" hdCeiling="0" hdCorrection="1" hdNoHdRankThreshold="1D"/>
+        <PlacementParameterSet>
             <PlacementCriteria>
-            [<PlacementCriterion name="NBW" number="1"/>, <PlacementCriterion name="SOSW" number="2"/>, <PlacementCriterion name="SOSOSW" number="3"/>, <PlacementCriterion name="NULL" number="4"/>, <PlacementCriterion name="NULL" number="5"/>, <PlacementCriterion name="NULL" number="6"/>]
+                <PlacementCriterion name="NBW" number="1"/>
+                <PlacementCriterion name="SOSW" number="2"/>
+                <PlacementCriterion name="SOSOSW" number="3"/>
+                <PlacementCriterion name="NULL" number="4"/>
+                <PlacementCriterion name="NULL" number="5"/>
+                <PlacementCriterion name="NULL" number="6"/>
             </PlacementCriteria>
-            </PlacementParameterSet>
-            <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="None" paiMaAvoidMixingCategories="20000000000000" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="3" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="3" paiSePreferMMSDiffRatherThanSameCountry="1" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
-            <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
-            <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
-            </TournamentParameterSet>
-            <TeamTournamentParameterSet>
-            <TeamGeneralParameterSet teamSize="4"/>
-            <TeamPlacementParameterSet>
+        </PlacementParameterSet>
+        <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="NULL" paiMaAvoidMixingCategories="20000000000000" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="3" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="3" paiSePreferMMSDiffRatherThanSameCountry="1" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
+        <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
+        <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
+    </TournamentParameterSet>
+    <TeamTournamentParameterSet>
+        <TeamGeneralParameterSet teamSize="4"/>
+        <TeamPlacementParameterSet>
             <PlacementCriteria>
-            <PlacementCriterion name="TEAMP" number="1"/>
-            <PlacementCriterion name="BDW" number="2"/>
-            <PlacementCriterion name="BDW3U" number="3"/>
-            <PlacementCriterion name="BDW2U" number="4"/>
-            <PlacementCriterion name="BDW1U" number="5"/>
-            <PlacementCriterion name="MNR" number="6"/>
+                <PlacementCriterion name="TEAMP" number="1"/>
+                <PlacementCriterion name="BDW" number="2"/>
+                <PlacementCriterion name="BDW3U" number="3"/>
+                <PlacementCriterion name="BDW2U" number="4"/>
+                <PlacementCriterion name="BDW1U" number="5"/>
+                <PlacementCriterion name="MNR" number="6"/>
             </PlacementCriteria>
-            </TeamPlacementParameterSet>
-            </TeamTournamentParameterSet>
-            </Tournament>
+        </TeamPlacementParameterSet>
+    </TeamTournamentParameterSet>
+</Tournament>
