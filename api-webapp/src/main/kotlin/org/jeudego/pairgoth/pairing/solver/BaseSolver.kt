@@ -210,7 +210,7 @@ sealed class BaseSolver(
     }
 
     open fun BaseCritParams.applyRandom(p1: Pairable, p2: Pairable): Double {
-        val score =  if (deterministic) detRandom(random, p1, p2)
+        val score =  if (deterministic) detRandom(random, p1, p2, true)
         else nonDetRandom(random)
         return score
     }
@@ -404,9 +404,9 @@ sealed class BaseSolver(
                         val rand =
                             if (asymmetricDetRandom && p1.fullName() > p2.fullName()) {
                                 // for old tests to pass
-                                detRandom(randRange, p2, p1)
+                                detRandom(randRange, p2, p1, false)
                             } else {
-                                detRandom(randRange, p1, p2)
+                                detRandom(randRange, p1, p2, true)
                             }
                         maxSeedingWeight - rand
                     } else {
@@ -546,7 +546,7 @@ sealed class BaseSolver(
             } else if (p1.colorBalance < p2.colorBalance) {
                 score = 1.0
             } else { // choose color from a det random
-                if (detRandom(1.0, p1, p2) === 0.0) {
+                if (detRandom(1.0, p1, p2, false) === 0.0) {
                     score = 1.0
                 } else {
                     score = -1.0

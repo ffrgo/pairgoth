@@ -3,7 +3,7 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.pairing.solver.BaseSolver
 
-fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
+fun detRandom(max: Double, p1: Pairable, p2: Pairable, symmetric: Boolean): Double {
     var inverse = false
     var name1 = p1.fullName("")
     var name2 = p2.fullName("")
@@ -15,7 +15,8 @@ fun detRandom(max: Double, p1: Pairable, p2: Pairable): Double {
         c.code.toDouble() * (i + 1)
     }.sum() * 1234567 % (max + 1)
     // we want the symmetry, except when explicitly asked for a legacy asymmetric detRandom, for tests
-    if (inverse && BaseSolver.asymmetricDetRandom) {
+    // if (inverse && BaseSolver.asymmetricDetRandom) {
+    if (inverse && !symmetric) {
         nR = max - nR
     }
     return nR
