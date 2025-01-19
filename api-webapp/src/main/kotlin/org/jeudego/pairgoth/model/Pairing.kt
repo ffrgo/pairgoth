@@ -330,8 +330,8 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?): Pairing {
     return when (type) {
         SWISS -> Swiss(pairingParams, placementParams)
         MAC_MAHON -> MacMahon(pairingParams, placementParams).also { mm ->
-            mm.mmFloor = json.getInt("mmFloor") ?: -20
-            mm.mmBar = json.getInt("mmBar") ?: 0
+            mm.mmFloor = json.getInt("mmFloor") ?: (default as? MacMahon)?.mmFloor ?: -20
+            mm.mmBar = json.getInt("mmBar") ?: (default as? MacMahon)?.mmBar ?: 0
         }
         ROUND_ROBIN -> RoundRobin(pairingParams, placementParams)
     }
