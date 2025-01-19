@@ -96,10 +96,7 @@
     #end
           <td class="nobreak game-result" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
   #end
-  $log.info("@@@@@ part = $part")
-  $log.info("@@@@@ crit = $criteres")
   #foreach($crit in $criteres)
-    $log.info("@@@@@ $crit found ? $part.containsKey($crit)")
     #set($value = "$number.format('0.#', $part[$crit])")
           <td data-sort="$value">$value.replace('.5', '½')</td>
   #end
