@@ -9,13 +9,13 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+## [0.19] - 2025-01-20
+
+Maintenance release. Some tests still need some fixing.
+
 ### Added
 
 - Added *this* changelog
-
-## [0.19] - 2025-01-19
-
-Maintenance release. Some tests still need some fixing.
 
 ### Changed
 
@@ -26,6 +26,7 @@ Maintenance release. Some tests still need some fixing.
 
 - Correction of ByePlayer choice in Swiss system
 - MM floor and bar were resetted to default values when editing advanced parameters
+- Review DUDD
 
 ## [0.18] - 2024-12-02
 
