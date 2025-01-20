@@ -220,13 +220,13 @@ open class HistoryHelper(
     val drawnUpDown by lazy {
         (history.flatten().map { game ->
             Pair(game.white, Pair(
-                Math.max(0, game.drawnUpDown),
-                Math.max(0, -game.drawnUpDown)
+                Math.max(0, -game.drawnUpDown),
+                Math.max(0, game.drawnUpDown)
             ))
         } + history.flatten().map { game ->
             Pair(game.black, Pair(
-                Math.max(0, -game.drawnUpDown),
-                Math.max(0, game.drawnUpDown)
+                Math.max(0, game.drawnUpDown),
+                Math.max(0, -game.drawnUpDown)
             ))
         }).groupingBy { it.first }.fold(Pair(0, 0)) { acc, next ->
             Pair(acc.first + next.second.first, acc.second + next.second.second)

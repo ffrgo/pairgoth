@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.model.MainCritParams.DrawUpDown
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.pairing.BasePairingHelper
 import org.jeudego.pairgoth.pairing.detRandom
@@ -289,6 +290,16 @@ sealed class BaseSolver(
         return score
     }
 
+    // helper function for DUDD
+    fun duddForGroup(duddMode: DrawUpDown, p: Pairable, duddWeight: Double): Double {
+        val (placeInGroup, groupSize) = p.placeInGroup
+        return when (duddMode) {
+            DrawUpDown.TOP -> duddWeight / 2 * (groupSize - 1 - placeInGroup) / groupSize
+            DrawUpDown.MIDDLE -> duddWeight / 2 * (groupSize - 1 - abs(2 * placeInGroup - groupSize + 1)) / groupSize
+            DrawUpDown.BOTTOM -> duddWeight / 2 * placeInGroup / groupSize
+        }
+     }
+
     open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
 
@@ -297,6 +308,8 @@ sealed class BaseSolver(
         // Modifs V3.44.05 (ideas from Tuomo Salo)
 
         if (p1.group != p2.group) {
+            val upperSP = if (p1.group < p2.group) p2 else p1
+            val lowerSP = if (p1.group < p2.group) p1 else p2
             // 5 scenarii
             // scenario = 0 : Both players have already been drawn in the same sense
             // scenario = 1 : One of the players has already been drawn in the same sense           
@@ -305,57 +318,33 @@ sealed class BaseSolver(
             // scenario = 3 : It corrects a previous DU/DD            //        
             // scenario = 4 : it corrects a previous DU/DD for both
             var scenario = 2
-            val p1_DU = p1.drawnUpDown.first
-            val p1_DD = p1.drawnUpDown.second
-            val p2_DU = p2.drawnUpDown.first
-            val p2_DD = p2.drawnUpDown.second
+            val (uSP_DU, uSP_DD) = upperSP.drawnUpDown
+            val (lSP_DU, lSP_DD) = lowerSP.drawnUpDown
             
-            if (p1_DU > 0 && p1.group > p2.group) {
+			// If upper player has already been drawn down or lower player has already been drawn up
+			// This is bad
+            if (uSP_DD > 0) {
                 scenario--
             }
-            if (p1_DD > 0 && p1.group < p2.group) {
+            if (lSP_DU > 0) {
                 scenario--
             }
-            if (p2_DU > 0 && p2.group > p1.group) {
-                scenario--
-            }
-            if (p2_DD > 0 && p2.group < p1.group) {
-                scenario--
-            }
-            if (scenario != 0 && p1_DU > 0 && p1_DD < p1_DU && p1.group < p2.group) {
+            // if top player has already been drawn down more than drawn up
+            // This is good
+            if (scenario != 0 && uSP_DU > 0 && uSP_DU >= uSP_DD) {
                 scenario++
             }
-            if (scenario != 0 && p1_DD > 0 && p1_DU < p1_DD && p1.group > p2.group) {
-                scenario++
-            }
-            if (scenario != 0 && p2_DU > 0 && p2_DD < p2_DU && p2.group < p1.group) {
-                scenario++
-            }
-            if (scenario != 0 && p2_DD > 0 && p2_DU < p2_DD && p2.group > p1.group) {
+            // Conversely if lower player has been drawn up more than drawn down
+            if (scenario != 0 && lSP_DD > 0 && lSP_DD >= lSP_DU) {
                 scenario++
             }
 
-            val duddWeight: Double = pairing.main.drawUpDownWeight/5.0
-            val upperSP = if (p1.group < p2.group) p2 else p1
-            val lowerSP = if (p1.group < p2.group) p1 else p2
-            val uSPgroupSize = upperSP.placeInGroup.second
-            val lSPgroupSize = lowerSP.placeInGroup.second
+            val duddWeight = pairing.main.drawUpDownWeight / 5.0
 
+            score +=
+                duddForGroup(pairing.main.drawUpDownUpperMode, upperSP, duddWeight) +
+                duddForGroup(pairing.main.drawUpDownLowerMode, lowerSP, duddWeight)
 
-            if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.TOP) {
-                score += duddWeight / 2 * (uSPgroupSize - 1 - upperSP.placeInGroup.first) / uSPgroupSize
-            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.MIDDLE) {
-                score += duddWeight / 2 * (uSPgroupSize - 1 - Math.abs(2 * upperSP.placeInGroup.first - uSPgroupSize + 1)) / uSPgroupSize
-            } else if (pairing.main.drawUpDownUpperMode === MainCritParams.DrawUpDown.BOTTOM) {
-                score += duddWeight / 2 * upperSP.placeInGroup.first / uSPgroupSize
-            }
-            if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.TOP) {
-                score += duddWeight / 2 * (lSPgroupSize - 1 - lowerSP.placeInGroup.first) / lSPgroupSize
-            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.MIDDLE) {
-                score += duddWeight / 2 * (lSPgroupSize - 1 - Math.abs(2 * lowerSP.placeInGroup.first - lSPgroupSize + 1)) / lSPgroupSize
-            } else if (pairing.main.drawUpDownLowerMode === MainCritParams.DrawUpDown.BOTTOM) {
-                score += duddWeight / 2 * lowerSP.placeInGroup.first / lSPgroupSize
-            }
             if (scenario == 0) {
                 // Do nothing
             } else if (scenario == 1) {
@@ -370,7 +359,7 @@ sealed class BaseSolver(
                 score += 2 * duddWeight
             }
         }
-        if (score < 0.0) score = 0.0
+        score = min(0.0, score)
         return score
     }
 
