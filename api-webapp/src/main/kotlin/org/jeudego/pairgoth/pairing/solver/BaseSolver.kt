@@ -349,10 +349,11 @@ sealed class BaseSolver(
                 // Do nothing
             } else if (scenario == 1) {
                 score += 1 * duddWeight
-            } else if (scenario != 2 && (scenario <= 2 || pairing.main.compensateDrawUpDown)) {
+            } else if (scenario != 2 && pairing.main.compensateDrawUpDown) {
                 if (scenario == 3) {
                     score += 3 * duddWeight
-                } else if (scenario == 4) {
+                } else {
+                    // scenario == 4
                     score += 4 * duddWeight
                 }
             } else {
