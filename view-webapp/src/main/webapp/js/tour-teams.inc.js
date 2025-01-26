@@ -40,9 +40,10 @@ function leave(teamId, playerId) {
   let team = teams.get(teamId);
   let index = team.players.indexOf(playerId);
   if (index > -1) {
-    team.players.splice(index, 1);
+    let newPlayers = team.players.slice();
+    newPlayers.splice(index, 1);
     api.putJson(`tour/${tour_id}/team/${teamId}`, {
-      "players": team.players
+      "players": newPlayers
     }).then(rst => {
       if (rst !== 'error') {
         document.location.reload();

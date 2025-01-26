@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
+import org.jeudego.pairgoth.model.TeamTournament.Team
 
 open class HistoryHelper(
     protected val history: List<List<Game>>,
@@ -247,18 +248,4 @@ open class HistoryHelper(
 
 class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scoresGetter: () -> Map<ID, Pair<Double, Double>>):
         HistoryHelper(history, { scoresGetter() }) {
-
-    private fun Pairable.asTeam() = this as TeamTournament.Team
-
-    override fun playedTogether(p1: Pairable, p2: Pairable) = paired.intersect(p1.asTeam().playerIds.first().let { id ->
-        (p2.asTeam()).playerIds.map {Pair(it, id) }
-    }.toSet()).isNotEmpty()
-
-    override fun nbW(p: Pairable) = p.asTeam().teamPlayers.map { super.nbW(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    //override fun sos(p:Pairable) = p.asTeam().teamPlayers.map { super.sos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    //override fun sosos(p:Pairable) = p.asTeam().teamPlayers.map { super.sosos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-    //override fun sodos(p:Pairable) = p.asTeam().teamPlayers.map { super.sodos(it) ?: throw Error("unknown player id: #${it.id}") }.sum()
-
-    // TODO CB - now that we've got the rounds in history helper, calculate virtual scores
-    // also - try to factorize a bit calculations
 }

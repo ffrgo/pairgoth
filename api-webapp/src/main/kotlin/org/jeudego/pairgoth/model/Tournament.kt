@@ -71,7 +71,7 @@ sealed class Tournament <P: Pairable>(
     }
 
     // games per id for each round
-    private val games = mutableListOf<MutableMap<ID, Game>>()
+    protected val games = mutableListOf<MutableMap<ID, Game>>()
 
     fun games(round: Int) = games.getOrNull(round - 1) ?:
         if (round > games.size + 1) throw Error("invalid round")
@@ -160,7 +160,10 @@ sealed class Tournament <P: Pairable>(
         return changed
     }
 
-    fun pairedPlayers() = games.flatMap { it.values }.flatMap { listOf(it.black, it.white) }.toSet()
+    open fun pairedPlayers() = games.flatMap { it.values }.flatMap { listOf(it.black, it.white) }.toSet()
+
+    open fun pairedPlayers(round: Int) = games(round).values.flatMap { listOf(it.black, it.white) }.filter { it != 0 }.toSet()
+
     fun hasPlayer(dbId: DatabaseId, pId: String) = pId.isNotBlank() && players.values.filter { player -> pId == player.externalIds[dbId] }.isNotEmpty()
 
     fun stats() = (0..rounds - 1).map { index ->
@@ -238,6 +241,12 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
+    fun pairedTeams() = super.pairedPlayers()
+
+    override fun pairedPlayers() = super.pairedPlayers().flatMap { pairables[it]!!.asTeam()!!.playerIds }.toSet()
+
+    override fun pairedPlayers(round: Int) = super.pairedPlayers(round).flatMap { pairables[it]!!.asTeam()!!.playerIds }.toSet()
+
     private fun List<Int>.average(provider: (Player)->Int) = ((sumOf {id -> provider(players[id]!!)} - epsilon) / size).roundToInt()
 
     inner class Team(id: ID, name: String, rating: Int, rank: Int, final: Boolean, mmsCorrection: Int = 0): Pairable(id, name, rating, rank, final, mmsCorrection) {
@@ -260,10 +269,10 @@ class TeamTournament(
         }
         val teamOfIndividuals: Boolean get() = type.individual
 
-        // override val skip get() = playerIds.map { players[it]!!.skip }.reduce { left, right -> (left union right) as MutableSet<Int> }
-
         override fun canPlay(round: Int) = teamPlayers.filter { it.canPlay(round) }.size == type.playersNumber
     }
+
+    fun getPlayerTeam(playerId: ID) = teams.values.filter { it.playerIds.contains(playerId) }.firstOrNull()
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null): Team {
         val teamPlayersIds = json.getArray("players")?.let { arr ->
@@ -286,6 +295,9 @@ class TeamTournament(
         }
     }
 }
+
+fun Pairable.asPlayer() = this as? Player
+fun Pairable.asTeam() = this as? TeamTournament.Team
 
 // Serialization
 

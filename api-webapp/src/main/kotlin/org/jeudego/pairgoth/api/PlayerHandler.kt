@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Player
+import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.server.Event.*
 import javax.servlet.http.HttpServletRequest
@@ -44,9 +45,22 @@ object PlayerHandler: PairgothApiHandler {
         val leavingRounds = updated.skip.toSet().minus(player.skip.toSet())
         leavingRounds.forEach {  round ->
             if (round <= tournament.lastRound()) {
-                val playing = tournament.games(round).values.flatMap { listOf(it.black, it.white) }
+                val playing = tournament.pairedPlayers(round)
                 if (playing.contains(id)) {
                     badRequest("player is playing in round #$round")
+                }
+            }
+        }
+        if (tournament is TeamTournament) {
+            // participations cannot be changed in an already paired team
+            val joiningRounds = player.skip.toSet().minus(updated.skip.toSet())
+            val changedRounds = leavingRounds.union(joiningRounds)
+            changedRounds.forEach { round ->
+                if (round <= tournament.lastRound()) {
+                    val team = tournament.getPlayerTeam(id)
+                    if (team != null && tournament.pairedTeams().contains(team.id)) {
+                        badRequest("number of active players for team #${team.id} cannot be changed for round $round")
+                    }
                 }
             }
         }

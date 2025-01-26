@@ -99,8 +99,8 @@
     #set($black = $pmap[$game.b])
       <tr>
         <td class="t" data-table="${game.t}">${game.t}</td>
-        <td class="left">#if($white)${white.name} ${white.firstname} (#rank($white.rank), $white.country $white.club)#{else}BIP#end</td>
-        <td class="left">#if($black)${black.name} ${black.firstname} (#rank($black.rank), $black.country $black.club)#{else}BIP#end</td>
+        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
+        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
         <td>${game.h}</td>
       </tr>
   #end
