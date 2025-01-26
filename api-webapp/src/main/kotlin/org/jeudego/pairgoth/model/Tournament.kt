@@ -255,10 +255,14 @@ class TeamTournament(
             json["rank"] = rank
             country?.also { json["country"] = it }
             club?.also { json["club"] = it }
+            json["names"] = playerIds.mapNotNull { players[it]?.fullName() }.toJsonArray()
+            json["ranks"] = playerIds.mapNotNull { players[it]?.rank }.toJsonArray()
         }
         val teamOfIndividuals: Boolean get() = type.individual
 
-        override val skip get() = playerIds.map { players[it]!!.skip }.reduce { left, right -> (left union right) as MutableSet<Int> }
+        // override val skip get() = playerIds.map { players[it]!!.skip }.reduce { left, right -> (left union right) as MutableSet<Int> }
+
+        override fun canPlay(round: Int) = teamPlayers.filter { it.canPlay(round) }.size == type.playersNumber
     }
 
     fun teamFromJson(json: Json.Object, default: TeamTournament.Team? = null): Team {
@@ -288,7 +292,8 @@ class TeamTournament(
 fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = null): Tournament<*> {
     val type = json.getString("type")?.uppercase()?.let { Tournament.Type.valueOf(it) } ?: default?.type ?:  badRequest("missing type")
     // No clean way to avoid this redundancy
-    val tournament = if (type.playersNumber == 1)
+    val tournament =
+        if (type.playersNumber == 1)
             StandardTournament(
                 id = json.getInt("id") ?: default?.id ?: nextTournamentId,
                 type = type,
@@ -301,7 +306,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
                 komi = json.getDouble("komi") ?: default?.komi ?: 7.5,
-                rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: Rules.FRENCH,
+                rules = json.getString("rules")?.let { Rules.valueOf(it) } ?: default?.rules ?: if (json.getString("country")?.lowercase(Locale.ROOT) ==  "fr") Rules.FRENCH else Rules.AGA,
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
@@ -317,7 +322,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 startDate = json.getString("startDate")?.let { LocalDate.parse(it) } ?: default?.startDate ?: badRequest("missing startDate"),
                 endDate = json.getString("endDate")?.let { LocalDate.parse(it) } ?: default?.endDate ?: badRequest("missing endDate"),
                 director = json.getString("director") ?: default?.director ?: "",
-                country = json.getString("country") ?: default?.country ?: badRequest("missing country"),
+                country = (json.getString("country") ?: default?.country ?: "fr").let { if (it.isEmpty()) "fr" else it },
                 location = json.getString("location") ?: default?.location ?: badRequest("missing location"),
                 online = json.getBoolean("online") ?: default?.online ?: false,
                 komi = json.getDouble("komi") ?: default?.komi ?: 7.5,

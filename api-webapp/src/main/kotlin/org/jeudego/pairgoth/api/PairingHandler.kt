@@ -2,8 +2,13 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
+import com.republicate.kson.toMutableJsonArray
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Game
+import org.jeudego.pairgoth.model.ID
+import org.jeudego.pairgoth.model.Player
+import org.jeudego.pairgoth.model.TeamTournament
+import org.jeudego.pairgoth.model.TeamTournament.Team
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
@@ -21,8 +26,8 @@ object PairingHandler: PairgothApiHandler {
         val playing = tournament.games(round).values.flatMap {
             listOf(it.black, it.white)
         }.toSet()
-        val unpairables = tournament.pairables.values.filter { it.final && it.skip.contains(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val pairables = tournament.pairables.values.filter { it.final && !it.skip.contains(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val unpairables = tournament.pairables.values.filter { it.final && !it.canPlay(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
+        val pairables = tournament.pairables.values.filter { it.final && it.canPlay(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val games = tournament.games(round).values.sortedBy {
             if (it.table == 0) Int.MAX_VALUE else it.table
         }

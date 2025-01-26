@@ -135,6 +135,8 @@ function hideOpponents() {
 
 onLoad(()=>{
   // note - this handler is also in use for lists on Mac Mahon super groups and teams pages
+  // CB TODO - there is some code cleaning to to around the listitems reuse and events:
+  // the on('click') method should not define specific behaviors for this page, just dispatch custom events
   $('.listitem').on('click', e => {
     let listitem = e.target.closest('.listitem');
     let box = e.target.closest('.multi-select');
@@ -156,17 +158,23 @@ onLoad(()=>{
       if (e.detail === 1) {
         // single click
         focused = listitem.toggleClass('selected').attr('draggable', listitem.hasClass('selected'));
-        if (box.getAttribute('id') === 'pairables') showOpponents(focused)
-      } else if (listitem.closest('#pairing-lists')) {
-        // on pairing page
-        if (listitem.closest('#paired')) {
-          // double click
-          hideOpponents()
-          focused = listitem.attr('draggable', listitem.hasClass('selected'));
-          editGame(focused);
-        } else if (listitem.closest('#pairables')) {
-          editPairable(focused);
+        if (box.getAttribute('id') === 'pairables') {
+          if (focused.hasClass('selected')) showOpponents(focused);
+          else hideOpponents();
         }
+      } else {
+        if (listitem.closest('#pairing-lists')) {
+          // on pairing page
+          if (listitem.closest('#paired')) {
+            // double click
+            hideOpponents()
+            focused = listitem.attr('draggable', listitem.hasClass('selected'));
+            editGame(focused);
+          } else if (listitem.closest('#pairables')) {
+            editPairable(focused);
+          }
+        }
+        box.dispatchEvent(new CustomEvent('listitem-dblclk', { 'detail': parseInt(listitem.data('id')) }));
       }
     }
     box.dispatchEvent(new CustomEvent('listitems'));

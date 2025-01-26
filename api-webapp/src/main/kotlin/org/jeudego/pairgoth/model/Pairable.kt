@@ -26,6 +26,8 @@ sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: I
     fun equals(other: Pairable): Boolean {
         return id == other.id
     }
+
+    open fun canPlay(round: Int) = !skip.contains(round)
 }
 
 object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE, true) {

@@ -6,12 +6,12 @@ import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.PairingType
+import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.historyBefore
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
-import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
@@ -129,20 +129,23 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     return sortedPairables
 }
 
-fun Tournament<*>.populateFrozenStandings(sortedPairables: List<Json.Object>, round: Int = rounds) {
+fun Tournament<*>.populateStandings(sortedPairables: List<Json.Object>, round: Int = rounds) {
     val sortedMap = sortedPairables.associateBy {
         it.getID()!!
     }
 
     // refresh name, firstname, club and level
-    sortedMap.forEach { (id, player) ->
-        val mutable = player as Json.MutableObject
-        val live = players[id]!!
-        mutable["name"] = live.name
-        mutable["firstname"] = live.firstname
-        mutable["club"] = live.club
-        mutable["rating"] = live.rating
-        mutable["rank"] = live.rank
+    sortedMap.forEach { (id, pairable) ->
+        val mutable = pairable as Json.MutableObject
+        pairables[id]?.let {
+            mutable["name"] = it.name
+            if (it is Player) {
+                mutable["firstname"] = it.firstname
+            }
+            mutable["club"] = it.club
+            mutable["rating"] = it.rating
+            mutable["rank"] = it.rank
+        }
     }
 
     // fill result

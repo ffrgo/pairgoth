@@ -105,6 +105,11 @@ function parseRank(rank) {
   return '';
 }
 
+function displayRank(rank) {
+  rank = parseInt(rank);
+  return rank < 0 ? `${-rank}k` : `${rank + 1}d`;
+}
+
 function fillPlayer(player) {
   // hack UK / GB
   let country = player.country.toLowerCase();

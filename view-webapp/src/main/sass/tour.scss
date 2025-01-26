@@ -284,6 +284,21 @@
     max-width: max(50vw, 20em);
   }
 
+  #composition.multi-select .listitem {
+    cursor: default;
+    i.icon {
+      cursor: pointer;
+      @media (hover: hover) {
+        display: none;
+      }
+    }
+    &:hover {
+      i.icon {
+        display: inline;
+      }
+    }
+  }
+
   /* pairing section */
 
   #pairing-content {
@@ -345,7 +360,7 @@
       }
     }
   }
-  #pairables {
+  #pairables, #teams {
     margin-bottom: 1em;
   }
   #paired {
@@ -379,7 +394,7 @@
     gap: 1em;
     max-width: max(10em, 20vw);
   }
-  #unpairables, #previous_games {
+  #unpairables, #previous_games, #composition {
     display: flex;
     flex-flow: column nowrap;
     min-height: 10vh;

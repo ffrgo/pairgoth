@@ -22,7 +22,6 @@ import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import java.text.Normalizer
 import java.util.*
-import kotlin.collections.ArrayList
 
 object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
@@ -31,7 +30,7 @@ object StandingsHandler: PairgothApiHandler {
         val includePreliminary = request.getParameter("include_preliminary")?.let { it.toBoolean() } ?: false
 
         val sortedPairables = tournament.getSortedPairables(round, includePreliminary)
-        tournament.populateFrozenStandings(sortedPairables, round)
+        tournament.populateStandings(sortedPairables, round)
 
         val acceptHeader = request.getHeader("Accept") as String?
         val accept = acceptHeader?.substringBefore(";")

@@ -18,17 +18,32 @@
               Team up
             </button>
           </div>
-          <button id="split" class="ui orange right labeled icon floating button">
+          <button id="join" class="ui green right labeled icon floating disabled button">
+            <i class="chevron right icon"></i>
+            Join
+          </button>
+          <button id="split" class="ui orange right labeled icon floating disabled button">
             <i class="angle double left icon"></i>
             Split
           </button>
         </div>
-        <div id="teams" class="multi-select" title="teams">
+        <div>
+          <div id="teams" class="multi-select" title="teams">
 #foreach($team in $teams)
-          <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank)#if($team.country) $team.country#end</span></div>
+            <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank)#if($team.country) $team.country#end</span></div>
 #end
+          </div>
+          <div id="composition" class="hidden multi-select" title="">
+
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
+<script type="text/javascript">
+  // XXXXXX
+  // $teams.class.name
+  // $teams
+  let teams = new Map(${teams}.map(team => [team.id, team]));
+</script>
