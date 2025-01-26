@@ -31,11 +31,15 @@ object PairingHandler: PairgothApiHandler {
         val games = tournament.games(round).values.sortedBy {
             if (it.table == 0) Int.MAX_VALUE else it.table
         }
-        return Json.Object(
+        val ret = Json.MutableObject(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
             "pairables" to pairables,
             "unpairables" to unpairables
         )
+        if (tournament is TeamTournament) {
+            ret["individualGames"] = tournament.individualGames(round).map { it.toJson() }.toJsonArray()
+        }
+        return ret
     }
 
     override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {

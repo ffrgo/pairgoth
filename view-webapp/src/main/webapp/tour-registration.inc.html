@@ -2,10 +2,12 @@
 #if($tour.type == 'INDIVIDUAL')
   ## Standard tournament
   #set($pmap = $utils.toMap($parts))
+  #set($plmap = $pmap)
 #else
   ## Pairgo, rengo and teams of individuals
   #set($teams = $api.get("tour/${params.id}/team"))
   #set($pmap = $utils.toMap($teams))
+  #set($plmap = $utils.toMap($parts))
   #set($tmap = $utils.getTeamMap($teams))
 #end
 

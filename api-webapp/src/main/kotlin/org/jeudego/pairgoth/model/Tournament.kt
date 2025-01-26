@@ -7,6 +7,7 @@ import com.republicate.kson.toJsonArray
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
+import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
 import kotlin.math.max
@@ -241,6 +242,26 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
+    // For teams of individual players, map from a team game id to the list of individual games
+    // (filled on demand - it is merely a cache)
+    private val individualGames = mutableMapOf<ID, List<Game>>()
+
+    fun individualGames(round: Int): List<Game> {
+        val teamGames = games(round).values.toList()
+        return teamGames.flatMap { game ->
+            if (game.white == 0 || game.black ==0 ) listOf()
+            else {
+                individualGames.computeIfAbsent(game.id) { id ->
+                    val whitePlayers = teams[game.white]!!.activePlayers(round)
+                    val blackPlayers = teams[game.black]!!.activePlayers(round)
+                    whitePlayers.zip(blackPlayers).map {
+                        Game(nextGameId, game.table, it.first.id, it.second.id)
+                    }
+                }
+            }
+        }
+    }
+
     fun pairedTeams() = super.pairedPlayers()
 
     fun pairedTeams(round: Int) = super.pairedPlayers(round)
@@ -271,7 +292,9 @@ class TeamTournament(
         }
         val teamOfIndividuals: Boolean get() = type.individual
 
-        override fun canPlay(round: Int) = teamPlayers.filter { it.canPlay(round) }.size == type.playersNumber
+        fun activePlayers(round: Int) = teamPlayers.filter { it.canPlay(round) }.sortedByDescending { it.rating }
+
+        override fun canPlay(round: Int) = activePlayers(round).size == type.playersNumber
     }
 
     fun getPlayerTeam(playerId: ID) = teams.values.filter { it.playerIds.contains(playerId) }.firstOrNull()
