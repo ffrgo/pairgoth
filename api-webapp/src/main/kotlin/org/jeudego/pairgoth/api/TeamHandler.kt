@@ -36,6 +36,11 @@ object TeamHandler: PairgothApiHandler {
         val team = tournament.teams[id] ?: badRequest("invalid team id")
         val payload = getObjectPayload(request)
         val updated = tournament.teamFromJson(payload, team)
+        for (round in 1..tournament.lastRound()) {
+            if (tournament.pairedTeams(round).contains(team.id) && !updated.canPlay(round)) {
+                badRequest("team is playing round #$round, number of pairable players cannot change for this round")
+            }
+        }
         tournament.teams[updated.id] = updated
         tournament.dispatchEvent(TeamUpdated, request, team.toJson())
         return Json.Object("success" to true)
@@ -45,7 +50,7 @@ object TeamHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val id = getSubSelector(request)?.toIntOrNull() ?: badRequest("missing or invalid team selector")
-        if (tournament.pairedPlayers().contains(id)) {
+        if (tournament.pairedTeams().contains(id)) {
             badRequest("team is playing");
         }
         tournament.teams.remove(id) ?: badRequest("invalid team id")

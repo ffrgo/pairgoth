@@ -32,13 +32,13 @@
     </div>
     <div id="pairing-lists">
       <div id="pairing-left">
-        <div id="pairables" class="multi-select" title="pairable players">
+        <div id="pairables" class="multi-select" title="pairable #if($tour.type == 'INDIVIDUAL')players#{else}teams#end">
 #foreach($p in $pairables)
   #set($part = $pmap[$p])
           <div data-id="$part.id" class="listitem pairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>
 #end
         </div>
-        <div id="unpairables" class="multi-select" title="unpairable players">
+        <div id="unpairables" class="multi-select" title="unpairable #if($tour.type == 'INDIVIDUAL')players#{else}teams#end">
 #foreach($p in $unpairables)
   #set($part = $pmap[$p])
           <div data-id="$part.id" class="listitem unpairable"><span class="name">$part.name#if($part.firstname) $part.firstname#end</span><span>#rank($part.rank)#if($part.country) $part.country#end</span></div>

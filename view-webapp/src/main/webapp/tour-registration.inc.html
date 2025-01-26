@@ -6,6 +6,7 @@
   ## Pairgo, rengo and teams of individuals
   #set($teams = $api.get("tour/${params.id}/team"))
   #set($pmap = $utils.toMap($teams))
+  #set($tmap = $utils.getTeamMap($teams))
 #end
 
 ## Team players do not have an individual MMS
@@ -67,6 +68,9 @@
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
           <th>MMS</th>
 #end
+#if($tour.type != 'INDIVIDUAL')
+          <th>Team</th>
+#end
           <th>Participation</th>
         </thead>
         <tbody>
@@ -91,6 +95,15 @@
             <td>$part.rating</td>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
             <td>$!mmsPlayersMap[$part.id]</td>
+#end
+#if($tour.type != 'INDIVIDUAL')
+  #set($teamId = $tmap[$part.id])
+  #if($teamId)
+    #set($teamName = $!pmap[$teamId].name)
+  #end
+            <td title="$esc.html($teamName)">
+              $esc.html($utils.truncate($!teamName, 10))
+            </td>
 #end
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
               <div class="participation">

@@ -243,6 +243,8 @@ class TeamTournament(
 
     fun pairedTeams() = super.pairedPlayers()
 
+    fun pairedTeams(round: Int) = super.pairedPlayers(round)
+
     override fun pairedPlayers() = super.pairedPlayers().flatMap { pairables[it]!!.asTeam()!!.playerIds }.toSet()
 
     override fun pairedPlayers(round: Int) = super.pairedPlayers(round).flatMap { pairables[it]!!.asTeam()!!.playerIds }.toSet()

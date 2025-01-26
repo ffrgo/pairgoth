@@ -17,6 +17,14 @@ import kotlin.io.path.walk
 class PairgothTool {
     fun toMap(array: Json.Array) = array.map { ser -> ser as Json.Object }.associateBy { it.getLong("id")!! }
 
+    fun getTeamMap(array: Json.Array) = array.flatMap { ser -> (ser as Json.Object).getArray("players")!!.map { Pair(it, ser.getLong("id")!!) } }.toMap()
+
+    fun truncate(disp: String?, length: Int): String {
+        if (disp == null) return ""
+        if (disp.length <= length) return disp
+        return disp.substring(0, length) + "…"
+    }
+
     fun countFinals(array: Json.Array) = array.map { ser -> ser as Json.Object }.count { it.getBoolean("final") ?: false }
 
     fun getCriteria() = mapOf(
