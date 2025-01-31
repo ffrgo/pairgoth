@@ -14,7 +14,7 @@ object ResultsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
-        val games = tournament.games(round).values
+        val games = tournament.individualGames(round).values
         return games.map { it.toJson() }.toJsonArray()
     }
 

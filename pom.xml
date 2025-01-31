@@ -81,13 +81,13 @@
     <pairgoth.store>file</pairgoth.store>
     <pairgoth.store.file.path>tournamentfiles</pairgoth.store.file.path>
     <pairgoth.auth>none</pairgoth.auth>
-    <pairgoth.auth.sesame>this_should_be_overriden</pairgoth.auth.sesame>
-    <pairgoth.oauth.ffg.client_id>pairtogh</pairgoth.oauth.ffg.client_id>
-    <pairgoth.smtp.sender></pairgoth.smtp.sender>
-    <pairgoth.smtp.host></pairgoth.smtp.host>
+    <pairgoth.auth.sesame>this_should_be_overridden</pairgoth.auth.sesame>
+    <pairgoth.oauth.ffg.client_id>pairgoth</pairgoth.oauth.ffg.client_id>
+    <pairgoth.smtp.sender><!-- email sender address --></pairgoth.smtp.sender>
+    <pairgoth.smtp.host><!-- smtp host --></pairgoth.smtp.host>
     <pairgoth.smtp.port>587</pairgoth.smtp.port>
-    <pairgoth.smtp.user></pairgoth.smtp.user>
-    <pairgoth.smtp.password></pairgoth.smtp.password>
+    <pairgoth.smtp.user><!-- smtp host login user --></pairgoth.smtp.user>
+    <pairgoth.smtp.password><!-- smtp host login password --></pairgoth.smtp.password>
     <pairgoth.logger.level>info</pairgoth.logger.level>
     <pairgoth.logger.format>[%level] %ip [%logger] %message</pairgoth.logger.format>
   </properties>
@@ -190,6 +190,7 @@
           <version>${kotlin.version}</version>
           <configuration>
             <jvmTarget>11</jvmTarget>
+            <apiVersion>2.1</apiVersion>
           </configuration>
         </plugin>
         <plugin>

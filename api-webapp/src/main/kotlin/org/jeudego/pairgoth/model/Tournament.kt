@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.model
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
+import com.republicate.kson.toJsonObject
 // CB TODO - review
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
@@ -10,6 +11,8 @@ import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
+import org.jeudego.pairgoth.util.MutableBiMultiMap
+import org.jeudego.pairgoth.util.mutableBiMultiMapOf
 import kotlin.math.max
 import java.util.*
 import java.util.regex.Pattern
@@ -57,7 +60,7 @@ sealed class Tournament <P: Pairable>(
     var frozen: Json.Array? = null
 
     // pairing
-    fun pair(round: Int, pairables: List<Pairable>): List<Game> {
+    open fun pair(round: Int, pairables: List<Pairable>): List<Game> {
         // Minimal check on round number.
         // CB TODO - the complete check should verify, for each player, that he was either non pairable or implied in the previous round
         if (round > games.size + 1) badRequest("previous round not paired")
@@ -71,12 +74,25 @@ sealed class Tournament <P: Pairable>(
         }
     }
 
+    open fun unpair(round: Int) {
+        games(round).clear()
+    }
+
+    open fun unpair(round: Int, id: ID) {
+        games(round).remove(id)
+    }
+
     // games per id for each round
     protected val games = mutableListOf<MutableMap<ID, Game>>()
 
     fun games(round: Int) = games.getOrNull(round - 1) ?:
         if (round > games.size + 1) throw Error("invalid round")
         else mutableMapOf<ID, Game>().also { games.add(it) }
+
+    open fun individualGames(round: Int): Map<ID, Game> = games(round)
+
+    open fun postPair(round: Int, games: List<Game>) {}
+
     fun lastRound() = max(1, games.size)
 
     fun recomputeDUDD(round: Int, gameID: ID) {
@@ -196,7 +212,7 @@ sealed class Tournament <P: Pairable>(
 // standard tournament of individuals
 class StandardTournament(
     id: ID,
-    type: Tournament.Type,
+    type: Type,
     name: String,
     shortName: String,
     startDate: LocalDate,
@@ -219,7 +235,7 @@ class StandardTournament(
 // team tournament
 class TeamTournament(
     id: ID,
-    type: Tournament.Type,
+    type: Type,
     name: String,
     shortName: String,
     startDate: LocalDate,
@@ -234,7 +250,8 @@ class TeamTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5,
-    tablesExclusion: MutableList<String> = mutableListOf()
+    tablesExclusion: MutableList<String> = mutableListOf(),
+    val individualGames: MutableBiMultiMap<ID, Game> = mutableBiMultiMapOf<ID, Game>()
 ): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
     companion object {
         private val epsilon = 0.0001
@@ -242,24 +259,43 @@ class TeamTournament(
     override val players = mutableMapOf<ID, Player>()
     val teams: MutableMap<ID, Team> = _pairables
 
-    // For teams of individual players, map from a team game id to the list of individual games
-    // (filled on demand - it is merely a cache)
-    private val individualGames = mutableMapOf<ID, List<Game>>()
+    override fun individualGames(round: Int): Map<ID, Game> {
+        val teamGames = games(round)
+        return if (type.individual) {
+            return teamGames.values.flatMap { game ->
+                if (game.white == 0 || game.black == 0 ) listOf()
+                else individualGames[game.id]?.toList() ?: listOf()
+            }.associateBy { it.id }
+        } else {
+            teamGames
+        }
+    }
 
-    fun individualGames(round: Int): List<Game> {
-        val teamGames = games(round).values.toList()
-        return teamGames.flatMap { game ->
-            if (game.white == 0 || game.black ==0 ) listOf()
-            else {
-                individualGames.computeIfAbsent(game.id) { id ->
-                    val whitePlayers = teams[game.white]!!.activePlayers(round)
-                    val blackPlayers = teams[game.black]!!.activePlayers(round)
-                    whitePlayers.zip(blackPlayers).map {
-                        Game(nextGameId, game.table, it.first.id, it.second.id)
+    override fun pair(round: Int, pairables: List<Pairable>) =
+        super.pair(round, pairables).also { games ->
+            if (type.individual) {
+                games.forEach { game ->
+                    individualGames.computeIfAbsent(game.id) { id ->
+                        val whitePlayers = teams[game.white]!!.activePlayers(round)
+                        val blackPlayers = teams[game.black]!!.activePlayers(round)
+                        whitePlayers.zip(blackPlayers).map {
+                            Game(nextGameId, game.table, it.first.id, it.second.id)
+                        }.toMutableSet()
                     }
                 }
             }
         }
+
+    override fun unpair(round: Int) {
+        games(round).values.forEach { game ->
+            individualGames.remove(game.id)
+        }
+        super.unpair(round)
+    }
+
+    override fun unpair(round: Int, id: ID) {
+        individualGames.remove(id)
+        super.unpair(round, id)
     }
 
     fun pairedTeams() = super.pairedPlayers()
@@ -368,7 +404,12 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
-                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf(),
+                individualGames = json.getObject("individualGames")?.entries?.flatMap {
+                    (key, value) -> (value as Json.Array).map { game -> Game.fromJson(game as Json.Object) }.map { Pair(key.toID(), it) }
+                }?.let {
+                    mutableBiMultiMapOf<ID, Game>(*it.toTypedArray())
+                } ?: (default as? TeamTournament)?.individualGames ?:  mutableBiMultiMapOf<ID, Game>()
             )
     json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
@@ -428,6 +469,11 @@ fun Tournament<*>.toFullJson(): Json.Object {
         json["teams"] = Json.Array(teams.values.map { it.toJson() })
     }
     json["games"] = Json.Array((1..lastRound()).mapTo(Json.MutableArray()) { round -> games(round).values.mapTo(Json.MutableArray()) { it.toJson() } });
+    if (this is TeamTournament && type.individual) {
+        json["individualGames"] = individualGames.mapValues { it ->
+            it.value.map { game -> game.toJson() }.toJsonArray()
+        }.toJsonObject()
+    }
     if (tablesExclusion.isNotEmpty()) {
         json["tablesExclusion"] = tablesExclusion.toJsonArray()
     }

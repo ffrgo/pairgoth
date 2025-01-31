@@ -37,7 +37,7 @@ object PairingHandler: PairgothApiHandler {
             "unpairables" to unpairables
         )
         if (tournament is TeamTournament) {
-            ret["individualGames"] = tournament.individualGames(round).map { it.toJson() }.toJsonArray()
+            ret["individualGames"] = tournament.individualGames(round).values.map { it.toJson() }.toJsonArray()
         }
         return ret
     }
@@ -169,17 +169,17 @@ object PairingHandler: PairgothApiHandler {
         val allPlayers = payload.size == 1 && payload[0] == "all"
         if (allPlayers) {
             // TODO - just remove this, it is never used ; and no check is done on whether the players are playing...
-            tournament.games(round).clear()
+            tournament.unpair(round)
         } else {
             payload.forEach {
-                val id = (it as Number).toInt()
+                val id = (it as Number).toID()
                 val game = tournament.games(round)[id] ?: throw Error("invalid game id")
                 if (game.result != Game.Result.UNKNOWN && game.black != 0 && game.white != 0) {
                     ApiHandler.logger.error("cannot unpair game id ${game.id}: it has a result")
                     // we'll only skip it
                     // throw Error("cannot unpair ")
                 } else {
-                    tournament.games(round).remove(id)
+                    tournament.unpair(round, id)
                 }
             }
         }
