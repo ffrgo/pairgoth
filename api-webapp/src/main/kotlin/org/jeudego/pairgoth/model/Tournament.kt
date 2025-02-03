@@ -16,6 +16,7 @@ import org.jeudego.pairgoth.util.mutableBiMultiMapOf
 import kotlin.math.max
 import java.util.*
 import java.util.regex.Pattern
+import kotlin.collections.get
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -276,10 +277,15 @@ class TeamTournament(
             if (type.individual) {
                 games.forEach { game ->
                     individualGames.computeIfAbsent(game.id) { id ->
+                        // Here white and black just denote the first board color
                         val whitePlayers = teams[game.white]!!.activePlayers(round)
                         val blackPlayers = teams[game.black]!!.activePlayers(round)
-                        whitePlayers.zip(blackPlayers).map {
-                            Game(nextGameId, game.table, it.first.id, it.second.id)
+                        whitePlayers.zip(blackPlayers).mapIndexed { i, players ->
+                            // alternate colors in the following boards
+                            if ((i % 2) == 0)
+                                Game(nextGameId, game.table, players.first.id, players.second.id)
+                            else
+                                Game(nextGameId, game.table, players.second.id, players.first.id)
                         }.toMutableSet()
                     }
                 }
@@ -355,6 +361,40 @@ class TeamTournament(
                 it.playerIds.addAll(teamPlayersIds)
         }
     }
+
+    fun propagateIndividualResult(round: Int, game: Game) {
+        val inverseMap = individualGames.inverse.map { it.key.id to it.value }.toMap()
+        val teamGameID = inverseMap[game.id]
+        val score = individualGames[teamGameID]?.sumOf { game ->
+            when (game.result) {
+                Game.Result.WHITE -> 1
+                Game.Result.BLACK -> -1
+                else -> 0
+            } as Int
+        } ?:  error("Team game not found: $teamGameID")
+        val teamGame = games[round - 1].get(teamGameID) ?: error("Team game not found: $teamGameID")
+        teamGame.result =
+            if (score < type.playersNumber / 2.0) Game.Result.BLACK
+            else if (score > type.playersNumber / 2.0) Game.Result.WHITE
+            else Game.Result.UNKNOWN
+    }
+
+    fun propagateIndividualResults(round: Int) {
+        for (teamGame in games(round).values) {
+            val score = individualGames[teamGame.id]?.sumOf { game ->
+                when (game.result) {
+                    Game.Result.WHITE -> 1
+                    Game.Result.BLACK -> -1
+                    else -> 0
+                } as Int
+            } ?:  error("Team game not found: $teamGame.id")
+            val teamGame = games[round - 1].get(teamGame.id) ?: error("Team game not found: $teamGame.id")
+            teamGame.result =
+                if (score < type.playersNumber / -2.0) Game.Result.BLACK
+                else if (score > type.playersNumber / 2.0) Game.Result.WHITE
+                else Game.Result.UNKNOWN
+        }
+    }
 }
 
 fun Pairable.asPlayer() = this as? Player
@@ -406,7 +446,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
                 tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf(),
                 individualGames = json.getObject("individualGames")?.entries?.flatMap {
-                    (key, value) -> (value as Json.Array).map { game -> Game.fromJson(game as Json.Object) }.map { Pair(key.toID(), it) }
+                    (key, value) -> (value as Json.Array).map { game -> Game.fromJson(game as Json.Object) }.map { key.toID() to it }
                 }?.let {
                     mutableBiMultiMapOf<ID, Game>(*it.toTypedArray())
                 } ?: (default as? TeamTournament)?.individualGames ?:  mutableBiMultiMapOf<ID, Game>()
