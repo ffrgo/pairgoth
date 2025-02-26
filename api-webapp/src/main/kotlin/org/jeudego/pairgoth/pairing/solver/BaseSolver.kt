@@ -303,9 +303,8 @@ sealed class BaseSolver(
     open fun MainCritParams.applyDUDD(p1: Pairable, p2: Pairable): Double {
         var score = 0.0
 
-        // TODO apply Drawn-Up/Drawn-Down if needed
         // Main Criterion 3 : If different groups, make a directed Draw-up/Draw-down
-        // Modifs V3.44.05 (ideas from Tuomo Salo)
+        // Modifs Opengotha V3.44.05 (ideas from Tuomo Salo)
 
         if (p1.group != p2.group) {
             val upperSP = if (p1.group < p2.group) p2 else p1
@@ -331,11 +330,11 @@ sealed class BaseSolver(
             }
             // if top player has already been drawn down more than drawn up
             // This is good
-            if (scenario != 0 && uSP_DU > 0 && uSP_DU >= uSP_DD) {
+            if (scenario != 0 && uSP_DU > 0 && uSP_DU > uSP_DD) {
                 scenario++
             }
             // Conversely if lower player has been drawn up more than drawn down
-            if (scenario != 0 && lSP_DD > 0 && lSP_DD >= lSP_DU) {
+            if (scenario != 0 && lSP_DD > 0 && lSP_DD > lSP_DU) {
                 scenario++
             }
 
@@ -349,18 +348,16 @@ sealed class BaseSolver(
                 // Do nothing
             } else if (scenario == 1) {
                 score += 1 * duddWeight
-            } else if (scenario != 2 && pairing.main.compensateDrawUpDown) {
-                if (scenario == 3) {
-                    score += 3 * duddWeight
-                } else {
-                    // scenario == 4
-                    score += 4 * duddWeight
-                }
-            } else {
+            } else if (scenario == 2 || (scenario > 2 && !pairing.main.compensateDrawUpDown)) {
                 score += 2 * duddWeight
+            } else if (scenario == 3) {
+                score += 3 * duddWeight
+            } else if (scenario == 4) {
+                score += 4 * duddWeight
             }
+
         }
-        score = min(0.0, score)
+        score = max(0.0, score)
         return score
     }
 
@@ -552,6 +549,8 @@ sealed class BaseSolver(
     }
 
     fun dudd(black: Pairable, white: Pairable): Int {
+        // bigger main means stronger group
+        // the dudd is given from white perspective
         return if (white.main > black.main) {
             1
         } else if (white.main < black.main) {
@@ -559,7 +558,6 @@ sealed class BaseSolver(
         } else {
             0
         }
-        //return white.group - black.group
     }
     fun hd(white: Pairable, black: Pairable): Int {
         return pairing.handicap.handicap(white = white, black = black)

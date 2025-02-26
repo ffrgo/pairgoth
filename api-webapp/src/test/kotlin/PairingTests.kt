@@ -78,6 +78,7 @@ class PairingTests: TestBase() {
                     if (isValid) {
                         // Key exists but values differ - print key
                         logger.info("Difference found at $key")
+                        logger.info("                          pairgoth    opengotha")
                         logger.info("baseDuplicateGameCost =   "+value!![0].toString()+"   "+map2[key]!![0].toString())
                         logger.info("baseRandomCost        =   "+value!![1].toString()+"   "+map2[key]!![1].toString())
                         logger.info("baseBWBalanceCost     =   "+value!![2].toString()+"   "+map2[key]!![2].toString())
