@@ -87,7 +87,8 @@ object PairingHandler: PairgothApiHandler {
             val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
                 listOf(it.black, it.white)
             }.toSet()
-            if (game.result != Game.Result.UNKNOWN && (
+            if ((game.result != Game.Result.UNKNOWN ||
+                    tournament is TeamTournament && tournament.hasIndividualResults(game.id)) && (
                     game.black != payload.getInt("b") ||
                     game.white != payload.getInt("w") ||
                     game.handicap != payload.getInt("h")
@@ -111,6 +112,9 @@ object PairingHandler: PairgothApiHandler {
             if (payload.containsKey("t")) {
                 game.table = payload.getString("t")?.toIntOrNull() ?:  badRequest("invalid table number")
                 game.forcedTable = true
+            }
+            if (tournament is TeamTournament) {
+                tournament.propagateTeamGameEdition(round, game.id)
             }
             tournament.dispatchEvent(GameUpdated, request, Json.Object("round" to round, "game" to game.toJson()))
             if (game.table != previousTable) {

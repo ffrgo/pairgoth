@@ -276,21 +276,25 @@ class TeamTournament(
         super.pair(round, pairables).also { games ->
             if (type.individual) {
                 games.forEach { game ->
-                    individualGames.computeIfAbsent(game.id) { id ->
-                        // Here white and black just denote the first board color
-                        val whitePlayers = teams[game.white]!!.activePlayers(round)
-                        val blackPlayers = teams[game.black]!!.activePlayers(round)
-                        whitePlayers.zip(blackPlayers).mapIndexed { i, players ->
-                            // alternate colors in the following boards
-                            if ((i % 2) == 0)
-                                Game(nextGameId, game.table, players.first.id, players.second.id)
-                            else
-                                Game(nextGameId, game.table, players.second.id, players.first.id)
-                        }.toMutableSet()
-                    }
+                    pairIndividualGames(round, game)
                 }
             }
         }
+
+    private fun pairIndividualGames(round: Int, game: Game) {
+        individualGames.computeIfAbsent(game.id) { id ->
+            // Here white and black just denote the first board color
+            val whitePlayers = teams[game.white]!!.activePlayers(round)
+            val blackPlayers = teams[game.black]!!.activePlayers(round)
+            whitePlayers.zip(blackPlayers).mapIndexed { i, players ->
+                // alternate colors in the following boards
+                if ((i % 2) == 0)
+                    Game(nextGameId, game.table, players.first.id, players.second.id)
+                else
+                    Game(nextGameId, game.table, players.second.id, players.first.id)
+            }.toMutableSet()
+        }
+    }
 
     override fun unpair(round: Int) {
         games(round).values.forEach { game ->
@@ -302,6 +306,19 @@ class TeamTournament(
     override fun unpair(round: Int, id: ID) {
         individualGames.remove(id)
         super.unpair(round, id)
+    }
+
+    fun hasIndividualResults(teamGameID: ID): Boolean {
+        return individualGames[teamGameID]?.any { game ->
+            game.result != Game.Result.UNKNOWN
+        } == true
+    }
+
+    fun propagateTeamGameEdition(round: Int, id: ID) {
+        // recreate individual games
+        val teamGame = games(round)[id] ?: error("Game with id $id not found")
+        individualGames.remove(id)
+        pairIndividualGames(round, teamGame)
     }
 
     fun pairedTeams() = super.pairedPlayers()
