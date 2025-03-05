@@ -397,8 +397,29 @@ class PairingTests: TestBase() {
                     getTestFile("opengotha/$name/$name" + "_weights_R$round.txt")
                 ), "Not matching opengotha weights for round $round"
             )
+
             // Compare pairings with OpenGotha
-            assertTrue(compare_games(games, pairingsOG[round - minRound]), "pairings for round $round differ")
+            val gamesDoMatch = compare_games(games, pairingsOG[round - minRound])
+            if (!gamesDoMatch) {
+                // give a nice error message
+                val playersMap = players.associate { p ->
+                    val player = p as Json.Object
+                    Pair(player.getLong("id")!!, formatPlayer(player))
+                }
+                logger.info("Expected opengotha pairing:\n${
+                    pairingsOG[round - minRound].joinToString("\n") {
+                        val game = it as Json.Object
+                        formatGame(playersMap, game)
+                    }
+                }")
+                logger.info("Actual pairgoth pairing:\n${
+                    games.joinToString("\n") {
+                        val game = it as Json.Object
+                        formatGame(playersMap, game)
+                    }
+                }")
+            }
+            assertTrue(gamesDoMatch, "pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
             // Enter results extracted from OpenGotha
