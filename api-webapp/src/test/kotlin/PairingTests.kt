@@ -160,11 +160,11 @@ class PairingTests: TestBase() {
             val cost = map[namePair]!![9]
             sumOfWeights += cost
         }
-        
+
         return sumOfWeights
     }
 
-    fun test_from_XML(name:String){
+    fun test_from_XML(name:String, forcePairing:List<Int>){
         // Let pairgoth use the legacy asymmetric detRandom()
         BaseSolver.asymmetricDetRandom = true
         // read tournament with pairing
@@ -201,10 +201,25 @@ class PairingTests: TestBase() {
             // Call Pairgoth pairing solver to generate games
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
             logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
-            logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
+            logger.info("games for round $round: {}", games.toString())
 
             // Compare weights with OpenGotha
             assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+
+            if (round in forcePairing) {
+                logger.info("Non unique pairing, forcing Opengotha pairing to Pairgoth")
+                firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
+                for (i in 0 until pairingsOG[round - 1].size) {
+                    val gameID = firstGameID + i
+                    // find corresponding game (matching white id)
+                    val gameOG = pairingsOG[round - 1].getJson(i)!!.asObject()// ["r"] as String?
+                    val whiteId = gameOG["w"] as Long?
+                    val blackId = gameOG["b"] as Long?
+                    TestAPI.put("/api/tour/$id/pair/$round", Json.parse("""{"id":$gameID,"w":$whiteId,"b":$blackId}""")).asObject()
+                    }
+                games = TestAPI.get("/api/tour/$id/res/$round").asArray()
+            }
+
             // Compare pairings with OpenGotha
             val gamesDoMatch = compare_games(games, pairingsOG[round - 1])
             if (!gamesDoMatch) {
@@ -310,22 +325,22 @@ class PairingTests: TestBase() {
 
     @Test
     fun `SwissTest notSoSimpleSwiss`() {
-        test_from_XML("notsosimpleswiss")
+        test_from_XML("notsosimpleswiss", listOf(6, 8))
     }
 
     @Test
     fun `MMtest simpleMM`() {
-        test_from_XML("simplemm")
+        test_from_XML("simplemm", emptyList())
     }
 
     @Test
     fun `MMtest notSimpleMM`() {
-        test_from_XML("notsimplemm")
+        test_from_XML("notsimplemm", emptyList())
     }
 
     @Test
     fun `MMtest Toulouse2024`() {
-        test_from_XML("Toulouse2024")
+        test_from_XML("Toulouse2024", emptyList())
     }
 
     @Test
