@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<Tournament dataVersion="201" externalIPAddress="77.128.107.78" gothaMinorVersion="5" gothaVersion="348" saveDT="20191119110542">
+<Tournament externalIPAddress="88.166.95.85" fullVersionNumber="3.51.02" runningMode="SAL" saveDT="20250303153254">
     <Players>
         <Player agaExpirationDate="" agaId="" club="84Av" country="FR" egfPin="" ffgLicence="0120001" ffgLicenceStatus="L" firstName="Bernard" grade="3K" name="Mignucci" participating="11111111111111111111" rank="3K" rating="1762" ratingOrigin="EGF : 1762" registeringStatus="FIN" smmsCorrection="0"/>
         <Player agaExpirationDate="" agaId="" club="69Ly" country="FR" egfPin="" ffgLicence="8414002" ffgLicenceStatus="L" firstName="Jean-Christophe" grade="3K" name="Honoré" participating="11111111111111111111" rank="3K" rating="1800" ratingOrigin="FFG : -254" registeringStatus="FIN" smmsCorrection="0"/>
@@ -38,191 +38,191 @@
         <Player agaExpirationDate="" agaId="" club="13Ma" country="FR" egfPin="" ffgLicence="0322103" ffgLicenceStatus="L" firstName="Claude" grade="7K" name="Brisson" participating="11111111111111111111" rank="7K" rating="1342" ratingOrigin="EGF : 1342" registeringStatus="FIN" smmsCorrection="0"/>
     </Players>
     <Games>
-        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="1" whitePlayer="DONZETFRÉDÉRIC"/>
-        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="2" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="3" whitePlayer="GRIMONDPHILIPPE"/>
-        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="MIZESSYNFRANÇOIS"/>
-        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="5" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="6" whitePlayer="FELDMANNDENIS"/>
-        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="7" whitePlayer="BRISSONCLAUDE"/>
-        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="8" whitePlayer="BERREBYMONIQUE"/>
+        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="1" whitePlayer="LABEYEPIERRE"/>
+        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="2" whitePlayer="JOLLIVETGUY"/>
+        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="3" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="MARTIN-VALLASBRUNO"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="5" whitePlayer="MIGNUCCIBERNARD"/>
+        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="6" whitePlayer="GIOVANNINICITA"/>
+        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="7" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
+        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="8" whitePlayer="LAMÔLELAURENT"/>
         <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="9" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="10" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="11" whitePlayer="LAMÔLELAURENT"/>
-        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="12" whitePlayer="GIOVANNINICITA"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="13" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="14" whitePlayer="MARTIN-VALLASBRUNO"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="15" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="16" whitePlayer="JOLLIVETGUY"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="17" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="1" whitePlayer="LADETJEAN-PIERRE"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="2" whitePlayer="EONSERGE"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="3" whitePlayer="BERREBYMONIQUE"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="4" whitePlayer="LAMÔLELAURENT"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="5" whitePlayer="HUBERTJÉRÔME"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="6" whitePlayer="DONZETFRÉDÉRIC"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="7" whitePlayer="BOYARTCHRISTIAN"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="8" whitePlayer="BATAILLERPHILIPPE"/>
-        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="9" whitePlayer="HABUDASTEPHAN"/>
-        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="10" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="11" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="12" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="13" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="14" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="15" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="16" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="17" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="1" whitePlayer="EONSERGE"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="2" whitePlayer="BUTAUDRÉMI"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="3" whitePlayer="BORNVÉRONIQUE"/>
-        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="4" whitePlayer="DONZETFRÉDÉRIC"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="5" whitePlayer="HUBERTJÉRÔME"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="6" whitePlayer="FELDMANNDENIS"/>
-        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="7" whitePlayer="GRIMONDPHILIPPE"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="8" whitePlayer="MIZESSYNFRANÇOIS"/>
-        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="9" whitePlayer="GAJDOSCHANTAL"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="10" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="11" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="12" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="13" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="14" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="15" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="16" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="17" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="1" whitePlayer="BORNVÉRONIQUE"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="2" whitePlayer="DUPRÉWILLIAM"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="3" whitePlayer="LAMÔLELAURENT"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="4" whitePlayer="HABUDASTEPHAN"/>
-        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="5" whitePlayer="BOYARTCHRISTIAN"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="6" whitePlayer="GAJDOSCHANTAL"/>
-        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="7" whitePlayer="MIZESSYNFRANÇOIS"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="8" whitePlayer="BRISSONCLAUDE"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="9" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="10" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="11" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="12" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="13" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="14" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="15" whitePlayer="GIOVANNINICITA"/>
-        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="16" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="17" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="1" whitePlayer="BUTAUDRÉMI"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="2" whitePlayer="HUBERTJÉRÔME"/>
-        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="3" whitePlayer="BRISSONCLAUDE"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="4" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="5" whitePlayer="GAJDOSCHANTAL"/>
-        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="6" whitePlayer="JOLLIVETGUY"/>
-        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="7" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="8" whitePlayer="GAILLARDJEAN-LUC"/>
-        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="9" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="10" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="11" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="12" whitePlayer="MARTIN-VALLASBRUNO"/>
-        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="13" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="14" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="15" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="16" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="17" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="1" whitePlayer="LAMÔLELAURENT"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="2" whitePlayer="BRISSONCLAUDE"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="3" whitePlayer="BUTAUDRÉMI"/>
-        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="4" whitePlayer="BERREBYMONIQUE"/>
-        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="5" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="6" whitePlayer="DONZETFRÉDÉRIC"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="7" whitePlayer="MIZESSYNFRANÇOIS"/>
-        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="8" whitePlayer="FELDMANNDENIS"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="9" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="10" whitePlayer="GRIMONDPHILIPPE"/>
-        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="11" whitePlayer="BATAILLERPHILIPPE"/>
-        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="12" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="13" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="14" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="15" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="16" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="17" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="1" whitePlayer="HUBERTJÉRÔME"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="2" whitePlayer="BERREBYMONIQUE"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="3" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="4" whitePlayer="EONSERGE"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="5" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="6" whitePlayer="MIZESSYNFRANÇOIS"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="7" whitePlayer="BOYARTCHRISTIAN"/>
-        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="8" whitePlayer="GAILLARDJEAN-LUC"/>
-        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="9" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="10" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="11" whitePlayer="GRIMONDPHILIPPE"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="12" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="13" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="14" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="15" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="16" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="17" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="1" whitePlayer="EONSERGE"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="2" whitePlayer="NEANTFABRICE"/>
-        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="3" whitePlayer="MIGNUCCIBERNARD"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="4" whitePlayer="BOYARTCHRISTIAN"/>
-        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="5" whitePlayer="FELDMANNDENIS"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="6" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="7" whitePlayer="HABUDASTEPHAN"/>
-        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="8" whitePlayer="LADETJEAN-PIERRE"/>
-        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="9" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="10" whitePlayer="JEGOUMARC"/>
-        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="11" whitePlayer="BATAILLERPHILIPPE"/>
-        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="12" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="13" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="14" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="15" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="16" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="17" whitePlayer="GIOVANNINICITA"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="1" whitePlayer="BOYARTCHRISTIAN"/>
-        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="2" whitePlayer="GUILLOUMARC"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="3" whitePlayer="LADETJEAN-PIERRE"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="4" whitePlayer="CORNUEJOLSDOMINIQUE"/>
-        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="5" whitePlayer="GAJDOSCHANTAL"/>
-        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="6" whitePlayer="BATAILLERPHILIPPE"/>
-        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="7" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="8" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="9" whitePlayer="GAILLARDJEAN-LUC"/>
-        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="10" whitePlayer="MARTINYVAN"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="11" whitePlayer="JEGOUMARC"/>
-        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="12" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
-        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="13" whitePlayer="BORNVÉRONIQUE"/>
-        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="14" whitePlayer="DONZETFRÉDÉRIC"/>
-        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="15" whitePlayer="MARTIN-VALLASBRUNO"/>
-        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="16" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="17" whitePlayer="GIOVANNINICITA"/>
-        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="1" whitePlayer="BONISMICHEL"/>
-        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="2" whitePlayer="RONAYETTELUC"/>
-        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="3" whitePlayer="GUERRE-GENTONPHILIPPE"/>
-        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="4" whitePlayer="BATAILLERPHILIPPE"/>
-        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="5" whitePlayer="GAILLARDJEAN-LUC"/>
-        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="6" whitePlayer="HABUDASTEPHAN"/>
-        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="7" whitePlayer="GAJDOSCHANTAL"/>
-        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="8" whitePlayer="JEGOUMARC"/>
-        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="9" whitePlayer="DUPRÉWILLIAM"/>
-        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="10" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
-        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="11" whitePlayer="LABEYEPIERRE"/>
-        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="12" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="10" whitePlayer="BERREBYMONIQUE"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="11" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="12" whitePlayer="FELDMANNDENIS"/>
+        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="13" whitePlayer="HABARTGILLES"/>
+        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="14" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="15" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="16" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="17" whitePlayer="DONZETFRÉDÉRIC"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="1" whitePlayer="DUPRÉWILLIAM"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="2" whitePlayer="GUILLOUMARC"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="3" whitePlayer="FELDMANNDENIS"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="4" whitePlayer="GAJDOSCHANTAL"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="5" whitePlayer="MIGNUCCIBERNARD"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="6" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
+        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="7" whitePlayer="GIOVANNINICITA"/>
+        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="8" whitePlayer="GAILLARDJEAN-LUC"/>
+        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="9" whitePlayer="JOLLIVETGUY"/>
+        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="10" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="11" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="12" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="13" whitePlayer="LAMÔLELAURENT"/>
+        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="14" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="15" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="16" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="10" tableNumber="17" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="1" whitePlayer="DUPRÉWILLIAM"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="2" whitePlayer="JOLLIVETGUY"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="3" whitePlayer="LADETJEAN-PIERRE"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="4" whitePlayer="BOYARTCHRISTIAN"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="5" whitePlayer="GIOVANNINICITA"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="6" whitePlayer="MIGNUCCIBERNARD"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="7" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="8" whitePlayer="CORNUEJOLSDOMINIQUE"/>
+        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="9" whitePlayer="LAMÔLELAURENT"/>
+        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="10" whitePlayer="LABEYEPIERRE"/>
+        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="11" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="12" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="13" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="14" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="15" whitePlayer="EONSERGE"/>
+        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="16" whitePlayer="HABARTGILLES"/>
+        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="9" tableNumber="17" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="1" whitePlayer="JOLLIVETGUY"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="2" whitePlayer="GIOVANNINICITA"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="3" whitePlayer="BOYARTCHRISTIAN"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="4" whitePlayer="BUTAUDRÉMI"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="5" whitePlayer="LAMÔLELAURENT"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="6" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="7" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="8" whitePlayer="GUERRE-GENTONPHILIPPE"/>
+        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="9" whitePlayer="GAILLARDJEAN-LUC"/>
+        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="10" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="11" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="12" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="13" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="14" whitePlayer="HABARTGILLES"/>
+        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="15" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="16" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="8" tableNumber="17" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="1" whitePlayer="LADETJEAN-PIERRE"/>
+        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="2" whitePlayer="BUTAUDRÉMI"/>
+        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="3" whitePlayer="DONZETFRÉDÉRIC"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="4" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="5" whitePlayer="GUILLOUMARC"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="6" whitePlayer="GAILLARDJEAN-LUC"/>
+        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="7" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="8" whitePlayer="BERREBYMONIQUE"/>
+        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="9" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="10" whitePlayer="CORNUEJOLSDOMINIQUE"/>
+        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="11" whitePlayer="HABARTGILLES"/>
+        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="12" whitePlayer="EONSERGE"/>
+        <Game blackPlayer="BORNVÉRONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="13" whitePlayer="JEGOUMARC"/>
+        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="14" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="15" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="16" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="7" tableNumber="17" whitePlayer="BARATOUPAUL"/>
+        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="1" whitePlayer="BOYARTCHRISTIAN"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="2" whitePlayer="FELDMANNDENIS"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="3" whitePlayer="BUTAUDRÉMI"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="4" whitePlayer="GUERRE-GENTONPHILIPPE"/>
+        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="5" whitePlayer="LAMÔLELAURENT"/>
+        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="6" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="7" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="8" whitePlayer="BERREBYMONIQUE"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="9" whitePlayer="EONSERGE"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="10" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="11" whitePlayer="JEGOUMARC"/>
+        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="12" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="13" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="14" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="15" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="16" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="BARATOUPAUL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="6" tableNumber="17" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="1" whitePlayer="BOYARTCHRISTIAN"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="2" whitePlayer="LAMÔLELAURENT"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="3" whitePlayer="DONZETFRÉDÉRIC"/>
+        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="4" whitePlayer="GUILLOUMARC"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="5" whitePlayer="GAILLARDJEAN-LUC"/>
+        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="6" whitePlayer="BERREBYMONIQUE"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="7" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="8" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="9" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="10" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="11" whitePlayer="GAJDOSCHANTAL"/>
+        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="12" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="CORNUEJOLSDOMINIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="13" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="14" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="15" whitePlayer="BORNVÉRONIQUE"/>
+        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="16" whitePlayer="JEGOUMARC"/>
+        <Game blackPlayer="LABEYEPIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="5" tableNumber="17" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="1" whitePlayer="GUILLOUMARC"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="2" whitePlayer="GAILLARDJEAN-LUC"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="3" whitePlayer="JEGOUMARC"/>
+        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="4" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="5" whitePlayer="HONORÉJEAN-CHRISTOPHE"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="6" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="7" whitePlayer="EONSERGE"/>
+        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="8" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="9" whitePlayer="GAJDOSCHANTAL"/>
+        <Game blackPlayer="BONISMICHEL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="10" whitePlayer="BORNVÉRONIQUE"/>
+        <Game blackPlayer="MARTIN-VALLASBRUNO" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="11" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="12" whitePlayer="CORNUEJOLSDOMINIQUE"/>
+        <Game blackPlayer="GUERRE-GENTONPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="13" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="HUBERTJÉRÔME" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="14" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="15" whitePlayer="HABARTGILLES"/>
+        <Game blackPlayer="HABUDASTEPHAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="16" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="4" tableNumber="17" whitePlayer="BARATOUPAUL"/>
+        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="1" whitePlayer="GAJDOSCHANTAL"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="2" whitePlayer="EONSERGE"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="3" whitePlayer="RONAYETTELUC"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="4" whitePlayer="NEANTFABRICE"/>
+        <Game blackPlayer="JEGOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="5" whitePlayer="DUPRÉWILLIAM"/>
+        <Game blackPlayer="LADETJEAN-PIERRE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="6" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="BATAILLERPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="7" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="8" whitePlayer="GUERRE-GENTONPHILIPPE"/>
+        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="9" whitePlayer="CORNUEJOLSDOMINIQUE"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="10" whitePlayer="BORNVÉRONIQUE"/>
+        <Game blackPlayer="JOLLIVETGUY" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="11" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="12" whitePlayer="BRISSONCLAUDE"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="13" whitePlayer="MARTINYVAN"/>
+        <Game blackPlayer="IMAMURA-CORNUEJOLSTORU" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="14" whitePlayer="MIZESSYNFRANÇOIS"/>
+        <Game blackPlayer="HABARTGILLES" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="15" whitePlayer="BARATOUPAUL"/>
+        <Game blackPlayer="GIOVANNINICITA" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="16" whitePlayer="MIGNUCCIBERNARD"/>
+        <Game blackPlayer="GRIMONDPHILIPPE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="3" tableNumber="17" whitePlayer="LABEYEPIERRE"/>
+        <Game blackPlayer="EONSERGE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="1" whitePlayer="LADETJEAN-PIERRE"/>
+        <Game blackPlayer="BOYARTCHRISTIAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="2" whitePlayer="BORNVÉRONIQUE"/>
+        <Game blackPlayer="GAJDOSCHANTAL" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="3" whitePlayer="JEGOUMARC"/>
+        <Game blackPlayer="GUILLOUMARC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="4" whitePlayer="HABUDASTEPHAN"/>
+        <Game blackPlayer="GAILLARDJEAN-LUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="5" whitePlayer="BATAILLERPHILIPPE"/>
+        <Game blackPlayer="BUTAUDRÉMI" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="6" whitePlayer="GUERRE-GENTONPHILIPPE"/>
+        <Game blackPlayer="NEANTFABRICE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="7" whitePlayer="CORNUEJOLSDOMINIQUE"/>
+        <Game blackPlayer="RONAYETTELUC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="8" whitePlayer="HUBERTJÉRÔME"/>
+        <Game blackPlayer="DUPRÉWILLIAM" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="9" whitePlayer="BONISMICHEL"/>
+        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="10" whitePlayer="GIOVANNINICITA"/>
+        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="11" whitePlayer="MARTIN-VALLASBRUNO"/>
+        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="12" whitePlayer="BARATOUPAUL"/>
         <Game blackPlayer="BERREBYMONIQUE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="13" whitePlayer="HABARTGILLES"/>
-        <Game blackPlayer="BRISSONCLAUDE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="14" whitePlayer="BARATOUPAUL"/>
-        <Game blackPlayer="HONORÉJEAN-CHRISTOPHE" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="15" whitePlayer="GIOVANNINICITA"/>
-        <Game blackPlayer="LAMÔLELAURENT" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="16" whitePlayer="MARTIN-VALLASBRUNO"/>
-        <Game blackPlayer="MIGNUCCIBERNARD" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="17" whitePlayer="JOLLIVETGUY"/>
+        <Game blackPlayer="FELDMANNDENIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="14" whitePlayer="GRIMONDPHILIPPE"/>
+        <Game blackPlayer="MIZESSYNFRANÇOIS" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="15" whitePlayer="LABEYEPIERRE"/>
+        <Game blackPlayer="MARTINYVAN" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="16" whitePlayer="IMAMURA-CORNUEJOLSTORU"/>
+        <Game blackPlayer="DONZETFRÉDÉRIC" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="2" tableNumber="17" whitePlayer="MIGNUCCIBERNARD"/>
     </Games>
     <ByePlayers>
         <ByePlayer player="DUPRÉWILLIAM" roundNumber="1"/>
-        <ByePlayer player="BORNVÉRONIQUE" roundNumber="2"/>
-        <ByePlayer player="JOLLIVETGUY" roundNumber="3"/>
-        <ByePlayer player="MARTIN-VALLASBRUNO" roundNumber="4"/>
-        <ByePlayer player="JEGOUMARC" roundNumber="5"/>
-        <ByePlayer player="GIOVANNINICITA" roundNumber="6"/>
-        <ByePlayer player="LADETJEAN-PIERRE" roundNumber="7"/>
-        <ByePlayer player="RONAYETTELUC" roundNumber="8"/>
-        <ByePlayer player="HABUDASTEPHAN" roundNumber="9"/>
-        <ByePlayer player="HABARTGILLES" roundNumber="10"/>
+        <ByePlayer player="JOLLIVETGUY" roundNumber="2"/>
+        <ByePlayer player="MARTIN-VALLASBRUNO" roundNumber="3"/>
+        <ByePlayer player="LABEYEPIERRE" roundNumber="4"/>
+        <ByePlayer player="BARATOUPAUL" roundNumber="5"/>
+        <ByePlayer player="BORNVÉRONIQUE" roundNumber="6"/>
+        <ByePlayer player="GRIMONDPHILIPPE" roundNumber="7"/>
+        <ByePlayer player="JEGOUMARC" roundNumber="8"/>
+        <ByePlayer player="NEANTFABRICE" roundNumber="9"/>
+        <ByePlayer player="HABUDASTEPHAN" roundNumber="10"/>
     </ByePlayers>
     <TournamentParameterSet>
-        <GeneralParameterSet bInternet="false" basicTime="60" beginDate="2020-12-22" canByoYomiTime="300" complementaryTimeSystem="STDBYOYOMI" director="François Mizessyn" endDate="2021-01-07" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Internet" name="Championnat des Vieux Dragons" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="10" shortName="notsosimpleswiss_10R" size="19" stdByoYomiTime="30"/>
+        <GeneralParameterSet bInternet="false" basicTime="60" beginDate="2020-12-22" canByoYomiTime="300" complementaryTimeSystem="STDBYOYOMI" director="François Mizessyn" endDate="2021-01-07" fischerTime="10" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location="Internet" name="Championnat des Vieux Dragons" nbMovesCanTime="15" numberOfCategories="1" numberOfRounds="10" shortName="notsosimpleswiss_new" size="19" stdByoYomiTime="30"/>
         <HandicapParameterSet hdBasedOnMMS="true" hdCeiling="0" hdCorrection="0" hdNoHdRankThreshold="30K"/>
         <PlacementParameterSet>
             <PlacementCriteria>
