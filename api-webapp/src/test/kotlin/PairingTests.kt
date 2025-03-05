@@ -147,8 +147,10 @@ class PairingTests: TestBase() {
             mapNamesID[id] = name
         }
 
+        val ngames = if (players.size.mod(2) == 1) opengotha.size-1 else opengotha.size
+
         var sumOfWeights = 0.0
-        for (i in 0 until opengotha.size) {
+        for (i in 0 until ngames) {
             val tmpOG = Game.fromJson(opengotha.getJson(i)!!.asObject().let {
                 Json.MutableObject(it).set("t", 0) // hack to fill the table to make fromJson() happy
             })
@@ -158,7 +160,7 @@ class PairingTests: TestBase() {
             val cost = map[namePair]!![9]
             sumOfWeights += cost
         }
-
+        
         return sumOfWeights
     }
 
@@ -188,13 +190,17 @@ class PairingTests: TestBase() {
             TestAPI.delete("/api/tour/$id/pair/$round", Json.Array("all"))
         }
 
+        val dec = DecimalFormat("#.#")
         var games: Json.Array
         var firstGameID: Int
 
         for (round in 1..tournament.getInt("rounds")!!) {
+            val sumOfWeightsOG = compute_sumOfWeight_OG(getTestFile("opengotha/$name/$name" + "_weights_R$round.txt"), pairingsOG[round-1], players)
+
             BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             // Call Pairgoth pairing solver to generate games
             games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
             logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
 
             // Compare weights with OpenGotha
