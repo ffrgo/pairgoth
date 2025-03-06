@@ -16,7 +16,7 @@ data class BaseCritParams(
     val dupWeight: Double = MAX_AVOIDDUPGAME,
     val random: Double = 0.0,
     val deterministic: Boolean = true,
-    val colorBalanceWeight: Double = MAX_COLOR_BALANCE,
+    val colorBalanceWeight: Double = MAX_COLOR_BALANCE/1000, // reduce default value to 1e3 (to avoid split bug)
     val byeWeight: Double = MAX_BYE_WEIGHT // This weight is not in opengotha
 ) {
     init {
