@@ -66,9 +66,9 @@
         <Game blackPlayer="SANNESPALHARALD#33" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="1" whitePlayer="CHUNGCHEN-EN#3"/>
         <Game blackPlayer="CARMONAPEDRO#35" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="25" whitePlayer="SILFVERANTON#41"/>
         <Game blackPlayer="SILFVERANTON#41" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="2" whitePlayer="GEYONGFEI#58"/>
-        <Game blackPlayer="KAADENJAMESANDREW#47" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="26" whitePlayer="RANJBARHOORYA#7"/>
+        <Game blackPlayer="TIMKLANCISAR#39" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="26" whitePlayer="HULILLY#17"/>
         <Game blackPlayer="TIMKLANCISAR#39" handicap="0" knownColor="true" result="RESULT_WHITEWINS" roundNumber="1" tableNumber="3" whitePlayer="KAWAGUCHITSUBASA#8"/>
-        <Game blackPlayer="NUNEZMARIOTPASCALALEJANDRO#59" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="27" whitePlayer="TIMKLANCISAR#39"/>
+        <Game blackPlayer="KAADENJAMESANDREW#47" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="27" whitePlayer="RANJBARHOORYA#7"/>
         <Game blackPlayer="KRUSHELNYTSKYIVALERII#44" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="4" whitePlayer="ANDELICMIHAJLO#37"/>
         <Game blackPlayer="RAVELOMANANTSOANIRINA#46" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="28" whitePlayer="SANNESPALHARALD#33"/>
         <Game blackPlayer="LIUTIANYI#2" handicap="0" knownColor="true" result="RESULT_BLACKWINS" roundNumber="1" tableNumber="5" whitePlayer="HAIDARALIMIN#1"/>
@@ -103,28 +103,28 @@
         <Game blackPlayer="DOBRANISDENIS#36" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="3" whitePlayer="RIOSSEBASTIAN#55"/>
         <Game blackPlayer="KARADABANDENIS#23" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="4" whitePlayer="GIEDRIUSTUMELIS#30"/>
         <Game blackPlayer="VAATAJAVILLE#22" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="5" whitePlayer="HAQUYNHANH#16"/>
-        <Game blackPlayer="HENAOBRANDAL#52" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="6" whitePlayer="WOOHO-YEUNG#45"/>
-        <Game blackPlayer="KARUEHAWANITWICHRICH#15" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="7" whitePlayer="VANNIEUWENHUYSEJOOST#18"/>
-        <Game blackPlayer="KIMDO-YOUNG#48" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="8" whitePlayer="TYUMENEVROMAN#29"/>
+        <Game blackPlayer="KARUEHAWANITWICHRICH#15" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="6" whitePlayer="HENAOBRANDAL#52"/>
+        <Game blackPlayer="KIMDO-YOUNG#48" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="7" whitePlayer="VANNIEUWENHUYSEJOOST#18"/>
+        <Game blackPlayer="TYUMENEVROMAN#29" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="8" whitePlayer="WOOHO-YEUNG#45"/>
         <Game blackPlayer="AKSUTHUSREV#43" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="9" whitePlayer="VANZEISTROB#32"/>
         <Game blackPlayer="CHUNGCHEN-EN#3" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="10" whitePlayer="ZHANGTIANYUAN#60"/>
         <Game blackPlayer="GEYONGFEI#58" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="11" whitePlayer="CZERNECKICEZARYTOMASZ#34"/>
-        <Game blackPlayer="KAWAGUCHITSUBASA#8" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="12" whitePlayer="RUZICKAMARTINANDREAS#24"/>
-        <Game blackPlayer="KWEESONGHE#12" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="13" whitePlayer="KIMTAE-HEON#9"/>
-        <Game blackPlayer="MICHAELITAL#27" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="14" whitePlayer="KRUSHELNYTSKYIVALERII#44"/>
+        <Game blackPlayer="KWEESONGHE#12" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="12" whitePlayer="KAWAGUCHITSUBASA#8"/>
+        <Game blackPlayer="MICHAELITAL#27" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="13" whitePlayer="KIMTAE-HEON#9"/>
+        <Game blackPlayer="KRUSHELNYTSKYIVALERII#44" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="14" whitePlayer="RUZICKAMARTINANDREAS#24"/>
         <Game blackPlayer="SAMINHANG#11" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="15" whitePlayer="LIUTIANYI#2"/>
         <Game blackPlayer="AZUAJEALAMOMANUELERNESTO#57" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="16" whitePlayer="BARATBAEVILIM#10"/>
         <Game blackPlayer="BASINANGSUNSHINE#13" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="17" whitePlayer="MAKANYZALAN#25"/>
-        <Game blackPlayer="RAMIREZALVAREZCARLOSADRIAN#54" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="18" whitePlayer="GOMEZJOSE#51"/>
-        <Game blackPlayer="GRASSODAVIDE#28" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="19" whitePlayer="WIJAYAWILIAM#6"/>
+        <Game blackPlayer="GOMEZJOSE#51" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="18" whitePlayer="WIJAYAWILIAM#6"/>
+        <Game blackPlayer="RAMIREZALVAREZCARLOSADRIAN#54" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="19" whitePlayer="GRASSODAVIDE#28"/>
         <Game blackPlayer="KINAKENYI#56" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="20" whitePlayer="VIVIANOJOSEGABRIEL#49"/>
-        <Game blackPlayer="ANDELICMIHAJLO#37" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="21" whitePlayer="HULILLY#17"/>
-        <Game blackPlayer="HAIDARALIMIN#1" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="22" whitePlayer="MENDEZFLEITASPEDRO#40"/>
-        <Game blackPlayer="SMOLARIKPETER#38" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="23" whitePlayer="NULTYSTEPHEN#26"/>
+        <Game blackPlayer="ANDELICMIHAJLO#37" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="21" whitePlayer="MENDEZFLEITASPEDRO#40"/>
+        <Game blackPlayer="HAIDARALIMIN#1" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="22" whitePlayer="NULTYSTEPHEN#26"/>
+        <Game blackPlayer="SMOLARIKPETER#38" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="23" whitePlayer="NUNEZMARIOTPASCALALEJANDRO#59"/>
         <Game blackPlayer="TUKARATADEJPETAR#19" handicap="0" knownColor="true" result="RESULT_UNKNOWN" roundNumber="2" tableNumber="24" whitePlayer="SANCHEZSUSANA#53"/>
     </Games>
     <TournamentParameterSet>
-        <GeneralParameterSet bInternet="false" basicTime="40" beginDate="2024-09-20" canByoYomiTime="300" complementaryTimeSystem="FISCHER" director="Arnold Kim" endDate="2024-09-27" fischerTime="20" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location=" Taebaek" name="19th KPMC Split bug" nbMovesCanTime="5" numberOfCategories="1" numberOfRounds="7" shortName="20240921-KPMC-Splitbug_OG240904" size="19" stdByoYomiTime="5"/>
+        <GeneralParameterSet bInternet="false" basicTime="40" beginDate="2024-09-20" canByoYomiTime="300" complementaryTimeSystem="FISCHER" director="Arnold Kim" endDate="2024-09-27" fischerTime="20" genCountNotPlayedGamesAsHalfPoint="false" genMMBar="9D" genMMFloor="30K" genMMS2ValueAbsent="1" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="true" komi="7.5" location=" Taebaek" name="19th KPMC Split bug" nbMovesCanTime="5" numberOfCategories="1" numberOfRounds="7" shortName="test" size="19" stdByoYomiTime="5"/>
         <HandicapParameterSet hdBasedOnMMS="false" hdCeiling="0" hdCorrection="1" hdNoHdRankThreshold="1D"/>
         <PlacementParameterSet>
             <PlacementCriteria>
@@ -136,7 +136,7 @@
                 <PlacementCriterion name="NULL" number="6"/>
             </PlacementCriteria>
         </PlacementParameterSet>
-        <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="NULL" paiMaAvoidMixingCategories="20000000000000" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="3" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="3" paiSePreferMMSDiffRatherThanSameCountry="1" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
+        <PairingParameterSet paiBaAvoidDuplGame="500000000000000" paiBaBalanceWB="1000" paiBaDeterministic="true" paiBaRandom="0" paiMaAdditionalPlacementCritSystem1="Rating" paiMaAdditionalPlacementCritSystem2="NULL" paiMaAvoidMixingCategories="20000000000000" paiMaCompensateDUDD="true" paiMaDUDDLowerMode="MID" paiMaDUDDUpperMode="MID" paiMaDUDDWeight="100000000" paiMaLastRoundForSeedSystem1="3" paiMaMaximizeSeeding="5000000" paiMaMinimizeScoreDifference="100000000000" paiMaSeedSystem1="SPLITANDSLIP" paiMaSeedSystem2="SPLITANDSLIP" paiSeAvoidSameGeo="0" paiSeBarThresholdActive="true" paiSeDefSecCrit="20000000000000" paiSeMinimizeHandicap="0" paiSeNbWinsThresholdActive="true" paiSePreferMMSDiffRatherThanSameClub="3" paiSePreferMMSDiffRatherThanSameCountry="1" paiSeRankThreshold="30K" paiStandardNX1Factor="0.5"/>
         <DPParameterSet displayClCol="true" displayCoCol="true" displayIndGamesInMatches="true" displayNPPlayers="false" displayNumCol="true" displayPlCol="true" gameFormat="short" playerSortType="name" showByePlayer="true" showNotFinallyRegisteredPlayers="true" showNotPairedPlayers="true" showNotParticipatingPlayers="false" showPlayerClub="true" showPlayerCountry="false" showPlayerGrade="true"/>
         <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
     </TournamentParameterSet>

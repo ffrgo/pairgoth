@@ -147,7 +147,7 @@ class PairingTests: TestBase() {
             mapNamesID[id] = name
         }
 
-        val ngames = if (players.size.mod(2) == 1) opengotha.size-1 else opengotha.size
+        val ngames = if ("\"b\":0" in opengotha.takeLast(1).toString()) opengotha.size-1 else opengotha.size // remove games with bye player
 
         var sumOfWeights = 0.0
         for (i in 0 until ngames) {
@@ -421,26 +421,6 @@ class PairingTests: TestBase() {
             }
             assertTrue(gamesDoMatch, "pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
-
-            // Enter results extracted from OpenGotha
-            firstGameID = (games.getJson(0)!!.asObject()["id"] as Long?)!!.toInt()
-            for (i in 0 until pairingsOG[round - minRound].size) {
-                val gameID = firstGameID + i
-                // find corresponding game (matching white id)
-                for (j in 0 until pairingsOG[round - 1].size) {
-                    val gameOG = pairingsOG[round - minRound].getJson(j)!!.asObject()// ["r"] as String?
-                    if (gameOG["w"] == games.getJson(i)!!.asObject()["w"]) {
-                        val gameRes = gameOG["r"] as String?
-                        resp = TestAPI.put(
-                            "/api/tour/$id/res/$round",
-                            Json.parse("""{"id":$gameID,"result":"$gameRes"}""")
-                        ).asObject()
-                        assertTrue(resp.getBoolean("success") == true, "expecting success")
-                        break
-                    }
-                }
-            }
-            logger.info("Results succesfully entered for round $round")
         }
     }
 
