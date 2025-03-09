@@ -33,7 +33,7 @@ sealed class BaseSolver(
         val rand = Random(/* seed from properties - TODO */)
         // Used in tests
         var weightsLogger: PrintWriter? = null
-        var asymmetricDetRandom = false
+        var legacy_mode = false
     }
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
@@ -389,7 +389,7 @@ sealed class BaseSolver(
                         val randRange = maxSeedingWeight * 0.2
                         // for old tests to pass
                         val rand =
-                            if (asymmetricDetRandom && p1.fullName() > p2.fullName()) {
+                            if (legacy_mode && p1.fullName() > p2.fullName()) {
                                 // for old tests to pass
                                 detRandom(randRange, p2, p1, false)
                             } else {
@@ -426,13 +426,12 @@ sealed class BaseSolver(
         val placementScoreRange = groupsCount
 
         val geoMaxCost = pairing.geo.avoidSameGeo
-        //val geoMaxCost = 100000000000.0
 
-		val countryFactor: Int = if (biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
+		val countryFactor: Int = if (legacy_mode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
 			preferMMSDiffRatherThanSameCountry
 		else
 			0
-		val clubFactor: Int = if (biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
+		val clubFactor: Int = if (legacy_mode || biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
 			preferMMSDiffRatherThanSameClub
 		else
 			0

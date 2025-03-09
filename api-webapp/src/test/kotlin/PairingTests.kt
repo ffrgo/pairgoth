@@ -164,9 +164,14 @@ class PairingTests: TestBase() {
         return sumOfWeights
     }
 
-    fun test_from_XML(name:String, forcePairing:List<Int>){
+    fun test_from_XML(name: String, forcePairing:List<Int>) {
+        test_from_XML_internal(name, true)
+        test_from_XML_internal(name, false)
+    }
+
+    fun test_from_XML_internal(name: String, legacy: Boolean){
         // Let pairgoth use the legacy asymmetric detRandom()
-        BaseSolver.asymmetricDetRandom = true
+        BaseSolver.legacy_mode = legacy
         // read tournament with pairing
         val file = getTestFile("opengotha/pairings/$name.xml")
         logger.info("read from file $file")
@@ -203,8 +208,10 @@ class PairingTests: TestBase() {
             logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
             logger.info("games for round $round: {}", games.toString())
 
-            // Compare weights with OpenGotha
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            // Compare weights with OpenGotha if legacy mode
+            if (legacy) {
+                assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            }
 
             if (round in forcePairing) {
                 logger.info("Non unique pairing, forcing Opengotha pairing to Pairgoth")
@@ -265,7 +272,7 @@ class PairingTests: TestBase() {
 
     @Test
     fun `SwissTest simpleSwiss`() {
-        BaseSolver.asymmetricDetRandom = true
+        BaseSolver.legacy_mode = true
         // read tournament with pairing
         var file = getTestFile("opengotha/pairings/simpleswiss.xml")
         logger.info("read from file $file")
@@ -346,7 +353,7 @@ class PairingTests: TestBase() {
     @Test
     fun `SwissTest KPMCSplitbug`() {
         // Let pairgoth use the legacy asymmetric detRandom()
-        BaseSolver.asymmetricDetRandom = true
+        BaseSolver.legacy_mode = true
         // read tournament with pairing
         val name = "20240921-KPMC-Splitbug"
         val file = getTestFile("opengotha/pairings/$name.xml")
