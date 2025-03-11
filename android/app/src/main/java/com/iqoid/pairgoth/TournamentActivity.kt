@@ -1,34 +1,55 @@
 package com.iqoid.pairgoth
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.ArrayAdapter
+import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
+import com.iqoid.pairgoth.client.model.Tournament
+import com.iqoid.pairgoth.client.network.NetworkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import com.iqoid.pairgoth.client.network.NetworkManager
 
-class TourActivity : AppCompatActivity() {
+class TournamentActivity : AppCompatActivity() {
+    private lateinit var tournamentListView: ListView
+    private lateinit var tournaments: List<Tournament>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main) //replace if you want
+        setContentView(R.layout.activity_tournament)
+
+        tournamentListView = findViewById(R.id.tournamentListView)
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = NetworkManager.pairGothApiService.getTours()
                 if (response.isSuccessful) {
-                    val tours = response.body()
-                    // Use the tours data
-                    Log.d("TourActivity", "Tours: $tours")
+                    tournaments = response.body() ?: emptyList()
+                    runOnUiThread {
+                        updateTournamentList()
+                    }
                 } else {
-                    // Handle the error
-                    Log.e("TourActivity", "Error: ${response.errorBody()}")
+                    Log.e("TournamentActivity", "Error: ${response.errorBody()}")
                 }
             } catch (e: Exception) {
-                // Handle network exceptions
-                Log.e("TourActivity", "Exception: ${e.message}")
+                Log.e("TournamentActivity", "Exception: ${e.message}")
             }
         }
+
+        tournamentListView.setOnItemClickListener { _, _, position, _ ->
+            val selectedTournament = tournaments[position]
+            val intent = Intent(this, PlayerSearchActivity::class.java).apply {
+                putExtra("tournamentId", selectedTournament.id)
+            }
+            startActivity(intent)
+        }
+    }
+
+    private fun updateTournamentList() {
+        val tournamentNames = tournaments.map { it.name }
+        val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, tournamentNames)
+        tournamentListView.adapter = adapter
     }
 }

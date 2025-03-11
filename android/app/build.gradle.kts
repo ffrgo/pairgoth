@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -56,4 +57,14 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    // Retrofit for network requests
+    implementation(libs.retrofit)
+    // Gson for JSON serialization/deserialization (if you use JSON)
+    implementation(libs.converter.gson)
+    // OkHttp for network communication (Retrofit uses it)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor) //optional for logging
+    // Kotlin Coroutines (for asynchronous network calls)
+    implementation(libs.kotlinx.coroutines.android) //or the latest version
+    
 }
