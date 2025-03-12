@@ -6,7 +6,7 @@ data class Player(
     val firstname: String,
     val country: String,
     val club: String,
-    val rank: Int,
+    val rank: String,
     val rating: Int,
     val skip: List<Int> = emptyList(), //optional property
     val final: Boolean = false, //optional property

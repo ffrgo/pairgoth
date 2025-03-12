@@ -1,9 +1,8 @@
 package com.iqoid.pairgoth.client.model
 
+import com.google.gson.annotations.SerializedName
+
 data class Tournament(
-    val id: String, // Example properties
-    val name: String,
-    val shortName: String,
-    val description: String
-    // ... other properties ...
+    @SerializedName("name") val name: String? = null,
+    @SerializedName("lastModified") val lastModified: String? = null
 )

@@ -45,7 +45,7 @@ class PlayerSearchActivity : AppCompatActivity() {
 
         searchButton.setOnClickListener {
             val name = nameEditText.text.toString()
-            val search = Search(needle = name, egf = false, ffg = false)
+            val search = Search(needle = name, egf = true, ffg = false)
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = NetworkManager.pairGothApiService.searchPlayer(search)

@@ -26,7 +26,12 @@ class TournamentActivity : AppCompatActivity() {
             try {
                 val response = NetworkManager.pairGothApiService.getTours()
                 if (response.isSuccessful) {
-                    tournaments = response.body() ?: emptyList()
+                    val tournaments = response.body()
+                    // log all the tournaments
+                    tournaments?.forEach { (key, value) ->
+                        Log.d("TournamentActivity", "Key: $key, Value: $value")
+                    }
+                    this@TournamentActivity.tournaments = tournaments?.values?.toList() ?: emptyList()
                     runOnUiThread {
                         updateTournamentList()
                     }
@@ -41,7 +46,7 @@ class TournamentActivity : AppCompatActivity() {
         tournamentListView.setOnItemClickListener { _, _, position, _ ->
             val selectedTournament = tournaments[position]
             val intent = Intent(this, PlayerSearchActivity::class.java).apply {
-                putExtra("tournamentId", selectedTournament.id)
+                putExtra("tournamentName", selectedTournament.name)
             }
             startActivity(intent)
         }
