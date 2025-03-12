@@ -3,10 +3,13 @@ package com.iqoid.pairgoth
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,15 +20,11 @@ import com.iqoid.pairgoth.client.network.NetworkManager
 class PlayerSearchActivity : AppCompatActivity() {
     private lateinit var nameEditText: EditText
     private lateinit var searchButton: Button
-    private lateinit var playerNameTextView: TextView
-    private lateinit var playerFirstnameTextView: TextView
-    private lateinit var playerCountryTextView: TextView
-    private lateinit var playerClubTextView: TextView
-    private lateinit var playerRankTextView: TextView
-    private lateinit var playerRatingTextView: TextView
+    private lateinit var playerRecyclerView: RecyclerView
     private lateinit var registerButton: Button
-    private lateinit var player: Player
-
+    private lateinit var playerAdapter: PlayerAdapter
+    private var players: List<Player> = emptyList()
+    private var selectedPlayer: Player? = null
     private lateinit var tournamentId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,14 +33,17 @@ class PlayerSearchActivity : AppCompatActivity() {
         tournamentId = intent.getStringExtra("tournamentId") ?: ""
         nameEditText = findViewById(R.id.nameEditText)
         searchButton = findViewById(R.id.searchButton)
-        playerNameTextView = findViewById(R.id.playerNameTextView)
-        playerFirstnameTextView = findViewById(R.id.playerFirstnameTextView)
-        playerCountryTextView = findViewById(R.id.playerCountryTextView)
-        playerClubTextView = findViewById(R.id.playerClubTextView)
-        playerRankTextView = findViewById(R.id.playerRankTextView)
-        playerRatingTextView = findViewById(R.id.playerRatingTextView)
+        playerRecyclerView = findViewById(R.id.playerRecyclerView)
         registerButton = findViewById(R.id.registerButton)
         registerButton.isEnabled = false
+
+        playerAdapter = PlayerAdapter(players) { player ->
+            selectedPlayer = player
+            registerButton.isEnabled = true
+            playerAdapter.setSelectedPlayer(player)
+        }
+        playerRecyclerView.adapter = playerAdapter
+        playerRecyclerView.layoutManager = LinearLayoutManager(this)
 
         searchButton.setOnClickListener {
             val name = nameEditText.text.toString()
@@ -50,60 +52,63 @@ class PlayerSearchActivity : AppCompatActivity() {
                 try {
                     val response = NetworkManager.pairGothApiService.searchPlayer(search)
                     if (response.isSuccessful) {
-                        if (response.body()!!.isNotEmpty()){
-                            player = response.body()!![0]
-                            runOnUiThread {
-                                updatePlayerInfo(player)
-                            }
-                        }
-                        else {
-                            runOnUiThread {
-                                playerNameTextView.text = "Player not found"
-                                playerFirstnameTextView.text = ""
-                                playerCountryTextView.text = ""
-                                playerClubTextView.text = ""
-                                playerRankTextView.text = ""
-                                playerRatingTextView.text = ""
-                                registerButton.isEnabled = false
-                            }
+                        players = response.body() ?: emptyList()
+                        runOnUiThread {
+                            updatePlayerList(players)
                         }
                     } else {
                         Log.e("PlayerSearchActivity", "Search Error: ${response.errorBody()}")
+                        runOnUiThread {
+                            Toast.makeText(this@PlayerSearchActivity, "Search Error", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 } catch (e: Exception) {
                     Log.e("PlayerSearchActivity", "Search Exception: ${e.message}")
+                    runOnUiThread {
+                        Toast.makeText(this@PlayerSearchActivity, "Search Exception", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         }
 
         registerButton.setOnClickListener {
-            CoroutineScope(Dispatchers.IO).launch {
-                try {
-                    val response = NetworkManager.pairGothApiService.registerPlayer(tournamentId,player)
-                    if (response.isSuccessful) {
-                        val registeredPlayer = response.body()
-                        runOnUiThread {
-                            //navigate to another activity or show a success message
-                            val intent = Intent(this@PlayerSearchActivity, SuccessActivity::class.java)
-                            startActivity(intent)
+            selectedPlayer?.let { player ->
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val response = NetworkManager.pairGothApiService.registerPlayer(tournamentId, player)
+                        if (response.isSuccessful) {
+                            runOnUiThread {
+                                val intent = Intent(this@PlayerSearchActivity, SuccessActivity::class.java)
+                                startActivity(intent)
+                            }
+                        } else {
+                            Log.e("PlayerSearchActivity", "Registration Error: ${response.errorBody()}")
+                            runOnUiThread {
+                                Toast.makeText(this@PlayerSearchActivity, "Registration Error", Toast.LENGTH_SHORT).show()
+                            }
                         }
-                    } else {
-                        Log.e("PlayerSearchActivity", "Registration Error: ${response.errorBody()}")
+                    } catch (e: Exception) {
+                        Log.e("PlayerSearchActivity", "Registration Exception: ${e.message}")
+                        runOnUiThread {
+                            Toast.makeText(this@PlayerSearchActivity, "Registration Exception", Toast.LENGTH_SHORT).show()
+                        }
                     }
-                } catch (e: Exception) {
-                    Log.e("PlayerSearchActivity", "Registration Exception: ${e.message}")
                 }
+            } ?: run {
+                Toast.makeText(this, "Please select a player", Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun updatePlayerInfo(player: Player) {
-        playerNameTextView.text = "Name: ${player.name}"
-        playerFirstnameTextView.text = "Firstname: ${player.firstname}"
-        playerCountryTextView.text = "Country: ${player.country}"
-        playerClubTextView.text = "Club: ${player.club}"
-        playerRankTextView.text = "Rank: ${player.rank}"
-        playerRatingTextView.text = "Rating: ${player.rating}"
-        registerButton.isEnabled = true
+    private fun updatePlayerList(players: List<Player>) {
+        if (players.isNotEmpty()) {
+            playerAdapter.updatePlayers(players)
+            playerRecyclerView.visibility = View.VISIBLE
+        } else {
+            playerRecyclerView.visibility = View.GONE
+            Toast.makeText(this, "Player not found", Toast.LENGTH_SHORT).show()
+        }
+        registerButton.isEnabled = false
+        selectedPlayer = null
     }
 }
