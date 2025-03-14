@@ -111,6 +111,7 @@ class PlayerSearchActivity : AppCompatActivity() {
                             Log.e("PlayerSearchActivity", "Registration Error: $errorMessage")
                             runOnUiThread {
                                 Toast.makeText(this@PlayerSearchActivity, "Registration Error: $errorMessage", Toast.LENGTH_SHORT).show()
+                                Log.e("PlayerSearchActivity", "Registration Error Body: $errorBody")
                             }
                         }
                     } catch (e: Exception) {
