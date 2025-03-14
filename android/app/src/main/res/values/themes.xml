@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.MyApplication" parent="android:Theme.Material.Light.NoActionBar" >
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/primaryColor</item>
+
+        <!-- Error color. -->
+        <item name="colorError">@color/errorColor</item>
+
+        <!-- Background color. -->
+        <item name="android:colorBackground">@color/backgroundColor</item>
+
+    </style>
+</resources>
