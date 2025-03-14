@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class TournamentActivity : AppCompatActivity() {
     private lateinit var tournamentListView: ListView
-    private lateinit var tournaments: List<Tournament>
+    private lateinit var tournaments: Map<String, Tournament>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,12 +26,11 @@ class TournamentActivity : AppCompatActivity() {
             try {
                 val response = NetworkManager.pairGothApiService.getTours()
                 if (response.isSuccessful) {
-                    val tournaments = response.body()
+                    tournaments = response.body() ?: emptyMap() // Store the map directly
                     // log all the tournaments
-                    tournaments?.forEach { (key, value) ->
+                    tournaments.forEach { (key, value) ->
                         Log.d("TournamentActivity", "Key: $key, Value: $value")
                     }
-                    this@TournamentActivity.tournaments = tournaments?.values?.toList() ?: emptyList()
                     runOnUiThread {
                         updateTournamentList()
                     }
@@ -44,16 +43,19 @@ class TournamentActivity : AppCompatActivity() {
         }
 
         tournamentListView.setOnItemClickListener { _, _, position, _ ->
-            val selectedTournament = tournaments[position]
+            val selectedTournamentEntry = tournaments.entries.toList()[position] // Get the selected entry
+            val tournamentKey = selectedTournamentEntry.key // Get the key
+            val selectedTournament = selectedTournamentEntry.value // Get the tournament object
             val intent = Intent(this, PlayerSearchActivity::class.java).apply {
                 putExtra("tournamentName", selectedTournament.name)
+                putExtra("tournamentId", tournamentKey) // Pass the key
             }
             startActivity(intent)
         }
     }
 
     private fun updateTournamentList() {
-        val tournamentNames = tournaments.map { it.name }
+        val tournamentNames = tournaments.values.map { it.name } // Get names from values
         val adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, tournamentNames)
         tournamentListView.adapter = adapter
     }

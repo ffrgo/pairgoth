@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
+import com.iqoid.pairgoth.client.model.ErrorResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -52,7 +54,20 @@ class PlayerSearchActivity : AppCompatActivity() {
                 try {
                     val response = NetworkManager.pairGothApiService.searchPlayer(search)
                     if (response.isSuccessful) {
-                        players = response.body() ?: emptyList()
+                        val playersResponse = response.body() ?: emptyList()
+                        players = playersResponse.mapNotNull { playerResponse ->
+                            try {
+                                playerResponse.rankAsString = playerResponse.rank
+                                val rankInt = Player.parseRank(playerResponse.rank)
+                                playerResponse.rank = rankInt.toString()
+                                return@mapNotNull playerResponse
+                            } catch (e: Exception) {
+                                Log.e("PlayerSearchActivity", "Error parsing rank for player ${playerResponse.name}: ${e.message}")
+                                // Handle the error appropriately, e.g., skip the player or set a default rank
+                                // For now, we'll skip the player
+                                null
+                            }
+                        }
                         runOnUiThread {
                             updatePlayerList(players)
                         }
@@ -82,9 +97,20 @@ class PlayerSearchActivity : AppCompatActivity() {
                                 startActivity(intent)
                             }
                         } else {
-                            Log.e("PlayerSearchActivity", "Registration Error: ${response.errorBody()}")
+                            val errorBody = response.errorBody()?.string()
+                            val errorMessage = if (errorBody != null) {
+                                try {
+                                    val errorResponse = Gson().fromJson(errorBody, ErrorResponse::class.java)
+                                    errorResponse.error // Extract the error message
+                                } catch (e: Exception) {
+                                    "Unknown error" // Handle parsing errors
+                                }
+                            } else {
+                                "Unknown error" // Handle null error body
+                            }
+                            Log.e("PlayerSearchActivity", "Registration Error: $errorMessage")
                             runOnUiThread {
-                                Toast.makeText(this@PlayerSearchActivity, "Registration Error", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@PlayerSearchActivity, "Registration Error: $errorMessage", Toast.LENGTH_SHORT).show()
                             }
                         }
                     } catch (e: Exception) {

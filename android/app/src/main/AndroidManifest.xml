@@ -36,6 +36,7 @@
         </activity>
         <activity
             android:name=".SuccessActivity"
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
             android:exported="false">
         </activity>
     </application>

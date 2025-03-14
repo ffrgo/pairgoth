@@ -36,7 +36,7 @@ class PlayerAdapter(
         holder.playerFirstnameTextView.text = "Firstname: ${player.firstname}"
         holder.playerCountryTextView.text = "Country: ${player.country}"
         holder.playerClubTextView.text = "Club: ${player.club}"
-        holder.playerRankTextView.text = "Rank: ${player.rank}"
+        holder.playerRankTextView.text = "Rank: ${player.rankAsString}"
         holder.playerRatingTextView.text = "Rating: ${player.rating}"
 
         holder.itemView.setOnClickListener {
