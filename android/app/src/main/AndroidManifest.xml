@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name=".TournamentActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:theme="@style/Theme.MyApplication"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,12 +31,17 @@
         </activity>
         <activity
             android:name=".PlayerSearchActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:theme="@style/Theme.MyApplication"
             android:exported="false">
         </activity>
         <activity
             android:name=".SuccessActivity"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+            android:theme="@style/Theme.MyApplication"
+            android:exported="false">
+        </activity>
+        <activity
+            android:name=".TournamentDetailsActivity"
+            android:theme="@style/Theme.Pairgoth"
             android:exported="false">
         </activity>
     </application>
