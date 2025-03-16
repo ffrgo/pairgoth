@@ -3,6 +3,7 @@ package com.iqoid.pairgoth.client.network
 import com.iqoid.pairgoth.client.model.Player
 import com.iqoid.pairgoth.client.model.Search
 import com.iqoid.pairgoth.client.model.TourListResponse
+import com.iqoid.pairgoth.client.model.TournamentDetails
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -21,4 +22,8 @@ interface PairGothApiService {
         @Path("tourId") tourId: String,
         @Body player: Player
     ): Response<Player>
+
+    @GET("tour/{tournamentId}")
+    suspend fun getTournament(@Path("tournamentId") tournamentId: String): Response<TournamentDetails>
 }
+

@@ -56,6 +56,7 @@ class TournamentActivity : AppCompatActivity() {
             val intent = Intent(this, TournamentDetailsActivity::class.java).apply { // Change to TournamentDetailsActivity
                 putExtra("tournamentName", selectedTournament.name)
                 putExtra("tournamentId", tournamentKey) // Pass the key
+                Log.d("TournamentActivity", "Key passed to TournamentDetailsActivity: $tournamentKey")
             }
             startActivity(intent)
         }
