@@ -37,7 +37,9 @@ data class PairingDetails(
     val secondary: SecondaryPairingDetails,
     val geo: GeoPairingDetails,
     val handicap: HandicapPairingDetails,
-    val placement: List<String>
+    val placement: List<String>,
+    val mmFloor: Int,
+    val mmBar: Int
 )
 
 data class BasePairingDetails(

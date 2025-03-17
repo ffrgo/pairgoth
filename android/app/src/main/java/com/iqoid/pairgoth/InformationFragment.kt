@@ -1,15 +1,22 @@
 package com.iqoid.pairgoth
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.graphics.Typeface
 import androidx.fragment.app.Fragment
+import com.iqoid.pairgoth.client.model.Player.Companion.formatRank
 import com.iqoid.pairgoth.client.model.TournamentDetails
 import com.iqoid.pairgoth.client.network.NetworkManager
+import com.iqoid.pairgoth.utils.CountriesTool
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -30,6 +37,12 @@ class InformationFragment : Fragment() {
     private lateinit var tournamentGobanSize: TextView
     private lateinit var tournamentKomi: TextView
     private lateinit var timeSystemContainer: LinearLayout
+
+    private val countriesTool: CountriesTool by lazy {
+        // This block will be executed only once, the first time countriesTool is accessed
+        // ... your complex initialization logic ...
+        CountriesTool()
+    }
 
     companion object {
         const val TOURNAMENT_ID_EXTRA = "tournamentId"
@@ -91,41 +104,105 @@ class InformationFragment : Fragment() {
     }
 
     private fun updateUI(tournament: TournamentDetails) {
-        tournamentName.text = "Name: ${tournament.name}"
-        tournamentDates.text = "Dates: ${tournament.startDate} - ${tournament.endDate}"
-        tournamentCountry.text = "Country: ${tournament.country}"
-        tournamentLocation.text = "Location: ${tournament.location}"
-        tournamentDirector.text = "Director: ${tournament.director}"
-        tournamentShortName.text = "Short Name: ${tournament.shortName}"
-        tournamentType.text = "Type: ${tournament.type}"
-        tournamentRounds.text = "Rounds: ${tournament.rounds}"
-        tournamentRules.text = "Rules: ${tournament.rules}"
-        tournamentGobanSize.text = "Goban Size: ${tournament.gobanSize}"
-        tournamentKomi.text = "Komi: ${tournament.komi}"
+        tournamentName.text = formatLabelAndValue("Name", tournament.name)
+        tournamentDates.text = formatLabelAndValue("Dates", "${tournament.startDate} - ${tournament.endDate}")
+        val countryName = tournament.country.lowercase().let { countriesTool.getCountry(it) }
+        tournamentCountry.text = formatLabelAndValue("Country", countryName ?: tournament.country)
+        tournamentLocation.text = formatLabelAndValue("Location", tournament.location)
+        tournamentDirector.text = formatLabelAndValue("Director", tournament.director)
+        tournamentShortName.text = formatLabelAndValue("Short Name", tournament.shortName)
+        tournamentType.text = formatLabelAndValue("Tournament type", convertTournamentTypeToString(tournament.type))
+        tournamentRounds.text = formatLabelAndValue("Rounds", "${tournament.rounds}")
+        tournamentRules.text = formatLabelAndValue("Rules", convertRuleToDetailedDescription(tournament.rules))
+        tournamentGobanSize.text = formatLabelAndValue("Goban Size", convertGobanSizeToString(tournament.gobanSize))
+        tournamentKomi.text = formatLabelAndValue("Komi", "${tournament.komi}")
 
-        // Pairing
+        // Pairing Details
+        pairingConfigContainer.removeAllViews() // Clear previous views
+        pairingConfigContainer.orientation = LinearLayout.VERTICAL
         with(tournament.pairing) {
-            addTextViewToLinearLayout(pairingConfigContainer, "Pairing Type: ${type}")
-            with(main) {
-                addTextViewToLinearLayout(pairingConfigContainer, "Main configs: catWeight=$categoriesWeight, scoreWeight=$scoreWeight, upDownWeight=$upDownWeight")
-                addTextViewToLinearLayout(pairingConfigContainer, "firstSeed=$firstSeed, secondSeed=$secondSeed")
-            }
-            addTextViewToLinearLayout(pairingConfigContainer,"Placement: ${placement.joinToString()}")
+            addTextViewToLinearLayout(pairingConfigContainer, formatLabelAndValue("Pairing", convertPairingTypeToString(type)))
+            addTextViewToLinearLayout(pairingConfigContainer, formatLabelAndValue("MM floor", formatRank(mmFloor)))
+            addTextViewToLinearLayout(pairingConfigContainer, formatLabelAndValue("MM bar", formatRank(mmBar)))
+        }
+        with(tournament.pairing.handicap) {
+            // convert correction according to this logic:
+            addTextViewToLinearLayout(pairingConfigContainer, formatLabelAndValue("Hd correction", "${correction * -1}"))
+            addTextViewToLinearLayout(pairingConfigContainer, formatLabelAndValue("No hd threshold", formatRank(threshold)))
         }
 
         // Time System
+        timeSystemContainer.orientation = LinearLayout.VERTICAL
         with(tournament.timeSystem) {
-            addTextViewToLinearLayout(timeSystemContainer, "Time System Type: ${type}")
-            addTextViewToLinearLayout(timeSystemContainer, "Main Time: ${mainTime}")
+            addTextViewToLinearLayout(timeSystemContainer, formatLabelAndValue("Time System", convertTimeSystemTypeToString(type)))
+            addTextViewToLinearLayout(timeSystemContainer, formatLabelAndValue("Main Time", toHMS(mainTime)))
             increment?.let {
-                addTextViewToLinearLayout(timeSystemContainer, "Increment: ${it}")
+                addTextViewToLinearLayout(timeSystemContainer, formatLabelAndValue("Increment",toHMS(it)))
             }
         }
     }
 
-    private fun addTextViewToLinearLayout(container: LinearLayout, text: String) {
-        val textView = TextView(context)
-        textView.text = text
-        container.addView(textView)
+    private fun addTextViewToLinearLayout(container: LinearLayout, text: SpannableString) {
+            val textView = TextView(context)
+            textView.text = text
+            container.addView(textView)
+    }
+    private fun formatLabelAndValue(label: String, value: String): SpannableString {
+        val fullText = "$label: $value"
+        val spannableString = SpannableString(fullText)
+        spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, label.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        return spannableString
+    }
+
+    private fun convertRuleToDetailedDescription(rule: String): String {
+        return when (rule) {
+            "AGA" -> "American Game Association rules"
+            "CHINESE" -> "Chinese rules"
+            "FRENCH" -> "French rules"
+            "JAPANESE" -> "Japanese rules"
+            else -> rule
+        }
+    }
+
+    private fun convertGobanSizeToString(gobanSize: Int): String {
+        return gobanSize.toString() + "x" + gobanSize.toString()
+    }
+
+    private fun convertTimeSystemTypeToString(timeSystemType: String): String {
+        return when (timeSystemType) {
+            "FISCHER" -> "Fischer timing"
+            "CANADIAN" -> "Canadian byo-yomi"
+            "JAPANESE" -> "Japanese byo-yomi"
+            "SUDDEN_DEATH" -> "Sudden death"
+            else -> timeSystemType
+        }
+    }
+
+    private fun convertTournamentTypeToString(tournamentType: String): String {
+        return when (tournamentType) {
+            "INDIVIDUAL" -> "Individual players"
+            "PAIRGO" -> "Pair-go tournament"
+            "RENGO2" -> "Rengo with 2 players teams"
+            "RENGO3" -> "Rengo with 3 players team"
+            else -> tournamentType
+        }
+    }
+
+    private fun convertPairingTypeToString(pairingType: String): String {
+        return when (pairingType) {
+            "MAC_MAHON" -> "Mac Mahon"
+            "SWISS" -> "Swiss"
+            "ROUND_ROBIN" -> "Round-robin"
+            else -> pairingType
+        }
+    }
+
+    @SuppressLint("DefaultLocale")
+    private fun toHMS(seconds: Int): String {
+        val hours = seconds / 3600
+        val minutes = (seconds % 3600) / 60
+        val remainingSeconds = seconds % 60
+
+        return String.format("%02d:%02d:%02d", hours, minutes, remainingSeconds)
     }
 }

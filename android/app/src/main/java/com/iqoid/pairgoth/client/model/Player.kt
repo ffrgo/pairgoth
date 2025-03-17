@@ -31,5 +31,13 @@ data class Player(
                 else -> throw Error("impossible")
             }
         }
+
+        fun formatRank(rankInt: Int): String {
+            return when {
+                rankInt < 0 -> "${-rankInt}k"
+                rankInt >= 0 -> "${rankInt + 1}d"
+                else -> throw Error("impossible")
+            }
+        }
     }
 }
