@@ -1,5 +1,7 @@
 package com.iqoid.pairgoth.client.network
 
+import com.iqoid.pairgoth.client.model.GamesResponse
+import com.iqoid.pairgoth.client.model.Game
 import com.iqoid.pairgoth.client.model.Player
 import com.iqoid.pairgoth.client.model.Search
 import com.iqoid.pairgoth.client.model.TourListResponse
@@ -25,5 +27,14 @@ interface PairGothApiService {
 
     @GET("tour/{tournamentId}")
     suspend fun getTournament(@Path("tournamentId") tournamentId: String): Response<TournamentDetails>
+
+    @GET("tour/{tournamentId}/pair/{round}")
+    suspend fun getPairing(@Path("tournamentId") tournamentId: String, @Path("round") round: Int): Response<GamesResponse>
+
+    @GET("tour/{tournamentId}/part")
+    suspend fun getParticipants(@Path("tournamentId") tournamentId: String): Response<List<Player>>
+
+    @GET("tour/{tournamentId}/part/{playerId}")
+    suspend fun getParticipant(@Path("tournamentId") tournamentId: String, @Path("playerId") playerId: String): Response<Player>
 }
 

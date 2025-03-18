@@ -12,20 +12,16 @@ import com.iqoid.pairgoth.client.network.NetworkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.appcompat.widget.Toolbar
 
 class TournamentActivity : AppCompatActivity() {
     private lateinit var tournamentListView: ListView
-    private lateinit var tournaments: Map<String, Tournament> // Changed to Map
-    private lateinit var toolbar: Toolbar
+    private lateinit var tournaments: Map<String, Tournament>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
         tournamentListView = findViewById(R.id.tournamentListView)
-//        toolbar = findViewById(R.id.toolbar)
-//        setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
 

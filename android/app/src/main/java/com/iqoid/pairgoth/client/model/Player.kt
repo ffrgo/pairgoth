@@ -1,9 +1,7 @@
 package com.iqoid.pairgoth.client.model
 
-import com.google.gson.annotations.SerializedName
-
 data class Player(
-    val id: String? = null, // Nullable because it's assigned by the server on registration
+    val id: Int? = null, // Nullable because it's assigned by the server on registration
     val name: String,
     val firstname: String,
     val country: String,
@@ -37,6 +35,15 @@ data class Player(
                 rankInt < 0 -> "${-rankInt}k"
                 rankInt >= 0 -> "${rankInt + 1}d"
                 else -> throw Error("impossible")
+            }
+        }
+
+        fun formatRank(rankStr: String?): String {
+            if (rankStr == null) return ""
+            return try {
+                formatRank(rankStr.toInt())
+            } catch (e: NumberFormatException) {
+                ""
             }
         }
     }

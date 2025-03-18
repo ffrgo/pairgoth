@@ -37,8 +37,9 @@ class TournamentDetailsActivity : AppCompatActivity() {
             tabTextView.text = when (position) {
                 0 -> "Information"
                 1 -> "Registration"
-                2 -> "Results"
-                3 -> "Standings"
+                2 -> "Pairing"
+                3 -> "Results"
+                4 -> "Standings"
                 else -> throw IllegalArgumentException("Invalid position")
             }
             tab.customView = tabView
