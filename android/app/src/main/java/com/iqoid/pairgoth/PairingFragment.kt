@@ -187,12 +187,14 @@ class PairingFragment : Fragment() {
             row.addView(blackPlayerTextView)
 
             // Handicap
-            if (pairing.h != 0) {
-                val handicapTextView = TextView(context)
-                handicapTextView.text = pairing.h.toString()
-                handicapTextView.setPadding(8, 8, 8, 8)
-                row.addView(handicapTextView)
+            val handicapTextView = TextView(context)
+            handicapTextView.text = if (pairing.h == 0) {
+                ""
+            } else {
+                getString(R.string.handicap_format, pairing.h)
             }
+            handicapTextView.setPadding(8, 8, 8, 8)
+            row.addView(handicapTextView)
 
             pairingTable.addView(row)
         }
