@@ -42,14 +42,9 @@ class ResultsFragment : Fragment() {
         resultsTable = view.findViewById(R.id.resultsTable)
 
         // Get the tournament ID from the arguments
-        val tournamentId = arguments?.getString(InformationFragment.TOURNAMENT_ID_EXTRA)
+        tournamentId = arguments?.getString(InformationFragment.TOURNAMENT_ID_EXTRA)?: "1"
 
-        if (tournamentId == null) {
-            Log.e("ResultsFragment", "Tournament ID not found in arguments")
-            // Handle the error, e.g., show an error message or navigate back
-        } else {
-            fetchTournamentDetails(tournamentId)
-        }
+        fetchTournamentDetails(tournamentId)
 
         return view
     }
@@ -156,7 +151,7 @@ class ResultsFragment : Fragment() {
             val whitePlayer = players.find { it.id == result.w }
             val whitePlayerTextView = TextView(context)
             whitePlayerTextView.text = if(whitePlayer != null) {
-                "${whitePlayer.firstname} ${whitePlayer.name}"
+                "${whitePlayer.name} ${whitePlayer.firstname}"
             } else {
                 "BYE"
             }
@@ -184,7 +179,7 @@ class ResultsFragment : Fragment() {
             // Black Player
             val blackPlayerTextView = TextView(context)
             blackPlayerTextView.text = if(blackPlayer != null) {
-                "${blackPlayer.firstname} ${blackPlayer.name}"
+                "${blackPlayer.name} ${blackPlayer.firstname}"
             } else {
                 "BYE"
             }
@@ -230,7 +225,6 @@ class ResultsFragment : Fragment() {
         Log.e("ResultsFragment", "Error fetching results: ${response.errorBody()}")
         // clean up the table
         resultsTable.removeAllViews()
-        // display error
         // display error
         val errorBody = response.errorBody()?.string()
         val errorMessage = if (errorBody != null) {

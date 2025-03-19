@@ -30,6 +30,8 @@ class TournamentDetailsActivity : AppCompatActivity() {
 
         val adapter = ViewPagerAdapter(this, tournamentId)
         viewPager.adapter = adapter
+        // Disable swipe gesture
+        viewPager.isUserInputEnabled = false
 
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             val tabView = LayoutInflater.from(this).inflate(R.layout.custom_tab, null)

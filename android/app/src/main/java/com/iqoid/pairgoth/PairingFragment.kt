@@ -42,14 +42,9 @@ class PairingFragment : Fragment() {
         pairingTable = view.findViewById(R.id.pairingTable)
 
         // Get the tournament ID from the arguments
-        val tournamentId = arguments?.getString(InformationFragment.TOURNAMENT_ID_EXTRA)
+        tournamentId = arguments?.getString(InformationFragment.TOURNAMENT_ID_EXTRA)?: "1"
 
-        if (tournamentId == null) {
-            Log.e("PairingFragment", "Tournament ID not found in arguments")
-            // Handle the error, e.g., show an error message or navigate back
-        } else {
-            fetchTournamentDetails(tournamentId)
-        }
+        fetchTournamentDetails(tournamentId)
 
         return view
     }
@@ -156,7 +151,7 @@ class PairingFragment : Fragment() {
             val whitePlayer = players.find { it.id == pairing.w }
             val whitePlayerTextView = TextView(context)
             whitePlayerTextView.text = if(whitePlayer != null) {
-                "${whitePlayer.firstname} ${whitePlayer.name}"
+                "${whitePlayer.name} ${whitePlayer.firstname}"
             } else {
                 "BYE"
             }
@@ -179,7 +174,7 @@ class PairingFragment : Fragment() {
             // Black Player
             val blackPlayerTextView = TextView(context)
             blackPlayerTextView.text = if(blackPlayer != null) {
-                "${blackPlayer.firstname} ${blackPlayer.name}"
+                "${blackPlayer.name} ${blackPlayer.firstname}"
             } else {
                 "BYE"
             }

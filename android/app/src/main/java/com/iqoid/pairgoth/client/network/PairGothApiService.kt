@@ -4,6 +4,7 @@ import com.iqoid.pairgoth.client.model.GamesResponse
 import com.iqoid.pairgoth.client.model.Game
 import com.iqoid.pairgoth.client.model.Player
 import com.iqoid.pairgoth.client.model.Search
+import com.iqoid.pairgoth.client.model.Standing
 import com.iqoid.pairgoth.client.model.TourListResponse
 import com.iqoid.pairgoth.client.model.TournamentDetails
 import retrofit2.Response
@@ -39,5 +40,8 @@ interface PairGothApiService {
 
     @GET("tour/{tournamentId}/res/{round}")
     suspend fun getResults(@Path("tournamentId") tournamentId: String, @Path("round") round: Int): Response<List<Game>>
+
+    @GET("tour/{tournamentId}/standings/{round}")
+    suspend fun getStandings(@Path("tournamentId") tournamentId: String, @Path("round") round: Int): Response<List<Standing>>
 }
 
