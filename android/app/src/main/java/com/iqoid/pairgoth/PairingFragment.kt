@@ -14,6 +14,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.gson.Gson
 import com.iqoid.pairgoth.client.model.ErrorResponse
 import com.iqoid.pairgoth.client.model.Game
@@ -29,9 +30,11 @@ class PairingFragment : Fragment() {
 
     private lateinit var roundSpinner: Spinner
     private lateinit var pairingTable: TableLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
     private var tournamentId: String = "1"
     private var tournamentDetails: TournamentDetails? = null
     private var players: List<Player> = emptyList()
+    private var selectedRound: Int = 1 // Initialize with a default value
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,13 +43,24 @@ class PairingFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_pairing, container, false)
         roundSpinner = view.findViewById(R.id.roundSpinner)
         pairingTable = view.findViewById(R.id.pairingTable)
+        swipeRefreshLayout = view.findViewById(R.id.swipeRefreshLayout)
 
         // Get the tournament ID from the arguments
         tournamentId = arguments?.getString(InformationFragment.TOURNAMENT_ID_EXTRA)?: "1"
 
+        // Set up the refresh listener
+        swipeRefreshLayout.setOnRefreshListener {
+            refreshData()
+        }
+
         fetchTournamentDetails(tournamentId)
 
         return view
+    }
+
+    private fun refreshData() {
+        swipeRefreshLayout.isRefreshing = true
+        fetchTournamentDetails(tournamentId)
     }
 
     private fun fetchTournamentDetails(tournamentId: String) {
@@ -91,9 +105,14 @@ class PairingFragment : Fragment() {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         roundSpinner.adapter = adapter
 
+        // Re-select the previously selected round
+        if (selectedRound in rounds) {
+            roundSpinner.setSelection(rounds.indexOf(selectedRound))
+        }
+
         roundSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedRound = rounds[position]
+                selectedRound = rounds[position]
                 fetchPairings(tournamentId, selectedRound)
             }
 
@@ -121,6 +140,8 @@ class PairingFragment : Fragment() {
                 Log.e("PairingFragment", "Error fetching pairings", e)
             }
         }
+
+        swipeRefreshLayout.isRefreshing = false
     }
 
     private fun displayPairings(pairings: List<Game>) {

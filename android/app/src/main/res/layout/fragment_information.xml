@@ -1,133 +1,140 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipeRefreshLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".InformationFragment">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <ScrollView
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="16dp">
-
-        <TextView
-            android:id="@+id/section1Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tournament Details"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/tournamentName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Name: Tournament Name" />
-
-        <TextView
-            android:id="@+id/tournamentDates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Dates: 2023-10-26 - 2023-10-28" />
-
-        <TextView
-            android:id="@+id/tournamentCountry"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Country: USA" />
-
-        <TextView
-            android:id="@+id/tournamentLocation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Location: New York" />
-
-        <TextView
-            android:id="@+id/tournamentDirector"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Director: John Doe" />
-
-        <TextView
-            android:id="@+id/tournamentShortName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            tools:text="Short Name: J.Doe-2023" />
-
-        <TextView
-            android:id="@+id/section2Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pairing Details"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp"/>
-
-        <TextView
-            android:id="@+id/tournamentType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Type: INDIVIDUAL" />
-
-        <TextView
-            android:id="@+id/tournamentRounds"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Rounds: 5" />
+        android:layout_height="match_parent"
+        tools:context=".InformationFragment">
 
         <LinearLayout
-            android:id="@+id/pairingConfigContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginBottom="16dp"
-            />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <TextView
-            android:id="@+id/section3Title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Game Details"
-            android:textStyle="bold"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp"/>
+            <TextView
+                android:id="@+id/section1Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tournament Details"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"/>
 
-        <TextView
-            android:id="@+id/tournamentRules"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Rules: FRENCH" />
+            <TextView
+                android:id="@+id/tournamentName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Name: Tournament Name" />
 
-        <TextView
-            android:id="@+id/tournamentGobanSize"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Goban Size: 19" />
+            <TextView
+                android:id="@+id/tournamentDates"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Dates: 2023-10-26 - 2023-10-28" />
 
-        <TextView
-            android:id="@+id/tournamentKomi"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            tools:text="Komi: 7.5" />
+            <TextView
+                android:id="@+id/tournamentCountry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Country: USA" />
 
-        <LinearLayout
-            android:id="@+id/timeSystemContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"/>
+            <TextView
+                android:id="@+id/tournamentLocation"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Location: New York" />
 
-    </LinearLayout>
-</ScrollView>
+            <TextView
+                android:id="@+id/tournamentDirector"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Director: John Doe" />
+
+            <TextView
+                android:id="@+id/tournamentShortName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                tools:text="Short Name: J.Doe-2023" />
+
+            <TextView
+                android:id="@+id/section2Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pairing Details"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tournamentType"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Type: INDIVIDUAL" />
+
+            <TextView
+                android:id="@+id/tournamentRounds"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Rounds: 5" />
+
+            <LinearLayout
+                android:id="@+id/pairingConfigContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp"
+                />
+
+            <TextView
+                android:id="@+id/section3Title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Game Details"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:layout_marginBottom="8dp"/>
+
+            <TextView
+                android:id="@+id/tournamentRules"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Rules: FRENCH" />
+
+            <TextView
+                android:id="@+id/tournamentGobanSize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Goban Size: 19" />
+
+            <TextView
+                android:id="@+id/tournamentKomi"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                tools:text="Komi: 7.5" />
+
+            <LinearLayout
+                android:id="@+id/timeSystemContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"/>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
