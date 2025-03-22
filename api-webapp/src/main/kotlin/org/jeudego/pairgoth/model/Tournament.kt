@@ -31,7 +31,8 @@ sealed class Tournament <P: Pairable>(
     val rules: Rules = Rules.FRENCH,
     val gobanSize: Int = 19,
     val komi: Double = 7.5,
-    val tablesExclusion: MutableList<String> = mutableListOf()
+    val tablesExclusion: MutableList<String> = mutableListOf(),
+    val startTimes: List<String?> = listOf()
 ) {
     companion object {}
     enum class Type(val playersNumber: Int, val individual: Boolean = true) {
@@ -207,8 +208,9 @@ class StandardTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5,
-    tablesExclusion: MutableList<String> = mutableListOf()
-): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
+    tablesExclusion: MutableList<String> = mutableListOf(),
+    startTimes: List<String?> = listOf()
+): Tournament<Player>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion, startTimes) {
     override val players get() = _pairables
 }
 
@@ -230,8 +232,9 @@ class TeamTournament(
     rules: Rules = Rules.FRENCH,
     gobanSize: Int = 19,
     komi: Double = 7.5,
-    tablesExclusion: MutableList<String> = mutableListOf()
-): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion) {
+    tablesExclusion: MutableList<String> = mutableListOf(),
+    startTimes: List<String?> = listOf()
+): Tournament<TeamTournament.Team>(id, type, name, shortName, startDate, endDate, director, country, location, online, timeSystem, rounds, pairing, rules, gobanSize, komi, tablesExclusion, startTimes) {
     companion object {
         private val epsilon = 0.0001
     }
@@ -306,7 +309,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
-                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf(),
+                startTimes = json.getArray("startTimes")?.map { it as String? }?.toMutableList() ?: default?.startTimes ?: listOf()
             )
         else
             TeamTournament(
@@ -326,7 +330,8 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
                 pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
-                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf()
+                tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf(),
+                startTimes = json.getArray("startTimes")?.map { it as String? }?.toMutableList() ?: default?.startTimes ?: listOf()
             )
     json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
@@ -369,7 +374,8 @@ fun Tournament<*>.toJson() = Json.MutableObject(
     "gobanSize" to gobanSize,
     "timeSystem" to timeSystem.toJson(),
     "rounds" to rounds,
-    "pairing" to pairing.toJson()
+    "pairing" to pairing.toJson(),
+    "startTimes" to startTimes.toJsonArray()
 ).also { tour ->
     if (tablesExclusion.isNotEmpty()) {
         tour["tablesExclusion"] = tablesExclusion.toJsonArray()

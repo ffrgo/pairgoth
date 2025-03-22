@@ -7,6 +7,14 @@ function autofillShortName(dt, loc) {
   }
 }
 
+function updateStartTimesUI(rounds) {
+  const startTimesContainer = $('#startTimesContainer')[0]; // Access the DOM element
+  startTimesContainer.clearChildren(); // Use clearChildren() instead of empty()
+  for (let i = 0; i < rounds; i++) {
+    startTimesContainer.insertAdjacentHTML('beforeend', `<input type="text" name="startTime" placeholder="Start time for round ${i + 1}" />`);
+  }
+}
+
 onLoad(() => {
   $('#edit').on('click', e => {
     e.preventDefault();
@@ -201,7 +209,9 @@ onLoad(() => {
         byoyomi: fromHMS(form.val('byoyomi')),
         periods: form.val('periods'),
         stones: form.val('stones')
-      }
+      },
+      startTimes: Array.from(form.find('input[name="startTime"]')).map(element => element.value)
+
     }
     if (typeof(tour_id) !== 'undefined') {
       api.putJson(`tour/${tour_id}`, tour)
@@ -285,5 +295,10 @@ onLoad(() => {
     else $('#tournament-infos .mms').addClass('hidden');
     if (pairing === 'swiss') $('#tournament-infos .swiss').removeClass('hidden');
     else $('#tournament-infos .swiss').addClass('hidden');
+  });
+
+  const roundsInput = $('input[name="rounds"]')[0];
+  roundsInput.on('change', e => {
+    updateStartTimesUI(e.target.value);
   });
 });

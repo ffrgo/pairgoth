@@ -4,5 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class Tournament(
     @SerializedName("name") val name: String? = null,
-    @SerializedName("lastModified") val lastModified: String? = null
+    @SerializedName("lastModified") val lastModified: String? = null,
+    @SerializedName("startTimes") val startTimes: List<String>? = null
 )

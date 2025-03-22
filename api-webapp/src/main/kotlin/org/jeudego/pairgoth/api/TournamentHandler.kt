@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
+import com.republicate.kson.toJsonArray
 import com.republicate.kson.toJsonObject
 import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
@@ -18,6 +19,7 @@ import org.jeudego.pairgoth.store.getStore
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
 
 object TournamentHandler: PairgothApiHandler {
 
@@ -37,6 +39,7 @@ object TournamentHandler: PairgothApiHandler {
                                     json["stats"] = tour.stats()
                                     json["teamSize"] = tour.type.playersNumber
                                     json["frozen"] = tour.frozen != null
+                                    json["startTimes"] = tour.startTimes.toJsonArray()
                                 }
                             }
                         } ?: badRequest("no tournament with id #${id}")

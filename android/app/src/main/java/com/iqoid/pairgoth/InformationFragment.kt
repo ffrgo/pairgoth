@@ -39,6 +39,7 @@ class InformationFragment : Fragment() {
     private lateinit var tournamentGobanSize: TextView
     private lateinit var tournamentKomi: TextView
     private lateinit var timeSystemContainer: LinearLayout
+    private lateinit var startTimeContainer: LinearLayout
 
     private var tournamentId: String = "1"
 
@@ -73,6 +74,7 @@ class InformationFragment : Fragment() {
         tournamentGobanSize = view.findViewById(R.id.tournamentGobanSize)
         tournamentKomi = view.findViewById(R.id.tournamentKomi)
         timeSystemContainer = view.findViewById(R.id.timeSystemContainer)
+        startTimeContainer = view.findViewById(R.id.startTimeContainer)
 
         // Get the tournament ID from the arguments
         tournamentId = arguments?.getString(TOURNAMENT_ID_EXTRA)?: "1"
@@ -82,12 +84,7 @@ class InformationFragment : Fragment() {
             refreshData()
         }
 
-        if (tournamentId != null) {
-            fetchTournamentDetails(tournamentId)
-        } else {
-            Log.e("InformationFragment", "Tournament ID not found in arguments")
-            // Handle the error, e.g., show an error message or navigate back
-        }
+        fetchTournamentDetails(tournamentId)
 
         return view
     }
@@ -157,6 +154,18 @@ class InformationFragment : Fragment() {
             increment?.let {
                 addTextViewToLinearLayout(timeSystemContainer, formatLabelAndValue("Increment",toHMS(it)))
             }
+        }
+
+        // Clear previous startTime input fields
+        startTimeContainer.removeAllViews()
+        for (round in 1..tournament.rounds) {
+            val roundLabel = TextView(context)
+            roundLabel.text = "Round $round Start Time"
+            startTimeContainer.addView(roundLabel)
+
+            val startTimeInput = TextView(context)
+            startTimeInput.setText(tournament.startTimes?.getOrNull(round - 1) ?: "")
+            startTimeContainer.addView(startTimeInput)
         }
     }
 
