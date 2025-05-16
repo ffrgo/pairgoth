@@ -9,6 +9,11 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+# [0.20] - 2025-05-16
+
+- Reduce default value of the white/black balance weight from 1e6 to 1e3
+- Add a threshold in main club proportion after which geographic criteria are not applied
+
 ## [0.19] - 2025-01-20
 
 Maintenance release. Some tests still need some fixing.
