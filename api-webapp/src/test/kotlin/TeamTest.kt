@@ -28,7 +28,7 @@ class TeamTest {
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val aTeamID = resp.getInt("id") ?: error("no null allowed here")
         resp = TestAPI.get("/api/tour/$aTeamTournamentID/team/$aTeamID").asObject()
-        assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID],"rank":-3,"country":"FR"}""", resp.toString(), "expecting team description")
+        assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID],"rank":-3,"country":"FR","names":["Burma Nestor","Poirot Hercule"],"ranks":[-5,-1]}""", resp.toString(), "expecting team description")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
         // nothing stops us in reusing players in different teams, at least for now...
