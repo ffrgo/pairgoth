@@ -6,6 +6,7 @@ import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.Criterion.*
 import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.PairingType
+import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.adjustedTime
 import org.jeudego.pairgoth.model.displayRank
@@ -27,10 +28,18 @@ object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
-        val includePreliminary = request.getParameter("include_preliminary")?.let { it.toBoolean() } ?: false
+        val includePreliminary = request.getParameter("include_preliminary")?.toBoolean() ?: false
 
-        val sortedPairables = tournament.getSortedPairables(round, includePreliminary)
-        tournament.populateStandings(sortedPairables, round)
+        val individualStandings = tournament is TeamTournament &&
+                tournament.type.individual &&
+                request.getParameter("individual_standings")?.toBoolean() == true
+
+        val sortedEntries = if (individualStandings) {
+            tournament.getSortedTeamMembers(round)
+        } else {
+            tournament.getSortedPairables(round, includePreliminary)
+        }
+        tournament.populateStandings(sortedEntries, round, individualStandings)
 
         val acceptHeader = request.getHeader("Accept") as String?
         val accept = acceptHeader?.substringBefore(";")
@@ -44,7 +53,7 @@ object StandingsHandler: PairgothApiHandler {
             PrintWriter(OutputStreamWriter(response.outputStream, encoding))
         }
         return when (accept) {
-            "application/json" -> sortedPairables.toJsonArray()
+            "application/json" -> sortedEntries.toJsonArray()
             "application/egf" -> {
                 response.contentType = "text/plain;charset=${encoding}"
                 val neededCriteria = ArrayList(tournament.pairing.placementParams.criteria)
@@ -52,19 +61,19 @@ object StandingsHandler: PairgothApiHandler {
                 if (neededCriteria.first() == SCOREX) {
                     neededCriteria.add(1, MMS)
                 }
-                exportToEGFFormat(tournament, sortedPairables, neededCriteria, writer)
+                exportToEGFFormat(tournament, sortedEntries, neededCriteria, writer)
                 writer.flush()
                 return null
             }
             "application/ffg" -> {
                 response.contentType = "text/plain;charset=${encoding}"
-                exportToFFGFormat(tournament, sortedPairables, writer)
+                exportToFFGFormat(tournament, sortedEntries, writer)
                 writer.flush()
                 return null
             }
             "text/csv" -> {
                 response.contentType = "text/csv;charset=${encoding}"
-                exportToCSVFormat(tournament, sortedPairables, writer)
+                exportToCSVFormat(tournament, sortedEntries, writer)
                 writer.flush()
                 return null
             }

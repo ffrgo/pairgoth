@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairable
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Player
+import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.historyBefore
@@ -50,9 +51,9 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
                     val mmBase = pairable.mmBase()
                     val score = roundScore(mmBase +
                             (nbW(pairable) ?: 0.0) +
-                            (1..round).map { round ->
+                            (1..round).sumOf { round ->
                                 if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
-                            }.sum() * pairing.pairingParams.main.mmsValueAbsent)
+                            } * pairing.pairingParams.main.mmsValueAbsent)
                     Pair(
                         if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
                         else roundScore(mmBase + round/2),
@@ -100,14 +101,14 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.DC -> StandingsHandler.nullMap
         }
     }
-    val pairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
-    pairables.forEach { player ->
+    val jsonPairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
+    jsonPairables.forEach { player ->
         for (crit in criteria) {
             player[crit.first] = crit.second[player.getID()] ?: 0.0
         }
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }
-    val sortedPairables = pairables.sortedWith { left, right ->
+    val sortedPairables = jsonPairables.sortedWith { left, right ->
         for (crit in criteria) {
             val lval = left.getDouble(crit.first) ?: 0.0
             val rval = right.getDouble(crit.first) ?: 0.0
@@ -129,15 +130,16 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     return sortedPairables
 }
 
-fun Tournament<*>.populateStandings(sortedPairables: List<Json.Object>, round: Int = rounds) {
-    val sortedMap = sortedPairables.associateBy {
+fun Tournament<*>.populateStandings(sortedEntries: List<Json.Object>, round: Int = rounds, individualStandings: Boolean) {
+    val sortedMap = sortedEntries.associateBy {
         it.getID()!!
     }
 
     // refresh name, firstname, club and level
+    val refMap = if (individualStandings) players else pairables
     sortedMap.forEach { (id, pairable) ->
         val mutable = pairable as Json.MutableObject
-        pairables[id]?.let {
+        refMap[id]?.let {
             mutable["name"] = it.name
             if (it is Player) {
                 mutable["firstname"] = it.firstname
@@ -150,7 +152,8 @@ fun Tournament<*>.populateStandings(sortedPairables: List<Json.Object>, round: I
 
     // fill result
     for (r in 1..round) {
-        games(r).values.forEach { game ->
+        val roundGames = if (individualStandings) individualGames(r) else games(r)
+        roundGames.values.forEach { game ->
             val white = if (game.white != 0) sortedMap[game.white] else null
             val black = if (game.black != 0) sortedMap[game.black] else null
             val whiteNum = white?.getInt("num") ?: 0
@@ -185,4 +188,57 @@ fun Tournament<*>.populateStandings(sortedPairables: List<Json.Object>, round: I
             }
         }
     }
+}
+
+fun TeamTournament.getSortedTeamMembers(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
+
+    val teamGames = historyBefore(round + 1)
+    val individualHistory = teamGames.map { roundTeamGames ->
+        roundTeamGames.flatMap { game ->  individualGames[game.id]?.toList() ?: listOf() }
+    }
+    val historyHelper = HistoryHelper(individualHistory) {
+        pairables.mapValues {
+            Pair(0.0, wins[it.key] ?: 0.0)
+        }
+    }
+    val neededCriteria = mutableListOf(Criterion.NBW, Criterion.RATING)
+    val criteria = neededCriteria.map { crit ->
+        crit.name to when (crit) {
+            Criterion.NBW -> historyHelper.wins
+            Criterion.RANK -> pairables.mapValues { it.value.rank }
+            Criterion.RATING -> pairables.mapValues { it.value.rating }
+            else -> null
+        }
+    }
+    val jsonPlayers = players.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
+    jsonPlayers.forEach { player ->
+        for (crit in criteria) {
+            player[crit.first] = crit.second?.get(player.getID()) ?: 0.0
+        }
+        player["results"] = Json.MutableArray(List(round) { "0=" })
+    }
+    val sortedPlayers = jsonPlayers.sortedWith { left, right ->
+        for (crit in criteria) {
+            val lval = left.getDouble(crit.first) ?: 0.0
+            val rval = right.getDouble(crit.first) ?: 0.0
+            val cmp = lval.compareTo(rval)
+            if (cmp != 0) return@sortedWith -cmp
+        }
+        return@sortedWith 0
+    }.mapIndexed() { i, obj ->
+        obj.set("num", i+1)
+    }
+    var place = 1
+    sortedPlayers.groupBy { p ->
+        Triple(
+            criteria.getOrNull(0)?.first?.let { crit -> p.getDouble(crit) ?: 0.0 } ?: 0.0,
+            criteria.getOrNull(1)?.first?.let { crit -> p.getDouble(crit) ?: 0.0 } ?: 0.0,
+            criteria.getOrNull(2)?.first?.let { crit -> p.getDouble(crit) ?: 0.0 } ?: 0.0
+        )
+    }.forEach {
+        it.value.forEach { p -> p["place"] = place }
+        place += it.value.size
+    }
+
+    return sortedPlayers
 }

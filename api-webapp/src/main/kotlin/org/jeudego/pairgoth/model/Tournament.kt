@@ -263,7 +263,7 @@ class TeamTournament(
     override fun individualGames(round: Int): Map<ID, Game> {
         val teamGames = games(round)
         return if (type.individual) {
-            return teamGames.values.flatMap { game ->
+            teamGames.values.flatMap { game ->
                 if (game.white == 0 || game.black == 0 ) listOf()
                 else individualGames[game.id]?.toList() ?: listOf()
             }.associateBy { it.id }

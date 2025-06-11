@@ -30,6 +30,9 @@
       </div>
     </form>
   </div>
+#if($tour.type.startsWith('TEAM'))
+  <div class="strong">Team Standings</div>
+#end
   <div id="standings-container" class="roundbox">
 #set($standings = $api.get("tour/${params.id}/standings/$round"))
 #if($standings.isObject() && ($standings.error || $standings.message))
@@ -105,6 +108,78 @@
       </tbody>
     </table>
   </div>
+#if($tour.type.startsWith('TEAM'))
+  <div class="strong">Individual Standings</div>
+  <div id="individual-standings-container" class="roundbox">
+#set($indvstandings = $api.get("tour/${params.id}/standings/$round?individual_standings=true"))
+#if($indvstandings.isObject() && ($indvstandings.error || $indvstandings.message))
+  #if($indvstandings.error)
+    #set($error = $indvstandings.error)
+  #else
+    #set($error = $indvstandings.message)
+  #end
+    <script type="text/javascript">
+      onLoad(() => {
+        showError("$error")
+      });
+    </script>
+  #set($indvstandings = [])
+#end
+#set($indvsmap = {})
+#foreach($part in $indvstandings)
+  #set($indvsmap[$part.num] = $part)
+#end
+    <table id="individual-standings-table" class="ui striped table">
+      <thead>
+        <th>Num</th>
+        <th>Plc</th>
+        <th>Name</th>
+        <th>Rank</th>
+        <th>Ctr</th>
+        <th>Nbw</th>
+#foreach($r in [1..$round])
+        <th>R$r</th>
+#end
+#set($indvcriteres = ['NBW'])
+#foreach($crit in $indvcriteres)
+        <th>$crit</th>
+#end
+      </thead>
+      <tbody>
+#foreach($part in $indvstandings)
+        <tr data-id="$part.id">
+          <td>$part.num</td>
+          <td>$part.place</td>
+          <td>$esc.html($part.name)#if($part.firstname) $esc.html($part.firstname)#end</td>
+          <td data-sort="$part.rank">#rank($part.rank)</td>
+          <td>#if($part.country)$part.country#end</td>
+          <td>$number.format('0.#', $part.NBW)</td>
+  #set($mx = $round - 1)
+  #foreach($r in [0..$mx])
+    #set($rst = $part.results[$r])
+    #set($opp_num = $math.toLong($rst))
+    #if($opp_num)
+      #set($opponent = $!indvsmap[$opp_num])
+    #else
+      #set($opponent = false)
+    #end
+    #if($rst.contains('+'))
+      #set($rst = "<b>$rst</b>")
+    #elseif($rst.contains('-'))
+      #set($rst = "<i>$rst</i>")
+    #end
+          <td class="nobreak game-result" #if($opponent)title="$esc.html($opponent.name)#if($opponent.firstname) $esc.html($opponent.firstname)#end #rank($opponent.rank)#if($opponent.country) $opponent.country#end"#end>$rst</td>
+  #end
+  #foreach($crit in $indvcriteres)
+    #set($value = "$number.format('0.#', $part[$crit])")
+          <td data-sort="$value">$value.replace('.5', '½')</td>
+  #end
+        </tr>
+#end
+      </tbody>
+    </table>
+  </div>
+#end
   <div class="right form-actions">
 #if(!$tour.frozen && $round == $tour.rounds)
     <button id="freeze" class="ui orange floating right labeled icon button">
