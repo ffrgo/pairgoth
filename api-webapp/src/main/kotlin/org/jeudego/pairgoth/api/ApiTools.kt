@@ -13,12 +13,8 @@ import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.historyBefore
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
-import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.round
-
-//  TODO CB avoid code redundancy with solvers
 
 fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
@@ -27,42 +23,12 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         return min(max(rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + mmsCorrection
     }
 
-    fun roundScore(score: Double): Double {
-        val epsilon = 0.00001
-        // Note: this works for now because we only have .0 and .5 fractional parts
-        return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
-        else round(2 * score) / 2
-    }
-
     if (frozen != null) {
         return ArrayList(frozen!!.map { it -> it as Json.Object })
     }
 
-    // CB TODO - factorize history helper creation between here and solver classes
-    val historyHelper = HistoryHelper(historyBefore(round + 1)) {
-        if (pairing.type == PairingType.SWISS) {
-            pairables.mapValues {
-                Pair(0.0, wins[it.key] ?: 0.0)
-            }
-        }
-        else {
-            pairables.mapValues {
-                it.value.let { pairable ->
-                    val mmBase = pairable.mmBase()
-                    val score = roundScore(mmBase +
-                            (nbW(pairable) ?: 0.0) +
-                            (1..round).sumOf { round ->
-                                if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
-                            } * pairing.pairingParams.main.mmsValueAbsent)
-                    Pair(
-                        if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
-                        else roundScore(mmBase + round/2),
-                        score
-                    )
-                }
-            }
-        }
-    }
+    val history = historyHelper(round)
+
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
@@ -73,24 +39,24 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.CATEGORY -> StandingsHandler.nullMap
             Criterion.RANK -> pairables.mapValues { it.value.rank }
             Criterion.RATING -> pairables.mapValues { it.value.rating }
-            Criterion.NBW -> historyHelper.wins
-            Criterion.MMS -> historyHelper.mms
-            Criterion.SCOREX -> historyHelper.scoresX
+            Criterion.NBW -> history.wins
+            Criterion.MMS -> history.mms
+            Criterion.SCOREX -> history.scoresX
             Criterion.STS -> StandingsHandler.nullMap
             Criterion.CPS -> StandingsHandler.nullMap
 
-            Criterion.SOSW -> historyHelper.sos
-            Criterion.SOSWM1 -> historyHelper.sosm1
-            Criterion.SOSWM2 -> historyHelper.sosm2
-            Criterion.SODOSW -> historyHelper.sodos
-            Criterion.SOSOSW -> historyHelper.sosos
-            Criterion.CUSSW -> if (round == 0) StandingsHandler.nullMap else historyHelper.cumScore
-            Criterion.SOSM -> historyHelper.sos
-            Criterion.SOSMM1 -> historyHelper.sosm1
-            Criterion.SOSMM2 -> historyHelper.sosm2
-            Criterion.SODOSM -> historyHelper.sodos
-            Criterion.SOSOSM -> historyHelper.sosos
-            Criterion.CUSSM -> historyHelper.cumScore
+            Criterion.SOSW -> history.sos
+            Criterion.SOSWM1 -> history.sosm1
+            Criterion.SOSWM2 -> history.sosm2
+            Criterion.SODOSW -> history.sodos
+            Criterion.SOSOSW -> history.sosos
+            Criterion.CUSSW -> if (round == 0) StandingsHandler.nullMap else history.cumScore
+            Criterion.SOSM -> history.sos
+            Criterion.SOSMM1 -> history.sosm1
+            Criterion.SOSMM2 -> history.sosm2
+            Criterion.SODOSM -> history.sodos
+            Criterion.SOSOSM -> history.sosos
+            Criterion.CUSSM -> history.cumScore
 
             Criterion.SOSTS -> StandingsHandler.nullMap
 

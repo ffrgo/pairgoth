@@ -5,20 +5,14 @@ import org.jeudego.pairgoth.model.*
 abstract class BasePairingHelper(
     val round: Int,
     val totalRounds: Int,
-    history: List<List<Game>>, // History of all games played for each round
+    val history: HistoryHelper, // Digested history of all games played for each round
     var pairables: List<Pairable>, // All pairables for this round, it may include the bye player
-    val pairablesMap: Map<ID, Pairable>, // Map of all known pairables for this tournament
     val pairing: PairingParams,
     val placement: PlacementParams,
     ) {
 
-    abstract val scores: Map<ID, Pair<Double, Double>>
+    val scores get() = history.scores
     abstract val scoresX: Map<ID, Double>
-    val historyHelper =
-        if (pairables.first().let { it is TeamTournament.Team && it.teamOfIndividuals }) TeamOfIndividualsHistoryHelper(
-            history
-        ) { scores }
-        else HistoryHelper(history) { scores }
 
     // Extend pairables with members from all rounds
 
@@ -84,28 +78,28 @@ abstract class BasePairingHelper(
     }
 
     // already paired players map
-    protected fun Pairable.played(other: Pairable) = historyHelper.playedTogether(this, other)
+    protected fun Pairable.played(other: Pairable) = history.playedTogether(this, other)
 
     // color balance (nw - nb)
-    protected val Pairable.colorBalance: Int get() = historyHelper.colorBalance(this) ?: 0
+    protected val Pairable.colorBalance: Int get() = history.colorBalance(this) ?: 0
 
     protected val Pairable.group: Int get() = _groups[id]!!
 
-    protected val Pairable.drawnUpDown: Pair<Int, Int> get() = historyHelper.drawnUpDown(this) ?: Pair(0, 0)
+    protected val Pairable.drawnUpDown: Pair<Int, Int> get() = history.drawnUpDown(this) ?: Pair(0, 0)
 
-    protected val Pairable.nbBye: Int get() = historyHelper.nbPlayedWithBye(this) ?: 0
+    protected val Pairable.nbBye: Int get() = history.nbPlayedWithBye(this) ?: 0
 
     // score (number of wins)
-    val Pairable.nbW: Double get() = historyHelper.nbW(this) ?: 0.0
+    val Pairable.nbW: Double get() = history.nbW(this) ?: 0.0
 
-    val Pairable.sos: Double get() = historyHelper.sos[id] ?: 0.0
-    val Pairable.sosm1: Double get() = historyHelper.sosm1[id] ?: 0.0
-    val Pairable.sosm2: Double get() = historyHelper.sosm2[id] ?: 0.0
-    val Pairable.sosos: Double get() = historyHelper.sosos[id] ?: 0.0
-    val Pairable.sodos: Double get() = historyHelper.sodos[id] ?: 0.0
-    val Pairable.cums: Double get() = historyHelper.cumScore[id] ?: 0.0
+    val Pairable.sos: Double get() = history.sos[id] ?: 0.0
+    val Pairable.sosm1: Double get() = history.sosm1[id] ?: 0.0
+    val Pairable.sosm2: Double get() = history.sosm2[id] ?: 0.0
+    val Pairable.sosos: Double get() = history.sosos[id] ?: 0.0
+    val Pairable.sodos: Double get() = history.sodos[id] ?: 0.0
+    val Pairable.cums: Double get() = history.cumScore[id] ?: 0.0
     fun Pairable.missedRounds(): Int = (1 until round).map { round ->
-        if (historyHelper.playersPerRound.getOrNull(round - 1)
+        if (history.playersPerRound.getOrNull(round - 1)
                 ?.contains(id) == true
         ) 0 else 1
     }.sum()

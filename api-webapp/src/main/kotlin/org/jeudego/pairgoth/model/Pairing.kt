@@ -175,7 +175,7 @@ class Swiss(
 ): Pairing(SWISS, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        SwissSolver(round, tournament.rounds, tournament.historyBefore(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round))
+        SwissSolver(round, tournament.rounds, tournament.historyHelper(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round))
 }
 
 class MacMahon(
@@ -203,7 +203,7 @@ class MacMahon(
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        MacMahonSolver(round, tournament.rounds, tournament.historyBefore(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar)
+        MacMahonSolver(round, tournament.rounds, tournament.historyHelper(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar)
 }
 
 class RoundRobin(

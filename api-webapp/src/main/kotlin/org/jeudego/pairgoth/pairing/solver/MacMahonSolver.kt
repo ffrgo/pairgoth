@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.pairing.solver
 
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.pairing.HistoryHelper
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
@@ -8,34 +9,18 @@ import kotlin.math.roundToInt
 
 class MacMahonSolver(round: Int,
                      totalRounds: Int,
-                     history: List<List<Game>>,
+                     history: HistoryHelper,
                      pairables: List<Pairable>,
-                     pairablesMap: Map<ID, Pairable>,
+                     allPairablesMap: Map<ID, Pairable>,
                      pairingParams: PairingParams,
                      placementParams: PlacementParams,
                      usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int)  :
-    BaseSolver(round, totalRounds, history, pairables, pairablesMap, pairingParams, placementParams, usedTables) {
-
-    override val scores: Map<ID, Pair<Double, Double>> by lazy {
-        require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
-        pairablesMap.mapValues {
-            it.value.let { pairable ->
-                val score = roundScore(pairable.mmBase +
-                        pairable.nbW +
-                        pairable.missedRounds() * pairingParams.main.mmsValueAbsent)
-                Pair(
-                    if (pairingParams.main.sosValueAbsentUseBase) pairable.mmBase
-                    else roundScore(pairable.mmBase + round/2),
-                    score
-                )
-            }
-        }
-    }
+    BaseSolver(round, totalRounds, history, pairables, pairingParams, placementParams, usedTables) {
 
     override val scoresX: Map<ID, Double> by lazy {
         require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
-        pairablesMap.mapValues {
+        allPairablesMap.mapValues {
             it.value.let { pairable ->
                 roundScore(pairable.mmBase + pairable.nbW)
             }

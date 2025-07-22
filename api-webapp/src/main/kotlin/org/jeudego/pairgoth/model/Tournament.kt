@@ -7,7 +7,8 @@ import com.republicate.kson.toJsonObject
 //import kotlinx.datetime.LocalDate
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
-import org.jeudego.pairgoth.api.ApiHandler.Companion.logger
+import org.jeudego.pairgoth.pairing.HistoryHelper
+import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
@@ -15,8 +16,10 @@ import org.jeudego.pairgoth.util.MutableBiMultiMap
 import org.jeudego.pairgoth.util.mutableBiMultiMapOf
 import kotlin.math.max
 import java.util.*
-import java.util.regex.Pattern
 import kotlin.collections.get
+import kotlin.math.floor
+import kotlin.math.min
+import kotlin.math.round
 import kotlin.math.roundToInt
 
 sealed class Tournament <P: Pairable>(
@@ -207,6 +210,47 @@ sealed class Tournament <P: Pairable>(
             } while (t <= right)
         }
         return excluded
+    }
+
+    fun roundScore(score: Double): Double {
+        val epsilon = 0.00001
+        // Note: this works for now because we only have .0 and .5 fractional parts
+        return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
+        else round(2 * score) / 2
+    }
+
+    fun Pairable.mmBase(): Double {
+        if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
+        return min(max(rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + mmsCorrection
+    }
+
+    fun historyHelper(round: Int): HistoryHelper {
+        return HistoryHelper(historyBefore(round + 1)) {
+            if (pairing.type == PairingType.SWISS) {
+                pairables.mapValues {
+                    // In a Swiss tournament the main criterion is the number of wins
+                    Pair(0.0, wins[it.key] ?: 0.0)
+                }
+            }
+            else {
+                pairables.mapValues {
+                    // In a MacMahon tournament the main criterion is the mms
+                    it.value.let { pairable ->
+                        val mmBase = pairable.mmBase()
+                        val score = roundScore(mmBase +
+                                (nbW(pairable) ?: 0.0) +
+                                (1..round).sumOf { round ->
+                                    if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
+                                } * pairing.pairingParams.main.mmsValueAbsent)
+                        Pair(
+                            if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
+                            else roundScore(mmBase + round/2),
+                            score
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 

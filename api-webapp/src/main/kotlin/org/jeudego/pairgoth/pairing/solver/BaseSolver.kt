@@ -4,6 +4,7 @@ import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.MainCritParams.DrawUpDown
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.*
 import org.jeudego.pairgoth.pairing.BasePairingHelper
+import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.detRandom
 import org.jeudego.pairgoth.pairing.nonDetRandom
 import org.jeudego.pairgoth.store.nextGameId
@@ -21,13 +22,12 @@ import kotlin.math.*
 sealed class BaseSolver(
     round: Int,
     totalRounds: Int,
-    history: List<List<Game>>, // History of all games played for each round
+    history: HistoryHelper, // History of all games played for each round
     pairables: List<Pairable>, // All pairables for this round, it may include the bye player
-    pairablesMap: Map<ID, Pairable>, // Map of all known pairables in this tournament
     pairing: PairingParams,
     placement: PlacementParams,
     val usedTables: BitSet
-    ) : BasePairingHelper(round, totalRounds, history, pairables, pairablesMap, pairing, placement) {
+    ) : BasePairingHelper(round, totalRounds, history, pairables, pairing, placement) {
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
@@ -79,12 +79,12 @@ sealed class BaseSolver(
         // Choose bye player and remove from pairables
         if (ByePlayer in nameSortedPairables){
             nameSortedPairables.remove(ByePlayer)
-            var minWeight = 1000.0*round + (Pairable.MAX_RANK - Pairable.MIN_RANK) + 1;
+            var minWeight = 1000.0 * round + (Pairable.MAX_RANK - Pairable.MIN_RANK) + 1;
             var weightForBye : Double
             var byePlayerIndex = 0
             for (p in nameSortedPairables){
                 weightForBye = computeWeightForBye(p)
-                if (p.id in historyHelper.byePlayers) weightForBye += 1000
+                if (p.id in history.byePlayers) weightForBye += 1000
                 if (weightForBye <= minWeight){
                     minWeight = weightForBye
                     chosenByePlayer = p

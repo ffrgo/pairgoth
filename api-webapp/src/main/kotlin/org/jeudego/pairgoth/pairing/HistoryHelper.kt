@@ -3,11 +3,21 @@ package org.jeudego.pairgoth.pairing
 import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.model.Game.Result.*
 import org.jeudego.pairgoth.model.TeamTournament.Team
+import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * Map from a pairable ID to a pair of (missed rounds increment, main score).
+ * The missed rounds increment is 0 for Swiss, and a function of the MMS base of the pairable for MacMahon.
+ * The main score is the NBW for the Swiss, the MMS for MacMahon.
+ */
+typealias ScoreMapBuilder = HistoryHelper.()-> Map<ID, Pair<Double, Double>>
 
 open class HistoryHelper(
     protected val history: List<List<Game>>,
     // scoresGetter() returns Pair(sos value for missed rounds, score) where score is nbw for Swiss, mms for MM, ...
-    scoresGetter: HistoryHelper.()-> Map<ID, Pair<Double, Double>>) {
+    scoresGetter: ScoreMapBuilder) {
 
     private val Game.blackScore get() = when (result) {
         BLACK, BOTHWIN -> 1.0
@@ -19,7 +29,7 @@ open class HistoryHelper(
         else -> 0.0
     }
 
-    private val scores by lazy {
+    val scores by lazy {
         scoresGetter()
     }
 
@@ -241,11 +251,4 @@ open class HistoryHelper(
             else null
         }
     }
-
-}
-
-// CB TODO - a big problem with the current naive implementation is that the team score is -for now- the sum of team members individual scores
-
-class TeamOfIndividualsHistoryHelper(history: List<List<Game>>, scoresGetter: () -> Map<ID, Pair<Double, Double>>):
-        HistoryHelper(history, { scoresGetter() }) {
 }
