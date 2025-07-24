@@ -62,20 +62,21 @@
     #if($white.id != $black.id)
       #set($key = "$white.id-$black.id")
       #set($weights = $explain.weights[$key])
-      #set($toMax = $explain.max - $weights.total)
-      #set($toMin = $weights.total - $explain.min)
-      #if ($toMax > $toMin)
-        ## total is close to min
-        #set($percent = ($weights.total - $explain.min) / ($explain.low - $explain.min) * 40)
-      #else
-        ## total is close to max
-        #set($percent = 60 + ($explain.max - $weights.total) / ($explain.max - $explain.high) * 40)
+      #if($weights)
+        #set($toMax = $explain.max - $weights.total)
+        #set($toMin = $weights.total - $explain.min)
+        #if ($toMax > $toMin)
+          ## total is close to min
+          #set($percent = ($weights.total - $explain.min) / ($explain.low - $explain.min) * 40)
+        #else
+          ## total is close to max
+          #set($percent = 60 + ($explain.max - $weights.total) / ($explain.max - $explain.high) * 40)
+        #end
       #end
-        <!-- $!percent -->
       #set($game = $explain.games[$key])
-        <td data-wb="$white.id-$black.id" #if($game)class="game"#end style="background-color: color-mix(in srgb, rgb(0 255 0) ${percent}%, rgb(255 0 0));">
+        <td data-wb="$white.id-$black.id" #if($game)class="game"#end #if($weights)style="background-color: color-mix(in srgb, rgb(0 255 0) ${percent}%, rgb(255 0 0));"#end>
           <div class="weights">
-            <pre>$weights.toPrettyString()</pre>
+            <pre>#if($weights)$weights.toPrettyString()#{else}Bye Player#end</pre>
           </div>
         </td>
     #else

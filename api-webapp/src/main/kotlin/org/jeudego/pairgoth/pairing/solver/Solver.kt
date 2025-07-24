@@ -91,7 +91,7 @@ sealed class Solver(
 
     fun pair(): List<Game> {
         // check that at this stage, we have an even number of pairables
-        // The BYE player should have been added beforehand to make a number of pairables even.
+        // The BYE player should have been added beforehand to make the number of pairables even.
         if (pairables.size % 2 != 0) throw Error("expecting an even number of pairables")
         val builder = GraphBuilder(SimpleDirectedWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java))
 

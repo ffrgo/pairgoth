@@ -6,6 +6,7 @@
   }
   #pairing-table {
     border-collapse: collapse;
+    width: max-content;
     thead {
       //border-collapse: collapse;
       tr {
@@ -97,6 +98,7 @@
         }
         td {
           height: 55px;
+          width: 55px;
           border: solid 1px gray;
           position: relative;
           &.game::after {
