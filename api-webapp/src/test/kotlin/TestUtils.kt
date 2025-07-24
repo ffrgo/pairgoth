@@ -7,6 +7,8 @@ import org.jeudego.pairgoth.server.SSEServlet
 import org.jeudego.pairgoth.server.WebappManager
 import org.mockito.kotlin.*
 import java.io.*
+import java.net.URL
+import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.servlet.ReadListener
@@ -21,20 +23,45 @@ object TestAPI {
 
     fun Any?.toUnit() = Unit
 
+    fun parseURL(url: String): Pair<String, Map<String, String>> {
+        val qm = url.indexOf('?')
+        if (qm == -1) {
+            return url to emptyMap()
+        }
+        val uri = url.substring(0, qm)
+        val params = url.substring(qm + 1)
+            .split('&')
+            .map { it.split('=') }
+            .mapNotNull {
+                when (it.size) {
+                    1 -> it[0].decodeUTF8() to ""
+                    2 -> it[0].decodeUTF8() to it[1].decodeUTF8()
+                    else -> null
+                }
+            }
+            .toMap()
+        return uri to params
+    }
+
+    private fun String.decodeUTF8() = URLDecoder.decode(this, "UTF-8") // decode page=%22ABC%22 to page="ABC"
+
     private val apiServlet = ApiServlet()
     private val sseServlet = SSEServlet()
 
-    private fun <T> testRequest(reqMethod: String, uri: String, accept: String = "application/json", payload: T? = null): String {
+    private fun <T> testRequest(reqMethod: String, url: String, accept: String = "application/json", payload: T? = null): String {
 
         WebappManager.properties["auth"] = "none"
         WebappManager.properties["store"] = "memory"
         WebappManager.properties["webapp.env"] = "test"
+
+        val (uri, parameters) = parseURL(url)
 
         // mock request
         val myHeaderNames = if (reqMethod == "GET") emptyList() else listOf("Content-Type")
         val selector = argumentCaptor<String>()
         val subSelector = argumentCaptor<String>()
         val reqPayload = argumentCaptor<String>()
+        val parameter = argumentCaptor<String>()
         val myInputStream = payload?.let { DelegatingServletInputStream(payload.toString().byteInputStream(StandardCharsets.UTF_8)) }
         val myReader = payload?.let { BufferedReader(StringReader(payload.toString())) }
         val req = mock<HttpServletRequest> {
@@ -59,6 +86,7 @@ object TestAPI {
             }
             on { headerNames } doReturn Collections.enumeration(myHeaderNames)
             on { getHeader(eq("Accept")) } doReturn accept
+            on { getParameter(parameter.capture()) } doAnswer { parameters[parameter.lastValue] }
         }
 
         // mock response
@@ -77,7 +105,7 @@ object TestAPI {
             "DELETE" -> apiServlet.doDelete(req, resp)
         }
 
-        return buffer.toString() ?: throw Error("no response payload")
+        return buffer.toString()
     }
 
     fun get(uri: String): Json = Json.parse(testRequest<Void>("GET", uri)) ?: throw Error("no payload")

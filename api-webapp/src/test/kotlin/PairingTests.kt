@@ -8,8 +8,6 @@ import org.jeudego.pairgoth.store.lastPlayerId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
-import java.io.FileWriter
-import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import java.text.DecimalFormat
 import kotlin.math.abs
@@ -59,7 +57,6 @@ class PairingTests: TestBase() {
         }
 
         fun compare_weights(file1: File, file2: File, skipSeeding: Boolean = false):Boolean {
-            Solver.weightsLogger!!.flush()
             // Maps to store name pairs and costs
             val map1 = create_weights_map(file1)
             val map2 = create_weights_map(file2)
@@ -165,6 +162,7 @@ class PairingTests: TestBase() {
     }
 
     fun test_from_XML(name: String, forcePairing:List<Int>) {
+        // Let pairgoth use the legacy asymmetric detRandom()
         test_from_XML_internal(name, forcePairing, true)
         // Non-legacy tests inhibited for now: pairings differ for Toulouse and SimpleMM
         // test_from_XML_internal(name, forcePairing, false)
@@ -172,11 +170,10 @@ class PairingTests: TestBase() {
 
     fun test_from_XML_internal(name: String, forcePairing:List<Int>, legacy: Boolean) {
         // Let pairgoth use the legacy asymmetric detRandom()
-        Solver.legacy_mode = legacy
         // read tournament with pairing
-        val file = getTestFile("opengotha/pairings/$name.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
+        val tourFile = getTestFile("opengotha/pairings/$name.xml")
+        logger.info("read from file $tourFile")
+        val resource = tourFile.readText(StandardCharsets.UTF_8)
         var resp = TestAPI.post("/api/tour", resource)
         val id = resp.asObject().getInt("id")
         val tournament = TestAPI.get("/api/tour/$id").asObject()
@@ -203,15 +200,15 @@ class PairingTests: TestBase() {
         for (round in 1..tournament.getInt("rounds")!!) {
             val sumOfWeightsOG = compute_sumOfWeight_OG(getTestFile("opengotha/$name/$name" + "_weights_R$round.txt"), pairingsOG[round-1], players)
 
-            Solver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
+            val outputFile = getOutputFile("weights.txt")
             // Call Pairgoth pairing solver to generate games
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round?legacy=$legacy&weights_output=$outputFile", Json.Array("all")).asArray()
             logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
             logger.info("games for round $round: {}", games.toString())
 
             // Compare weights with OpenGotha if legacy mode
             if (legacy) {
-                assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+                assertTrue(compare_weights(outputFile, getTestFile("opengotha/$name/$name"+"_weights_R$round.txt")), "Not matching opengotha weights for round $round")
             }
 
             if (round in forcePairing) {
@@ -223,7 +220,7 @@ class PairingTests: TestBase() {
                     val gameOG = pairingsOG[round - 1].getJson(i)!!.asObject()// ["r"] as String?
                     val whiteId = gameOG["w"] as Long?
                     val blackId = gameOG["b"] as Long?
-                    TestAPI.put("/api/tour/$id/pair/$round", Json.parse("""{"id":$gameID,"w":$whiteId,"b":$blackId}""")).asObject()
+                    TestAPI.put("/api/tour/$id/pair/$round?legacy=$legacy&weights_output=$outputFile&append=true", Json.parse("""{"id":$gameID,"w":$whiteId,"b":$blackId}""")).asObject()
                     }
                 games = TestAPI.get("/api/tour/$id/res/$round").asArray()
             }
@@ -273,11 +270,10 @@ class PairingTests: TestBase() {
 
     @Test
     fun `SwissTest simpleSwiss`() {
-        Solver.legacy_mode = true
         // read tournament with pairing
-        var file = getTestFile("opengotha/pairings/simpleswiss.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
+        var tourFile = getTestFile("opengotha/pairings/simpleswiss.xml")
+        logger.info("read from file $tourFile")
+        val resource = tourFile.readText(StandardCharsets.UTF_8)
         var resp = TestAPI.post("/api/tour", resource)
         val id = resp.asObject().getInt("id")
         val tournament = TestAPI.get("/api/tour/$id").asObject()
@@ -315,10 +311,10 @@ class PairingTests: TestBase() {
         var firstGameID: Int
 
         for (round in 1..7) {
-            Solver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            val outputFile = getOutputFile("weights.txt")
+            games = TestAPI.post("/api/tour/$id/pair/$round?legacy=true&weights_output=$outputFile", Json.Array("all")).asArray()
             logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
-            assertTrue(compare_weights(getOutputFile("weights.txt"), getTestFile("opengotha/simpleswiss/simpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
+            assertTrue(compare_weights(outputFile, getTestFile("opengotha/simpleswiss/simpleswiss_weights_R$round.txt")), "Not matching opengotha weights for round $round")
             assertTrue(compare_games(games, Json.parse(pairingsOG[round - 1])!!.asArray()),"pairings for round $round differ")
             logger.info("Pairings for round $round match OpenGotha")
 
@@ -354,12 +350,12 @@ class PairingTests: TestBase() {
     @Test
     fun `SwissTest KPMCSplitbug`() {
         // Let pairgoth use the legacy asymmetric detRandom()
-        Solver.legacy_mode = true
+        val legacy = true
         // read tournament with pairing
         val name = "20240921-KPMC-Splitbug"
-        val file = getTestFile("opengotha/pairings/$name.xml")
-        logger.info("read from file $file")
-        val resource = file.readText(StandardCharsets.UTF_8)
+        val tourFile = getTestFile("opengotha/pairings/$name.xml")
+        logger.info("read from file $tourFile")
+        val resource = tourFile.readText(StandardCharsets.UTF_8)
         var resp = TestAPI.post("/api/tour", resource)
         val id = resp.asObject().getInt("id")
         val tournament = TestAPI.get("/api/tour/$id").asObject()
@@ -387,13 +383,13 @@ class PairingTests: TestBase() {
 
         var games: Json.Array
         var firstGameID: Int
+        val outputFile = getOutputFile("weights.txt")
 
         for (round in minRound..maxRound) {
             val sumOfWeightsOG = compute_sumOfWeight_OG(getTestFile("opengotha/$name/$name" + "_weights_R$round.txt"), pairingsOG[round - minRound], players)
 
-            Solver.weightsLogger = PrintWriter(FileWriter(getOutputFile("weights.txt")))
             // Call Pairgoth pairing solver to generate games
-            games = TestAPI.post("/api/tour/$id/pair/$round", Json.Array("all")).asArray()
+            games = TestAPI.post("/api/tour/$id/pair/$round?legacy=$legacy&weights_ouput=$outputFile&append=${round > 1}", Json.Array("all")).asArray()
             
             logger.info("sumOfWeightOG = " + dec.format(sumOfWeightsOG))
             logger.info("games for round $round: {}", games.toString().slice(0..50) + "...")
@@ -401,7 +397,7 @@ class PairingTests: TestBase() {
             // Compare weights with OpenGotha
             assertTrue(
                 compare_weights(
-                    getOutputFile("weights.txt"),
+                    outputFile,
                     getTestFile("opengotha/$name/$name" + "_weights_R$round.txt")
                 ), "Not matching opengotha weights for round $round"
             )

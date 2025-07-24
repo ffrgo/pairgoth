@@ -43,8 +43,7 @@ class MacMahonSolver(round: Int,
         return 2 * p.score
     }
 
-    override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
-
+    override fun SecondaryCritParams.playersMeetCriteria(p1: Pairable, p2: Pairable): Int {
         // playersMeetCriteria = 0 : No player is above thresholds -> apply the full weight
         // playersMeetCriteria = 1 : 1 player is above thresholds -> apply half the weight
         // playersMeetCriteria = 2 : Both players are above thresholds -> do not apply weight
@@ -60,14 +59,14 @@ class MacMahonSolver(round: Int,
         if (2 * p1.nbW >= nbw2Threshold
             // check if STARTING MMS is above MM bar (OpenGotha v3.52 behavior)
             || barThresholdActive && (p1.mmBase >= mmBar - Pairable.MIN_RANK)
-                || p1.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
+            || p1.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
         if (2 * p2.nbW >= nbw2Threshold
             // check if STARTING MMS is above MM bar (OpenGotha v3.52 behavior)
             || barThresholdActive && (p2.mmBase >= mmBar - Pairable.MIN_RANK)
             || p2.mms >= rankSecThreshold - Pairable.MIN_RANK) playersMeetCriteria++
 
-        return pairing.geo.apply(p1, p2, playersMeetCriteria)
+        return playersMeetCriteria
     }
 
     override fun HandicapParams.pseudoRank(pairable: Pairable): Int {

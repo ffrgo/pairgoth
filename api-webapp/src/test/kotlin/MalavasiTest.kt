@@ -1,11 +1,8 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.pairing.solver.Solver
 import org.jeudego.pairgoth.test.PairingTests.Companion.compare_weights
 import org.junit.jupiter.api.Test
-import java.io.FileWriter
-import java.io.PrintWriter
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -19,8 +16,8 @@ class MalavasiTest: TestBase() {
         )!!.asObject()
         val resp = TestAPI.post("/api/tour", tournament).asObject()
         val tourId = resp.getInt("id")
-        Solver.weightsLogger = PrintWriter(FileWriter(getOutputFile("malavasi-weights.txt")))
-        val games = TestAPI.post("/api/tour/$tourId/pair/2", Json.Array("all")).asArray()
+        val outputFile = getOutputFile("malavasi-weights.txt")
+        val games = TestAPI.post("/api/tour/$tourId/pair/2?weights_output=$outputFile", Json.Array("all")).asArray()
         // Oceane is ID 548, Valentine 549
         val buggy = games.map { it as Json.Object }.filter { game ->
             // build the two-elements set of players ids
@@ -33,6 +30,6 @@ class MalavasiTest: TestBase() {
         assertEquals(2, buggy.size)
 
         // compare weights
-        assertTrue(compare_weights(getOutputFile("malavasi-weights.txt"), getTestFile("opengotha/malavasi/malavasi_weights_R2.txt")), "Not matching opengotha weights for Malavasi test")
+        assertTrue(compare_weights(outputFile, getTestFile("opengotha/malavasi/malavasi_weights_R2.txt")), "Not matching opengotha weights for Malavasi test")
     }
 }

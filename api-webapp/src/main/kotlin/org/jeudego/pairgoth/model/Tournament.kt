@@ -9,6 +9,7 @@ import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import org.jeudego.pairgoth.pairing.solver.PairingListener
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
@@ -64,7 +65,7 @@ sealed class Tournament <P: Pairable>(
     var frozen: Json.Array? = null
 
     // pairing
-    open fun pair(round: Int, pairables: List<Pairable>): List<Game> {
+    open fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         // Minimal check on round number.
         // CB TODO - the complete check should verify, for each player, that he was either non pairable or implied in the previous round
         if (round > games.size + 1) badRequest("previous round not paired")
@@ -72,7 +73,7 @@ sealed class Tournament <P: Pairable>(
         val evenPairables =
             if (pairables.size % 2 == 0) pairables
             else pairables.toMutableList().also { it.add(ByePlayer) }
-        return pairing.pair(this, round, evenPairables).also { newGames ->
+        return pairing.pair(this, round, evenPairables, legacyMode, listener).also { newGames ->
             if (games.size < round) games.add(mutableMapOf())
             games[round - 1].putAll( newGames.associateBy { it.id } )
         }
@@ -291,8 +292,8 @@ class TeamTournament(
         }
     }
 
-    override fun pair(round: Int, pairables: List<Pairable>) =
-        super.pair(round, pairables).also { games ->
+    override fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean, listener: PairingListener?) =
+        super.pair(round, pairables, legacyMode, listener).also { games ->
             if (type.individual) {
                 games.forEach { game ->
                     pairIndividualGames(round, game)

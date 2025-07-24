@@ -32,10 +32,11 @@ sealed class Solver(
 
     companion object {
         val rand = Random(/* seed from properties - TODO */)
-        // Used in tests
-        var weightsLogger: PrintWriter? = null
-        var legacy_mode = false
     }
+
+    // For tests and explain feature
+    var legacyMode = false
+    var pairingListener: PairingListener? = null
 
     init {
         history.scoresFactory = this::mainScoreMapFactory
@@ -59,7 +60,7 @@ sealed class Solver(
     abstract fun missedRoundSosMapFactory(): Map<ID, Double>
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
-        1.0 + // 1 is minimum value because 0 means "no matching allowed"
+        1.0 + // 1 is the minimum value because 0 means "no matching allowed"
                 pairing.base.apply(p1, p2) +
                 pairing.main.apply(p1, p2) +
                 pairing.secondary.apply(p1, p2)
@@ -71,13 +72,19 @@ sealed class Solver(
         else 0.0
     }
 
-    open fun weight(p1: Pairable, p2: Pairable) =
-        openGothaWeight(p1, p2) +
-        pairgothBlackWhite(p1, p2) +
-        // pairing.base.applyByeWeight(p1, p2) +
-        pairing.handicap.color(p1, p2)
+    open fun weight(p1: Pairable, p2: Pairable): Double {
+        pairingListener?.startPair(p1, p2)
+        return (
+            openGothaWeight(p1, p2) +
+            pairgothBlackWhite(p1, p2).also { pairingListener?.addWeight("secColorBalance", it) } +
+            // pairing.base.applyByeWeight(p1, p2) +
+            pairing.handicap.color(p1, p2).also { pairingListener?.addWeight("secHandi", it) }
+        ).also {
+            pairingListener?.endPair(p1, p2)
+        }
+    }
 
-    open fun computeWeightForBye(p: Pairable): Double{
+    open fun computeWeightForBye(p: Pairable): Double {
         // The weightForBye function depends on the system type (Mac-Mahon or Swiss), default value is 0.0
         return 0.0
     }
@@ -92,10 +99,7 @@ sealed class Solver(
         val logger = LoggerFactory.getLogger("debug")
         val debug = false
 
-        weightsLogger?.apply {
-            this.println("Round $round")
-            this.println("Costs")
-        }
+        pairingListener?.start(round)
 
         var chosenByePlayer: Pairable = ByePlayer
         // Choose bye player and remove from pairables
@@ -124,21 +128,6 @@ sealed class Solver(
                 val q = nameSortedPairables[j]
                 weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
                 weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
-                weightsLogger?.apply {
-                    this.println("Player1Name=${p.fullName()}")
-                    this.println("Player2Name=${q.fullName()}")
-                    this.println("baseDuplicateGameCost=${dec.format(pairing.base.avoidDuplicatingGames(p, q))}")
-                    this.println("baseRandomCost=${dec.format(pairing.base.applyRandom(p, q))}")
-                    this.println("baseBWBalanceCost=${dec.format(pairing.base.applyColorBalance(p, q))}")
-                    this.println("mainCategoryCost=${dec.format(pairing.main.avoidMixingCategory(p, q))}")
-                    this.println("mainScoreDiffCost=${dec.format(pairing.main.minimizeScoreDifference(p, q))}")
-                    this.println("mainDUDDCost=${dec.format(pairing.main.applyDUDD(p, q))}")
-                    this.println("mainSeedCost=${dec.format(pairing.main.applySeeding(p, q))}")
-                    this.println("secHandiCost=${dec.format(pairing.handicap.handicap(p, q))}")
-                    this.println("secGeoCost=${dec.format(pairing.secondary.apply(p, q))}")
-                    this.println("totalCost=${dec.format(openGothaWeight(p,q))}")
-                    //File(WEIGHTS_FILE).appendText("ByeCost="+dec.format(pairing.base.applyByeWeight(p,q))+"\n")
-                }
             }
         }
         val graph = builder.build()
@@ -152,6 +141,8 @@ sealed class Solver(
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
         if (chosenByePlayer != ByePlayer) result += Game(id = nextGameId, table = 0, white = chosenByePlayer.id, black = ByePlayer.id, result = Game.Result.fromSymbol('w'))
+
+        pairingListener?.end()
 
         if (debug) {
             var sumOfWeights = 0.0
@@ -216,11 +207,11 @@ sealed class Solver(
         var score = 0.0
         // Base Criterion 1 : Avoid Duplicating Game
         // Did p1 and p2 already play ?
-        score += avoidDuplicatingGames(p1, p2)
+        score += avoidDuplicatingGames(p1, p2).also { pairingListener?.addWeight("baseDuplicateGame", it) }
         // Base Criterion 2 : Random
-        score += applyRandom(p1, p2)
+        score += applyRandom(p1, p2).also { pairingListener?.addWeight("baseRandom", it) }
         // Base Criterion 3 : Balance W and B
-        score += applyColorBalance(p1, p2)
+        score += applyColorBalance(p1, p2).also { pairingListener?.addWeight("baseColorBalance", it) }
 
         return score
     }
@@ -280,16 +271,16 @@ sealed class Solver(
         var score = 0.0
 
         // Main criterion 1 avoid mixing category is moved to Swiss with category
-        score += avoidMixingCategory(p1, p2)
+        score += avoidMixingCategory(p1, p2).also { pairingListener?.addWeight("mainCategory", it) }
 
         // Main criterion 2 minimize score difference
-        score += minimizeScoreDifference(p1, p2)
+        score += minimizeScoreDifference(p1, p2).also { pairingListener?.addWeight("mainScoreDiff", it) }
 
         // Main criterion 3 If different groups, make a directed Draw-up/Draw-down
-        score += applyDUDD(p1, p2)
+        score += applyDUDD(p1, p2).also { pairingListener?.addWeight("mainDUDD", it) }
 
         // Main criterion 4 seeding
-        score += applySeeding(p1, p2)
+        score += applySeeding(p1, p2).also { pairingListener?.addWeight("mainSeed", it) }
 
         return score
     }
@@ -411,7 +402,7 @@ sealed class Solver(
                         val randRange = maxSeedingWeight * 0.2
                         // for old tests to pass
                         val rand =
-                            if (legacy_mode && p1.fullName() > p2.fullName()) {
+                            if (legacyMode && p1.fullName() > p2.fullName()) {
                                 // for old tests to pass
                                 detRandom(randRange, p2, p1, false)
                             } else {
@@ -427,8 +418,7 @@ sealed class Solver(
         return Math.round(score).toDouble()
     }
 
-    open fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
-
+    open fun SecondaryCritParams.playersMeetCriteria(p1: Pairable, p2: Pairable): Int {
         // playersMeetCriteria = 0 : No player is above thresholds -> apply secondary criteria
         // playersMeetCriteria = 1 : 1 player is above thresholds -> apply half the weight
         // playersMeetCriteria = 2 : Both players are above thresholds -> apply the full weight
@@ -441,7 +431,11 @@ sealed class Solver(
         if (2*p1.nbW >= nbw2Threshold) playersMeetCriteria++
         if (2*p2.nbW >= nbw2Threshold) playersMeetCriteria++
 
-        return pairing.geo.apply(p1, p2, playersMeetCriteria)
+        return playersMeetCriteria
+    }
+
+    fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
+        return pairing.geo.apply(p1, p2, playersMeetCriteria(p1, p2))
     }
 
     fun GeographicalParams.apply(p1: Pairable, p2: Pairable, playersMeetCriteria: Int): Double {
@@ -449,11 +443,11 @@ sealed class Solver(
 
         val geoMaxCost = pairing.geo.avoidSameGeo
 
-		val countryFactor: Int = if (legacy_mode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
+		val countryFactor: Int = if (legacyMode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
 			preferMMSDiffRatherThanSameCountry
 		else
 			0
-		val clubFactor: Int = if (legacy_mode || biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
+		val clubFactor: Int = if (legacyMode || biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
 			preferMMSDiffRatherThanSameClub
 		else
 			0
@@ -511,7 +505,7 @@ sealed class Solver(
             2 -> geoMaxCost
             1 -> 0.5 * (geoNominalCost + geoMaxCost)
             else -> geoNominalCost
-        }
+        }.also { pairingListener?.addWeight("secGeo", it) }
     }
 
     // Handicap functions
@@ -559,7 +553,7 @@ sealed class Solver(
             } else if (p1.colorBalance < p2.colorBalance) {
                 score = 1.0
             } else { // choose color from a det random
-                if (detRandom(1.0, p1, p2, false) === 0.0) {
+                if (detRandom(1.0, p1, p2, false) == 0.0) {
                     score = 1.0
                 } else {
                     score = -1.0

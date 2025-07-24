@@ -7,6 +7,7 @@ import org.jeudego.pairgoth.model.PairingType.*
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.jeudego.pairgoth.pairing.solver.Solver
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
+import org.jeudego.pairgoth.pairing.solver.PairingListener
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import kotlin.math.min
 
@@ -133,8 +134,15 @@ sealed class Pairing(
     val placementParams: PlacementParams) {
     companion object {}
     abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
-    fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
-        return solver(tournament, round, pairables).pair()
+    fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
+        return solver(tournament, round, pairables)
+            .also { solver ->
+                solver.legacyMode = legacyMode
+                listener?.let {
+                    solver.pairingListener = listener
+                }
+            }
+            .pair()
     }
 }
 

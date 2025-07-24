@@ -13,7 +13,10 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.toID
 import org.jeudego.pairgoth.model.toJson
+import org.jeudego.pairgoth.pairing.solver.LoggingListener
 import org.jeudego.pairgoth.server.Event.*
+import java.io.FileWriter
+import java.io.PrintWriter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -67,7 +70,15 @@ object PairingHandler: PairgothApiHandler {
                     if (playing.contains(it.id)) badRequest("pairable #$id already plays round $round")
                 } ?: badRequest("invalid pairable id: #$id")
             }
-        val games = tournament.pair(round, pairables)
+
+        // POST pair/$round accepts a few parameters to help tests
+        val legacy = request.getParameter("legacy")?.toBoolean() ?: false
+        val weightsLogger = request.getParameter("weights_output")?.let {
+            val append = request.getParameter("append")?.toBoolean() ?: false
+            LoggingListener(PrintWriter(FileWriter(it, append)))
+        }
+
+        val games = tournament.pair(round, pairables, legacy, weightsLogger)
 
         val ret = games.map { it.toJson() }.toJsonArray()
         tournament.dispatchEvent(GamesAdded, request, Json.Object("round" to round, "games" to ret))
