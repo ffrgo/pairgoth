@@ -570,7 +570,7 @@
     }
 
     /* TODO - plenty of those elements could just use the .noprint class */
-    #header, #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .result-sheets, .toggle, #overview, .tables-exclusion, .button, .noprint {
+    #header, #logo, #lang, .steps, #filter-box, #reglist-mode, #footer, #unpairables, #pairing-buttons, button, #standings-params, #logout, .pairing-stats, .pairing-post-actions, .toggle, #overview, .tables-exclusion, .button, .noprint {
       display: none !important;
     }
 

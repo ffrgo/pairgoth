@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.Caffeine
 import com.republicate.kson.Json
 import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.api.ApiHandler
+import org.jeudego.pairgoth.api.ExplainHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
@@ -99,6 +100,7 @@ class ApiServlet: HttpServlet() {
                     if ("token" == selector) TokenHandler
                     else when (subEntity) {
                         null -> TournamentHandler
+                        "explain" -> ExplainHandler
                         "part" -> PlayerHandler
                         "pair" -> PairingHandler
                         "res" -> ResultsHandler

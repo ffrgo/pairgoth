@@ -18,11 +18,6 @@ import kotlin.math.min
 
 fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
-    fun Pairable.mmBase(): Double {
-        if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
-        return min(max(rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + mmsCorrection
-    }
-
     if (frozen != null) {
         return ArrayList(frozen!!.map { it -> it as Json.Object })
     }

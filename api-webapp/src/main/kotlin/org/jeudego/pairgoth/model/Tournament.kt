@@ -100,14 +100,17 @@ sealed class Tournament <P: Pairable>(
 
     fun lastRound() = max(1, games.size)
 
+    /**
+     * Recompute DUDD for a specific game
+     */
     fun recomputeDUDD(round: Int, gameID: ID) {
         // Instantiate solver with game history
-        val solver = pairing.solver(this, round, pairables.values.toList())
+        val solver = pairing.solver(this, round, emptyList())
 
         // Recomputes DUDD and hd
         val game = games(round)[gameID]!!
-        val white = solver.pairables.find { p-> p.id == game.white }!!
-        val black = solver.pairables.find { p-> p.id == game.black }!!
+        val white = pairables[game.white]!!
+        val black = pairables[game.black]!!
         game.drawnUpDown = solver.dudd(black, white)
         game.handicap = solver.hd(white = white, black = black)
     }
@@ -119,16 +122,15 @@ sealed class Tournament <P: Pairable>(
     fun recomputeDUDD(round: Int) {
         if (pairables.isEmpty() || games(1).isEmpty()) return;
         // Instantiate solver with game history
-        val solver = pairing.solver(this, round, pairables.values.toList())
+        val solver = pairing.solver(this, round, emptyList())
         for (game in games(round).values) {
             if (game.black != 0 && game.white != 0) {
-                val white = solver.pairables.find { p-> p.id == game.white }!!
-                val black = solver.pairables.find { p-> p.id == game.black }!!
+                val white = pairables[game.white]!!
+                val black = pairables[game.black]!!
                 game.drawnUpDown = solver.dudd(black, white)
             }
         }
     }
-
 
     /**
      * Recompute DUDD for all rounds

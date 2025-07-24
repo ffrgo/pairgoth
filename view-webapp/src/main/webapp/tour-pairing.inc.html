@@ -83,7 +83,10 @@
 #end
           </div>
 #if(!$tour.type.startsWith('TEAM'))
-          <div class="result-sheets"><a href="result-sheets?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></a></div>
+          <div class="pairing-post-actions">
+            <a href="result-sheets?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></a>
+            <a href="explain?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">explain pairing <i class="fa fa-external-link"></i></a>
+          </div>
 #end
         </div>
       </div>

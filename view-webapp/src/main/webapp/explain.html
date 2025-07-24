@@ -1,0 +1,114 @@
+#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
+#if (!$tour)
+<div class="section">
+  <h2 class="error">Invalid tournament id</h2>
+</div>
+#stop
+#end
+#set($round = $math.toInteger($!params.round))
+#if(!$round)
+  #set($round = 1)
+#else
+  #set($round = $math.min($math.max($round, 1), $tour.rounds))
+#end
+#if($tour.type == 'INDIVIDUAL' || $tour.type.startsWith('TEAM'))
+  #set($parts = $api.get("tour/${params.id}/part"))
+#else
+  #set($parts = $api.get("tour/${params.id}/team"))
+#end
+#set($pmap = $utils.toMap($parts))
+#set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
+#if($roundPairing.error)
+<script type="text/javascript">
+  onLoad(() => {
+    showError("$roundPairing.error")
+  });
+</script>
+  #stop
+#end
+#set($explain = $api.get("tour/${params.id}/explain/$round"))
+<div id="pairing-table-wrapper">
+  <table id="pairing-table">
+    <thead>
+      <tr>
+        <th>
+          <label class="top-right">white</label>
+          <label class="bottom-left">black</label>
+        </th>
+#foreach($white in $explain.paired)
+        <th data-white="$white.id">
+          <div>
+            <span>
+              $white.name $white.firstname
+            </span>
+          </div>
+          <pre>$white.toPrettyString()</pre>
+        </th>
+#end
+      </tr>
+    </thead>
+    <tbody>
+#foreach($black in $explain.paired)
+      <tr>
+        <th data-black="$black.id">
+          <div>
+            <span>
+              $black.name $black.firstname
+            </span>
+          </div>
+          <pre>$black.toPrettyString()</pre>
+        </th>
+  #foreach($white in $explain.paired)
+    #if($white.id != $black.id)
+      #set($key = "$white.id-$black.id")
+      #set($weights = $explain.weights[$key])
+      #set($toMax = $explain.max - $weights.total)
+      #set($toMin = $weights.total - $explain.min)
+      #if ($toMax > $toMin)
+        ## total is close to min
+        #set($percent = ($weights.total - $explain.min) / ($explain.low - $explain.min) * 40)
+      #else
+        ## total is close to max
+        #set($percent = 60 + ($explain.max - $weights.total) / ($explain.max - $explain.high) * 40)
+      #end
+        <!-- $!percent -->
+      #set($game = $explain.games[$key])
+        <td data-wb="$white.id-$black.id" #if($game)class="game"#end style="background-color: color-mix(in srgb, rgb(0 255 0) ${percent}%, rgb(255 0 0));">
+          <div class="weights">
+            <pre>$weights.toPrettyString()</pre>
+          </div>
+        </td>
+    #else
+        <td></td>
+    #end
+  #end
+      </tr>
+#end
+    </tbody>
+  </table>
+</div>
+<div id="captures"></div>
+<script type="text/javascript">
+  // #[[
+  onLoad(() => {
+    $('#header').hide();
+    $('td').on('click', e => {
+      const td = e.target.closest('td');
+      const ids = td.data('wb')?.split(/-/);
+      if (ids) {
+        const white = $(`th[data-white="${ids[0]}"] div span`)?.text();
+        const black = $(`th[data-white="${ids[1]}"] div span`)?.text();
+        const weights = td.find('.weights pre').text();
+        const captures = $('#captures')[0];
+        captures.insertAdjacentHTML('beforeend', `<div>${white} vs ${black}<pre>${weights}</pre></div>`);
+      }
+    })
+    $('th[data-white], th[data-black]').on('click', e => {
+      const th = e.target.closest('th');
+      const name = th.find('span').text();
+      const info = th.find('pre').text();
+      captures.insertAdjacentHTML('beforeend', `<div>${name}<pre>${info}</pre></div>`);
+    });
+  });
+  // ]]#
+</script>

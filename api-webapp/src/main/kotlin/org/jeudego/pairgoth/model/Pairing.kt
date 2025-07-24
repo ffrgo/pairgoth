@@ -133,8 +133,8 @@ sealed class Pairing(
     val pairingParams: PairingParams,
     val placementParams: PlacementParams) {
     companion object {}
-    abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
-    fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
+    internal abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
+    internal fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         return solver(tournament, round, pairables)
             .also { solver ->
                 solver.legacyMode = legacyMode

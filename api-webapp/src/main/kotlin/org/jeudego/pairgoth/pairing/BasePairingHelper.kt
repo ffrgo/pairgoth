@@ -78,17 +78,17 @@ abstract class BasePairingHelper(
     protected fun Pairable.played(other: Pairable) = history.playedTogether(this, other)
 
     // color balance (nw - nb)
-    protected val Pairable.colorBalance: Int get() = history.colorBalance(this) ?: 0
+    protected val Pairable.colorBalance: Int get() = history.colorBalance[id] ?: 0
 
     protected val Pairable.group: Int get() = _groups[id]!!
 
-    protected val Pairable.drawnUpDown: Pair<Int, Int> get() = history.drawnUpDown(this) ?: Pair(0, 0)
+    protected val Pairable.drawnUpDown: Pair<Int, Int> get() = history.drawnUpDown[id] ?: Pair(0, 0)
 
     protected val Pairable.nbBye: Int get() = history.nbPlayedWithBye(this) ?: 0
 
     val Pairable.score: Double get() = history.scores[id] ?: 0.0
     val Pairable.scoreX: Double get() = history.scoresX[id] ?: 0.0
-    val Pairable.nbW: Double get() = history.nbW(this) ?: 0.0
+    val Pairable.nbW: Double get() = history.wins[id] ?: 0.0
     val Pairable.sos: Double get() = history.sos[id] ?: 0.0
     val Pairable.sosm1: Double get() = history.sosm1[id] ?: 0.0
     val Pairable.sosm2: Double get() = history.sosm2[id] ?: 0.0

@@ -33,9 +33,6 @@ open class HistoryHelper(
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
     open fun nbPlayedWithBye(p: Pairable) = nbPlayedWithBye[p.id]
-    open fun nbW(p: Pairable) = wins[p.id]
-
-    fun drawnUpDown(p: Pairable) = drawnUpDown[p.id]
 
     protected val paired: Set<Pair<ID, ID>> by lazy {
         (history.flatten().map { game ->
@@ -47,7 +44,7 @@ open class HistoryHelper(
 
     // Returns the number of games played as white minus the number of games played as black
     // Only count games without handicap
-    private val colorBalance: Map<ID, Int> by lazy {
+    val colorBalance: Map<ID, Int> by lazy {
         history.flatten().filter { game ->
             game.handicap == 0
         }.filter { game ->

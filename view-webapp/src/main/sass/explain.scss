@@ -1,0 +1,141 @@
+@layer pairgoth {
+  /* explain section */
+
+  #pairing-table-wrapper {
+    padding: 8em 2em 1em 2em;
+  }
+  #pairing-table {
+    border-collapse: collapse;
+    thead {
+      //border-collapse: collapse;
+      tr {
+        &:first-child {
+          min-height: 8rem;
+          th:first-child {
+            background: linear-gradient(to right top, #ffffff 0%,#ffffff 49.9%,#000000 50%,#000000 51%,#ffffff 51.1%,#ffffff 100%);
+            position: relative;
+            min-width: 8rem;
+            label.top-right {
+              position: absolute;
+              top: 0;
+              right: 0;
+            }
+            label.bottom-left {
+              position: absolute;
+              bottom: 0;
+              left: 0;
+            }
+          }
+          th:not(:first-child) {
+            z-index: 5;
+            width: 55px;
+            height: 140px;
+            white-space: nowrap;
+            padding-bottom: 10px;
+            position: relative;
+            > div {
+              transform: translate(35px, 51px) rotate(315deg);
+              width: 30px;
+              &:hover {
+                cursor: pointer;
+                > span {
+                  background-color: rgba(0, 0, 255, 0.2) !important;
+                }
+              }
+              > span {
+                border-bottom: 1px solid gray;
+                padding: 5px 10px;
+              }
+            }
+            > pre {
+              display: none;
+              font-size: smaller;
+              line-height: 1em;
+              text-align: left;
+              position: absolute;
+              pointer-events: none;
+              top: 100%;
+              left: 100%;
+              background-color: rgba(255, 255, 255, 0.7);
+            }
+            &:hover {
+              cursor: pointer;
+              > pre {
+                display: block;
+                z-index: 10;
+              }
+            }
+          }
+        }
+      }
+    }
+    tbody {
+      tr {
+        th {
+          text-align: left;
+          padding-right: 1em;
+          position: relative;
+          > pre {
+            display: none;
+            font-size: smaller;
+            line-height: 1em;
+            text-align: left;
+            position: absolute;
+            pointer-events: none;
+            top: 100%;
+            left: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+          }
+          &:hover {
+            cursor: pointer;
+            background-color: rgba(0, 0, 255, 0.2) !important;
+            pre {
+              display: block;
+              z-index: 10;
+            }
+          }
+        }
+        td {
+          height: 55px;
+          border: solid 1px gray;
+          position: relative;
+          &.game::after {
+            position: absolute;
+            content: "X";
+            color: blue;
+            text-align: center;
+            top: 50%;
+            transform: translateY(-50%);
+            bottom: 0;
+            left: 0;
+            right: 0;
+          }
+          .weights {
+            display: none;
+            font-size: smaller;
+            line-height: 1em;
+            text-align: left;
+            position: absolute;
+            pointer-events: none;
+            top: 100%;
+            left: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+          }
+          &:hover {
+            background-color: rgba(0, 0, 255, 0.7) !important;
+            cursor: pointer;
+            .weights {
+              display: block;
+              z-index: 10;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  #captures {
+    padding: 1em;
+  }
+}
+
