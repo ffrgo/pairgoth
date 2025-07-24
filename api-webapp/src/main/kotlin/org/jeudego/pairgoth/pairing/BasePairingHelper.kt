@@ -11,14 +11,11 @@ abstract class BasePairingHelper(
     val placement: PlacementParams,
     ) {
 
-    val scores get() = history.scores
-    abstract val scoresX: Map<ID, Double>
-
     // Extend pairables with members from all rounds
 
     // The main criterion that will be used to define the groups should be defined by subclasses
     // SOS and variants will be computed based on this score
-    val Pairable.main: Double get() = scores[id]?.second ?: 0.0
+    val Pairable.main: Double get() = score ?: 0.0
     abstract val mainLimits: Pair<Double, Double>
 
     // pairables sorted using overloadable sort function
@@ -89,9 +86,9 @@ abstract class BasePairingHelper(
 
     protected val Pairable.nbBye: Int get() = history.nbPlayedWithBye(this) ?: 0
 
-    // score (number of wins)
+    val Pairable.score: Double get() = history.scores[id] ?: 0.0
+    val Pairable.scoreX: Double get() = history.scoresX[id] ?: 0.0
     val Pairable.nbW: Double get() = history.nbW(this) ?: 0.0
-
     val Pairable.sos: Double get() = history.sos[id] ?: 0.0
     val Pairable.sosm1: Double get() = history.sosm1[id] ?: 0.0
     val Pairable.sosm2: Double get() = history.sosm2[id] ?: 0.0

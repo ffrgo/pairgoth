@@ -27,7 +27,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         return ArrayList(frozen!!.map { it -> it as Json.Object })
     }
 
-    val history = historyHelper(round)
+    val history = historyHelper(round + 1)
 
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
@@ -162,10 +162,8 @@ fun TeamTournament.getSortedTeamMembers(round: Int, includePreliminary: Boolean 
     val individualHistory = teamGames.map { roundTeamGames ->
         roundTeamGames.flatMap { game ->  individualGames[game.id]?.toList() ?: listOf() }
     }
-    val historyHelper = HistoryHelper(individualHistory) {
-        pairables.mapValues {
-            Pair(0.0, wins[it.key] ?: 0.0)
-        }
+    val historyHelper = HistoryHelper(individualHistory).apply {
+        scoresFactory = { wins }
     }
     val neededCriteria = mutableListOf(Criterion.NBW, Criterion.RATING)
     val criteria = neededCriteria.map { crit ->

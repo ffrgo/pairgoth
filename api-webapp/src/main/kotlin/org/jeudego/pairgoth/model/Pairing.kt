@@ -4,7 +4,8 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.SPLIT_AND_SLIP
 import org.jeudego.pairgoth.model.PairingType.*
-import org.jeudego.pairgoth.pairing.solver.BaseSolver
+import org.jeudego.pairgoth.pairing.HistoryHelper
+import org.jeudego.pairgoth.pairing.solver.Solver
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.SwissSolver
 import kotlin.math.min
@@ -131,7 +132,7 @@ sealed class Pairing(
     val pairingParams: PairingParams,
     val placementParams: PlacementParams) {
     companion object {}
-    abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): BaseSolver
+    abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
     fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): List<Game> {
         return solver(tournament, round, pairables).pair()
     }
@@ -139,19 +140,6 @@ sealed class Pairing(
 
 internal fun Tournament<*>.historyBefore(round: Int) =
     (1 until min(round, lastRound() + 1)).map { games(it).values.toList() }
-
-/*private fun Tournament<*>.historyBefore(round: Int) : List<List<Game>> {
-    println("Welcome to tournament.historyBefore !")
-    println("lastround and round = "+lastRound().toString()+"   "+round.toString())
-    println((1 until round).map { it })
-    println((1 until round).map { games(it).values.toList() })
-    if (lastRound() == 1){
-        return emptyList()
-    }
-    else {
-        return (1 until round).map { games(it).values.toList() }
-    }
-}*/
 
 class Swiss(
     pairingParams: PairingParams = PairingParams(
@@ -175,7 +163,7 @@ class Swiss(
 ): Pairing(SWISS, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        SwissSolver(round, tournament.rounds, tournament.historyHelper(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round))
+        SwissSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round))
 }
 
 class MacMahon(
@@ -203,14 +191,14 @@ class MacMahon(
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        MacMahonSolver(round, tournament.rounds, tournament.historyHelper(round), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar)
+        MacMahonSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar)
 }
 
 class RoundRobin(
     pairingParams: PairingParams = PairingParams(),
     placementParams: PlacementParams = PlacementParams(Criterion.NBW, Criterion.RATING)
 ): Pairing(ROUND_ROBIN, pairingParams, placementParams) {
-    override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): BaseSolver {
+    override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver {
         TODO("not implemented")
     }
 }

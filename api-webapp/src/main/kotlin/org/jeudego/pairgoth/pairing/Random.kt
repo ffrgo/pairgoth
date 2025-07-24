@@ -1,7 +1,6 @@
 package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.Pairable
-import org.jeudego.pairgoth.pairing.solver.BaseSolver
 
 fun detRandom(max: Double, p1: Pairable, p2: Pairable, symmetric: Boolean): Double {
     var inverse = false

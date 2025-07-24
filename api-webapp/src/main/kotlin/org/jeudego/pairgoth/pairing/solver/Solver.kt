@@ -19,11 +19,12 @@ import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.*
 
-sealed class BaseSolver(
+sealed class Solver(
     round: Int,
     totalRounds: Int,
-    history: HistoryHelper, // History of all games played for each round
-    pairables: List<Pairable>, // All pairables for this round, it may include the bye player
+    history: HistoryHelper,    // Digested history of all games played for each round
+    pairables: List<Pairable>, // Pairables to pair together
+    val allPairablesMap: Map<ID, Pairable>, // Map of all known pairables
     pairing: PairingParams,
     placement: PlacementParams,
     val usedTables: BitSet
@@ -35,6 +36,27 @@ sealed class BaseSolver(
         var weightsLogger: PrintWriter? = null
         var legacy_mode = false
     }
+
+    init {
+        history.scoresFactory = this::mainScoreMapFactory
+        history.scoresXFactory = this::scoreXMapFactory
+        history.missedRoundsSosFactory = this::missedRoundSosMapFactory
+    }
+
+    /**
+     * Main score map factory (NBW for Swiss, MMS for MacMahon, ...).
+     */
+    abstract fun mainScoreMapFactory(): Map<ID, Double>
+
+    /**
+     * ScoreX map factory (NBW for Swiss, MMSBase + MMS for MacMahon, ...).
+     */
+    abstract fun scoreXMapFactory(): Map<ID, Double>
+
+    /**
+     * SOS for missed rounds factory (0 for Swiss, mmBase or mmBase+rounds/2 for MacMahon depending on pairing option sosValueAbsentUseBase)
+     */
+    abstract fun missedRoundSosMapFactory(): Map<ID, Double>
 
     open fun openGothaWeight(p1: Pairable, p2: Pairable) =
         1.0 + // 1 is minimum value because 0 means "no matching allowed"
@@ -144,8 +166,8 @@ sealed class BaseSolver(
             for (p in sortedPairables) {
                 logger.info(String.format("%-20s", p.name.substring(0, min(p.name.length, 18)))
                         + " " + String.format("%-4s", p.id)
-                        + " " + String.format("%-4s", scores[p.id]?.first)
-                        + " " + String.format("%-4s", scores[p.id]?.second)
+                        + " " + String.format("%-4s", history.missedRoundsSos[p.id])
+                        + " " + String.format("%-4s", history.scores[p.id])
                         + " " + String.format("%-4s", p.sos)
                 )
             }

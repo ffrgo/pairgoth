@@ -225,32 +225,7 @@ sealed class Tournament <P: Pairable>(
     }
 
     fun historyHelper(round: Int): HistoryHelper {
-        return HistoryHelper(historyBefore(round + 1)) {
-            if (pairing.type == PairingType.SWISS) {
-                pairables.mapValues {
-                    // In a Swiss tournament the main criterion is the number of wins
-                    Pair(0.0, wins[it.key] ?: 0.0)
-                }
-            }
-            else {
-                pairables.mapValues {
-                    // In a MacMahon tournament the main criterion is the mms
-                    it.value.let { pairable ->
-                        val mmBase = pairable.mmBase()
-                        val score = roundScore(mmBase +
-                                (nbW(pairable) ?: 0.0) +
-                                (1..round).sumOf { round ->
-                                    if (playersPerRound.getOrNull(round - 1)?.contains(pairable.id) == true) 0.0 else 1.0
-                                } * pairing.pairingParams.main.mmsValueAbsent)
-                        Pair(
-                            if (pairing.pairingParams.main.sosValueAbsentUseBase) mmBase
-                            else roundScore(mmBase + round/2),
-                            score
-                        )
-                    }
-                }
-            }
-        }
+        return pairing.solver(this, round, emptyList()).history
     }
 }
 

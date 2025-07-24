@@ -16,19 +16,31 @@ class MacMahonSolver(round: Int,
                      placementParams: PlacementParams,
                      usedTables: BitSet,
                      private val mmFloor: Int, private val mmBar: Int)  :
-    BaseSolver(round, totalRounds, history, pairables, pairingParams, placementParams, usedTables) {
+    Solver(round, totalRounds, history, pairables, allPairablesMap, pairingParams, placementParams, usedTables) {
 
-    override val scoresX: Map<ID, Double> by lazy {
-        require (mmBar > mmFloor) { "MMFloor is higher than MMBar" }
-        allPairablesMap.mapValues {
-            it.value.let { pairable ->
-                roundScore(pairable.mmBase + pairable.nbW)
+    override fun mainScoreMapFactory() =
+        allPairablesMap.mapValues { (id, pairable) ->
+            roundScore(pairable.mmBase +
+                    pairable.nbW +
+                    pairable.missedRounds() * pairing.main.mmsValueAbsent)
+        }
+
+    override fun scoreXMapFactory() =
+        allPairablesMap.mapValues { (id, pairable) ->
+            roundScore(pairable.mmBase + pairable.nbW)
+        }
+
+    override fun missedRoundSosMapFactory() =
+        allPairablesMap.mapValues { (id, pairable) ->
+            if (pairing.main.sosValueAbsentUseBase) {
+                pairable.mmBase
+            } else {
+                roundScore(pairable.mmBase + round/2)
             }
         }
-    }
 
     override fun computeWeightForBye(p: Pairable): Double{
-        return 2*scores[p.id]!!.second
+        return 2 * p.score
     }
 
     override fun SecondaryCritParams.apply(p1: Pairable, p2: Pairable): Double {
@@ -69,8 +81,7 @@ class MacMahonSolver(round: Int,
     // mmBase: starting Mac-Mahon score of the pairable
     val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
     // mms: current Mac-Mahon score of the pairable
-    val Pairable.mms: Double get() = scores[id]?.second ?: 0.0
-    val Pairable.scoreX: Double get() = scoresX[id] ?: 0.0
+    val Pairable.mms: Double get() = score
 
     // CB TODO - configurable criteria
     val mainScoreMin = mmFloor + PLA_SMMS_SCORE_MIN - Pairable.MIN_RANK

@@ -1,7 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.pairing.solver.BaseSolver
+import org.jeudego.pairgoth.pairing.solver.Solver
 import org.jeudego.pairgoth.test.PairingTests.Companion.compare_weights
 import org.junit.jupiter.api.Test
 import java.io.FileWriter
@@ -19,7 +19,7 @@ class MalavasiTest: TestBase() {
         )!!.asObject()
         val resp = TestAPI.post("/api/tour", tournament).asObject()
         val tourId = resp.getInt("id")
-        BaseSolver.weightsLogger = PrintWriter(FileWriter(getOutputFile("malavasi-weights.txt")))
+        Solver.weightsLogger = PrintWriter(FileWriter(getOutputFile("malavasi-weights.txt")))
         val games = TestAPI.post("/api/tour/$tourId/pair/2", Json.Array("all")).asArray()
         // Oceane is ID 548, Valentine 549
         val buggy = games.map { it as Json.Object }.filter { game ->
