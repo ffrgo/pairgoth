@@ -70,7 +70,7 @@
           #set($percent = ($weights.total - $explain.min) / ($explain.low - $explain.min) * 40)
         #else
           ## total is close to max
-          #set($percent = 60 + ($explain.max - $weights.total) / ($explain.max - $explain.high) * 40)
+          #set($percent = 60 + 40 * (1 - ($explain.max - $weights.total) / ($explain.max - $explain.high)) )
         #end
       #end
       #set($game = $explain.games[$key])
