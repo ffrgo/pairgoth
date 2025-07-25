@@ -377,6 +377,9 @@
         width: 6em;
       }
     }
+    &:empty + .pairing-post-actions {
+      display: none;
+    }
   }
   #print-pairables {
     width: 100%;

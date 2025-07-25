@@ -69,7 +69,7 @@
           </button>
         </div>
         <div>
-          <div id="paired" class="multi-select" title="white vs. black">
+          <div id="paired" class="multi-select" title="white vs. black">##
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
@@ -80,8 +80,8 @@
               <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
               <div class="handicap" data-value="$game.h">#if($game.h)h$game.h#{else}&nbsp;#end</div>
             </div>
-#end
-          </div>
+#end##
+#*      *#</div>
 #if(!$tour.type.startsWith('TEAM'))
           <div class="pairing-post-actions">
             <a href="result-sheets?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></a>
