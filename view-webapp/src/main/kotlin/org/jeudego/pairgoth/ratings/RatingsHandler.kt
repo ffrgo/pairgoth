@@ -21,8 +21,12 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     companion object {
         private val delay = TimeUnit.HOURS.toMillis(1L)
         private val ymd = DateTimeFormatter.ofPattern("yyyyMMdd")
+        private const val USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
     }
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .build()
     abstract val defaultURL: URL
     open val active = true
     lateinit var players: Json.Array
@@ -102,6 +106,16 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         try {
             val request = Request.Builder()
                 .url(url)
+                .header("User-Agent", USER_AGENT)
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
+                .header("Accept-Language", "en-US,en;q=0.9")
+                .header("Accept-Encoding", "gzip, deflate, br")
+                .header("Connection", "keep-alive")
+                .header("Upgrade-Insecure-Requests", "1")
+                .header("Sec-Fetch-Dest", "document")
+                .header("Sec-Fetch-Mode", "navigate")
+                .header("Sec-Fetch-Site", "none")
+                .header("Sec-Fetch-User", "?1")
                 .build()
 
             client.newCall(request).execute().use { response ->
