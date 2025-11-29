@@ -148,6 +148,8 @@ ${
             player.getArray("results")!!.map {
                 (it as String).padStart(8, ' ')
             }.joinToString(" ")
+        }${
+            player.getString("egf")?.let { if (it.length == 8) " |$it" else "" } ?: ""
         }"
     }
 }
