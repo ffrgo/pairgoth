@@ -100,11 +100,12 @@
 #end
 #if($tour.type != 'INDIVIDUAL')
   #set($teamId = $tmap[$part.id])
+  #set($teamName = false)
   #if($teamId)
     #set($teamName = $!pmap[$teamId].name)
   #end
-            <td title="$esc.html($teamName)">
-              $esc.html($utils.truncate($!teamName, 10))
+            <td title="#if($teamName)$esc.html($teamName)#end">
+              #if($teamName)$esc.html($utils.truncate($teamName, 10))#end
             </td>
 #end
             <td class="participating" data-sort="#if($part.skip)$part.skip.size()/part.skip#{else}0#end">
