@@ -142,6 +142,12 @@
           rather than pairing players of the same club.
         </label>
       </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" name="avoidSameFamily" value="true" #if($tour.pairing.geo.avoidSameFamily) checked #end/>
+          avoid pairing players from the same club with the same family name
+        </label>
+      </div>
     </div>
     <div class="title"><i class="dropdown icon"></i>Handicap parameters</div>
     <div class="content">

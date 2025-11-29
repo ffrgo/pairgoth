@@ -87,6 +87,7 @@ data class GeographicalParams(
     val preferMMSDiffRatherThanSameClubsGroup: Int = 2, // Typically = 2
     val preferMMSDiffRatherThanSameClub: Int = 3,       // Typically = 3
     val proportionMainClubThreshold: Double = 0.4, // If the biggest club has a proportion of players higher than this, the secondary criterium is not applied
+    val avoidSameFamily: Boolean = false, // When enabled, avoid pairing players from the same club with the same family name
 ) {
     companion object {
         val disabled = GeographicalParams(avoidSameGeo = 0.0)

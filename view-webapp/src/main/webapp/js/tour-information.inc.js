@@ -247,7 +247,8 @@ onLoad(() => {
         },
         geo: {
           mmsDiffCountry: form.val('mmsDiffCountry'),
-          mmsDiffClub: form.val('mmsDiffClub')
+          mmsDiffClub: form.val('mmsDiffClub'),
+          avoidSameFamily: form.val('avoidSameFamily')
         },
         handicap: {
           useMMS: form.val('useMMS'),

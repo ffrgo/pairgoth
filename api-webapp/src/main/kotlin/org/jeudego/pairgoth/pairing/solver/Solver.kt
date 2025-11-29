@@ -504,7 +504,14 @@ sealed class Solver(
         // else: effectiveCommonClub = true → clubRatio stays 0 (no bonus for same club)
         clubRatio = min(clubRatio, 1.0)
 
-        // TODO Same family
+        // Same family: when enabled and players are from the same club, check if they have the same surname
+        // If so, remove the bonus to avoid pairing family members (even if local club logic gave them a bonus)
+        if (avoidSameFamily && commonClub) {
+            val sameFamily = p1.name.uppercase() == p2.name.uppercase()
+            if (sameFamily) {
+                clubRatio = 0.0  // No bonus for same family within same club
+            }
+        }
 
         // compute geoRatio
         val mainPart = max(countryRatio, clubRatio)
