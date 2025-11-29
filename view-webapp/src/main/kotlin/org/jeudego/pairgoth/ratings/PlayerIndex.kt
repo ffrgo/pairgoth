@@ -39,8 +39,8 @@ class PlayerIndex {
         val stopChars = Regex("[_-]")
     }
     private final val directory: Directory = ByteBuffersDirectory(NoLockFactory.INSTANCE)
-    private val reader by lazy { DirectoryReader.open(directory) }
-    private val searcher by lazy { IndexSearcher(reader) }
+    private lateinit var reader: DirectoryReader
+    private lateinit var searcher: IndexSearcher
 
     // helper functions
     fun Json.Object.field(key: String) = getString(key) ?: throw Error("missing $key")
@@ -68,6 +68,9 @@ class PlayerIndex {
                 ++count
             }
         }
+        // Refresh reader and searcher to see the new index
+        reader = DirectoryReader.open(directory)
+        searcher = IndexSearcher(reader)
         logger.info("indexed $count players")
     }
 
