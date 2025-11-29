@@ -132,17 +132,16 @@ ${
             player.getString("num")!!.padStart(4, ' ')
         } ${
             "${
-                player.getString("name")?.toSnake(true)
-                
+                player.getString("name")?.toCapitals()
             } ${
-                player.getString("firstname")?.toSnake() ?: ""
+                player.getString("firstname")?.toCapitals() ?: ""
             }".padEnd(30, ' ').take(30)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
             player.getString("country")?.uppercase() ?: ""
         } ${
-            (player.getString("club") ?: "").toSnake().padStart(4).take(4)
+            (player.getString("club") ?: "").toCapitals().padStart(4).take(4)
         } ${
             criteria.joinToString(" ") { numFormat.format(player.getDouble(it.name)!!).let { if (it.contains('.')) it else "$it  " }.padStart(7, ' ') }
         }  ${
@@ -156,14 +155,12 @@ ${
         writer.println(ret)
     }
 
-    private fun String.toSnake(upper: Boolean = false): String {
+    private fun String.toCapitals(): String {
         val sanitized = sanitizeISO()
         val parts = sanitized.trim().split(Regex("(?:\\s|\\xA0)+"))
-        val snake = parts.joinToString("_") { part ->
-            if (upper) part.uppercase(Locale.ROOT)
-            else part.capitalize()
+        return parts.joinToString("_") { part ->
+            part.lowercase(Locale.ROOT).replaceFirstChar { it.titlecase(Locale.ROOT) }
         }
-        return snake
     }
 
     private fun String.sanitizeISO(): String {
@@ -202,14 +199,14 @@ ${
         "${
             player.getString("num")!!.padStart(4, ' ')
         } ${
-            "${player.getString("name")?.toSnake(true)} ${player.getString("firstname")?.toSnake() ?: ""}".padEnd(24, ' ').take(24)
+            "${player.getString("name")?.toCapitals()} ${player.getString("firstname")?.toCapitals() ?: ""}".padEnd(24, ' ').take(24)
         } ${
             displayRank(player.getInt("rank")!!).uppercase().padStart(3, ' ')
         } ${
             player.getString("ffg") ?: "       "
         } ${
             if (player.getString("country") == "FR")
-                (player.getString("club") ?: "").toSnake().padEnd(4).take(4)
+                (player.getString("club") ?: "").toCapitals().padEnd(4).take(4)
             else
                 (player.getString("country") ?: "").padEnd(4).take(4)
         } ${
