@@ -95,7 +95,7 @@ class CountriesTool {
             "fj" to "Fiji",
             "fr" to "France",
             "ga" to "Gabon",
-            "gb" to "United Kingdom",
+            "uk" to "United Kingdom",
             "gd" to "Grenada",
             "ge" to "Georgia",
             "gg" to "Guernsey",

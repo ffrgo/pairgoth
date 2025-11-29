@@ -36,9 +36,6 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                                 if (adjusted < 0) "${-(adjusted - 99) / 100}k"
                                 else "${(adjusted + 100) / 100}d"
                         }
-                        if ("UK" == player.getString("country")) {
-                            player["country"] = "GB"
-                        }
                         // fix for missing firstnames
                         if (player.getString("firstname") == null) {
                             player["firstname"] = ""
