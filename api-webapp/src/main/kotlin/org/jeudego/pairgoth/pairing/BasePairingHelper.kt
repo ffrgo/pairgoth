@@ -66,12 +66,30 @@ abstract class BasePairingHelper(
     }
 
     // number of players in the biggest club and the biggest country
-    // this can be used to disable geocost if there is a majority of players from the same country or club
+    // this can be used to adjust geocost if there is a majority of players from the same country or club
+    private val clubCounts by lazy {
+        pairables.groupingBy { it.club?.take(4)?.uppercase() }.eachCount()
+    }
     protected val biggestClubSize by lazy {
-        pairables.groupingBy { it.club }.eachCount().values.maxOrNull()!!
+        clubCounts.values.maxOrNull() ?: 0
     }
     protected val biggestCountrySize by lazy {
-        pairables.groupingBy { it.club }.eachCount().values.maxOrNull()!!
+        pairables.groupingBy { it.country }.eachCount().values.maxOrNull() ?: 0
+    }
+
+    // Local club detection: a club is "local" if it has more than the threshold proportion of players
+    protected val localClub: String? by lazy {
+        val threshold = pairing.geo.proportionMainClubThreshold
+        clubCounts.entries.find { (_, count) ->
+            count.toDouble() / pairables.size > threshold
+        }?.key
+    }
+    protected val hasLocalClub: Boolean get() = localClub != null
+
+    // Check if a player belongs to the local club
+    protected fun Pairable.isFromLocalClub(): Boolean {
+        val local = localClub ?: return false
+        return club?.take(4)?.uppercase() == local
     }
 
     // already paired players map

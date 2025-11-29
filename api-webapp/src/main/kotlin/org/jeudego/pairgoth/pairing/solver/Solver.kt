@@ -443,14 +443,14 @@ sealed class Solver(
 
         val geoMaxCost = pairing.geo.avoidSameGeo
 
-		val countryFactor: Int = if (legacyMode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
-			preferMMSDiffRatherThanSameCountry
-		else
-			0
-		val clubFactor: Int = if (legacyMode || biggestClubSize.toDouble() / pairables.size <= proportionMainClubThreshold)
-			preferMMSDiffRatherThanSameClub
-		else
-			0
+        // Country factor: in legacy mode or when no dominant country, use normal factor
+        val countryFactor: Int = if (legacyMode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
+            preferMMSDiffRatherThanSameCountry
+        else
+            0
+
+        // Club factor: always use the configured value
+        val clubFactor: Int = preferMMSDiffRatherThanSameClub
         //val groupFactor: Int = preferMMSDiffRatherThanSameClubsGroup
 
         // Same country
@@ -463,24 +463,38 @@ sealed class Solver(
         // Same club and club group (TODO club group)
         var clubRatio = 0.0
         // To match OpenGotha, only do a case insensitive comparison of the first four characters.
-        // But obviously, there is a margin of improvement here towards some way of normalizing clubs.
         val commonClub = p1.club?.take(4)?.uppercase() == p2.club?.take(4)?.uppercase()
         val commonGroup = false // TODO
 
-        if (commonGroup && !commonClub) {
+        // Local club adjustment: when local club exists (non-legacy mode), treat local club
+        // members pairing together as if they were from different clubs (give them the bonus).
+        // Strangers from the same visiting club still get no bonus (normal same-club behavior).
+        val effectiveCommonClub: Boolean = if (!legacyMode && hasLocalClub && commonClub) {
+            val p1Local = p1.isFromLocalClub()
+            val p2Local = p2.isFromLocalClub()
+            // Both from local club: treat as different clubs (effectiveCommonClub = false)
+            // Both strangers from same club: normal same-club (effectiveCommonClub = true)
+            // Mixed (one local, one stranger): treat as different (effectiveCommonClub = false)
+            !p1Local && !p2Local
+        } else {
+            commonClub
+        }
+
+        if (commonGroup && !effectiveCommonClub) {
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
                 clubFactor.toDouble() / 2.0 / placementScoreRange.toDouble()
             }
 
-        } else if (!commonGroup && !commonClub) {
+        } else if (!commonGroup && !effectiveCommonClub) {
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
                 clubFactor.toDouble() * 1.2 / placementScoreRange.toDouble()
             }
         }
+        // else: effectiveCommonClub = true → clubRatio stays 0 (no bonus for same club)
         clubRatio = min(clubRatio, 1.0)
 
         // TODO Same family
