@@ -56,7 +56,7 @@ object RatingsManager: Runnable {
     object Task: TimerTask() {
         override fun run() {
             try {
-                players = ratingsHandlers.values.filter { it.active }.flatMapTo(Json.MutableArray()) { ratings ->
+                val newPlayers = ratingsHandlers.values.filter { it.active }.flatMapTo(Json.MutableArray()) { ratings ->
                     val ratingsFile = WebappManager.properties.getProperty("ratings.${ratings.origin.name.lowercase()}") as String?
                     if (ratingsFile == null) {
                         ratings.fetchPlayers()
@@ -64,36 +64,33 @@ object RatingsManager: Runnable {
                         ratings.fetchPlayers(Paths.get("").resolve(ratingsFile).toFile())
                     }
                 }
-                val updated = ratingsHandlers.values.filter { it.active }.map { it.updated() }.reduce { u1, u2 ->
-                    u1 or u2
-                }
-                if (updated) {
-                    try {
-                        updateLock.writeLock().lock()
-                        index.build(players)
-                    } finally {
-                        updateLock.writeLock().unlock()
-                    }
-                }
+                // Always update players and index together under the write lock
+                // Index must be rebuilt every time since it stores array indices
+                try {
+                    updateLock.writeLock().lock()
+                    players = newPlayers
+                    index.build(players)
 
-                // propagate French players license status from ffg to egf
-                val licenseStatus = players.map { it -> it as Json.MutableObject }.filter {
-                    it["origin"] == "FFG"
-                }.associate { player ->
-                    Pair(player.getString("ffg")!!, player.getString("license") ?: "-")
-                }
-                players.map { it -> it as Json.MutableObject }.filter {
-                    it["origin"] == "EGF" && it["country"] == "FR"
-                }.forEach { player ->
-                    player.getString("egf")?.let { egf ->
-                        egf2ffg[egf]?.let { ffg ->
-                            licenseStatus[ffg]?.let {
-                                player["license"] = it
+                    // propagate French players license status from ffg to egf
+                    val licenseStatus = players.map { it -> it as Json.MutableObject }.filter {
+                        it["origin"] == "FFG"
+                    }.associate { player ->
+                        Pair(player.getString("ffg")!!, player.getString("license") ?: "-")
+                    }
+                    players.map { it -> it as Json.MutableObject }.filter {
+                        it["origin"] == "EGF" && it["country"] == "FR"
+                    }.forEach { player ->
+                        player.getString("egf")?.let { egf ->
+                            egf2ffg[egf]?.let { ffg ->
+                                licenseStatus[ffg]?.let {
+                                    player["license"] = it
+                                }
                             }
                         }
                     }
+                } finally {
+                    updateLock.writeLock().unlock()
                 }
-
             } catch (e: Exception) {
                 logger.error("could not build or refresh index: ${e.javaClass.name} ${e.message}")
                 logger.debug("could not build or refresh index", e)
