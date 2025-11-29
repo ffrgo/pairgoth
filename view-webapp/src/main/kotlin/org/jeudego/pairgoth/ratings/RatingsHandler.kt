@@ -107,11 +107,15 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
             val request = Request.Builder()
                 .url(url)
                 .header("User-Agent", USER_AGENT)
-                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8")
                 .header("Accept-Language", "en-US,en;q=0.9")
-                // Let OkHttp handle compression (it supports gzip/deflate but not brotli)
+                .header("Accept-Encoding", "gzip, deflate, br")
                 .header("Connection", "keep-alive")
                 .header("Upgrade-Insecure-Requests", "1")
+                .header("Sec-Fetch-Dest", "document")
+                .header("Sec-Fetch-Mode", "navigate")
+                .header("Sec-Fetch-Site", "none")
+                .header("Sec-Fetch-User", "?1")
                 .build()
 
             client.newCall(request).execute().use { response ->
