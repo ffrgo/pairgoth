@@ -466,16 +466,21 @@ sealed class Solver(
         val commonClub = p1.club?.take(4)?.uppercase() == p2.club?.take(4)?.uppercase()
         val commonGroup = false // TODO
 
-        // Local club adjustment: when local club exists (non-legacy mode), treat local club
-        // members pairing together as if they were from different clubs (give them the bonus).
-        // Strangers from the same visiting club still get no bonus (normal same-club behavior).
+        // Local club adjustment (non-legacy mode only):
+        // When a local club exists, we want to encourage local-vs-stranger pairings.
+        // - Ist vs Ist: full bonus (treat as different clubs)
+        // - Ist vs non-Ist: full bonus (different clubs, and mixing locals with visitors)
+        // - non-Ist vs non-Ist (different clubs): half bonus (prefer local-stranger mixing)
+        // - non-Ist vs non-Ist (same club): no bonus (normal same-club behavior)
+        val p1Local = p1.isFromLocalClub()
+        val p2Local = p2.isFromLocalClub()
+        val bothStrangers = !legacyMode && hasLocalClub && !p1Local && !p2Local
+
         val effectiveCommonClub: Boolean = if (!legacyMode && hasLocalClub && commonClub) {
-            val p1Local = p1.isFromLocalClub()
-            val p2Local = p2.isFromLocalClub()
             // Both from local club: treat as different clubs (effectiveCommonClub = false)
             // Both strangers from same club: normal same-club (effectiveCommonClub = true)
             // Mixed (one local, one stranger): treat as different (effectiveCommonClub = false)
-            !p1Local && !p2Local
+            bothStrangers
         } else {
             commonClub
         }
@@ -484,14 +489,16 @@ sealed class Solver(
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
-                clubFactor.toDouble() / 2.0 / placementScoreRange.toDouble()
+                val factor = if (bothStrangers) 0.5 else 1.0  // Half bonus for stranger-vs-stranger
+                factor * clubFactor.toDouble() / 2.0 / placementScoreRange.toDouble()
             }
 
         } else if (!commonGroup && !effectiveCommonClub) {
             clubRatio = if (clubFactor == 0) {
                 0.0
             } else {
-                clubFactor.toDouble() * 1.2 / placementScoreRange.toDouble()
+                val factor = if (bothStrangers) 0.5 else 1.0  // Half bonus for stranger-vs-stranger
+                factor * clubFactor.toDouble() * 1.2 / placementScoreRange.toDouble()
             }
         }
         // else: effectiveCommonClub = true → clubRatio stays 0 (no bonus for same club)
