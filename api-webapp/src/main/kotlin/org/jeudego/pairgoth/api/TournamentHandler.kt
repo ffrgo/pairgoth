@@ -5,6 +5,7 @@ import com.republicate.kson.toJsonObject
 import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.PAYLOAD_KEY
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
+import org.jeudego.pairgoth.ext.MacMahon39
 import org.jeudego.pairgoth.ext.OpenGotha
 import org.jeudego.pairgoth.model.BaseCritParams
 import org.jeudego.pairgoth.model.TeamTournament
@@ -55,7 +56,7 @@ object TournamentHandler: PairgothApiHandler {
     override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
             is Json.Object -> Tournament.fromJson(getObjectPayload(request))
-            is Element -> OpenGotha.import(payload)
+            is Element -> if (MacMahon39.isFormat(payload)) MacMahon39.import(payload) else OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
         tournament.recomputeDUDD()
