@@ -654,9 +654,8 @@ onLoad(() => {
       }
 
       spinner(false);
-      showSuccess(`Synced ${imported} players from website`);
       if (imported > 0) {
-        setTimeout(() => window.location.reload(), 1500);
+        window.location.reload();
       }
     } catch (err) {
       spinner(false);
