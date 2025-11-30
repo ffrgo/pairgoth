@@ -96,6 +96,66 @@ onLoad(() => {
   $('.publish-html').on('click', e => {
     publishHtml();
   });
+  $('.publish-website').on('click', async e => {
+    let connectorUrl = prefs.get('connectorUrl');
+    let connectorSecret = prefs.get('connectorSecret');
+
+    if (!connectorUrl) {
+      showError('Website connector not configured. Go to Settings to configure it.');
+      return;
+    }
+
+    let form = $('#tournament-infos')[0];
+    let code = form.val('shortName');
+    if (!code) {
+      showError('Tournament short name is required for publishing');
+      return;
+    }
+
+    // Get standings HTML
+    let standingsHtml = $('#standings-table')[0]?.outerHTML;
+    if (!standingsHtml) {
+      showError('No standings to publish');
+      return;
+    }
+
+    spinner(true);
+    close_modal();
+
+    try {
+      let response = await fetch(`${connectorUrl}/standings/${code}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/html',
+          'X-Pairgoth-Secret': connectorSecret
+        },
+        body: standingsHtml
+      });
+
+      spinner(false);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          showError('Invalid connector secret');
+        } else if (response.status === 404) {
+          showError(`Event '${code}' not found on website`);
+        } else {
+          showError('Publish failed: ' + response.status);
+        }
+        return;
+      }
+
+      let data = await response.json();
+      if (data.status) {
+        showSuccess('Standings published to website');
+      } else {
+        showError(data.message || 'Publish failed');
+      }
+    } catch (err) {
+      spinner(false);
+      showError('Publish error: ' + err.message);
+    }
+  });
   $('#freeze').on('click', e => {
     if (confirm("Once frozen, names, levels and even pairings can be changed, but the scores and the standings will stay the same. Freeze the standings?")) {
       freeze()

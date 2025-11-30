@@ -567,4 +567,100 @@ onLoad(() => {
   $('#rank').on('input', e => {
     manualRank = true;
   });
+
+  // Website connector - sync players
+  $('#sync-website').on('click', async e => {
+    let connectorUrl = prefs.get('connectorUrl');
+    let connectorSecret = prefs.get('connectorSecret');
+
+    if (!connectorUrl) {
+      showError('Website connector not configured. Go to Settings to configure it.');
+      return;
+    }
+
+    // Use tournament short name as event code
+    let form = $('#tournament-infos')[0];
+    let code = form.val('shortName');
+    if (!code) {
+      showError('Tournament short name is required for sync');
+      return;
+    }
+
+    spinner(true);
+    try {
+      let response = await fetch(`${connectorUrl}/players/${code}`, {
+        method: 'GET',
+        headers: {
+          'X-Pairgoth-Secret': connectorSecret
+        }
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          showError('Invalid connector secret');
+        } else if (response.status === 404) {
+          showError(`Event '${code}' not found on website`);
+        } else {
+          showError('Sync failed: ' + response.status);
+        }
+        spinner(false);
+        return;
+      }
+
+      let data = await response.json();
+      if (!data.status || !data.players) {
+        showError(data.message || 'Invalid response from website');
+        spinner(false);
+        return;
+      }
+
+      // Import players
+      let imported = 0;
+      let updated = 0;
+      let errors = 0;
+
+      for (let player of data.players) {
+        // Map website player format to pairgoth format
+        let pairgothPlayer = {
+          name: player.lastname,
+          firstname: player.firstname,
+          country: player.country?.toLowerCase() || '',
+          club: player.club || '',
+          rank: player.level ? player.level - 30 : 0, // Convert 1-30=kyu, 31-39=dan to pairgoth format
+          rating: player.rating || 2050 + (player.level ? (player.level - 30) * 100 : 0),
+          egf: player.pin || null,
+          final: true,
+          skip: [] // Parse rounds string if needed
+        };
+
+        // Parse rounds participation (e.g., "1111100000" means participating in rounds 1-5)
+        if (player.rounds) {
+          pairgothPlayer.skip = [];
+          for (let i = 0; i < player.rounds.length; i++) {
+            if (player.rounds[i] === '0') {
+              pairgothPlayer.skip.push(i + 1);
+            }
+          }
+        }
+
+        try {
+          // Check if player already exists (by EGF PIN)
+          // For now, just add new players - TODO: implement update logic
+          await api.postJson(`tour/${tour_id}/part`, pairgothPlayer);
+          imported++;
+        } catch (err) {
+          errors++;
+        }
+      }
+
+      spinner(false);
+      showSuccess(`Synced ${imported} players from website`);
+      if (imported > 0) {
+        setTimeout(() => window.location.reload(), 1500);
+      }
+    } catch (err) {
+      spinner(false);
+      showError('Sync error: ' + err.message);
+    }
+  });
 });

@@ -262,4 +262,64 @@ onLoad(()=>{
   if ($('#paired .listitem').length === 0) {
     $('body').addClass('nogame');
   }
+
+  // Publish pairings to website
+  $('#publish-pairings').on('click', async e => {
+    let connectorUrl = prefs.get('connectorUrl');
+    let connectorSecret = prefs.get('connectorSecret');
+
+    if (!connectorUrl) {
+      showError('Website connector not configured. Go to Settings to configure it.');
+      return;
+    }
+
+    let form = $('#tournament-infos')[0];
+    let code = form.val('shortName');
+    if (!code) {
+      showError('Tournament short name is required for publishing');
+      return;
+    }
+
+    // Get the pairings HTML from the print table
+    let pairingsHtml = $('#print-pairings')[0]?.outerHTML;
+    if (!pairingsHtml) {
+      // Fallback: build from paired list
+      pairingsHtml = $('#paired')[0]?.outerHTML || '<div>No pairings</div>';
+    }
+
+    spinner(true);
+    try {
+      let response = await fetch(`${connectorUrl}/pairings/${code}/${activeRound}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/html',
+          'X-Pairgoth-Secret': connectorSecret
+        },
+        body: pairingsHtml
+      });
+
+      spinner(false);
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          showError('Invalid connector secret');
+        } else if (response.status === 404) {
+          showError(`Event '${code}' not found on website`);
+        } else {
+          showError('Publish failed: ' + response.status);
+        }
+        return;
+      }
+
+      let data = await response.json();
+      if (data.status) {
+        showSuccess(`Pairings for round ${activeRound} published to website`);
+      } else {
+        showError(data.message || 'Publish failed');
+      }
+    } catch (err) {
+      spinner(false);
+      showError('Publish error: ' + err.message);
+    }
+  });
 });

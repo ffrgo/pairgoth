@@ -13,8 +13,8 @@ const prefs = {
   getAll: function() {
     return {
       blackFirst: this.get('blackFirst') || false,
-      egcUrl: this.get('egcUrl') || '',
-      egcSecret: this.get('egcSecret') || ''
+      connectorUrl: this.get('connectorUrl') || '',
+      connectorSecret: this.get('connectorSecret') || ''
     };
   }
 };
@@ -368,10 +368,10 @@ onLoad(() => {
 
   // Settings modal handlers
   $('#settings').on('click', e => {
-    // Load current EGC connector values
-    $('#pref-egc-url')[0].value = prefs.get('egcUrl') || '';
-    $('#pref-egc-secret')[0].value = prefs.get('egcSecret') || '';
-    $('#egc-status-indicator')[0].textContent = '';
+    // Load current connector values
+    $('#pref-connector-url')[0].value = prefs.get('connectorUrl') || '';
+    $('#pref-connector-secret')[0].value = prefs.get('connectorSecret') || '';
+    $('#connector-status-indicator')[0].textContent = '';
     modal('settings-modal');
   });
 
@@ -380,20 +380,20 @@ onLoad(() => {
     prefs.set('blackFirst', blackFirst);
     // Set cookie for server-side rendering (expires in 1 year)
     document.cookie = `blackFirst=${blackFirst}; path=/; max-age=31536000; SameSite=Lax`;
-    // Save EGC connector settings
-    prefs.set('egcUrl', $('#pref-egc-url')[0].value.trim());
-    prefs.set('egcSecret', $('#pref-egc-secret')[0].value);
+    // Save connector settings
+    prefs.set('connectorUrl', $('#pref-connector-url')[0].value.trim());
+    prefs.set('connectorSecret', $('#pref-connector-secret')[0].value);
     close_modal();
     // Reload page to apply new preference
     window.location.reload();
   });
 
-  // EGC connector test
-  $('#egc-test').on('click', async e => {
+  // Website connector test
+  $('#connector-test').on('click', async e => {
     e.preventDefault();
-    let url = $('#pref-egc-url')[0].value.trim();
-    let secret = $('#pref-egc-secret')[0].value;
-    let indicator = $('#egc-status-indicator')[0];
+    let url = $('#pref-connector-url')[0].value.trim();
+    let secret = $('#pref-connector-secret')[0].value;
+    let indicator = $('#connector-status-indicator')[0];
 
     if (!url) {
       indicator.textContent = 'Please enter an API URL';
@@ -414,7 +414,7 @@ onLoad(() => {
       if (response.ok) {
         let data = await response.json();
         if (data.status) {
-          indicator.textContent = 'Connected to ' + (data.name || 'EGC');
+          indicator.textContent = 'Connected to ' + (data.name || 'website');
           indicator.className = 'success';
         } else {
           indicator.textContent = data.message || 'Connection failed';

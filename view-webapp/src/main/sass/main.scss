@@ -543,12 +543,12 @@
         border-radius: 4px;
         font-size: 0.9em;
       }
-      &.egc-status {
+      &.connector-status {
         display: flex;
         align-items: center;
         gap: 1em;
         margin-top: 0.8em;
-        #egc-status-indicator {
+        #connector-status-indicator {
           font-size: 0.85em;
           &.success { color: green; }
           &.error { color: #c00; }
