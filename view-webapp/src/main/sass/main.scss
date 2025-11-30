@@ -536,6 +536,38 @@
         gap: 0.5em;
         cursor: pointer;
       }
+      input[type="text"], input[type="password"] {
+        flex: 1;
+        padding: 0.4em 0.6em;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+      &.egc-status {
+        display: flex;
+        align-items: center;
+        gap: 1em;
+        margin-top: 0.8em;
+        #egc-status-indicator {
+          font-size: 0.85em;
+          &.success { color: green; }
+          &.error { color: #c00; }
+          &.pending { color: #666; }
+        }
+      }
+    }
+    .setting-section {
+      margin-top: 1.5em;
+      padding-top: 1em;
+      border-top: 1px solid #ddd;
+      .setting-title {
+        font-weight: 600;
+        margin-bottom: 0.8em;
+        color: #444;
+      }
+      .setting label {
+        min-width: 70px;
+      }
     }
   }
 

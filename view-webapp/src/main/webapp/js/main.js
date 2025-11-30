@@ -12,7 +12,9 @@ const prefs = {
   },
   getAll: function() {
     return {
-      blackFirst: this.get('blackFirst') || false
+      blackFirst: this.get('blackFirst') || false,
+      egcUrl: this.get('egcUrl') || '',
+      egcSecret: this.get('egcSecret') || ''
     };
   }
 };
@@ -366,6 +368,10 @@ onLoad(() => {
 
   // Settings modal handlers
   $('#settings').on('click', e => {
+    // Load current EGC connector values
+    $('#pref-egc-url')[0].value = prefs.get('egcUrl') || '';
+    $('#pref-egc-secret')[0].value = prefs.get('egcSecret') || '';
+    $('#egc-status-indicator')[0].textContent = '';
     modal('settings-modal');
   });
 
@@ -374,9 +380,57 @@ onLoad(() => {
     prefs.set('blackFirst', blackFirst);
     // Set cookie for server-side rendering (expires in 1 year)
     document.cookie = `blackFirst=${blackFirst}; path=/; max-age=31536000; SameSite=Lax`;
+    // Save EGC connector settings
+    prefs.set('egcUrl', $('#pref-egc-url')[0].value.trim());
+    prefs.set('egcSecret', $('#pref-egc-secret')[0].value);
     close_modal();
     // Reload page to apply new preference
     window.location.reload();
+  });
+
+  // EGC connector test
+  $('#egc-test').on('click', async e => {
+    e.preventDefault();
+    let url = $('#pref-egc-url')[0].value.trim();
+    let secret = $('#pref-egc-secret')[0].value;
+    let indicator = $('#egc-status-indicator')[0];
+
+    if (!url) {
+      indicator.textContent = 'Please enter an API URL';
+      indicator.className = 'error';
+      return;
+    }
+
+    indicator.textContent = 'Testing...';
+    indicator.className = 'pending';
+
+    try {
+      let response = await fetch(url + '/health', {
+        method: 'GET',
+        headers: {
+          'X-Pairgoth-Secret': secret
+        }
+      });
+      if (response.ok) {
+        let data = await response.json();
+        if (data.status) {
+          indicator.textContent = 'Connected to ' + (data.name || 'EGC');
+          indicator.className = 'success';
+        } else {
+          indicator.textContent = data.message || 'Connection failed';
+          indicator.className = 'error';
+        }
+      } else if (response.status === 401) {
+        indicator.textContent = 'Invalid secret';
+        indicator.className = 'error';
+      } else {
+        indicator.textContent = 'Connection failed: ' + response.status;
+        indicator.className = 'error';
+      }
+    } catch (err) {
+      indicator.textContent = 'Connection error: ' + err.message;
+      indicator.className = 'error';
+    }
   });
 
   if (isTouchDevice()) {

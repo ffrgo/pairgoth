@@ -97,6 +97,21 @@
             Display games as "Black vs White" (instead of "White vs Black")
           </label>
         </div>
+        <div class="setting-section">
+          <div class="setting-title">EGC Connector</div>
+          <div class="setting">
+            <label for="pref-egc-url">API URL</label>
+            <input type="text" id="pref-egc-url" placeholder="https://egc2026.eu/api/pairgoth" />
+          </div>
+          <div class="setting">
+            <label for="pref-egc-secret">Secret</label>
+            <input type="password" id="pref-egc-secret" placeholder="shared secret" />
+          </div>
+          <div class="setting egc-status">
+            <span id="egc-status-indicator"></span>
+            <button class="ui button small" id="egc-test">Test Connection</button>
+          </div>
+        </div>
       </div>
       <div class="popup-footer">
         <button class="ui button" id="settings-save">Save</button>
