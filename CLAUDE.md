@@ -158,3 +158,22 @@ Translations in `view-webapp/.../WEB-INF/translations/`
 - French (fr)
 - German (de)
 - Korean (ko)
+
+## Current Work
+
+### User Preferences (feature/user-preferences branch)
+Implemented "black vs white" display order option:
+- Gear icon in header opens settings modal
+- Preference stored in cookie (`blackFirst`) for server-side Velocity rendering
+- localStorage backup via store2 (`prefs.blackFirst`)
+- Velocity conditionals in tour-pairing.inc.html, tour-results.inc.html, result-sheets.html
+- ViewServlet reads cookie and sets `$blackFirst` in Velocity context
+
+Files modified:
+- `view-webapp/.../layouts/standard.html` - gear icon + settings modal
+- `view-webapp/.../sass/main.scss` - settings modal styles
+- `view-webapp/.../js/main.js` - prefs object + modal handlers + cookie set
+- `view-webapp/.../kotlin/.../ViewServlet.kt` - read blackFirst cookie
+- `view-webapp/.../tour-pairing.inc.html` - `#if($blackFirst)` conditionals
+- `view-webapp/.../tour-results.inc.html` - `#if($blackFirst)` conditionals + inverted result display
+- `view-webapp/.../result-sheets.html` - `#if($blackFirst)` conditionals

@@ -1,6 +1,21 @@
 // Utilities
 
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+// User preferences
+const prefs = {
+  get: function(key) {
+    return store('prefs.' + key);
+  },
+  set: function(key, value) {
+    store('prefs.' + key, value);
+  },
+  getAll: function() {
+    return {
+      blackFirst: this.get('blackFirst') || false
+    };
+  }
+};
 function randomString(length) {
   let result = '';
   const charactersLength = characters.length;
@@ -347,6 +362,21 @@ onLoad(() => {
   $('#dimmer').on('click', e => {
     let dialog = e.target.closest('.popup');
     if (!dialog) close_modal();
+  });
+
+  // Settings modal handlers
+  $('#settings').on('click', e => {
+    modal('settings-modal');
+  });
+
+  $('#settings-save').on('click', e => {
+    let blackFirst = $('#pref-black-first')[0].checked;
+    prefs.set('blackFirst', blackFirst);
+    // Set cookie for server-side rendering (expires in 1 year)
+    document.cookie = `blackFirst=${blackFirst}; path=/; max-age=31536000; SameSite=Lax`;
+    close_modal();
+    // Reload page to apply new preference
+    window.location.reload();
   });
 
   if (isTouchDevice()) {

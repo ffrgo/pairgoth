@@ -59,17 +59,27 @@
         Surround winner's name or ½-½
       </div>
       <div class="players">
+#if($blackFirst)
+        <div class="black player">
+          <div class="color">Black</div>
+          <div class="name">$black.name $!black.firstname #rank($black.rank)<br/>#if($black.country)($black.country.toUpperCase()#if($black.club), $black.club#end)#end</div>
+        </div>
+        <div class="equal">½-½</div>
         <div class="white player">
           <div class="color">White</div>
           <div class="name">$white.name $!white.firstname #rank($white.rank)<br/>#if($white.country)($white.country.toUpperCase()#if($white.club), $white.club#end)#end</div>
-##          <div class="pin">$white.egf</div>
+        </div>
+#else
+        <div class="white player">
+          <div class="color">White</div>
+          <div class="name">$white.name $!white.firstname #rank($white.rank)<br/>#if($white.country)($white.country.toUpperCase()#if($white.club), $white.club#end)#end</div>
         </div>
         <div class="equal">½-½</div>
         <div class="black player">
           <div class="color">Black</div>
           <div class="name">$black.name $!black.firstname #rank($black.rank)<br/>#if($black.country)($black.country.toUpperCase()#if($black.club), $black.club#end)#end</div>
-##          <div class="pin">$black.egf</div>
         </div>
+#end
       </div>
       <div class="signatures">
         <div class="signature">Signature:</div>

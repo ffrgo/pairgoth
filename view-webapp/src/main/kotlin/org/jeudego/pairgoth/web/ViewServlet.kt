@@ -43,6 +43,11 @@ class ViewServlet : VelocityViewServlet() {
             }
         }
         val lang = request.getAttribute("lang") as String
+
+        // User preferences - read from cookie
+        val blackFirst = request.cookies?.find { it.name == "blackFirst" }?.value == "true"
+        context.put("blackFirst", blackFirst)
+
         /*
         val menu = menuEntries!![uri]
         var title: String? = null

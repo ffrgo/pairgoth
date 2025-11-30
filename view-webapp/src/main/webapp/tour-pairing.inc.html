@@ -69,15 +69,21 @@
           </button>
         </div>
         <div>
-          <div id="paired" class="multi-select" title="white vs. black">##
+          <div id="paired" class="multi-select" title="#if($blackFirst)black vs. white#{else}white vs. black#end">##
 #foreach($game in $games)
   #set($white = $pmap[$game.w])
   #set($black = $pmap[$game.b])
             <div class="listitem game" data-id="$game.id">
               <div class="table" data-value="$game.t">${game.t}.</div>
+#if($blackFirst)
+              <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
+              <div class="levels">#if($black)#rank($black.rank)#end&nbsp;/&nbsp;#if($white)#rank($white.rank)#end</div>
+              <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
+#else
               <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
               <div class="levels">#if($white)#rank($white.rank)#end&nbsp;/&nbsp;#if($black)#rank($black.rank)#end</div>
               <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
+#end
               <div class="handicap" data-value="$game.h">#if($game.h)h$game.h#{else}&nbsp;#end</div>
             </div>
 #end##
@@ -98,8 +104,13 @@
       <thead>
       <tr>
         <th>Tbl</th>
+#if($blackFirst)
+        <th>Black</th>
+        <th>White</th>
+#else
         <th>White</th>
         <th>Black</th>
+#end
         <th>Hd</th>
       </tr>
       </thead>
@@ -109,8 +120,13 @@
     #set($black = $pmap[$game.b])
       <tr>
         <td class="t" data-table="${game.t}">${game.t}</td>
+#if($blackFirst)
+        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
+        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
+#else
         <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
         <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
+#end
         <td>${game.h}</td>
       </tr>
   #end

@@ -523,8 +523,20 @@
     }
   }
 
-  #logout {
+  #logout, #settings {
     cursor: pointer;
+  }
+
+  #settings-modal {
+    .setting {
+      margin: 0.5em 0;
+      label {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        cursor: pointer;
+      }
+    }
   }
 
   @media screen {

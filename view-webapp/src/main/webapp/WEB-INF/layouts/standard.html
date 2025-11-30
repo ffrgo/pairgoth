@@ -44,6 +44,9 @@
   #translate('tour-menu.inc.html')
 #end
     <div id="header-right">
+      <div id="settings" title="Settings">
+        <i class="fa fa-cog"></i>
+      </div>
       <div id="lang">
         <i class="$translate.flags[$request.lang] flag"></i>
       </div>
@@ -83,6 +86,23 @@
     <a class="lang" data-lang="$lang.key" href="#"><i class="$lang.value flag"></i>&nbsp;$lang.key</a>
   #end
 #end
+  </div>
+  <div id="settings-modal" class="popup">
+    <div class="popup-body">
+      <div class="popup-header">Settings</div>
+      <div class="popup-content">
+        <div class="setting">
+          <label>
+            <input type="checkbox" id="pref-black-first" #if($blackFirst)checked#end />
+            Display games as "Black vs White" (instead of "White vs Black")
+          </label>
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button class="ui button" id="settings-save">Save</button>
+        <button class="ui button gray close">Cancel</button>
+      </div>
+    </div>
   </div>
   <script type="text/javascript" src="/lib/store2-2.14.2.min.js"></script>
   <script type="text/javascript" src="/lib/tablesort-5.4.0/tablesort.min.js"></script>
