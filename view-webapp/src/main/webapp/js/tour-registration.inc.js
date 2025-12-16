@@ -127,6 +127,7 @@ function fillPlayer(player) {
   $('#needle')[0].value = '';
   initSearch();
   $('#register').removeClass('disabled').focus();
+  document.getElementById('connect-rating').checked = true;
 }
 
 function addPlayers() {
@@ -448,18 +449,6 @@ onLoad(() => {
       else tr.removeClass('hidden');
     });
   });
-  manualRating = ($('#rating')[0].value !== '');
-  manualRank = ($('#rank')[0].value !== '');
-  $('#player input[name="rating"]').on('input', e=>{
-    manualRating = true;
-  });
-  $('#player select[name="rank"]').on('input', e=>{
-    let rank = e.target.value;
-    let ratingCtl = $('#player input[name="rating"]')[0];
-    if (!$('#rating')[0].value || !manualRating) {
-      ratingCtl.value = 2050 + 100 * rank;
-    }
-  });
   $('#filter-box i').on('click', e => {
     $('#filter')[0].value = '';
     $('tbody > tr').removeClass('hidden');
@@ -556,15 +545,36 @@ onLoad(() => {
     e.preventDefault();
     return false;
   });
+
+  manualRating = ($('#rating')[0].value !== '');
+  manualRank = ($('#rank')[0].value !== '');
+  $('#player input[name="rating"]').on('input', e => {
+    manualRating = true;
+  });
+  $('#rank').on('input', e => {
+    manualRank = true;
+  });
+  $('#player select[name="rank"]').on('input', e => {
+    const checkbox = document.getElementById('connect-rating');
+    console.log(checkbox)
+    if (!checkbox.checked) {
+      return;
+    }
+    let rank = e.target.value;
+    let ratingCtl = $('#player input[name="rating"]')[0];
+    if (!$('#rating')[0].value || !manualRating) {
+      ratingCtl.value = 2050 + 100 * rank;
+    }
+  });
   $('#rating').on('input', e => {
+    if (!document.getElementById('connect-rating').checked) {
+      return true;
+    }
     if (!$('#rank')[0].value || !manualRank) {
       let rank = (e.target.value - 2050) / 100;
       console.log(rank);
       $('#rank')[0].value = `${rank}`;
     }
     return true;
-  });
-  $('#rank').on('input', e => {
-    manualRank = true;
   });
 });

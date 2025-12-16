@@ -255,17 +255,23 @@
           </div>
           <div class="two stackable fields">
             <div class="eight wide field">
-              <label>Rating</label>
+              <label>Rating<span class="note">Used for handicap</span></label>
               <span class="info"></span>
               <input id="rating" name="rating" type="text" class="numeric"/>
             </div>
             <div class="eight wide field">
-              <label>Rank<span class="note">initialized from rating</span></label>
+              <label>Rank</label>
               <span class="info"></span>
               <select id="rank" name="rank">
                 <option></option>
 #levels()
               </select>
+            </div>
+          </div>
+          <div class="inline fields">
+            <label>Connect Rating and Rank</label>
+            <div>
+              <input id="connect-rating" name="connect-rating" type="checkbox" checked value="true"/>
             </div>
           </div>
           <div class="inline fields">
