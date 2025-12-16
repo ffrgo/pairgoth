@@ -9,3 +9,4 @@ target
 *.iml
 *~
 pairgoth.db
+ratings/

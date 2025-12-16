@@ -538,8 +538,8 @@ sealed class Solver(
 
     // Handicap functions
     fun HandicapParams.handicap(white: Pairable, black: Pairable): Int {
-        var pseudoRankWhite: Int = pseudoRank(white)
-        var pseudoRankBlack: Int = pseudoRank(black)
+        var pseudoRankWhite: Int = ((white.rating - 2050) / 100) - 1;
+        var pseudoRankBlack: Int = ((black.rating - 2050) / 100) - 1;
 
         pseudoRankWhite = min(pseudoRankWhite, rankThreshold)
         pseudoRankBlack = min(pseudoRankBlack, rankThreshold)
