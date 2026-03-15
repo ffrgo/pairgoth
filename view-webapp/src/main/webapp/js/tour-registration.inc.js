@@ -5,6 +5,15 @@ let searchResult;
 let searchHighlight;
 let manualRating = false;
 let manualRank = false;
+let chained = false;
+
+function updateChainState() {
+  let rating = parseInt($('#rating')[0].value);
+  let rank = parseInt($('#rank')[0].value);
+  chained = !isNaN(rating) && !isNaN(rank) && Math.floor((rating - 2050) / 100) === rank;
+  if (chained) $('#chain-rating').addClass('chained');
+  else $('#chain-rating').removeClass('chained');
+}
 
 function searchResultShown() {
   return !(!searchResult || searchResult.length === 0 || $('#search-result').hasClass('hidden'));
@@ -124,6 +133,7 @@ function fillPlayer(player) {
   form.val('final', false);
   form.val('ffg_id', player.ffg);
   form.val('egf_id', player.egf);
+  updateChainState();
   $('#needle')[0].value = '';
   initSearch();
   $('#register').removeClass('disabled').focus();
@@ -137,6 +147,7 @@ function addPlayers() {
   form.val('final', status);
   $('#player').removeClass('edit').addClass('create');
   $('#register').removeClass('disabled');
+  updateChainState();
   modal('player');
   setTimeout(() => {
     $('#needle').focus();
@@ -323,6 +334,7 @@ onLoad(() => {
           }
           $('#player').removeClass('create').addClass('edit');
           $('#register').addClass('disabled');
+          updateChainState();
           modal('player');
         }
       });
@@ -450,13 +462,18 @@ onLoad(() => {
   });
   manualRating = ($('#rating')[0].value !== '');
   manualRank = ($('#rank')[0].value !== '');
+  $('#chain-rating').on('click', e => {
+    e.preventDefault();
+    chained = !chained;
+    $('#chain-rating').toggleClass('chained');
+  });
   $('#player input[name="rating"]').on('input', e=>{
     manualRating = true;
   });
   $('#player select[name="rank"]').on('input', e=>{
     let rank = e.target.value;
     let ratingCtl = $('#player input[name="rating"]')[0];
-    if (!$('#rating')[0].value || !manualRating) {
+    if (chained && (!$('#rating')[0].value || !manualRating)) {
       ratingCtl.value = 2050 + 100 * rank;
     }
   });
@@ -557,9 +574,8 @@ onLoad(() => {
     return false;
   });
   $('#rating').on('input', e => {
-    if (!$('#rank')[0].value || !manualRank) {
+    if (chained && (!$('#rank')[0].value || !manualRank)) {
       let rank = (e.target.value - 2050) / 100;
-      console.log(rank);
       $('#rank')[0].value = `${rank}`;
     }
     return true;
