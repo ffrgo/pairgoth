@@ -9,7 +9,7 @@ if test -f "$BASE.css"
 then
   pandoc --pdf-engine-opt=--enable-local-file-access -t html -F mermaid-filter --css $BASE.css $INPUT -o $BASE.pdf
 else
-  pandoc  --pdf-engine=xelatex -F mermaid-filter $INPUT -o $BASE.pdf
+  sed '/^\[TOC\]$/d' "$INPUT" | pandoc  --pdf-engine=xelatex --shift-heading-level-by=-1 --number-sections --toc --toc-depth=2 -V mainfont="DejaVu Serif" -V fontsize=9pt -V geometry:"margin=1.5cm" -V colorlinks=true -V linkcolor=blue -V urlcolor=blue -H <(echo '\usepackage{float}\floatplacement{figure}{H}\usepackage{graphicx}\setkeys{Gin}{keepaspectratio,height=0.8\textheight}') -F mermaid-filter -o $BASE.pdf
 #  pandoc --pdf-engine-opt=--enable-local-file-access -t html -F mermaid-filter $INPUT -o $BASE.pdf
 fi
 

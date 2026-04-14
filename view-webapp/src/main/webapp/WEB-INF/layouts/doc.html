@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="${request.lang}">
+<head>
+  <meta charset="UTF-8">
+  <title>Pairgoth - Documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/lib/fork-awesome-1.2.0/fork-awesome.min.css"/>
+  <link rel="stylesheet" href="/css/main.css?v=$version"/>
+  <link rel="stylesheet" href="/css/doc.css?v=$version"/>
+</head>
+<body class="vert flex doc">
+  <div id="header" class="horz flex">
+    <div id="logo">
+      <a href="/"><img src="/img/logov2.svg"/></a>
+    </div>
+    <div id="header-right">
+      <div id="lang">
+        <i class="$translate.flags[$request.lang] flag"></i>
+      </div>
+    </div>
+  </div>
+  <div id="center">
+    <div id="inner">
+      <div class="markdown-body">
+        $!docContent
+      </div>
+    </div>
+  </div>
+  <div id="footer" class="horz flex">
+    <div id="version">pairgoth v$version</div>
+    <div id="contact"><a href="mailto:pairgoth-dev@jeudego.org">contact</a></div>
+  </div>
+  <script type="text/javascript" src="/lib/mermaid-11.14.0/mermaid.min.js"></script>
+  <script type="text/javascript">
+    // #[[
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+    document.querySelectorAll('code.language-mermaid').forEach(el => {
+      let container = el.parentElement; // the <pre> tag
+      let div = document.createElement('div');
+      div.className = 'mermaid';
+      div.textContent = el.textContent;
+      container.replaceWith(div);
+    });
+    mermaid.run();
+    // ]]#
+  </script>
+</body>
+</html>

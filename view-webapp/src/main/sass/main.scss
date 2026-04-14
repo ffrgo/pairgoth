@@ -178,6 +178,49 @@
     }
   }
 
+  /* help menu */
+
+  #help {
+    cursor: pointer;
+  }
+
+  #help-menu {
+    position: fixed;
+    display: none;
+    top: 2.5em;
+    right: 1em;
+    flex-flow: column nowrap;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 60;
+    min-width: 10em;
+    overflow: hidden;
+    &.shown {
+      display: flex;
+    }
+    a {
+      display: block;
+      padding: 0.5em 0.8em;
+      white-space: nowrap;
+      color: #333;
+      text-decoration: none;
+      i {
+        width: 1.3em;
+        text-align: center;
+        margin-right: 0.3em;
+        color: #666;
+      }
+      &:hover {
+        background-color: #f0f0f0;
+      }
+      & + a {
+        border-top: 1px solid #eee;
+      }
+    }
+  }
+
   /* languages */
 
   #lang {

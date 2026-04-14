@@ -1,0 +1,150 @@
+body.doc {
+  overflow: auto;
+  counter-reset: h2;
+
+  #center {
+    overflow: auto;
+    padding: 2em;
+  }
+
+  .markdown-body {
+    max-width: 50em;
+    margin: 0 auto;
+    line-height: 1.6;
+
+    /* section numbering via CSS counters */
+    h2 {
+      counter-reset: h3;
+      counter-increment: h2;
+      font-size: 1.4em;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.2em;
+      margin-top: 1.3em;
+      &::before {
+        content: counter(h2) ". ";
+      }
+    }
+
+    h3 {
+      counter-reset: h4;
+      counter-increment: h3;
+      font-size: 1.15em;
+      margin-top: 1.2em;
+      &::before {
+        content: counter(h2) "." counter(h3) " ";
+      }
+    }
+
+    h4 {
+      counter-increment: h4;
+      font-size: 1em;
+      margin-top: 1.1em;
+      &::before {
+        content: counter(h2) "." counter(h3) "." counter(h4) " ";
+      }
+    }
+
+    /* title — no numbering */
+    h1 {
+      font-size: 1.8em;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.3em;
+      margin-top: 1.5em;
+    }
+
+    /* TOC styling */
+    div.table-of-contents {
+      background-color: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 1em 1.5em;
+      margin: 1em 0 2em;
+
+      &::before {
+        content: "Contents";
+        font-weight: bold;
+        font-size: 1.1em;
+        display: block;
+        margin-bottom: 0.5em;
+      }
+
+      ul {
+        list-style: none;
+        padding-left: 0;
+        margin: 0;
+
+        ul {
+          padding-left: 1.5em;
+        }
+
+        li {
+          margin: 0.2em 0;
+
+          a {
+            color: #336;
+            text-decoration: none;
+            &:hover {
+              text-decoration: underline;
+            }
+          }
+        }
+      }
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 1em 0;
+      width: auto;
+
+      th, td {
+        border: 1px solid #ddd;
+        padding: 0.4em 0.8em;
+        text-align: left;
+      }
+
+      th {
+        background-color: #f6f8fa;
+        font-weight: 600;
+      }
+
+      tr:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+    }
+
+    code {
+      background-color: #f4f4f4;
+      padding: 0.15em 0.3em;
+      border-radius: 3px;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      border-radius: 5px;
+      overflow-x: auto;
+
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+
+    .mermaid {
+      text-align: center;
+      margin: 1.5em 0;
+    }
+
+    ul, ol {
+      padding-left: 2em;
+    }
+
+    blockquote {
+      border-left: 3px solid #ddd;
+      padding-left: 1em;
+      color: #666;
+      margin: 1em 0;
+    }
+  }
+}

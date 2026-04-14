@@ -47,6 +47,9 @@
       <div id="settings" title="Settings">
         <i class="fa fa-cog"></i>
       </div>
+      <div id="help" title="Help">
+        <i class="fa fa-question-circle"></i>
+      </div>
       <div id="lang">
         <i class="$translate.flags[$request.lang] flag"></i>
       </div>
@@ -80,6 +83,10 @@
   </div>
   <div id="backdrop"></div>
   <div id="dimmer"></div>
+  <div id="help-menu">
+    <a href="/${request.lang}/doc/tutorial" target="_new"><i class="fa fa-graduation-cap"></i> Tutorial</a>
+    <a href="/${request.lang}/doc/reference" target="_new"><i class="fa fa-book"></i> Reference</a>
+  </div>
   <div id="lang-list">
 #foreach($lang in $translate.flags.entrySet())
   #if($lang != $request.lang)
@@ -139,7 +146,12 @@
     onLoad(() => {
       $('body').removeClass('initial');
       $('#lang').on('click', e => {
+        $('#help-menu').removeClass('shown');
         $('#lang-list').toggleClass('shown');
+      });
+      $('#help').on('click', e => {
+        $('#lang-list').removeClass('shown');
+        $('#help-menu').toggleClass('shown');
       });
       $('.lang').on('click', e => {
         let lang = e.target.closest('.lang').data('lang');
@@ -149,6 +161,9 @@
       document.on('click', e => {
         if ($('#lang-list').hasClass('shown') && !e.target.closest('.lang,#lang')) {
           $('#lang-list').removeClass('shown');
+        }
+        if ($('#help-menu').hasClass('shown') && !e.target.closest('#help-menu,#help')) {
+          $('#help-menu').removeClass('shown');
         }
       });
       $('.popup .popup-footer .close').on('click', e => {
