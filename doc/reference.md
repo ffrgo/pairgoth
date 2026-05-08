@@ -570,6 +570,31 @@ Log levels: `trace`, `debug`, `info`, `warn`, `error`
 
 Format placeholders: `%level`, `%ip`, `%logger`, `%message`
 
+### Webhook
+
+Pairgoth can push content (pairings, results, standings) to an external
+tournament website, and pull registered players from it. See
+[Pairgoth Webhook specification](#pairgoth-webhook-specification) for the
+endpoint contract a consumer must implement.
+
+```
+webhook.url    = https://my-tournament-site.example/api/pairgoth
+webhook.secret = a-shared-secret
+```
+
+- `webhook.url` — base URL of the consumer's pairgoth-integration endpoint.
+- `webhook.secret` — shared secret sent on every request as `X-Pairgoth-Secret` header
+
+Behavior:
+
+- If `webhook.url` is **unset or blank**, no webhook integration runs and the
+  related UI buttons (Sync from website, Publish pairings/results/standings)
+  are not shown.
+- If `webhook.url` is set, pairgoth performs a `GET /health` against it at
+  startup. **A failed health check is a fatal startup error** — the
+  assumption being that the tournament site is supposed to already be running
+  when the tournament director launches pairgoth.
+
 ### Example configurations
 
 #### Standalone development
@@ -900,3 +925,126 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
 + `DELETE /api/token` Logout / revoke token
 
     *output* `{ "success": true }`
+
+## Pairgoth Webhook specification
+
+*To integrate pairgoth with a tournament website.*
+
+### General remarks
+
+The webhook is the inverse direction of the [Pairgoth API](#pairgoth-api-specification): pairgoth is the **client**,
+the tournament website is the **server**. The direction is fixed because the tournament director can run pairgoth
+on a venue laptop behind some NAT or firewall — the website cannot reach pairgoth, but pairgoth can reach the website
+outbound.
+
+Pairgoth's role:
+
+- **Pull** registered players from the website on demand (Sync from website).
+- **Push** content (pairings, results, standings) to the website when the operator clicks a Publish button.
+
+Configuration is described in [Webhook](#webhook) under the Configuration section. When `webhook.url` is set, pairgoth
+performs `GET <webhook.url>/health` at startup; a failed check is fatal.
+
+All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate
+it on every endpoint and return `401` on mismatch.
+
+JSON responses follow the shape `{ "status": true | false, "message"?: string, … }`. A `false` status reaches the pairgoth UI as the error message.
+
+The path component `{code}` is the tournament's `shortName` — used as a stable, human-meaningful identifier on the website side. `{round}` is a 1-based round number.
+
+### Synopsis
+
+Pairgoth calls the following endpoints, all relative to `webhook.url`:
+
++ /health                     GET    Auth-gated health check
++ /players/{code}             GET    Pull registered players
++ /pairings/{code}/{round}    POST   Push pairings or results HTML
++ /standings/{code}/{round}   POST   Push standings HTML
+
+### /health
+
++ `GET /health` — health check used at pairgoth startup.
+
+    *output* `{ "status": true, "name"?: string, "version"?: string }`
+
+    The `name` is shown in pairgoth's startup log line (`webhook at <url> healthy: <name>`) — useful for the operator to confirm the right backend.
+
+### /players/{code}
+
++ `GET /players/{code}` — return all players registered for the tournament.
+
+    *output* `{ "status": true, "players": [ { ... }, ... ] }` on success;
+    `{ "status": false, "message": string }` on error (e.g. event not found → 404).
+
+    Player JSON shape (each entry):
+
+    ```json
+    {
+      "id":        12345,         // stable per-website id (used by pairgoth as DatabaseId.EXT)
+      "lastname":  "Doe",
+      "firstname": "Jane",
+      "country":   "FR",          // ISO-3166 alpha-2; pairgoth normalizes GB → UK
+      "club":      "75Pa",
+      "level":     27,            // 1-30 = kyu (1k=30, 30k=1), 31-39 = dan (1d=31 .. 9d=39)
+      "rating":    1850,          // optional; if absent, pairgoth derives a default from level
+      "pin":       "12345678",    // optional EGF PIN — used as DatabaseId.EGF
+      "rounds":    "1111100000"   // optional, one char per round; '1' = playing, '0' = skip
+    }
+    ```
+
+    The `id` field is the website's primary key for that player, typically a registration id. Pairgoth stores it as `externalIds[EXT]` and uses it as the **primary** deduplication key on re-sync — taking precedence over `pin`, since a PIN entered wrong on the source side may be corrected later. Without an `id`, players without a PIN duplicate on every re-sync.
+
+### /pairings/{code}/{round}
+
++ `POST /pairings/{code}/{round}` — receive pairings or results for a round.
+
+    *Content-Type* `text/html; charset=UTF-8`
+
+    *body* HTML fragment, see [Published payload](#published-payload).
+
+    *output* `{ "status": true }` on success; `{ "status": false, "message": string }` on error.
+
+    Both the Pairings tab's "Publish to website" and the Results tab's "Publish to website" hit this endpoint. The Results variant differs only in that its rendered table includes a `Result` column. The website should overwrite previous content for `(code, round)` on each call.
+
+    For TEAM tournaments, the Pairings publish renders team-vs-team rows and the Results publish renders the per-board breakdown. Both ship to the same endpoint; the website sees whichever was published most recently.
+
+### /standings/{code}/{round}
+
++ `POST /standings/{code}/{round}` — receive standings as of a given round.
+
+    *Content-Type* `text/html; charset=UTF-8`
+
+    *body* HTML fragment, see [Published payload](#published-payload). For TEAM* tournaments, the body contains both the team standings table and the individual standings table, each wrapped in a `<div class="standings-section team-standings">` / `<div class="standings-section individual-standings">`.
+
+    *output* `{ "status": true }` on success; `{ "status": false, "message": string }` on error.
+
+### Published payload
+
+The HTML pushed to `/pairings/...` and `/standings/...` is **self-contained**: it carries its own `<style>` block and is wrapped in a `.pairgoth-published` container, so the website can drop it into any container without writing CSS:
+
+```html
+<style>@layer pairgoth-published {
+  /* table sizing, headers, zebra rows, etc. */
+}</style>
+<div class="pairgoth-published">
+  <!-- table or sections -->
+</div>
+```
+
+Properties:
+
+- The styles are inside a CSS `@layer` named `pairgoth-published`. **Unlayered styles in the consuming page take precedence over the layer**, so the website's own theme wins automatically — the published styles only show through where the website hasn't styled.
+- All selectors are scoped under `.pairgoth-published`, so they don't leak.
+- Each result cell carries `data-result="<code>"` where `<code>` is one of `?` `w` `b` `=` `X` `#` `0`. The website can re-style results without parsing the rendered string (`1-0` / `½-½` etc.).
+- Each table row's `td.t` cell carries `data-table="<n>"` (the table number).
+
+### Error responses
+
+For all webhook endpoints, error responses should return:
+
+- `401` for invalid or missing `X-Pairgoth-Secret`.
+- `404` for unknown `{code}` (event not found on the website).
+- `4xx`/`5xx` with body `{ "status": false, "message": string }` for other errors. The `message` is surfaced in the pairgoth UI.
+
+If the website returns a non-2xx with no body, pairgoth synthesizes a `{ "status": false, "message": "upstream <status> with no body for <url>" }` so the browser-side parser does not choke.
+
