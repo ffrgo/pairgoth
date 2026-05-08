@@ -210,7 +210,9 @@
             <button type="button" class="ui blue floating publish-csv button">CSV</button>
             <button type="button" class="ui blue floating publish-egf button">EGF</button>
             <button type="button" class="ui blue floating publish-ffg button">FFG</button>
+#if($webhookConfigured)
             <button type="button" class="ui yellow floating publish-website button"><i class="fa fa-cloud-upload"></i> Website</button>
+#end
           </div>
         </div>
       </form>

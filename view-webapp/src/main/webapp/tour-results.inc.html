@@ -58,6 +58,12 @@
     </table>
   </div>
   <div class="form-actions">
+#if($webhookConfigured)
+    <button id="publish-results" class="ui yellow right labeled icon floating button">
+      <i class="fa fa-cloud-upload"></i>
+      Publish to website
+    </button>
+#end
     <button id="clear-results" class="ui orange right labeled icon floating info button">
       <i class="trash icon"></i>
       Clear results

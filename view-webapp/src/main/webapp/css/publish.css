@@ -1,0 +1,39 @@
+/* Self-contained styles for content published to external consumers via the webhook.
+   Wrapped in @layer pairgoth-published by WebhookServlet so consumer styles take precedence
+   if they exist. All selectors scoped under .pairgoth-published to avoid leaking. */
+
+.pairgoth-published table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.95rem;
+}
+.pairgoth-published thead th {
+  padding: 0.78em 0.78em;
+  background: #f9fafb;
+  color: rgba(0, 0, 0, 0.87);
+  font-weight: bold;
+  text-align: left;
+  border-bottom: 1px solid rgba(34, 36, 38, 0.15);
+}
+.pairgoth-published tbody td {
+  padding: 0.6em 0.7em;
+  border-bottom: 1px solid rgba(34, 36, 38, 0.08);
+}
+.pairgoth-published tbody tr:nth-child(even) td {
+  background: rgba(0, 0, 50, 0.02);
+}
+.pairgoth-published td.t {
+  text-align: center;
+  font-weight: 600;
+  width: 3em;
+}
+.pairgoth-published td.left {
+  text-align: left;
+}
+.pairgoth-published td[data-result='?'] {
+  color: #aaa;
+}
+.pairgoth-published .standings-section + .standings-section {
+  margin-top: 1.5em;
+}

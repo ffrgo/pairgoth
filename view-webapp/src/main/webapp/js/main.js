@@ -12,9 +12,7 @@ const prefs = {
   },
   getAll: function() {
     return {
-      blackFirst: this.get('blackFirst') || false,
-      connectorUrl: this.get('connectorUrl') || '',
-      connectorSecret: this.get('connectorSecret') || ''
+      blackFirst: this.get('blackFirst') || false
     };
   }
 };
@@ -368,10 +366,6 @@ onLoad(() => {
 
   // Settings modal handlers
   $('#settings').on('click', e => {
-    // Load current connector values
-    $('#pref-connector-url')[0].value = prefs.get('connectorUrl') || '';
-    $('#pref-connector-secret')[0].value = prefs.get('connectorSecret') || '';
-    $('#connector-status-indicator')[0].textContent = '';
     modal('settings-modal');
   });
 
@@ -380,57 +374,9 @@ onLoad(() => {
     prefs.set('blackFirst', blackFirst);
     // Set cookie for server-side rendering (expires in 1 year)
     document.cookie = `blackFirst=${blackFirst}; path=/; max-age=31536000; SameSite=Lax`;
-    // Save connector settings
-    prefs.set('connectorUrl', $('#pref-connector-url')[0].value.trim());
-    prefs.set('connectorSecret', $('#pref-connector-secret')[0].value);
     close_modal();
     // Reload page to apply new preference
     window.location.reload();
-  });
-
-  // Website connector test
-  $('#connector-test').on('click', async e => {
-    e.preventDefault();
-    let url = $('#pref-connector-url')[0].value.trim();
-    let secret = $('#pref-connector-secret')[0].value;
-    let indicator = $('#connector-status-indicator')[0];
-
-    if (!url) {
-      indicator.textContent = 'Please enter an API URL';
-      indicator.className = 'error';
-      return;
-    }
-
-    indicator.textContent = 'Testing...';
-    indicator.className = 'pending';
-
-    try {
-      let response = await fetch(url + '/health', {
-        method: 'GET',
-        headers: {
-          'X-Pairgoth-Secret': secret
-        }
-      });
-      if (response.ok) {
-        let data = await response.json();
-        if (data.status) {
-          indicator.textContent = 'Connected to ' + (data.name || 'website');
-          indicator.className = 'success';
-        } else {
-          indicator.textContent = data.message || 'Connection failed';
-          indicator.className = 'error';
-        }
-      } else if (response.status === 401) {
-        indicator.textContent = 'Invalid secret';
-        indicator.className = 'error';
-      } else {
-        indicator.textContent = 'Connection failed: ' + response.status;
-        indicator.className = 'error';
-      }
-    } catch (err) {
-      indicator.textContent = 'Connection error: ' + err.message;
-      indicator.className = 'error';
-    }
   });
 
   if (isTouchDevice()) {

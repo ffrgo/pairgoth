@@ -106,6 +106,12 @@ abstract class BaseWebappManager(val webappName: String, loggerName: String) : S
         try {
             // load default properties
             properties.load(context.getResourceAsStream("/WEB-INF/pairgoth.default.properties"))
+            // override with user properties from ./pairgoth.properties (dev mode parity with standalone launcher)
+            val userProperties = java.io.File("./pairgoth.properties")
+            if (userProperties.exists()) {
+                logger.info("loading user properties from ${userProperties.absolutePath}")
+                java.io.FileReader(userProperties).use { properties.load(it) }
+            }
             // override with system properties after stripping off the 'pairgoth.' prefix
             System.getProperties().filter { (key, value) -> key is String && key.startsWith(PAIRGOTH_PROPERTIES_PREFIX)
             }.forEach { (key, value) ->

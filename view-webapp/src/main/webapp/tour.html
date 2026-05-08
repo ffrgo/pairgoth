@@ -14,7 +14,6 @@
     <option value="$k" #if($sel && $sel == $k)selected#end>$disp</option>
   #end
 #end
-#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
 #if($params.id)
   #if (!$tour)
 <div class="section">

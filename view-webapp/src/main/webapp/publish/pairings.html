@@ -1,0 +1,14 @@
+## Publish-mode rendering of round pairings — inner content only.
+## WebhookServlet wraps the output with the .pairgoth-published div + style block.
+## Pairables in $games: players for INDIVIDUAL, teams for everything else (PAIRGO, RENGO, TEAM*).
+#if(!$tour)<div class="pairgoth-published-error">missing tour</div>#stop#end
+#set($round = $math.toInteger($!params.round))
+#if(!$round)#set($round = 1)#end
+#if($tour.type == 'INDIVIDUAL')
+  #set($pmap = $utils.toMap($api.get("tour/${params.id}/part")))
+#else
+  #set($pmap = $utils.toMap($api.get("tour/${params.id}/team")))
+#end
+#set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
+#set($games = $!roundPairing.games)
+#roundTable($games $pmap false)

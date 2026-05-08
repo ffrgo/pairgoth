@@ -91,4 +91,18 @@ onLoad(()=>{
       clearResults();
     }
   });
+  $('#publish-results').on('click', e => {
+    let form = $('#tournament-infos')[0];
+    let code = form.val('shortName');
+    if (!code) {
+      showError('Tournament short name is required for publishing');
+      return;
+    }
+    api.postJson(`webhook/publish/results/${code}/${activeRound}?id=${tour_id}`, {})
+      .then(data => {
+        if (data === 'error') return;
+        if (!data.status) showError(data.message || 'Publish failed');
+        else showSuccess(`Results for round ${activeRound} published to website`);
+      });
+  });
 });

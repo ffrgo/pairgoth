@@ -92,7 +92,9 @@
           <div class="pairing-post-actions">
             <a href="result-sheets?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></a>
             <a href="explain?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">explain pairing <i class="fa fa-external-link"></i></a>
+#if($webhookConfigured)
             <button id="publish-pairings" class="ui mini yellow floating icon button">publish to website <i class="fa fa-cloud-upload"></i></button>
+#end
           </div>
 #end
         </div>
@@ -101,38 +103,7 @@
   </div>
 #if($games.size())
   <div id="print-pairings">
-    <table class="ui striped table">
-      <thead>
-      <tr>
-        <th>Tbl</th>
-#if($blackFirst)
-        <th>Black</th>
-        <th>White</th>
-#else
-        <th>White</th>
-        <th>Black</th>
-#end
-        <th>Hd</th>
-      </tr>
-      </thead>
-      <tbody>
-  #foreach($game in $games)
-    #set($white = $pmap[$game.w])
-    #set($black = $pmap[$game.b])
-      <tr>
-        <td class="t" data-table="${game.t}">${game.t}</td>
-#if($blackFirst)
-        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
-        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
-#else
-        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
-        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
-#end
-        <td>${game.h}</td>
-      </tr>
-  #end
-      </tbody>
-    </table>
+#roundTable($games $pmap false)
   </div>
 #end
 </div>

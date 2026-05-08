@@ -60,7 +60,9 @@ fun Pairable.Companion.parseRank(rankStr: String): Int {
 enum class DatabaseId {
     AGA,
     EGF,
-    FFG;
+    FFG,
+    // External registration source (e.g. tournament website pushing players via webhook)
+    EXT;
     val key get() = this.name.lowercase(Locale.ROOT)
 }
 

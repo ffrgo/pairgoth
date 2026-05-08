@@ -188,7 +188,17 @@ sealed class Tournament <P: Pairable>(
 
     open fun pairedPlayers(round: Int) = games(round).values.flatMap { listOf(it.black, it.white) }.filter { it != 0 }.toSet()
 
-    fun hasPlayer(dbId: DatabaseId, pId: String) = pId.isNotBlank() && players.values.filter { player -> pId == player.externalIds[dbId] }.isNotEmpty()
+    // Find an existing player matching any of the supplied external ids. EXT (the consumer-side
+    // registration id) takes precedence over rating-body ids: it is the stable identifier, while
+    // a PIN/licence can be entered wrong on the source side and corrected later.
+    fun findPlayerByExternalIds(ids: Map<DatabaseId, String>): Player? {
+        val ordered = listOf(DatabaseId.EXT) + DatabaseId.values().filter { it != DatabaseId.EXT }
+        for (dbId in ordered) {
+            val pid = ids[dbId]?.takeIf { it.isNotBlank() } ?: continue
+            players.values.firstOrNull { it.externalIds[dbId] == pid }?.let { return it }
+        }
+        return null
+    }
 
     fun stats() = (0..rounds - 1).map { index ->
         Json.Object(

@@ -41,6 +41,13 @@ function showError(message) {
   $('#error').removeClass('hidden');
 }
 
+function showSuccess(message) {
+  console.log(message);
+  $('#success')[0].innerText = message;
+  $('#success').removeClass('hidden');
+  setTimeout(() => $('#success').addClass('hidden'), 3000);
+}
+
 function error(response) {
   const contentType = response.headers.get("content-type");
   let promise =
@@ -106,6 +113,33 @@ let api = {
               else {
                 throw resp;
               }
+          })
+          .catch(err => {
+            error(err);
+            return 'error';
+          })
+          .finally(() => {
+              spinner(false);
+          });
+    },
+
+    postBody: (path, body, contentType) => {
+        clearFeedback();
+        spinner(true);
+        let hdrs = headers(false);
+        hdrs['Content-Type'] = contentType;
+        return fetch(base + path, {
+            credentials: "same-origin",
+            method: 'POST',
+            body: body,
+            headers: hdrs
+        })
+          .then(resp => {
+              if (resp.ok) {
+                success();
+                return resp.json();
+              }
+              else throw resp;
           })
           .catch(err => {
             error(err);

@@ -42,3 +42,48 @@ $number.format('#0.00 €', $amount)##
 #set($ttc = $amount * 1.2)##
 $number.format('#0.00 €', $ttc)##
 #end
+
+#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
+
+#macro(roundTable $games $mapping $showResult)
+#set($_dispRst = {'?':'?', 'w':'1-0', 'b':'0-1', '=':'½-½', 'X':'X', '#':'1-1', '0':'0-0'})
+#set($_dispRstInv = {'?':'?', 'w':'0-1', 'b':'1-0', '=':'½-½', 'X':'X', '#':'1-1', '0':'0-0'})
+    <table class="ui striped table">
+      <thead>
+      <tr>
+        <th>Tbl</th>
+#if($blackFirst)
+        <th>Black</th>
+        <th>White</th>
+#else
+        <th>White</th>
+        <th>Black</th>
+#end
+        <th>Hd</th>
+#if($showResult)
+        <th>Result</th>
+#end
+      </tr>
+      </thead>
+      <tbody>
+  #foreach($game in $games)
+    #set($white = $mapping[$game.w])
+    #set($black = $mapping[$game.b])
+      <tr>
+        <td class="t" data-table="${game.t}">${game.t}</td>
+#if($blackFirst)
+        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
+        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
+#else
+        <td class="left">#if($white)${white.name} $!{white.firstname} (#rank($white.rank) $!white.country $!white.club)#{else}BIP#end</td>
+        <td class="left">#if($black)${black.name} $!{black.firstname} (#rank($black.rank) $!black.country $!black.club)#{else}BIP#end</td>
+#end
+        <td>${game.h}</td>
+#if($showResult)
+        <td data-result="$game.r">#if($blackFirst)$_dispRstInv[$game.r]#{else}$_dispRst[$game.r]#end</td>
+#end
+      </tr>
+  #end
+      </tbody>
+    </table>
+#end

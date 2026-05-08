@@ -104,6 +104,12 @@
     <servlet-name>doc</servlet-name>
     <servlet-class>org.jeudego.pairgoth.web.MarkdownServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>webhook</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.WebhookServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
 
   <!-- servlet mappings -->
   <servlet-mapping>
@@ -138,6 +144,10 @@
   <servlet-mapping>
     <servlet-name>doc</servlet-name>
     <url-pattern>/doc/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>webhook</servlet-name>
+    <url-pattern>/api/webhook/*</url-pattern>
   </servlet-mapping>
 
   <!-- context params -->

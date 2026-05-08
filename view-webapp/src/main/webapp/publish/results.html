@@ -1,0 +1,20 @@
+## Publish-mode rendering of round results — inner content only.
+## WebhookServlet wraps the output with the .pairgoth-published div + style block.
+## Tab semantics: results → $individualGames + $resultsMap (per-board for TEAM, single row for PAIRGO/RENGO).
+#if(!$tour)<div class="pairgoth-published-error">missing tour</div>#stop#end
+#set($round = $math.toInteger($!params.round))
+#if(!$round)#set($round = 1)#end
+#set($parts = $api.get("tour/${params.id}/part"))
+#set($plmap = $utils.toMap($parts))
+#if($tour.type == 'PAIRGO' || $tour.type.startsWith('RENGO'))
+  #set($resultsMap = $utils.toMap($api.get("tour/${params.id}/team")))
+#else
+  #set($resultsMap = $plmap)
+#end
+#set($roundPairing = $api.get("tour/${params.id}/pair/$round"))
+#if($tour.type.startsWith('TEAM'))
+  #set($individualGames = $!roundPairing.individualGames)
+#else
+  #set($individualGames = $!roundPairing.games)
+#end
+#roundTable($individualGames $resultsMap true)

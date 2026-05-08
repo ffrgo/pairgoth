@@ -19,16 +19,18 @@ class ViewServlet : VelocityViewServlet() {
     }
 
     private fun decodeURI(request: HttpServletRequest): String {
-        var uri = request.requestURI
-        uri = try {
-            URLDecoder.decode(uri, "UTF-8")
+        // include()d requests carry the inner URI as an attribute; getRequestURI() still returns the outer one.
+        val rawUri = (request.getAttribute("javax.servlet.include.request_uri") as? String) ?: request.requestURI
+        return try {
+            URLDecoder.decode(rawUri, "UTF-8")
         } catch (use: UnsupportedEncodingException) {
-            throw RuntimeException("could not decode URI $uri", use)
+            throw RuntimeException("could not decode URI $rawUri", use)
         }
-        return uri
     }
 
-    override fun getTemplate(request: HttpServletRequest, response: HttpServletResponse?): Template = getTemplate(STANDARD_LAYOUT)
+    override fun getTemplate(request: HttpServletRequest, response: HttpServletResponse?): Template =
+        if (decodeURI(request).startsWith("/publish/")) getTemplate(BARE_LAYOUT)
+        else getTemplate(STANDARD_LAYOUT)
 
     override fun fillContext(context: Context, request: HttpServletRequest) {
         super.fillContext(context, request)
@@ -42,7 +44,9 @@ class ViewServlet : VelocityViewServlet() {
                 context.put(suffix, resource)
             }
         }
-        val lang = request.getAttribute("lang") as String
+        // LanguageFilter skips /api/* URIs and INCLUDE dispatches, so this can be null
+        // (e.g. when WebhookServlet includes /publish/* to render a publish payload).
+        val lang = request.getAttribute("lang") as String?
 
         // User preferences - read from cookie
         val blackFirst = request.cookies?.find { it.name == "blackFirst" }?.value == "true"
@@ -110,5 +114,6 @@ class ViewServlet : VelocityViewServlet() {
     companion object {
         private var logger = LoggerFactory.getLogger("view")
         private const val STANDARD_LAYOUT = "/WEB-INF/layouts/standard.html"
+        private const val BARE_LAYOUT = "/WEB-INF/layouts/bare.html"
     }
 }

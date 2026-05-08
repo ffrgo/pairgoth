@@ -1,8 +1,11 @@
 package org.jeudego.pairgoth.web
 
+import com.republicate.kson.Json
 import org.apache.commons.lang3.tuple.Pair
 import org.jeudego.pairgoth.oauth.OauthHelperFactory
 import org.jeudego.pairgoth.ratings.RatingsManager
+import org.jeudego.pairgoth.util.ApiClient.JsonApiClient
+import org.jeudego.pairgoth.util.ApiClient.header
 import org.jeudego.pairgoth.util.Translator
 import org.slf4j.LoggerFactory
 import java.io.IOException
@@ -53,6 +56,24 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
                 }
             }
             else -> throw Error("Unhandled auth: $auth")
+        }
+
+        // Validate webhook at startup (fatal error if configured but unhealthy)
+        val webhookUrl = properties.getProperty("webhook.url")?.takeIf { it.isNotBlank() }
+        context.setAttribute("webhookConfigured", webhookUrl != null)
+        webhookUrl?.let { url ->
+            val secret = properties.getProperty("webhook.secret")
+                ?: throw Error("webhook.url is set but webhook.secret is missing")
+            val healthUrl = "${url.removeSuffix("/")}/health"
+            try {
+                val resp = JsonApiClient.get(healthUrl, header("X-Pairgoth-Secret", secret)) as Json.Object
+                if (resp.getBoolean("status") != true) {
+                    throw Error("webhook at $url returned status=false: ${resp.getString("message") ?: "(no message)"}")
+                }
+                logger.info("webhook at $url healthy: ${resp.getString("name") ?: "(unnamed)"}")
+            } catch (e: Exception) {
+                throw Error("webhook health check failed for $healthUrl: ${e.message}", e)
+            }
         }
 
         logger.info("")
