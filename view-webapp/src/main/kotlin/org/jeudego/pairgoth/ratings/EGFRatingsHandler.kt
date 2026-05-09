@@ -1,12 +1,12 @@
 package org.jeudego.pairgoth.ratings
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.util.displayRank
+import org.jeudego.pairgoth.util.ratingToRank
 import java.net.URL
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.math.ceil
-import kotlin.math.floor
 
 object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
@@ -29,12 +29,9 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                     }.toTypedArray()
                     Json.MutableObject(*pairs).also { player ->
                         player["origin"] = "EGF"
-                        // override rank with rating equivalent
+                        // override rank with rating equivalent (canonical EGD GoR2Rank mapping)
                         player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
-                            val adjusted = rating - 2050;
-                            player["rank"] =
-                                if (adjusted < 0) "${-(adjusted - 99) / 100}k"
-                                else "${(adjusted + 100) / 100}d"
+                            player["rank"] = displayRank(ratingToRank(rating))
                         }
                         // fix for missing firstnames
                         if (player.getString("firstname") == null) {

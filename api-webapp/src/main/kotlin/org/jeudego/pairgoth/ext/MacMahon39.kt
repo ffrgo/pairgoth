@@ -4,6 +4,7 @@ import org.jeudego.pairgoth.model.*
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Element
 import org.w3c.dom.Node
 import org.w3c.dom.NodeList
@@ -14,6 +15,11 @@ import java.time.LocalDate
  * Ported from OpenGothaCustom (https://bitbucket.org/kamyszyn/opengothacustom)
  */
 object MacMahon39 {
+    private val logger = LoggerFactory.getLogger("MacMahon39")
+    private fun parseRankOrDefault(rankStr: String, default: Int, ctx: String): Int =
+        Pairable.parseRank(rankStr) ?: default.also {
+            logger.warn("invalid rank '$rankStr' for $ctx; defaulting to ${displayRank(default)}")
+        }
 
     /**
      * Check if the XML element is in MacMahon 3.9 format
@@ -52,9 +58,9 @@ object MacMahon39 {
         val breakers = if (walllistEl != null) extractValues("ShortName", walllistEl) else listOf("Score", "SOS", "SOSOS")
 
         // Determine effective values
-        val mmBar = if (isMMBar) parseRank(mmBarStr) else 8  // 9d
-        val mmFloor = if (isMMFloor) parseRank(mmFloorStr) else -30 // 30k
-        val handicapBelow = if (isHandicapBelow) parseRank(handicapBelowStr) else 8 // 9d
+        val mmBar = if (isMMBar) parseRankOrDefault(mmBarStr, 0, "MM bar") else 8  // 9d
+        val mmFloor = if (isMMFloor) parseRankOrDefault(mmFloorStr, -30, "MM floor") else -30 // 30k
+        val handicapBelow = if (isHandicapBelow) parseRankOrDefault(handicapBelowStr, -30, "handicap rank threshold") else 8 // 9d
         val handicapCorrection = if (isHandicapReduction) -1 * handicapCorrectionStr.toInt() else 0
         val handicapCeiling = when {
             !handicapUsed -> 0
@@ -116,7 +122,7 @@ object MacMahon39 {
             val club = extractValue("Club", playerEl, "")
             val country = extractValue("Country", playerEl, "").uppercase()
             val rankStr = extractValue("GoLevel", playerEl, "30k")
-            val rank = parseRank(rankStr)
+            val rank = parseRankOrDefault(rankStr, -20, "player $surname $firstname")
             val ratingStr = extractValue("Rating", playerEl, "-901")
             val rating = ratingStr.toInt()
             val superBarMember = extractValue("SuperBarMember", parentEl, "false") == "true"
@@ -218,18 +224,6 @@ object MacMahon39 {
             // ignore
         }
         return result
-    }
-
-    private fun parseRank(rankStr: String): Int {
-        val regex = Regex("(\\d+)([kKdD])")
-        val match = regex.matchEntire(rankStr) ?: return -20
-        val (num, letter) = match.destructured
-        val level = num.toIntOrNull() ?: return -20
-        return when (letter.lowercase()) {
-            "k" -> -level
-            "d" -> level - 1
-            else -> -20
-        }
     }
 
     private fun parseResult(resultStr: String, byRef: Boolean): Game.Result {

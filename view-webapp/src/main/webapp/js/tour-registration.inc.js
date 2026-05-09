@@ -101,17 +101,20 @@ function initSearch() {
   }, SEARCH_DELAY);
 }
 
+// Returns the integer rank, or null on invalid input. `p` (pro) returns null
+// until the pro model lands; callers should guard accordingly.
 function parseRank(rank) {
-  let groups = /(\d+)([kd])/.exec(rank)
-  if (groups) {
-    let level = parseInt(groups[1]);
-    let letter = groups[2];
-    switch (letter) {
-      case 'k': return -level;
-      case 'd': return level - 1;
-    }
+  if (rank == null) return null;
+  let groups = /^(\d+)([kdp])$/i.exec(String(rank).trim());
+  if (!groups) return null;
+  let level = parseInt(groups[1]);
+  if (!(level >= 1)) return null;
+  switch (groups[2].toLowerCase()) {
+    case 'k': return level <= 30 ? -level : null;
+    case 'd': return level <= 9 ? level - 1 : null;
+    case 'p': return null;
   }
-  return '';
+  return null;
 }
 
 function displayRank(rank) {
@@ -128,7 +131,8 @@ function fillPlayer(player) {
   form.val('firstname', player.firstname);
   form.val('country', country);
   form.val('club', player.club);
-  form.val('rank', parseRank(player.rank));
+  let parsedRank = parseRank(player.rank);
+  form.val('rank', parsedRank != null ? parsedRank : '');
   form.val('rating', player.rating);
   form.val('final', false);
   form.val('ffg_id', player.ffg);

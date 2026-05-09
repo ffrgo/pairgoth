@@ -8,7 +8,6 @@ import com.republicate.kson.toJsonObject
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.HistoryHelper
-import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.PairingListener
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
@@ -19,7 +18,6 @@ import kotlin.math.max
 import java.util.*
 import kotlin.collections.get
 import kotlin.math.floor
-import kotlin.math.min
 import kotlin.math.round
 import kotlin.math.roundToInt
 
@@ -230,11 +228,6 @@ sealed class Tournament <P: Pairable>(
         // Note: this works for now because we only have .0 and .5 fractional parts
         return if (pairing.pairingParams.main.roundDownScore) floor(score + epsilon)
         else round(2 * score) / 2
-    }
-
-    fun Pairable.mmBase(): Double {
-        if (pairing !is MacMahon) throw Error("invalid call: tournament is not Mac Mahon")
-        return min(max(rank, pairing.mmFloor), pairing.mmBar) + MacMahonSolver.mmsZero + mmsCorrection
     }
 
     fun historyHelper(round: Int): HistoryHelper {

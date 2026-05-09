@@ -10,6 +10,7 @@ import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
 import org.jeudego.pairgoth.store.nextTournamentId
+import org.slf4j.LoggerFactory
 import org.w3c.dom.Element
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,6 +22,11 @@ private const val MILLISECONDS_PER_DAY = 86400000
 fun XMLGregorianCalendar.toLocalDate() = LocalDate.of(year, month, day)
 
 object OpenGotha {
+    private val logger = LoggerFactory.getLogger("OpenGotha")
+    private fun parseRankOrDefault(rankStr: String, default: Int, ctx: String): Int =
+        Pairable.parseRank(rankStr) ?: default.also {
+            logger.warn("invalid rank '$rankStr' for $ctx; defaulting to ${displayRank(default)}")
+        }
 
     private fun parseDrawUpDownMode(str: String) = when (str) {
         "BOT" -> MainCritParams.DrawUpDown.BOTTOM
@@ -94,7 +100,7 @@ object OpenGotha {
             ),
             secondary = SecondaryCritParams(
                 barThresholdActive = pairParams.paiSeBarThresholdActive.toBoolean(),
-                rankSecThreshold = Pairable.parseRank(pairParams.paiSeRankThreshold),
+                rankSecThreshold = parseRankOrDefault(pairParams.paiSeRankThreshold, -20, "secondary rank threshold"),
                 nbWinsThresholdActive = pairParams.paiSeNbWinsThresholdActive.toBoolean(),
                 defSecCrit = pairParams.paiSeDefSecCrit.toDouble()
             ),
@@ -107,7 +113,7 @@ object OpenGotha {
             handicap = HandicapParams(
                 weight = pairParams.paiSeMinimizeHandicap.toDouble(),
                 useMMS = handParams.hdBasedOnMMS.toBoolean(),
-                rankThreshold = Pairable.parseRank(handParams.hdNoHdRankThreshold),
+                rankThreshold = parseRankOrDefault(handParams.hdNoHdRankThreshold, -20, "handicap rank threshold"),
                 correction = handParams.hdCorrection,
                 ceiling = handParams.hdCeiling
             )
@@ -147,8 +153,8 @@ object OpenGotha {
                 else -> MacMahon(
                     pairingParams = pairgothPairingParams,
                     placementParams = pairgothPlacementParams,
-                    mmFloor = Pairable.parseRank(genParams.genMMFloor),
-                    mmBar = Pairable.parseRank(genParams.genMMBar)
+                    mmFloor = parseRankOrDefault(genParams.genMMFloor, -30, "MM floor"),
+                    mmBar = parseRankOrDefault(genParams.genMMBar, 0, "MM bar")
                 )
             },
             rounds = genParams.numberOfRounds
@@ -162,7 +168,7 @@ object OpenGotha {
                 name = player.name,
                 firstname = player.firstName,
                 rating = player.rating,
-                rank = Pairable.parseRank(player.rank),
+                rank = parseRankOrDefault(player.rank, -20, "player ${player.name} ${player.firstName}"),
                 country = player.country,
                 club = player.club,
                 final = "FIN" == player.registeringStatus,

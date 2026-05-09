@@ -4,14 +4,21 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.store.Store
 import org.jeudego.pairgoth.store.nextPlayerId
+import org.jeudego.pairgoth.util.MAX_RANK as COMMON_MAX_RANK
+import org.jeudego.pairgoth.util.MIN_RANK as COMMON_MIN_RANK
+import org.jeudego.pairgoth.util.ratingToRank as commonRatingToRank
+import org.jeudego.pairgoth.util.rankToRating as commonRankToRating
 import java.util.*
 
 // Pairable
 
 sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
     companion object {
-        const val MIN_RANK: Int = -30 // 30k
-        const val MAX_RANK: Int = 8 // 9D
+        val MIN_RANK: Int = COMMON_MIN_RANK
+        val MAX_RANK: Int = COMMON_MAX_RANK
+
+        fun ratingToRank(rating: Int): Int = commonRatingToRank(rating)
+        fun rankToRating(rank: Int): Int = commonRankToRating(rank)
     }
     fun toJson(): Json.Object = toMutableJson()
     abstract fun toMutableJson(): Json.MutableObject
@@ -39,19 +46,23 @@ object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE, true) {
     override val country = "none"
 }
 
-fun displayRank(rank: Int) = if (rank < 0) "${-rank}k" else "${rank + 1}d"
+// re-exported from pairgoth-common util for callers that import org.jeudego.pairgoth.model.*
+fun displayRank(rank: Int) = org.jeudego.pairgoth.util.displayRank(rank)
 fun Pairable.displayRank() = displayRank(rank)
 
-private val rankRegex = Regex("(\\d+)([kd])", RegexOption.IGNORE_CASE)
+private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
 
-fun Pairable.Companion.parseRank(rankStr: String): Int {
-    val (level, letter) = rankRegex.matchEntire(rankStr)?.destructured ?: throw Error("invalid rank: $rankStr")
-    val num = level.toInt()
-    if (num < 0 || letter != "k" && letter != "K" && num > 9) throw Error("invalid rank: $rankStr")
+// Returns null on invalid input or on `p` ranks (pro support comes in a later step).
+// Caller decides the fallback (typically -20 / 20k with a warning at import boundaries).
+fun Pairable.Companion.parseRank(rankStr: String): Int? {
+    val (level, letter) = rankRegex.matchEntire(rankStr.trim())?.destructured ?: return null
+    val num = level.toIntOrNull() ?: return null
+    if (num < 1) return null
     return when (letter.lowercase()) {
-        "k" -> -num
-        "d" -> num - 1
-        else -> throw Error("impossible")
+        "k" -> if (num > -MIN_RANK) null else -num     // 1k..30k
+        "d" -> if (num > MAX_RANK + 1) null else num - 1 // 1d..9d
+        "p" -> null // pro: not yet represented in the rank-only Int domain
+        else -> null
     }
 }
 

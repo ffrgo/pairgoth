@@ -1,6 +1,8 @@
 package org.jeudego.pairgoth.ratings
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.util.displayRank
+import org.jeudego.pairgoth.util.ratingToRank
 import java.net.URL
 import java.nio.charset.StandardCharsets
 import java.time.LocalDate
@@ -27,9 +29,10 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
                         it["origin"] = "FFG"
                         val rating = it["rating"]?.toString()?.toIntOrNull()
                         if (rating != null) {
-                            it["rank"] = (rating/100).let { if (rating < 0) "${-it+1}k" else "${it+1}d" }
-                            // then adjust to match EGF ratings
-                            it["rating"] = rating + 2050
+                            // shift FFG raw rating to EGD GoR scale (FFG 0 ≈ EGD 1k/1d boundary at 2050)
+                            val gor = rating + 2050
+                            it["rating"] = gor
+                            it["rank"] = displayRank(ratingToRank(gor))
                         }
                     }
                 }
