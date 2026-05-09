@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.lang.Exception
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.locks.ReadWriteLock
@@ -57,11 +56,16 @@ object RatingsManager: Runnable {
         override fun run() {
             try {
                 val newPlayers = ratingsHandlers.values.filter { it.active }.flatMapTo(Json.MutableArray()) { ratings ->
-                    val ratingsFile = WebappManager.properties.getProperty("ratings.${ratings.origin.name.lowercase()}") as String?
-                    if (ratingsFile == null) {
+                    // `ratings.<origin>` (when set) is a URL override — http(s):// or file:// — handled by
+                    // RatingsHandler.url. The freeze logic uses `ratings.date` (see RatingsHandler).
+                    // Per-handler try/catch isolates failures so one source's error doesn't kill the others.
+                    try {
                         ratings.fetchPlayers()
-                    } else {
-                        ratings.fetchPlayers(Paths.get("").resolve(ratingsFile).toFile())
+                    } catch (e: Exception) {
+                        logger.error("could not refresh ${ratings.origin} ratings: ${e.javaClass.simpleName} ${e.message}")
+                        logger.debug("could not refresh ${ratings.origin} ratings", e)
+                        // keep whatever's already in memory for this handler (may be empty on first failure)
+                        if (ratings.ready) ratings.players else Json.Array()
                     }
                 }
                 // Always update players and index together under the write lock

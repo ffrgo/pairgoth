@@ -11,8 +11,13 @@ import java.time.format.DateTimeFormatter
 object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy")
     override val defaultURL = URL("https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt")
-    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array> {
-        val ratingsDateString = payload.lineSequence().first().substringAfter("#Echelle au ").substringBefore(" ")
+    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array>? {
+        val firstLine = payload.lineSequence().firstOrNull()
+        if (firstLine == null || !firstLine.contains("#Echelle au ")) {
+            logger.warn("FFG response did not contain the expected `#Echelle au <date>` header. First 200 chars: ${payload.take(200).replace("\n", " ")}")
+            return null
+        }
+        val ratingsDateString = firstLine.substringAfter("#Echelle au ").substringBefore(" ")
         val ratingsDate = LocalDate.parse(ratingsDateString, ratingsDateFormatter)
         return Pair(
               ratingsDate,

@@ -517,15 +517,29 @@ Directory for caching downloaded ratings files.
 For each rating source (`aga`, `egf`, `ffg`):
 
 ```
-ratings.<source> = <url or file path>
+ratings.<source> = <url>
 ```
 
-If not set, ratings are auto-downloaded from the default URL. Set to a local file path to freeze ratings at a specific date.
+URL override for the rating source. Schemes: `http://`, `https://`, `file://`. If not set, the built-in default URL for that source is used:
 
-Example to freeze EGF ratings:
+- FFG: https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt
+- EGF: https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html
+
+Use this to point at a local mirror or to a static file when the upstream is unreachable.
+
+#### Ratings freeze
+
 ```
-ratings.egf = ratings/EGF-20240115.json
+ratings.date = YYYY-MM-DD
 ```
+
+Upper bound for the ratings snapshot to use, applied globally to all sources. Designed for multi-day events where ratings must not drift mid-tournament.
+
+Behaviour:
+- `ratings.date` not set, or today is before it: dynamic — latest ratings are fetched as usual.
+- Today is on or after `ratings.date`: load the most recent cached snapshot whose date is ≤ `ratings.date`. Cache files past the freeze are kept on disk but ignored at load time.
+- Until a cached snapshot dated ≥ `ratings.date` exists, hourly fetches continue (so the cache grows toward the freeze date). Once one exists, fetches stop for that source.
+- Set in advance and forget: configure on day -N, freeze takes effect automatically on day 0.
 
 #### Enable/disable ratings
 

@@ -9,7 +9,7 @@ object AGARatingsHandler: RatingsHandler(RatingsManager.Ratings.AGA) {
         throw Error("No functional URL for AGA...")
     }
     override val active = false
-    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array> {
+    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array>? {
         return Pair(
             LocalDate.MIN,
             Json.Array()

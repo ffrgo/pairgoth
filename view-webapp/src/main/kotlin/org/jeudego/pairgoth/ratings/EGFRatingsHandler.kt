@@ -11,8 +11,19 @@ import java.util.*
 object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
     override val defaultURL = URL("https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html")
-    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array> {
-        val ratingsDateString = payload.lines().filter { it.startsWith("(") }.first().trim().removeSurrounding("(", ")")
+    override fun parsePayload(payload: String): Pair<LocalDate, Json.Array>? {
+        val ratingsDateString = payload.lines().firstOrNull { it.startsWith("(") }?.trim()?.removeSurrounding("(", ")")
+            ?: run {
+                val looksLikeChallenge = payload.contains("Just a moment", ignoreCase = true)
+                        || payload.contains("cf-chl", ignoreCase = true)
+                        || payload.lineSequence().take(3).any { it.contains("<!DOCTYPE", ignoreCase = true) }
+                if (looksLikeChallenge) {
+                    logger.warn("EGD download is behind a Cloudflare bot challenge — User-Agent bypass no longer sufficient. Falling back to last cached ratings file. Ask EGD admins to add a Cloudflare page rule excluding /EGD/EGD_2_0/downloads/* from the challenge.")
+                } else {
+                    logger.warn("EGD response did not contain the expected `(date)` header line. First 200 chars: ${payload.take(200).replace("\n", " ")}")
+                }
+                return null
+            }
         val ratingsDate = LocalDate.parse(ratingsDateString, ratingsDateFormatter)
         return Pair(
             ratingsDate,
