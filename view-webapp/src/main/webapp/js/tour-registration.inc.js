@@ -7,10 +7,63 @@ let manualRating = false;
 let manualRank = false;
 let chained = false;
 
+// EGD-canonical rank/rating helpers (mirror pairgoth-common/util/RankRating.kt)
+const MIN_RANK = -30, MAX_RANK = 8, MIN_PRO = 1, MAX_PRO = 9;
+const PRO_BASE_RATING = 2700, PRO_STEP = 30;
+function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+function ratingToRankInt(r) { return clamp(Math.floor((r - 2050) / 100), MIN_RANK, MAX_RANK); }
+function rankIntToRating(k) { return 2050 + 100 * k; }
+function ratingToProLevel(r) { return clamp(Math.round((r - PRO_BASE_RATING) / PRO_STEP) + 1, MIN_PRO, MAX_PRO); }
+function proLevelToRating(p) { return PRO_BASE_RATING + PRO_STEP * (p - 1); }
+function isProFormValue(v) { return typeof v === 'string' && /^p[1-9]$/i.test(v); }
+function proLevelOf(v) { return parseInt(String(v).substring(1)); }
+
+// Returns the form select value for a player payload: "pN" if pro > 0, "<int>" for amateur.
+// `player.rank` may be an int or a display string ("1d", "2k", "1p").
+function playerToFormRank(player) {
+  if (player == null) return '';
+  if (player.pro && player.pro >= MIN_PRO && player.pro <= MAX_PRO) return `p${player.pro}`;
+  if (typeof player.rank === 'number') return String(player.rank);
+  return parseRank(player.rank) ?? '';
+}
+
+// Returns the form select value parsed from a display string. For pro returns "pN", for amateur an int as string, null on garbage.
+function parseRank(rank) {
+  if (rank == null) return null;
+  let groups = /^(\d+)([kdp])$/i.exec(String(rank).trim());
+  if (!groups) return null;
+  let level = parseInt(groups[1]);
+  if (!(level >= 1)) return null;
+  switch (groups[2].toLowerCase()) {
+    case 'k': return level <= 30 ? String(-level) : null;
+    case 'd': return level <= 9 ? String(level - 1) : null;
+    case 'p': return level <= 9 ? `p${level}` : null;
+  }
+  return null;
+}
+
+function displayRank(rank, pro) {
+  if (pro && pro >= MIN_PRO && pro <= MAX_PRO) return `${pro}p`;
+  rank = parseInt(rank);
+  return rank < 0 ? `${-rank}k` : `${rank + 1}d`;
+}
+
+// Chain detection: chain is "on" iff the dropdown value matches what the rating implies in the active domain.
 function updateChainState() {
   let rating = parseInt($('#rating')[0].value);
-  let rank = parseInt($('#rank')[0].value);
-  chained = !isNaN(rating) && !isNaN(rank) && Math.floor((rating - 2050) / 100) === rank;
+  let rankValue = $('#rank')[0].value;
+  let isPro = isProFormValue(rankValue);
+  let isAmateur = !isPro && rankValue !== '' && !isNaN(parseInt(rankValue));
+  if (isNaN(rating) || (!isPro && !isAmateur)) {
+    chained = false;
+  } else if (isPro) {
+    let p = proLevelOf(rankValue);
+    chained = rating >= PRO_BASE_RATING && rating < PRO_BASE_RATING + PRO_STEP * MAX_PRO + Math.ceil(PRO_STEP / 2)
+              && ratingToProLevel(rating) === p;
+  } else {
+    let k = parseInt(rankValue);
+    chained = ratingToRankInt(rating) === k && k >= MIN_RANK && k <= MAX_RANK;
+  }
   if (chained) $('#chain-rating').addClass('chained');
   else $('#chain-rating').removeClass('chained');
 }
@@ -101,27 +154,6 @@ function initSearch() {
   }, SEARCH_DELAY);
 }
 
-// Returns the integer rank, or null on invalid input. `p` (pro) returns null
-// until the pro model lands; callers should guard accordingly.
-function parseRank(rank) {
-  if (rank == null) return null;
-  let groups = /^(\d+)([kdp])$/i.exec(String(rank).trim());
-  if (!groups) return null;
-  let level = parseInt(groups[1]);
-  if (!(level >= 1)) return null;
-  switch (groups[2].toLowerCase()) {
-    case 'k': return level <= 30 ? -level : null;
-    case 'd': return level <= 9 ? level - 1 : null;
-    case 'p': return null;
-  }
-  return null;
-}
-
-function displayRank(rank) {
-  rank = parseInt(rank);
-  return rank < 0 ? `${-rank}k` : `${rank + 1}d`;
-}
-
 function fillPlayer(player) {
   // hack UK / GB
   let country = player.country.toLowerCase();
@@ -131,8 +163,7 @@ function fillPlayer(player) {
   form.val('firstname', player.firstname);
   form.val('country', country);
   form.val('club', player.club);
-  let parsedRank = parseRank(player.rank);
-  form.val('rank', parsedRank != null ? parsedRank : '');
+  form.val('rank', playerToFormRank(player));
   form.val('rating', player.rating);
   form.val('final', false);
   form.val('ffg_id', player.ffg);
@@ -277,11 +308,19 @@ onLoad(() => {
       return false;
     }
     let form = $('#player-form')[0];
+    let rankValue = form.val('rank');
+    let pro = 0;
+    let rank = rankValue;
+    if (isProFormValue(rankValue)) {
+      pro = proLevelOf(rankValue);
+      rank = ratingToRankInt(proLevelToRating(pro));   // amateur-equivalent strength for pairing/MMS
+    }
     let player = {
       name: form.val('name'),
       firstname: form.val('firstname'),
       rating: form.val('rating'),
-      rank: form.val('rank'),
+      rank: rank,
+      pro: pro,
       country: form.val('country'),
       club: form.val('club'),
       skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0]),
@@ -327,7 +366,7 @@ onLoad(() => {
           form.val('name', player.name);
           form.val('firstname', player.firstname);
           form.val('rating', player.rating);
-          form.val('rank', player.rank);
+          form.val('rank', playerToFormRank(player));
           form.val('country', player.country.toLowerCase());
           form.val('club', player.club);
           form.val('final', player.final);
@@ -475,10 +514,14 @@ onLoad(() => {
     manualRating = true;
   });
   $('#player select[name="rank"]').on('input', e=>{
-    let rank = e.target.value;
+    let rankValue = e.target.value;
     let ratingCtl = $('#player input[name="rating"]')[0];
     if (chained && (!$('#rating')[0].value || !manualRating)) {
-      ratingCtl.value = 2050 + 100 * rank;
+      if (isProFormValue(rankValue)) {
+        ratingCtl.value = proLevelToRating(proLevelOf(rankValue));
+      } else if (rankValue !== '') {
+        ratingCtl.value = rankIntToRating(parseInt(rankValue));
+      }
     }
   });
   $('#filter-box i').on('click', e => {
@@ -579,8 +622,19 @@ onLoad(() => {
   });
   $('#rating').on('input', e => {
     if (chained && (!$('#rank')[0].value || !manualRank)) {
-      let rank = (e.target.value - 2050) / 100;
-      $('#rank')[0].value = `${rank}`;
+      let rating = parseInt(e.target.value);
+      if (isNaN(rating)) return true;
+      let current = $('#rank')[0].value;
+      let inProDomain = isProFormValue(current);
+      // domain switch only when the rating exits the active domain's bounds.
+      // amateur -> pro when rating reaches above 9d (>= 2950);
+      // pro -> amateur when rating falls below 1p (< 2700).
+      // Inside the [2700, 2950) overlap, keep current domain.
+      if (inProDomain && rating < PRO_BASE_RATING) inProDomain = false;
+      else if (!inProDomain && rating >= PRO_BASE_RATING + PRO_STEP * MAX_PRO + Math.ceil(PRO_STEP / 2)) inProDomain = true;
+      $('#rank')[0].value = inProDomain
+        ? `p${ratingToProLevel(rating)}`
+        : `${ratingToRankInt(rating)}`;
     }
     return true;
   });

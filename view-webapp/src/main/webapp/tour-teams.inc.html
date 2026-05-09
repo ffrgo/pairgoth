@@ -5,7 +5,7 @@
       <div id="teams-left">
         <div id="teamables" class="multi-select" title="team members">
 #foreach($part in $teamables)
-          <div data-id="$part.id" data-name="$part.name" class="listitem pairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank) $part.country</span></div>
+          <div data-id="$part.id" data-name="$part.name" class="listitem pairable"><span class="name">$part.name $part.firstname</span><span>#rank($part.rank $!part.pro) $part.country</span></div>
 #end
         </div>
       </div>

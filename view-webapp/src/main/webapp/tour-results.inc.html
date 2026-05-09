@@ -43,11 +43,11 @@
         <tr id="result-$game.id" data-id="$game.id">
           <td data-sort="$game.t">${game.t}.</td>
 #if($blackFirst)
-          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank)#{else}BIP#end</span></td>
-          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank)#{else}BIP#end</span></td>
+          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
+          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
 #else
-          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank)#{else}BIP#end</span></td>
-          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank)#{else}BIP#end</span></td>
+          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
+          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
 #end
           <td class="handicap centered">$!game.h</td>
           <td class="result centered" data-sort="$game.r" data-result="$game.r">#if($blackFirst)$dispRstInv[$game.r]#{else}$dispRst[$game.r]#end</td>

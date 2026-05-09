@@ -3,16 +3,26 @@
 #macro(levels $sel)
   #set($dSuffix = $translate.translate('d'))
   #set($kSuffix = $translate.translate('k'))
+  #set($pSuffix = $translate.translate('p'))
+  <optgroup label="Pro">
+  #foreach($p in [9..1])
+    #set($val = "p$p")
+    #set($disp = "$p$pSuffix")
+    <option value="$val" #if("$!sel" == "$val")selected#end>$disp</option>
+  #end
+  </optgroup>
+  <optgroup label="Amateur">
   #foreach($d in [8..0])
     #set($dan = $d + 1)
     #set($disp = "$dan$dSuffix")
-    <option value="$d" #if("$!sel" != "" && $sel == $d)selected#end>$disp</option>
+    <option value="$d" #if("$!sel" != "" && "$!sel" == "$d")selected#end>$disp</option>
   #end
   #foreach($k in [-1..-30])
     #set($kyu = $math.abs($k))
     #set($disp = "$kyu$kSuffix")
-    <option value="$k" #if($sel && $sel == $k)selected#end>$disp</option>
+    <option value="$k" #if("$!sel" != "" && "$!sel" == "$k")selected#end>$disp</option>
   #end
+  </optgroup>
 #end
 #if($params.id)
   #if (!$tour)

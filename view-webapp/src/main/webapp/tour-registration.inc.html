@@ -93,7 +93,7 @@
             <td>$!part.ffg</td>
   #end
   ## display MMS correction on the screen, but not when printed
-            <td data-sort="$part.rank">#rank($part.rank)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
+            <td data-sort="$part.rank">#rank($part.rank $!part.pro)#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
             <td>$part.rating</td>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
             <td>$!mmsPlayersMap[$part.id]</td>
@@ -320,7 +320,7 @@
   #set($underGroup = $mmsMap.get(30 + $tour.pairing.mmBar - 1))
       <div id="under-group" class="multi-select" title="bar-1#if($underGroup && $underGroup.size() > 0), $underGroup.size() players#end">
   #foreach($part in $underGroup)
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank $!part.pro) $part.country $part.rating</span></div>
   #end
       </div>
       <div class="pairing-buttons">
@@ -330,7 +330,7 @@
   #set($topGroup = $mmsMap.get(30 + $tour.pairing.mmBar))
       <div id="top-group" class="multi-select" title="bar (top group)#if($topGroup && $topGroup.size() > 0), $topGroup.size() players#end">
   #foreach($part in $topGroup)
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank $!part.pro) $part.country $part.rating</span></div>
   #end
       </div>
       <div class="pairing-buttons">
@@ -340,7 +340,7 @@
   #set($superGroup = $mmsMap.get(30 + $tour.pairing.mmBar + 1))
       <div id="super-group" class="multi-select" title="bar+1 (super group)#if($superGroup && $superGroup.size() > 0), $superGroup.size() players#end">
   #foreach($part in $superGroup)
-        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank) $part.country $part.rating</span></div>
+        <div data-id="$part.id" data-correction="${part.mmsCorrection|0}" class="listitem pairable"><span>$part.name $part.firstname</span><span>#rank($part.rank $!part.pro) $part.country $part.rating</span></div>
   #end
       </div>
     </div>

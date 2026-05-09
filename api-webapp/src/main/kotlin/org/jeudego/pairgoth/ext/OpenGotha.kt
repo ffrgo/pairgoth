@@ -28,6 +28,12 @@ object OpenGotha {
             logger.warn("invalid rank '$rankStr' for $ctx; defaulting to ${displayRank(default)}")
         }
 
+    // Returns (rank, pro) for amateur or pro inputs; falls back to (default, 0) on garbage.
+    private fun parseRankAndProOrDefault(rankStr: String, default: Int, ctx: String): Pair<Int, Int> =
+        Pairable.parseRankAndPro(rankStr) ?: Pair(default, 0).also {
+            logger.warn("invalid rank '$rankStr' for $ctx; defaulting to ${displayRank(default)}")
+        }
+
     private fun parseDrawUpDownMode(str: String) = when (str) {
         "BOT" -> MainCritParams.DrawUpDown.BOTTOM
         "MID" -> MainCritParams.DrawUpDown.MIDDLE
@@ -163,16 +169,18 @@ object OpenGotha {
         val canonicMap = mutableMapOf<String, Int>()
         // import players
         ogTournament.players.player.map { player ->
+            val (rank, pro) = parseRankAndProOrDefault(player.rank, -20, "player ${player.name} ${player.firstName}")
             Player(
                 id = nextPlayerId,
                 name = player.name,
                 firstname = player.firstName,
                 rating = player.rating,
-                rank = parseRankOrDefault(player.rank, -20, "player ${player.name} ${player.firstName}"),
+                rank = rank,
                 country = player.country,
                 club = player.club,
                 final = "FIN" == player.registeringStatus,
-                mmsCorrection = player.smmsCorrection
+                mmsCorrection = player.smmsCorrection,
+                pro = pro
             ).also {
                 player.participating.forEachIndexed { i,c ->
                     if (c == '0') it.skip.add(i + 1)

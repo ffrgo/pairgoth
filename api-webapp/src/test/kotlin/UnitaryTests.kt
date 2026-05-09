@@ -1,10 +1,15 @@
 package org.jeudego.pairgoth.test
 
+import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Pairable
+import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.displayRank
+import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.parseRank
+import org.jeudego.pairgoth.model.parseRankAndPro
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 
 
@@ -67,6 +72,95 @@ class UnitaryTests: TestBase() {
         assertNull(Pairable.parseRank("31k"))           // beyond MIN_RANK
         assertNull(Pairable.parseRank("1p"))            // pro: not yet supported
         assertNull(Pairable.parseRank("9p"))
+    }
+
+    @Test
+    fun `015 ratingToPro EGD canonical pro buckets`() {
+        // EGD: 1p = 2700, 2p = 2730, ..., 9p = 2940. round((gor-2700)/30)+1.
+        assertEquals(1, Pairable.ratingToPro(2700))
+        assertEquals(1, Pairable.ratingToPro(2714))   // round to 1p
+        assertEquals(2, Pairable.ratingToPro(2715))   // boundary 1p/2p
+        assertEquals(2, Pairable.ratingToPro(2730))   // 2p centre
+        assertEquals(9, Pairable.ratingToPro(2940))   // 9p
+        assertEquals(9, Pairable.ratingToPro(9999))   // clamped
+        assertEquals(1, Pairable.ratingToPro(-9999))  // clamped to MIN_PRO
+    }
+
+    @Test
+    fun `016 proToRating round-trip`() {
+        for (p in Pairable.MIN_PRO..Pairable.MAX_PRO) {
+            assertEquals(p, Pairable.ratingToPro(Pairable.proToRating(p)))
+        }
+        assertEquals(2700, Pairable.proToRating(1))
+        assertEquals(2940, Pairable.proToRating(9))
+    }
+
+    @Test
+    fun `017 parseRankAndPro handles amateur and pro`() {
+        assertEquals(Pair(0, 0), Pairable.parseRankAndPro("1d"))
+        assertEquals(Pair(-1, 0), Pairable.parseRankAndPro("1k"))
+        assertEquals(Pair(-30, 0), Pairable.parseRankAndPro("30k"))
+        // 1p (2700) → rank 6 (=7d strength) + pro=1
+        assertEquals(Pair(6, 1), Pairable.parseRankAndPro("1p"))
+        assertEquals(Pair(6, 2), Pairable.parseRankAndPro("2p"))   // 2730 → 7d (still in 7d bucket)
+        assertEquals(Pair(8, 9), Pairable.parseRankAndPro("9p"))   // 2940 → 9d (clamped)
+        assertEquals(Pair(6, 1), Pairable.parseRankAndPro("1P"))   // case-insensitive
+        assertNull(Pairable.parseRankAndPro("0p"))
+        assertNull(Pairable.parseRankAndPro("10p"))
+        assertNull(Pairable.parseRankAndPro("foo"))
+        assertNull(Pairable.parseRankAndPro(""))
+    }
+
+    @Test
+    fun `018 displayRank with pro overrides amateur`() {
+        assertEquals("1d", displayRank(0, 0))
+        assertEquals("1d", displayRank(0))
+        assertEquals("1k", displayRank(-1, 0))
+        assertEquals("1p", displayRank(6, 1))      // pro takes precedence
+        assertEquals("9p", displayRank(8, 9))
+        assertEquals("1d", displayRank(0, 0))
+    }
+
+    @Test
+    fun `019 Player JSON round-trip with pro`() {
+        val original = Json.MutableObject(
+            "id" to 42,
+            "name" to "Cho",
+            "firstname" to "Chikun",
+            "rating" to 2820,
+            "rank" to 7,           // 8d-equivalent
+            "country" to "JP",
+            "club" to "xxxx",
+            "final" to true,
+            "pro" to 5
+        )
+        val player = Player.fromJson(original)
+        assertEquals(5, player.pro)
+        assertEquals(7, player.rank)
+        // Pairable.displayRank() extension factors in pro for Players
+        assertEquals("5p", (player as Pairable).displayRank())
+        val roundTrip = player.toJson()
+        assertEquals(5, roundTrip.getInt("pro"))
+        assertEquals(7, roundTrip.getInt("rank"))
+        assertEquals(2820, roundTrip.getInt("rating"))
+    }
+
+    @Test
+    fun `020 Player without pro omits the field in JSON`() {
+        val original = Json.MutableObject(
+            "id" to 1,
+            "name" to "Doe",
+            "firstname" to "John",
+            "rating" to 2050,
+            "rank" to 0,
+            "country" to "FR",
+            "club" to "xxxx",
+            "final" to true
+        )
+        val player = Player.fromJson(original)
+        assertEquals(0, player.pro)
+        val json = player.toJson()
+        assertNull(json.getInt("pro"))
     }
 
     @Test

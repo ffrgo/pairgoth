@@ -29,6 +29,13 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                     }.toTypedArray()
                     Json.MutableObject(*pairs).also { player ->
                         player["origin"] = "EGF"
+                        // honor a declared `Np` rank as the pro flag (EGD ground truth);
+                        // the strength rank itself is overridden below from the rating.
+                        player.getString("rank")?.let { declaredRank ->
+                            proSuffixRegex.matchEntire(declaredRank)?.groupValues?.getOrNull(1)
+                                ?.toIntOrNull()?.takeIf { it in 1..9 }
+                                ?.let { player["pro"] = it }
+                        }
                         // override rank with rating equivalent (canonical EGD GoR2Rank mapping)
                         player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
                             player["rank"] = displayRank(ratingToRank(rating))
@@ -46,4 +53,5 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     var linePattern =
         Regex("\\s+(?<egf>\\d{8})\\s+(?<name>$atom+)\\s(?<firstname>$atom+)?,?\\s+(?<country>[A-Z]{2})\\s+(?<club>\\S{1,4})\\s+(?<rank>[1-9][0-9]?[kdp])\\s+(?<promotion>[1-9][0-9]?[kdp]|--)\\s+(?<rating>-?[0-9]+)\\s+(?<nt>[0-9]+)\\s+(?<last>\\S+)\\s*")
     val groups = arrayOf("egf", "name", "firstname", "country", "club", "rank", "rating")
+    private val proSuffixRegex = Regex("([1-9])p", RegexOption.IGNORE_CASE)
 }
