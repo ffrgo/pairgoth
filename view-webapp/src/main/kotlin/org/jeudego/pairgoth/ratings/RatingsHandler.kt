@@ -117,7 +117,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         val newFile = RatingsManager.path.resolve(ratingsFilename).toFile()
         val isFreshFile = latestCached == null || latestCached.name != ratingsFilename
         if (isFreshFile) {
-            RatingsManager.logger.info("Updating $origin cache from $url")
+            RatingsManager.logger.info("Writing new $origin snapshot $ratingsFilename")
             newFile.printWriter().use { out -> out.println(lastPlayers.toString()) }
         }
 
@@ -149,6 +149,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
     }
 
     protected fun fetchPayload(): String? {
+        logger.info("Fetching ${origin.name} ratings from $url")
         if (url.protocol == "file") {
             return try {
                 File(url.toURI()).readText(defaultCharset())
