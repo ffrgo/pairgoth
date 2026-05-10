@@ -39,13 +39,27 @@ function showError(message) {
   console.error(message);
   $('#error')[0].innerText = message;
   $('#error').removeClass('hidden');
+  dismissOnNextClick($('#error'));
 }
 
-function showSuccess(message) {
+function showSuccess(message, sticky = false) {
   console.log(message);
   $('#success')[0].innerText = message;
   $('#success').removeClass('hidden');
-  setTimeout(() => $('#success').addClass('hidden'), 3000);
+  if (sticky) dismissOnNextClick($('#success'));
+  else setTimeout(() => $('#success').addClass('hidden'), 3000);
+}
+
+// Hide `elem` on the next click anywhere on the page. Deferred via setTimeout(0)
+// so the click that triggered the toast doesn't immediately dismiss it.
+function dismissOnNextClick(elem) {
+  setTimeout(() => {
+    let handler = () => {
+      elem.addClass('hidden');
+      document.removeEventListener('click', handler, true);
+    };
+    document.addEventListener('click', handler, true);
+  }, 0);
 }
 
 function error(response) {

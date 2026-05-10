@@ -552,6 +552,12 @@ onLoad(() => {
     }
   }
   store.remove('scrollIntoView');
+  let refreshReport = store('refreshReport');
+  if (refreshReport) {
+    if (refreshReport.error) showError(refreshReport.msg);
+    else showSuccess(refreshReport.msg, true);
+    store.remove('refreshReport');
+  }
   if (store('macmahonGroups')) {
     modal('macmahon-groups');
   }
@@ -695,5 +701,109 @@ onLoad(() => {
       showSuccess(`Sync: ${imported} new, ${skipped} already known`);
     }
     if (imported > 0) setTimeout(() => window.location.reload(), 1500);
+  });
+
+  // Refresh ratings — pulls latest rating/rank/pro for already-registered players from EGD/FFG.
+  // Source priority when a player has multiple external IDs: EGF > FFG > AGA. Rank is updated
+  // only when the player's current (rating, rank) are chained; rating and pro are always
+  // updated. The summary toast lists rank-skipped players so the organiser can spot manual
+  // overrides that would otherwise be silently kept.
+  $('#refresh-ratings').on('click', async e => {
+    e.preventDefault();
+    let players = await api.getJson(`tour/${tour_id}/part`);
+    if (players === 'error' || !Array.isArray(players)) return;
+    let registered = players.filter(p => p.egf || p.ffg || p.aga);
+    if (registered.length === 0) {
+      showError('No registered player has an external ID (EGF/FFG/AGA) to refresh from.');
+      return;
+    }
+    if (!confirm(`Refresh ratings for ${registered.length} registered player(s) from EGD/FFG?`)) return;
+
+    // Bulk lookup
+    let want = { egf: [], ffg: [], aga: [] };
+    for (let p of registered) {
+      if (p.egf) want.egf.push(p.egf);
+      if (p.ffg) want.ffg.push(p.ffg);
+      if (p.aga) want.aga.push(p.aga);
+    }
+    let lookup = await api.postJson('ratings-lookup', want);
+    if (lookup === 'error' || typeof lookup !== 'object') {
+      showError('ratings-lookup failed');
+      return;
+    }
+
+    // Chain test: are (rating, rank, pro) internally consistent? Pros chain on pro level,
+    // amateurs on rank. Used to decide whether to propagate rank/pro from the refreshed
+    // state or keep the player's manual override.
+    function isChained(rating, rank, pro) {
+      if (isNaN(rating)) return false;
+      if (pro > 0) return ratingToProLevel(rating) === pro;
+      return !isNaN(rank) && ratingToRankInt(rating) === rank;
+    }
+
+    let updated = 0, unchanged = 0, rankSkipped = [], mmsCorrected = [], notFound = [], failed = 0, lastError = null;
+    for (let p of registered) {
+      // Pick the first source with a hit, in priority order.
+      let hit = null;
+      for (let src of ['egf', 'ffg', 'aga']) {
+        let id = p[src];
+        if (id && lookup[src] && lookup[src][id]) { hit = lookup[src][id]; break; }
+      }
+      if (!hit || hit.rating == null) {
+        notFound.push(`${p.name} ${p.firstname || ''}`.trim());
+        continue;
+      }
+      let newRating = parseInt(hit.rating);
+      let newPro = hit.pro ? parseInt(hit.pro) : 0;
+      let oldRating = parseInt(p.rating);
+      let oldRank = parseInt(p.rank);
+      let oldPro = p.pro ? parseInt(p.pro) : 0;
+      let wasChained = isChained(oldRating, oldRank, oldPro);
+      // When chained, propagate everything; when not, keep rank/pro and only refresh rating.
+      let newRank = wasChained ? ratingToRankInt(newRating) : oldRank;
+      let proToApply = wasChained ? newPro : oldPro;
+      if (newRating === oldRating && newRank === oldRank && proToApply === oldPro) {
+        unchanged++;
+        continue;
+      }
+      try {
+        let resp = await api.putJson(`tour/${tour_id}/part/${p.id}`, {
+          id: p.id,
+          rating: newRating,
+          rank: newRank,
+          pro: proToApply
+        });
+        if (resp === 'error') {
+          failed++; lastError = `PUT failed for ${p.name}`;
+          continue;
+        }
+        updated++;
+        let label = `${p.name} ${p.firstname || ''}`.trim();
+        if (!wasChained && newRating !== oldRating) rankSkipped.push(label);
+        // Only flag mmsCorrection when the rank actually shifted (chained + new rank ≠ old rank).
+        // That's when the player's effective MM bracket has moved and the manual correction
+        // may no longer be appropriate. Untouched rank → MM bracket unchanged → no warning.
+        let mc = parseInt(p.mmsCorrection || 0);
+        if (mc !== 0 && wasChained && newRank !== oldRank) {
+          mmsCorrected.push(`${label} (${mc > 0 ? '+' : ''}${mc})`);
+        }
+      } catch (err) {
+        failed++; lastError = err.message || String(err);
+      }
+    }
+
+    let parts = [];
+    parts.push(`${updated} updated`);
+    if (unchanged > 0) parts.push(`${unchanged} unchanged`);
+    if (rankSkipped.length > 0) parts.push(`${rankSkipped.length} rank kept (unchained: ${rankSkipped.join(', ')})`);
+    if (mmsCorrected.length > 0) parts.push(`${mmsCorrected.length} with MMS correction — review: ${mmsCorrected.join(', ')}`);
+    if (notFound.length > 0) parts.push(`${notFound.length} not found in ratings DB${notFound.length <= 5 ? ` (${notFound.join(', ')})` : ''}`);
+    if (failed > 0) parts.push(`${failed} failed${lastError ? ` (last: ${lastError})` : ''}`);
+    let msg = parts.join('; ');
+    // Stash the report and reload so the table reflects new rating/rank/pro values.
+    // The on-load handler below re-shows it as a sticky toast.
+    store('refreshReport', { msg: msg, error: failed > 0 });
+    if (updated > 0) setTimeout(() => window.location.reload(), 200);
+    else if (failed > 0) showError(msg); else showSuccess(msg, true);
   });
 });
