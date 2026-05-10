@@ -524,8 +524,9 @@ URL override for the rating source. Schemes: `http://`, `https://`, `file://`. I
 
 - FFG: https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt
 - EGF: https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html
+- AGA: TBD
 
-Use this to point at a local mirror or to a static file when the upstream is unreachable.
+Use this property to point at a local mirror or to a static file when the upstream is unreachable.
 
 #### Ratings freeze
 
