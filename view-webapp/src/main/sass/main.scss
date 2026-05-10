@@ -47,33 +47,36 @@
   }
 
   .chain {
-    float: right;
     background: none;
     border: none;
     cursor: pointer;
     padding: 0;
     margin: 0;
     position: relative;
-    width: 1.2em;
-    height: 1.2em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
     img {
-      width: 1.2em;
-      height: 1.2em;
-      vertical-align: middle;
-    }
-    &:not(.chained)::after {
-      content: '';
-      position: absolute;
-      top: 10%;
-      left: 10%;
-      width: 120%;
-      height: 0;
-      border-top: 2px solid red;
-      transform: rotate(-45deg);
-      transform-origin: left center;
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
     }
     &:not(.chained) {
       opacity: 0.5;
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 5%;
+        width: 100%;
+        height: 0;
+        border-top: 4px solid red;
+        transform: rotate(-45deg);
+        transform-origin: center center;
+        pointer-events: none;
+      }
     }
   }
 

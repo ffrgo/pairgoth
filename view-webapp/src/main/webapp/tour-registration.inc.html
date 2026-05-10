@@ -228,9 +228,6 @@
     </div>
     <form id="player-form" autocomplete="off" class="ui form edit">
       <input type="hidden" name="id"/>
-      <input type="hidden" name="egf_id"/>
-      <input type="hidden" name="ffg_id"/>
-      <!-- input type="hidden" name="aga"/> -->
       <div class="popup-content">
         <div class="player-fields">
           <div class="two stackable fields">
@@ -263,14 +260,39 @@
               <input type="text" name="club" placeholder="club" spellcheck="false"/>
             </div>
           </div>
-          <div class="two stackable fields">
-            <div class="eight wide field">
-              <label>Rating<button id="chain-rating" type="button" class="chain chained" title="Chain rating and rank"><img src="/img/chain.svg"/></button></label>
+          <div class="four stackable fields">
+            <div class="four wide field">
+              <label>EGF</label>
+              <span class="info"></span>
+              <input type="text" name="egf" placeholder="EGF pin" spellcheck="false"/>
+            </div>
+            <div class="four wide field">
+              <label>FFG</label>
+              <span class="info"></span>
+              <input type="text" name="ffg" placeholder="FFG licence" spellcheck="false"/>
+            </div>
+            <div class="four wide field">
+              <label>AGA</label>
+              <span class="info"></span>
+              <input type="text" name="aga" placeholder="AGA id" spellcheck="false"/>
+            </div>
+            <div class="four wide field">
+              <label>EXT</label>
+              <span class="info"></span>
+              <input type="text" name="ext" placeholder="External id" spellcheck="false"/>
+            </div>
+          </div>
+          <div class="three stackable fields">
+            <div class="seven wide field">
+              <label>Rating</label>
               <span class="info"></span>
               <input id="rating" name="rating" type="text" class="numeric"/>
             </div>
-            <div class="eight wide field">
-              <label>Rank<span class="note">initialized from rating</span></label>
+            <div class="two wide field">
+              <button id="chain-rating" type="button" class="chain chained" title="Chain rating and rank"><img src="/img/chain.svg"/></button>
+            </div>
+            <div class="seven wide field">
+              <label>Rank</label>
               <span class="info"></span>
               <select id="rank" name="rank">
                 <option></option>

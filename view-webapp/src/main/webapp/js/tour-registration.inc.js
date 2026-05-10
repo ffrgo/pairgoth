@@ -155,6 +155,7 @@ function initSearch() {
 }
 
 function fillPlayer(player) {
+  console.log(player);
   // hack UK / GB
   let country = player.country.toLowerCase();
   if ('uk' === country) country = 'gb';
@@ -166,8 +167,10 @@ function fillPlayer(player) {
   form.val('rank', playerToFormRank(player));
   form.val('rating', player.rating);
   form.val('final', false);
-  form.val('ffg_id', player.ffg);
-  form.val('egf_id', player.egf);
+  form.val('ffg', player.ffg);
+  form.val('egf', player.egf);
+  form.val('aga', player.aga);
+  form.val('ext', player.ext);
   updateChainState();
   $('#needle')[0].value = '';
   initSearch();
@@ -370,6 +373,10 @@ onLoad(() => {
           form.val('country', player.country.toLowerCase());
           form.val('club', player.club);
           form.val('final', player.final);
+          form.val('egf', player.egf);
+          form.val('ffg', player.ffg);
+          form.val('aga', player.aga);
+          form.val('ext', player.ext);
           if (player.final) $('#final-reg').addClass('final');
           else $('#final-reg').removeClass('final');
           for (r = 1; r <= tour_rounds; ++r) {
@@ -672,6 +679,8 @@ onLoad(() => {
         rank: player.level ? player.level - 30 : 0,
         rating: player.rating || 2050 + (player.level ? (player.level - 30) * 100 : 0),
         egf: player.pin || null,
+        ffg: player.ffg || null,
+        aga: player.aga || null,
         ext: player.id != null ? String(player.id) : null,
         final: true,
         skip: []
