@@ -42,6 +42,23 @@ function parseRank(rank) {
   return null;
 }
 
+// Same input grammar as parseRank, but returns the {rank, pro} ints the API expects.
+// Pro inputs derive rank from the canonical pro→rating→rank mapping so pairing/MMS treat
+// pros at their rating equivalent.
+function parseRankAndPro(rankStr) {
+  if (rankStr == null) return null;
+  let groups = /^(\d+)([kdp])$/i.exec(String(rankStr).trim());
+  if (!groups) return null;
+  let n = parseInt(groups[1]);
+  if (!(n >= 1)) return null;
+  switch (groups[2].toLowerCase()) {
+    case 'k': return n <= 30 ? { rank: -n, pro: 0 } : null;
+    case 'd': return n <= 9 ? { rank: n - 1, pro: 0 } : null;
+    case 'p': return n <= 9 ? { rank: ratingToRankInt(proLevelToRating(n)), pro: n } : null;
+  }
+  return null;
+}
+
 function displayRank(rank, pro) {
   if (pro && pro >= MIN_PRO && pro <= MAX_PRO) return `${pro}p`;
   rank = parseInt(rank);
@@ -655,7 +672,12 @@ onLoad(() => {
     manualRank = true;
   });
 
-  // Webhook - sync players
+  // Webhook - sync players from the website. Inserts new players and updates existing ones
+  // matched by external ids (EXT > EGF/FFG/AGA, mirroring Tournament.findPlayerByExternalIds).
+  // Last-wins on rank/rating/club/country/skip/etc. — operator is expected to keep both sides
+  // consistent. The server guards round-drops against pairings; those rejections are surfaced
+  // as a distinct "blocked, already paired" line so the operator can spot a misordered flow
+  // (correct procedure: freeze the round on the website *first*, then resync).
   $('#sync-website').on('click', async e => {
     let form = $('#tournament-infos')[0];
     let code = form.val('shortName');
@@ -669,47 +691,124 @@ onLoad(() => {
       showError(data.message || 'Invalid response from website');
       return;
     }
-    let imported = 0, skipped = 0, failed = 0, lastError = null;
-    for (let player of data.players) {
-      let pairgothPlayer = {
-        name: player.lastname,
-        firstname: player.firstname,
-        country: player.country?.toLowerCase() || '',
-        club: player.club || '',
-        rank: player.level ? player.level - 30 : 0,
-        rating: player.rating || 2050 + (player.level ? (player.level - 30) * 100 : 0),
-        egf: player.pin || null,
-        ffg: player.ffg || null,
-        aga: player.aga || null,
-        ext: player.id != null ? String(player.id) : null,
-        final: true,
-        skip: []
-      };
-      if (player.rounds) {
-        for (let i = 0; i < player.rounds.length; i++) {
-          if (player.rounds[i] === '0') pairgothPlayer.skip.push(i + 1);
+    let existing = await api.getJson(`tour/${tour_id}/part`);
+    if (existing === 'error' || !Array.isArray(existing)) return;
+
+    let byExt = {}, byEgf = {}, byFfg = {}, byAga = {};
+    for (let p of existing) {
+      if (p.ext) byExt[p.ext] = p;
+      if (p.egf) byEgf[p.egf] = p;
+      if (p.ffg) byFfg[p.ffg] = p;
+      if (p.aga) byAga[p.aga] = p;
+    }
+    let findMatch = pl =>
+      (pl.ext && byExt[pl.ext]) ||
+      (pl.egf && byEgf[pl.egf]) ||
+      (pl.ffg && byFfg[pl.ffg]) ||
+      (pl.aga && byAga[pl.aga]) ||
+      null;
+
+    function buildPayload(wp) {
+      // Wire format: `rank` is a string ("10k", "2d", "1p"). 1p..9p doubles as the pro flag.
+      let parsed = parseRankAndPro(wp.rank);
+      let rank = parsed?.rank ?? -20; // 20k fallback on garbage / missing
+      let pro = parsed?.pro ?? 0;
+      let rating = (wp.rating != null && !isNaN(parseInt(wp.rating)))
+        ? parseInt(wp.rating)
+        : (pro > 0 ? proLevelToRating(pro) : rankIntToRating(rank));
+      let skip = [];
+      if (wp.rounds) {
+        for (let i = 0; i < wp.rounds.length; i++) {
+          if (wp.rounds[i] === '0') skip.push(i + 1);
         }
       }
-      // Use raw api.post so we can swallow the expected "already registered" rejection on re-sync.
-      let resp = await api.post(`tour/${tour_id}/part`, pairgothPlayer);
-      if (resp.ok) {
-        imported++;
-      } else {
-        let body = await resp.json().catch(() => ({}));
-        if (body.error === 'player already registered') {
-          skipped++;
+      return {
+        name: wp.lastname, firstname: wp.firstname,
+        country: (wp.country || '').toLowerCase(),
+        club: wp.club || '',
+        rank, rating, pro,
+        egf: wp.pin || null, ffg: wp.ffg || null, aga: wp.aga || null,
+        ext: wp.id != null ? String(wp.id) : null,
+        final: true, skip
+      };
+    }
+
+    let norm = s => (s == null ? '' : String(s)).trim().toLowerCase();
+    // Server upcases country and rewrites GB→UK on store; align here so re-sync of a UK player
+    // doesn't show as "updated" every time.
+    let cnorm = c => { let s = norm(c); return s === 'gb' ? 'uk' : s; };
+    let normSkip = a => Array.isArray(a) ? Array.from(new Set(a.map(Number))).sort((x, y) => x - y).join(',') : '';
+    function isUnchanged(payload, current) {
+      return norm(payload.name) === norm(current.name)
+          && norm(payload.firstname) === norm(current.firstname)
+          && cnorm(payload.country) === cnorm(current.country)
+          && norm(payload.club) === norm(current.club)
+          && parseInt(payload.rank) === parseInt(current.rank)
+          && parseInt(payload.rating) === parseInt(current.rating)
+          && (parseInt(payload.pro) || 0) === (parseInt(current.pro) || 0)
+          && normSkip(payload.skip) === normSkip(current.skip || [])
+          && norm(payload.egf) === norm(current.egf)
+          && norm(payload.ffg) === norm(current.ffg)
+          && norm(payload.aga) === norm(current.aga)
+          && norm(payload.ext) === norm(current.ext);
+    }
+
+    let added = 0, updated = 0, unchanged = 0, failed = 0, lastError = null;
+    let blocked = []; // [{ label, round }] — paired in the round being dropped
+    for (let wp of data.players) {
+      let payload = buildPayload(wp);
+      let label = `${payload.name} ${payload.firstname || ''}`.trim();
+      let match = findMatch(payload);
+      if (!match) {
+        let resp = await api.post(`tour/${tour_id}/part`, payload);
+        if (resp.ok) {
+          added++;
         } else {
+          let body = await resp.json().catch(() => ({}));
           failed++;
           lastError = body.error || `HTTP ${resp.status}`;
         }
+        continue;
+      }
+      if (isUnchanged(payload, match)) {
+        unchanged++;
+        continue;
+      }
+      payload.id = match.id;
+      let resp = await api.put(`tour/${tour_id}/part/${match.id}`, payload);
+      if (resp.ok) {
+        updated++;
+      } else {
+        let body = await resp.json().catch(() => ({}));
+        let err = body.error || `HTTP ${resp.status}`;
+        failed++;
+        let m = err.match(/player is playing in round #(\d+)/);
+        if (m) blocked.push({ label, round: parseInt(m[1]) });
+        else lastError = err;
       }
     }
-    if (failed > 0) {
-      showError(`Sync: ${failed} failed (last: ${lastError}); ${imported} new, ${skipped} known`);
-    } else {
-      showSuccess(`Sync: ${imported} new, ${skipped} already known`);
+
+    let lines = [];
+    if (added > 0) lines.push(`  ${added} added`);
+    if (updated > 0) lines.push(`  ${updated} updated`);
+    if (unchanged > 0) lines.push(`  ${unchanged} unchanged`);
+    if (blocked.length > 0) {
+      let names = blocked.map(x => `${x.label} (round ${x.round})`).join(', ');
+      lines.push(`  ${blocked.length} blocked — already paired: ${names}`);
     }
-    if (imported > 0) setTimeout(() => window.location.reload(), 1500);
+    let other = failed - blocked.length;
+    if (other > 0) lines.push(`  ${other} other failed${lastError ? ` — last: ${lastError}` : ''}`);
+    let msg = lines.length === 0 ? 'Sync: nothing to do' : 'Sync results:\n' + lines.join('\n');
+    let hasError = failed > 0;
+    if (added > 0 || updated > 0) {
+      // Stash and reload so the table reflects the new state. The on-load handler re-shows it.
+      store('refreshReport', { msg, error: hasError });
+      setTimeout(() => window.location.reload(), 200);
+    } else if (hasError) {
+      showError(msg);
+    } else {
+      showSuccess(msg, true);
+    }
   });
 
   // Refresh ratings — pulls latest rating/rank/pro for already-registered players from EGD/FFG.
