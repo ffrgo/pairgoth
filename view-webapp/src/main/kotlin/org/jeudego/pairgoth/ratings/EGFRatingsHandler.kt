@@ -47,9 +47,11 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
                                 ?.toIntOrNull()?.takeIf { it in 1..9 }
                                 ?.let { player["pro"] = it }
                         }
-                        // override rank with rating equivalent (canonical EGD GoR2Rank mapping)
+                        // override rank with rating equivalent (canonical EGD GoR2Rank mapping);
+                        // for pros, keep the `Np` title in the displayed rank.
                         player["rating"]?.toString()?.toIntOrNull()?.let { rating ->
-                            player["rank"] = displayRank(ratingToRank(rating))
+                            val pro = (player["pro"] as? Number)?.toInt() ?: 0
+                            player["rank"] = displayRank(ratingToRank(rating), pro)
                         }
                         // fix for missing firstnames
                         if (player.getString("firstname") == null) {
