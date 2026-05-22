@@ -48,8 +48,8 @@ class ViewServlet : VelocityViewServlet() {
         // (e.g. when WebhookServlet includes /publish/* to render a publish payload).
         val lang = request.getAttribute("lang") as String?
 
-        // User preferences - read from cookie
-        val blackFirst = request.cookies?.find { it.name == "blackFirst" }?.value == "true"
+        // Display preference - server-side configuration (display.pairing.blackFirst).
+        val blackFirst = WebappManager.properties.getProperty("display.pairing.blackFirst")?.toBoolean() ?: false
         context.put("blackFirst", blackFirst)
 
         /*

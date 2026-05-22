@@ -119,6 +119,23 @@
             <label>Tbl</label>
             <span class="nobreak">#<input name="t" type="number"/></span>
           </div>
+#if($blackFirst)
+          <div class="field">
+            <label>Black</label>
+            <input type="hidden" name="b"/>
+            <div id="edit-pairing-black"></div>
+          </div>
+          <div class="field">
+            <button id="pairing-exchange" type="button" class="ui icon button">
+              <i class="fa fa-exchange"></i>
+            </button>
+          </div>
+          <div class="field">
+            <label>White</label>
+            <input type="hidden" name="w"/>
+            <div id="edit-pairing-white"></div>
+          </div>
+#else
           <div class="field">
             <label>White</label>
             <input type="hidden" name="w"/>
@@ -134,6 +151,7 @@
             <input type="hidden" name="b"/>
             <div id="edit-pairing-black"></div>
           </div>
+#end
           <div class="field">
             <label>Hd</label>
             <select name="h">

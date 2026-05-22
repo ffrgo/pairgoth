@@ -1,6 +1,6 @@
 ## Layout for self-contained payload renders (no chrome, no scripts).
 ## Used by /publish/* URIs to produce HTML fragments shipped to external consumers.
-## ViewServlet.fillContext already sets $blackFirst from the request cookie.
+## ViewServlet.fillContext already sets $blackFirst from the display.pairing.blackFirst property.
 #if($params.id)
   #set($tour = $api.get("tour/${params.id}"))
 #end

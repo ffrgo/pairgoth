@@ -2,7 +2,9 @@
 
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-// User preferences
+/* Per-user preferences — disabled. Display.pairing.blackFirst is now a server-side
+   pairgoth.properties config; the per-user gear icon / settings modal are commented
+   out in the layout. Kept here for potential reuse.
 const prefs = {
   get: function(key) {
     return store('prefs.' + key);
@@ -12,10 +14,11 @@ const prefs = {
   },
   getAll: function() {
     return {
-      blackFirst: this.get('blackFirst') || false
+      // key: value
     };
   }
 };
+*/
 function randomString(length) {
   let result = '';
   const charactersLength = characters.length;
@@ -364,20 +367,21 @@ onLoad(() => {
     if (!dialog) close_modal();
   });
 
-  // Settings modal handlers
+  /* Settings modal handlers - empty for now
   $('#settings').on('click', e => {
     modal('settings-modal');
   });
 
   $('#settings-save').on('click', e => {
-    let blackFirst = $('#pref-black-first')[0].checked;
-    prefs.set('blackFirst', blackFirst);
+    // let <setting> = <input state>;
+    prefs.set('<setting>', <value>);
     // Set cookie for server-side rendering (expires in 1 year)
-    document.cookie = `blackFirst=${blackFirst}; path=/; max-age=31536000; SameSite=Lax`;
+    document.cookie = `<key>=${value}; path=/; max-age=31536000; SameSite=Lax`;
     close_modal();
     // Reload page to apply new preference
     window.location.reload();
   });
+  */
 
   if (isTouchDevice()) {
     $("[title]").on('click', e => {
