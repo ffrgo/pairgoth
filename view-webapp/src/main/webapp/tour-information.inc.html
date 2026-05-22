@@ -214,6 +214,9 @@
           <input name="stones" class="seconds" type="number" min="0" value="#if($tour && "$!tour.timeSystem.stones" != "")$tour.timeSystem.stones#{else}15#end"/>
         </div>
       </div>
+      <div class="field" style="margin-top:-0.5rem">
+        <small id="adjusted-time-info" style="font-style:italic;color:#888"></small>
+      </div>
     </div>
     <div class="form-actions">
       <button id="cancel" class="ui gray right labeled icon floating edit button">

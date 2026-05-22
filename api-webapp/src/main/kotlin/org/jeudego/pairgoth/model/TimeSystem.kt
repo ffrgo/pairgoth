@@ -92,9 +92,14 @@ fun TimeSystem.toJson() = when (type) {
     TimeSystem.TimeSystemType.SUDDEN_DEATH -> Json.Object("type" to type.name, "mainTime" to mainTime)
 }
 
+// Average per-player game-length estimate used by EGF/FFG tournament-class thresholds.
+// Multipliers match OpenGotha's heuristics:
+// - Canadian: assume 60 stones played in byoyomi (4 full periods of 15-stone byoyomi).
+// - Japanese: assume 45 byoyomi periods (one move per period; periods reset).
+// - Fischer: assume 120 increments (long-game heuristic; over-estimates blitz).
 fun TimeSystem.adjustedTime() = when (type) {
-    TimeSystem.TimeSystemType.CANADIAN -> mainTime + 60 * byoyomi / stones
-    TimeSystem.TimeSystemType.JAPANESE -> mainTime + 45 * byoyomi
-    TimeSystem.TimeSystemType.FISCHER -> mainTime + 120 * increment
+    TimeSystem.TimeSystemType.CANADIAN -> if (byoyomi > 0 && stones > 0) mainTime + 60 * byoyomi / stones else mainTime
+    TimeSystem.TimeSystemType.JAPANESE -> if (byoyomi > 0 && periods > 0) mainTime + 45 * byoyomi else mainTime
+    TimeSystem.TimeSystemType.FISCHER -> if (increment > 0) mainTime + 120 * increment else mainTime
     TimeSystem.TimeSystemType.SUDDEN_DEATH -> mainTime
 }

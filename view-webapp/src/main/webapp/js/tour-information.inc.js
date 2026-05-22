@@ -104,7 +104,37 @@ onLoad(() => {
         $('#stones').addClass('hidden');
         break;
     }
+    updateAdjustedTimeInfo();
   });
+
+  // Mirror of TimeSystem.adjustedTime() / timeSystemComment()
+  function updateAdjustedTimeInfo() {
+    let form = $('#tournament-infos')[0];
+    let type = form.val('timeSystemType');
+    let mainTime = fromHMS(form.val('mainTime'));
+    let byoyomi = fromHMS(form.val('byoyomi'));
+    let increment = fromHMS(form.val('increment'));
+    let periods = parseInt(form.val('periods')) || 0;
+    let stones = parseInt(form.val('stones')) || 0;
+    let adjusted;
+    switch (type) {
+      case 'CANADIAN':
+        adjusted = (byoyomi > 0 && stones > 0) ? mainTime + 60 * byoyomi / stones : mainTime;
+        break;
+      case 'JAPANESE':
+        adjusted = (byoyomi > 0 && periods > 0) ? mainTime + 45 * byoyomi : mainTime;
+        break;
+      case 'FISCHER':
+        adjusted = (increment > 0) ? mainTime + 120 * increment : mainTime;
+        break;
+      default:
+        adjusted = mainTime;
+    }
+    $('#adjusted-time-info').text(`Adjusted time: ${Math.floor(adjusted / 60)} minutes`);
+  }
+
+  $('input[name="mainTime"], input[name="byoyomi"], input[name="increment"], input[name="periods"], input[name="stones"]').on('input change', updateAdjustedTimeInfo);
+  updateAdjustedTimeInfo();
 
   $('input.duration').imask({
     mask: '00:00:00',

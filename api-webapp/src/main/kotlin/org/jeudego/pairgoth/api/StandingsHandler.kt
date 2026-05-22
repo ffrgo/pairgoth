@@ -172,9 +172,9 @@ ${
         val mainMin = ts.mainTime / 60
         fun seconds(s: Int) = if (s >= 60 && s % 60 == 0) "${s / 60} minutes" else "$s seconds"
         return when (ts.type) {
-            CANADIAN -> if (ts.byoyomi > 0) "Canadian $mainMin minutes, ${ts.stones} stones / ${seconds(ts.byoyomi)}"
+            CANADIAN -> if (ts.byoyomi > 0 && ts.stones > 0) "Canadian $mainMin minutes, ${ts.stones} stones / ${seconds(ts.byoyomi)}"
                 else "Sudden death $mainMin minutes"
-            JAPANESE -> if (ts.byoyomi > 0) "Japanese $mainMin minutes, ${ts.periods} periods of ${seconds(ts.byoyomi)}"
+            JAPANESE -> if (ts.byoyomi > 0 && ts.periods > 0) "Japanese $mainMin minutes, ${ts.periods} periods of ${seconds(ts.byoyomi)}"
                 else "Sudden death $mainMin minutes"
             FISCHER -> if (ts.increment > 0) "Fischer $mainMin minutes + ${ts.increment} seconds${ if (ts.maxTime > 0) ", max ${ts.maxTime / 60} minutes" else "" }"
                 else "Sudden death $mainMin minutes"
