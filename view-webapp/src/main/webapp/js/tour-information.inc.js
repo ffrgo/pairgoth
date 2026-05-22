@@ -28,7 +28,46 @@ onLoad(() => {
 
   $('#parameters').on('click', e => {
     modal('parameters-modal');
+    updateMainClubReadout();
   });
+
+  // Toggle visibility of the threshold/readout block when the adjustment checkbox flips.
+  $('#mainClubAdjustment').on('change', e => {
+    $('#mainClubDetails')[0].style.display = e.target.checked ? '' : 'none';
+    if (e.target.checked) updateMainClubReadout();
+  });
+  $('input[name="mainClubDetectionThreshold"]').on('input change', updateMainClubReadout);
+
+  // Mirror of BasePairingHelper.localClub — fetches the current player list and tells
+  // the operator which club the algorithm would treat as "main" at the current threshold.
+  function updateMainClubReadout() {
+    let readout = $('#mainClubReadout')[0];
+    if (!readout || typeof(tour_id) === 'undefined') return;
+    api.getJson(`tour/${tour_id}/part`).then(players => {
+      if (!Array.isArray(players) || players.length === 0) {
+        readout.textContent = 'No registered players yet.';
+        return;
+      }
+      let counts = {};
+      players.forEach(p => {
+        let k = (p.club || '').substring(0, 4).toUpperCase();
+        if (k) counts[k] = (counts[k] || 0) + 1;
+      });
+      let top = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+      if (!top) {
+        readout.textContent = 'No club data on registered players.';
+        return;
+      }
+      let pct = top[1] / players.length;
+      let thresholdPct = (parseInt($('input[name="mainClubDetectionThreshold"]')[0].value) || 40) / 100;
+      let pctTxt = `${(pct * 100).toFixed(1)}%`;
+      if (pct > thresholdPct) {
+        readout.textContent = `Detected main club: ${top[0]} (${top[1]}/${players.length} = ${pctTxt}).`;
+      } else {
+        readout.textContent = `Most-represented club: ${top[0]} (${top[1]}/${players.length} = ${pctTxt}) — below threshold; no main club detected.`;
+      }
+    });
+  }
 
   $('#cancel-parameters').on('click', e => {
     // Same rationale as the main #cancel handler: reload to discard unsaved edits.
@@ -289,7 +328,10 @@ onLoad(() => {
         geo: {
           mmsDiffCountry: form.val('mmsDiffCountry'),
           mmsDiffClub: form.val('mmsDiffClub'),
-          avoidSameFamily: form.val('avoidSameFamily')
+          avoidSameFamily: form.val('avoidSameFamily'),
+          mainClubAdjustment: form.val('mainClubAdjustment'),
+          // UI shows percent (1..99); model stores 0..1
+          mainClubDetectionThreshold: (parseInt(form.val('mainClubDetectionThreshold')) || 40) / 100
         },
         handicap: {
           useMMS: form.val('useMMS'),

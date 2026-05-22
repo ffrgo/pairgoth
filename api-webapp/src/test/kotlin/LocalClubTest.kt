@@ -36,7 +36,8 @@ class LocalClubTest : TestBase() {
             "pairing" to Json.Object(
                 "type" to "MAC_MAHON",
                 "mmFloor" to -20,
-                "mmBar" to 0
+                "mmBar" to 0,
+                "geo" to Json.Object("mainClubAdjustment" to true)
             )
         )
 

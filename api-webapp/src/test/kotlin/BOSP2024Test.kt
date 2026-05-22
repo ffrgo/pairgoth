@@ -18,7 +18,15 @@ class BOSP2024Test: TestBase() {
         val tournament = Json.Companion.parse(
             getTestFile("opengotha/bosp2024/bosp2024.tour").readText(StandardCharsets.UTF_8)
         )!!.asObject()
-        val resp = TestAPI.post("/api/tour", tournament).asObject()
+        // BOSP2024 has a dominant Turkish field — the DUDD scenario this test exercises
+        // depends on the main-club / dominant-country adjustment, which is opt-in since
+        // the GeographicalParams refactor. Enable it explicitly here.
+        val pairing = Json.MutableObject(tournament["pairing"] as Json.Object)
+        val geo = Json.MutableObject(pairing["geo"] as? Json.Object ?: Json.Object())
+        geo.set("mainClubAdjustment", true)
+        pairing.set("geo", geo)
+        val mutableTournament = Json.MutableObject(tournament).also { it.set("pairing", pairing) }
+        val resp = TestAPI.post("/api/tour", mutableTournament).asObject()
         val tourId = resp.getInt("id")
         val outputFile = getOutputFile("bosp2024-weights.txt")
         TestAPI.post("/api/tour/$tourId/pair/3?legacy=true&weights_output=$outputFile", Json.Array("all")).asArray()

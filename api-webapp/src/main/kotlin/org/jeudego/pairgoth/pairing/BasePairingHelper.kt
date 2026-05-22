@@ -77,12 +77,17 @@ abstract class BasePairingHelper(
         pairables.groupingBy { it.country }.eachCount().values.maxOrNull() ?: 0
     }
 
-    // Local club detection: a club is "local" if it has more than the threshold proportion of players
+    // Local club detection: when mainClubAdjustment is enabled, the club that holds
+    // more than mainClubDetectionThreshold of the field is considered the host club
+    // and same-club avoidance is relaxed for its members.
     protected val localClub: String? by lazy {
-        val threshold = pairing.geo.proportionMainClubThreshold
-        clubCounts.entries.find { (_, count) ->
-            count.toDouble() / pairables.size > threshold
-        }?.key
+        if (!pairing.geo.mainClubAdjustment) null
+        else {
+            val threshold = pairing.geo.mainClubDetectionThreshold
+            clubCounts.entries.find { (_, count) ->
+                count.toDouble() / pairables.size > threshold
+            }?.key
+        }
     }
     protected val hasLocalClub: Boolean get() = localClub != null
 

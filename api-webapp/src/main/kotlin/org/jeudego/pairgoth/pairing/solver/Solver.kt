@@ -443,8 +443,10 @@ sealed class Solver(
 
         val geoMaxCost = pairing.geo.avoidSameGeo
 
-        // Country factor: in legacy mode or when no dominant country, use normal factor
-        val countryFactor: Int = if (legacyMode || biggestCountrySize.toDouble() / pairables.size <= proportionMainClubThreshold)
+        // Country factor: drop to 0 only when mainClubAdjustment is enabled AND the
+        // biggest country exceeds the threshold (no point penalising same-country pairs
+        // when most players ARE from that country). Otherwise use the configured value.
+        val countryFactor: Int = if (legacyMode || !mainClubAdjustment || biggestCountrySize.toDouble() / pairables.size <= mainClubDetectionThreshold)
             preferMMSDiffRatherThanSameCountry
         else
             0

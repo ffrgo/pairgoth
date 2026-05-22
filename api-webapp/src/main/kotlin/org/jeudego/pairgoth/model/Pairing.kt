@@ -86,8 +86,14 @@ data class GeographicalParams(
     val preferMMSDiffRatherThanSameCountry: Int = 1,    // Typically = 1
     val preferMMSDiffRatherThanSameClubsGroup: Int = 2, // Typically = 2
     val preferMMSDiffRatherThanSameClub: Int = 3,       // Typically = 3
-    val proportionMainClubThreshold: Double = 0.4, // If the biggest club has a proportion of players higher than this, the secondary criterium is not applied
-    val avoidSameFamily: Boolean = false, // When enabled, avoid pairing players from the same club with the same family name
+    // Main-club adjustment: when enabled, a "main club" is detected as the club whose
+    // members exceed mainClubDetectionThreshold of the field. The same-club avoidance
+    // is then relaxed between main-club members (sensible when 40%+ are from the host
+    // club) and the country-factor gate is dropped for dominant-country events.
+    // Disabled by default to keep stock behavior aligned with OpenGotha.
+    val mainClubAdjustment: Boolean = false,
+    val mainClubDetectionThreshold: Double = 0.4,
+    val avoidSameFamily: Boolean = false, // Avoid pairing players from the same club with the same family name
 ) {
     companion object {
         val disabled = GeographicalParams(avoidSameGeo = 0.0)
@@ -284,14 +290,20 @@ fun GeographicalParams.Companion.fromJson(json: Json.Object, localDefault: Geogr
     avoidSameGeo = json.getDouble("weight") ?: localDefault?.avoidSameGeo ?: disabled.avoidSameGeo,
     preferMMSDiffRatherThanSameCountry = json.getInt("mmsDiffCountry") ?: localDefault?.preferMMSDiffRatherThanSameCountry ?: disabled.preferMMSDiffRatherThanSameCountry,
     preferMMSDiffRatherThanSameClubsGroup = json.getInt("mmsDiffClubGroup") ?: localDefault?.preferMMSDiffRatherThanSameClub ?: disabled.preferMMSDiffRatherThanSameClubsGroup,
-    preferMMSDiffRatherThanSameClub = json.getInt("mmsDiffClub") ?: localDefault?.preferMMSDiffRatherThanSameClub ?: disabled.preferMMSDiffRatherThanSameClub
+    preferMMSDiffRatherThanSameClub = json.getInt("mmsDiffClub") ?: localDefault?.preferMMSDiffRatherThanSameClub ?: disabled.preferMMSDiffRatherThanSameClub,
+    mainClubAdjustment = json.getBoolean("mainClubAdjustment") ?: localDefault?.mainClubAdjustment ?: disabled.mainClubAdjustment,
+    mainClubDetectionThreshold = json.getDouble("mainClubDetectionThreshold") ?: localDefault?.mainClubDetectionThreshold ?: disabled.mainClubDetectionThreshold,
+    avoidSameFamily = json.getBoolean("avoidSameFamily") ?: localDefault?.avoidSameFamily ?: disabled.avoidSameFamily
 )
 
 fun GeographicalParams.toJson() = Json.Object(
     "weight" to avoidSameGeo,
     "mmsDiffCountry" to preferMMSDiffRatherThanSameCountry,
     "mmsDiffClubGroup" to preferMMSDiffRatherThanSameClubsGroup,
-    "mmsDiffClub" to preferMMSDiffRatherThanSameClub
+    "mmsDiffClub" to preferMMSDiffRatherThanSameClub,
+    "mainClubAdjustment" to mainClubAdjustment,
+    "mainClubDetectionThreshold" to mainClubDetectionThreshold,
+    "avoidSameFamily" to avoidSameFamily
 )
 
 fun HandicapParams.Companion.fromJson(json: Json.Object, type: PairingType, localDefault: HandicapParams? = null) = HandicapParams(

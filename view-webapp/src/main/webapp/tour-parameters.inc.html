@@ -148,6 +148,22 @@
           avoid pairing players from the same club with the same family name
         </label>
       </div>
+      <div class="field">
+        <label>
+          <input type="checkbox" name="mainClubAdjustment" id="mainClubAdjustment" value="true" #if($tour.pairing.geo.mainClubAdjustment) checked #end/>
+          apply main-club adjustment (relax same-club avoidance for members of a dominant host club)
+        </label>
+      </div>
+      <div id="mainClubDetails" class="field" #if(!$tour.pairing.geo.mainClubAdjustment) style="display:none"#end>
+        <label>
+          Main club detected when a single club gathers more than
+          <input type="number" name="mainClubDetectionThreshold" min="1" max="99" step="1"
+                 value="#if($tour.pairing.geo.mainClubDetectionThreshold)#evaluate('$math.toInteger($tour.pairing.geo.mainClubDetectionThreshold * 100)')#{else}40#end"
+                 style="width:4em"/>
+          % of the field.
+        </label>
+        <div id="mainClubReadout" style="font-style:italic;color:#888;margin-top:0.3rem"></div>
+      </div>
     </div>
     <div class="title"><i class="dropdown icon"></i>Handicap parameters</div>
     <div class="content">
