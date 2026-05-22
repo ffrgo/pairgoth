@@ -459,11 +459,11 @@
     .player {
       min-width: 12em;
       &.winner {
-        color: darkred;
+        color: #1e7a1e;
         font-weight: bold;
       }
       &.looser {
-        color: blue;
+        color: #999;
         font-style: italic;
       }
     }
