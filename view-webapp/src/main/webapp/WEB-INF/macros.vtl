@@ -43,7 +43,7 @@ $number.format('#0.00 €', $amount)##
 $number.format('#0.00 €', $ttc)##
 #end
 
-#macro(rank $rank)#if( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
+#macro(rank $rank $pro)#if( "$!pro" != "" && $pro >= 1 && $pro <= 9 )${pro}p#elseif( $rank<0 )#set( $k = -$rank )${k}k#else#set( $d=$rank+1 )${d}d#end#end
 
 #macro(roundTable $games $mapping $showResult)
 #set($_dispRst = {'?':'?', 'w':'1-0', 'b':'0-1', '=':'½-½', 'X':'X', '#':'1-1', '0':'0-0'})
