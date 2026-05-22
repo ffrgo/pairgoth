@@ -10,6 +10,7 @@ import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.server.ServerConnector
 import org.eclipse.jetty.server.SslConnectionFactory
 import org.eclipse.jetty.server.handler.ContextHandlerCollection
+import org.eclipse.jetty.util.component.LifeCycle
 import org.eclipse.jetty.util.resource.Resource
 import org.eclipse.jetty.util.ssl.SslContextFactory
 import org.eclipse.jetty.webapp.WebAppContext
@@ -221,8 +222,14 @@ private fun createContext(webapp: String, contextPath: String) = WebAppContext()
     context.contextPath = contextPath
     if (webapp == "api") {
         context.allowNullPathInfo = true
-    } else {
-
+    }
+    // HTTP-session idle timeout
+    serverProps.getProperty("session.timeout.minutes")?.toIntOrNull()?.let { mins ->
+        context.addEventListener(object : LifeCycle.Listener {
+            override fun lifeCycleStarted(event: LifeCycle?) {
+                context.sessionHandler?.maxInactiveInterval = mins * 60
+            }
+        })
     }
 }
 

@@ -160,6 +160,10 @@
     <url-pattern>/api/ratings-lookup</url-pattern>
   </servlet-mapping>
 
+  <session-config>
+    <session-timeout>240</session-timeout>
+  </session-config>
+
   <!-- context params -->
   <context-param>
     <param-name>webapp-slf4j-logger.format</param-name>

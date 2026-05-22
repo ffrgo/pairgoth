@@ -14,5 +14,9 @@ logger.level = trace
 
 # display
 # Show pairings as "Black vs White" instead of the default "White vs Black".
-# Country/club-level convention; rarely needs to be set per user.
 # display.pairing.blackFirst = false
+
+# session
+# Override HTTP session idle timeout default (minutes)
+# session.timeout.minutes = 240
+
