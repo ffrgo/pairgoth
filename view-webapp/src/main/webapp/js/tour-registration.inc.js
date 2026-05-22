@@ -347,7 +347,7 @@ onLoad(() => {
       final: form.val('final')
     }
     for (let origin of ['egf', 'ffg']) {
-      let value = form.val(`${origin}_id`);
+      let value = form.val(origin);
       if (value) {
         player[origin] = value;
       }
