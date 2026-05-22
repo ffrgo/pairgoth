@@ -7,17 +7,87 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
-## [Unreleased]
+## [0.24] - 2026-05-22
+
+### Added
+
+- Webhook feature: allows to connect Pairgoth to a tournament or EGC website.
+- Chained rating/rank toggle in the player dialog (link/unlink rating and rank).
+- Pro ranks handling.
+- Ratings: button to refresh ratings of registered players from EGD/FFG; freeze-by-date for the rating snapshot used by a tournament; configurable ratings source URLs.
+- Online documentation with markdown rendering from the `doc/` folder. Reference ready (yet too much of a technical doc), Tutorial still in preparation.
+- Adjusted-time preview shown live below the time-settings row (and added as a comment line in `.h9` exports).
+- Geographic parameters: explicit "main-club adjustment" toggle (off by default) with a configurable detection threshold and a live "detected main club" readout in the parameters dialog.
+- `session.timeout.minutes` property override for the HTTP session idle timeout (WAR default raised to 240 min).
+- `display.pairing.blackFirst` property to set the Black-vs-White display order at the deployment level (replaces the per-user cookie).
+- Sync-from-website now updates already-registered players (last-wins on rank, rating, club, country, name, round participation, external ids) and returns a structured report (added / updated / unchanged / blocked / failed).
 
 ### Changed
 
-- Webhook `/players/{code}` wire format: `level` (int 1-39) replaced by `rank` (string `"30k".."1k"`, `"1d".."9d"`, `"1p".."9p"`); `1p..9p` doubles as the pro flag. Lockstep change with the tournament website.
-- "Sync from website" now updates already-registered players too (last-wins on rank, rating, club, country, name, round participation, external ids) instead of silently skipping them. Returns a multi-line report (added / updated / unchanged / blocked / failed). Players paired in a round the website now drops are listed under "blocked — already paired" and surfaced as failures, prompting the operator to freeze the round on the website first and resync.
+- Case of players names is now aligned with the expected EGF / FFG formats and encodings.
+- Results page: winner / loser colors switched from OpenGotha's darkred/blue to muted green / dimmed gray.
 
-# [0.20] - 2025-05-16
+### Fixed
+
+- `avoid same family` and `main club adjustments` parameters were not persisted.
+- Club-code casing regression in `.tou`/`.h` exports re-introduced in 0.22 (legacy `toCapitals` was lowercasing FFG club codes like `75Al`).
+
+## [0.23] - 2025-11-30
+
+### Added
+
+- `avoidSameFamily` geographic criterion (avoid pairing players from the same club with the same family name).
+- Per-user preference for "Black vs White" display order
+
+### Fixed
+
+- Results display for PAIRGO and RENGO tournaments.
+
+## [0.22] - 2025-11-29
+
+### Added
+
+- MacMahon 3.9 file import support.
+- EGD PIN appended to `.h9` export rows.
+- Local-club nuanced geographic criteria: when a club gathers > 40% of the field, same-club avoidance is relaxed between locals (full / half / no bonus depending on local-vs-stranger configuration).
+
+### Fixed
+
+- Null `teamName` in team-tournament registration view.
+
+## [0.21] - 2025-11-29
+
+### Added
+
+- Team-of-individuals tournament support (teams composition page, display of individual standings below team standings, constraints on team updates).
+- Beta of the *explain* page (per-pair pairing-weight breakdown, heat map).
+- `PairingListener` class to collect or print weights once (avoids double-computation in tests).
+- API / configuration / model documentation refresh.
+
+### Changed
+
+- Upgrade Kotlin to 2.1.21.
+- Use nicer HTTP headers when querying ratings.
+- Normalize country code to UK instead of GB on incoming data.
+
+### Fixed
+
+- EGF/FFG export name case: Title_Case instead of UPPERCASE (per Sylvain's August 2024 report — corrected again in 0.24).
+- `.tou` and `.h` export format issues (inner `name=`, country code casing, version coherence).
+- Treat zero byoyomi / zero increment as Sudden death in the time-system comment.
+- Stale Lucene reader after ratings index rebuild.
+- Race condition in player search-index synchronization.
+- Ratings fetch: don't request brotli compression.
+
+## [0.20] - 2025-05-16
+
+### Added
+
+- Add a threshold in main club proportion after which geographic criteria are not applied
+
+### Changed
 
 - Reduce default value of the white/black balance weight from 1e6 to 1e3
-- Add a threshold in main club proportion after which geographic criteria are not applied
 
 ## [0.19] - 2025-01-20
 
