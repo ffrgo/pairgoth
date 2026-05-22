@@ -444,7 +444,7 @@ fun Pairable.asTeam() = this as? TeamTournament.Team
 
 // Serialization
 
-fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = null): Tournament<*> {
+fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = null, canonicalize: Boolean = true): Tournament<*> {
     val type = json.getString("type")?.uppercase()?.let { Tournament.Type.valueOf(it) } ?: default?.type ?:  badRequest("missing type")
     // No clean way to avoid this redundancy
     val tournament =
@@ -495,7 +495,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             )
     json.getArray("players")?.forEach { obj ->
         val pairable = obj as Json.Object
-        tournament.players[pairable.getID("id")!!] = Player.fromJson(pairable)
+        tournament.players[pairable.getID("id")!!] = Player.fromJson(pairable, canonicalize = canonicalize)
     }
     if (tournament is TeamTournament) {
         json.getArray("teams")?.forEach { obj ->

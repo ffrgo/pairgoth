@@ -14,6 +14,30 @@ import org.jeudego.pairgoth.util.ratingToRank as commonRatingToRank
 import org.jeudego.pairgoth.util.rankToRating as commonRankToRating
 import java.util.*
 
+// Canonical internal form for player surnames and first names: Title_Case-per-word,
+// words joined by single space. Hyphen and apostrophe are kept in place and treated as
+// case-boundaries. Underscore is treated as a legacy word-separator and folded to space,
+// so previously stored "Lebas_de_Saint_Martin" auto-migrates to "Lebas De Saint Martin"
+// on next read. Diacritics preserved (UTF-8 internal). Idempotent in steady state.
+// Export paths re-split on whitespace and rejoin with '_' (FFG/EGF require no spaces).
+fun String.toCanonicalName(): String {
+    val normalized = trim().replace(Regex("(?:\\s|\\xA0|_)+"), " ")
+    val sb = StringBuilder(normalized.length)
+    var capitalizeNext = true
+    for (c in normalized) {
+        if (c.isWhitespace() || c == '-' || c == '\'') {
+            sb.append(c)
+            capitalizeNext = true
+        } else if (capitalizeNext) {
+            sb.append(c.titlecase(Locale.ROOT))
+            capitalizeNext = false
+        } else {
+            sb.append(c.lowercase(Locale.ROOT))
+        }
+    }
+    return sb.toString()
+}
+
 // Pairable
 
 sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
@@ -139,10 +163,13 @@ class Player(
     }
 }
 
-fun Player.Companion.fromJson(json: Json.Object, default: Player? = null) = Player(
+// canonicalize=false skips name normalisation; use for disk-restore paths where the
+// stored form must round-trip unchanged (otherwise detRandom-driven pairings would shift
+// when a tournament is reopened — names feed detRandom in pairing/Random.kt).
+fun Player.Companion.fromJson(json: Json.Object, default: Player? = null, canonicalize: Boolean = true) = Player(
     id = json.getInt("id") ?: default?.id ?: nextPlayerId,
-    name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
-    firstname = json.getString("firstname") ?: default?.firstname ?: badRequest("missing firstname"),
+    name = (json.getString("name") ?: default?.name ?: badRequest("missing name")).let { if (canonicalize) it.toCanonicalName() else it },
+    firstname = (json.getString("firstname") ?: default?.firstname ?: badRequest("missing firstname")).let { if (canonicalize) it.toCanonicalName() else it },
     rating = json.getInt("rating") ?: default?.rating ?: badRequest("missing rating"),
     rank = json.getInt("rank") ?: default?.rank ?: badRequest("missing rank"),
     country = ( json.getString("country") ?: default?.country ?: badRequest("missing country") ).let {

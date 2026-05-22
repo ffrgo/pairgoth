@@ -84,14 +84,14 @@ class FileStore(pathStr: String): Store {
             }.firstOrNull() ?: throw Error("no such tournament")
         }
         val json = Json.parse(path.resolve(file).readText())?.asObject() ?: throw Error("could not read tournament")
-        val tournament = Tournament.fromJson(json)
+        val tournament = Tournament.fromJson(json, canonicalize = false)
         var maxPlayerId = 0
         var maxGameId = 0
         val players = json["players"] as Json.Array? ?: Json.Array()
         tournament.players.putAll(
             players.associate {
                 (it as Json.Object).let { player ->
-                    Pair(player.getID("id") ?: throw Error("invalid tournament file"), Player.fromJson(player)).also {
+                    Pair(player.getID("id") ?: throw Error("invalid tournament file"), Player.fromJson(player, canonicalize = false)).also {
                         maxPlayerId = max(maxPlayerId, it.first)
                     }
                 }

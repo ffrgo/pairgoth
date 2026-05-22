@@ -6,13 +6,22 @@ function publish(format, extension, encoding) {
   fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
     headers: hdrs
   }).then(resp => {
-    if (resp.ok) return resp.arrayBuffer()
-    else throw "publish error"
-  }).then(bytes => {
+    if (!resp.ok) throw "publish error";
+    let serverName = filenameFromContentDisposition(resp.headers.get('Content-Disposition'));
+    return resp.arrayBuffer().then(bytes => [bytes, serverName]);
+  }).then(([bytes, serverName]) => {
     let blob = new Blob([bytes], { type: `text/plain;charset=${encoding}` });
-    downloadFile(blob, `${shortName}.${extension}`);
+    downloadFile(blob, serverName || `${shortName}.${extension}`);
     close_modal();
   }).catch(err => showError(err));
+}
+
+function filenameFromContentDisposition(header) {
+  if (!header) return null;
+  let m = header.match(/filename\*=(?:UTF-8'')?([^;]+)/i);
+  if (m) try { return decodeURIComponent(m[1].trim().replace(/^"|"$/g, '')); } catch (e) { /* fall through */ }
+  m = header.match(/filename="?([^";]+)"?/i);
+  return m ? m[1].trim() : null;
 }
 
 function publishHtml() {

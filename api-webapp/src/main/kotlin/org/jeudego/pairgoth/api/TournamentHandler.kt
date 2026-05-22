@@ -55,7 +55,9 @@ object TournamentHandler: PairgothApiHandler {
 
     override fun post(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
-            is Json.Object -> Tournament.fromJson(getObjectPayload(request))
+            // Tournament POST is a restore-from-payload (full player array inline). Don't
+            // canonicalise names — pairing depends on stable detRandom seed (see Pairable.kt).
+            is Json.Object -> Tournament.fromJson(getObjectPayload(request), canonicalize = false)
             is Element -> if (MacMahon39.isFormat(payload)) MacMahon39.import(payload) else OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
@@ -119,8 +121,10 @@ object TournamentHandler: PairgothApiHandler {
                         else "NONE"
                 }
             }
-            // prepare updated tournament version
-            val updated = Tournament.fromJson(payload, tournament)
+            // prepare updated tournament version (no name canonicalisation — players are
+            // copied across from the existing tournament right after this, so the flag here
+            // is mostly moot, but keep it false for symmetry with the restore path)
+            val updated = Tournament.fromJson(payload, tournament, canonicalize = false)
             // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
             updated.players.putAll(tournament.players)
             if (tournament is TeamTournament && updated is TeamTournament) {
