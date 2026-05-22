@@ -17,7 +17,9 @@ onLoad(() => {
   $('#cancel, #close').on('click', e => {
     e.preventDefault();
     if ($('#tournament-infos').hasClass('edit') && typeof(tour_id) !== 'undefined') {
-      $('#tournament-infos').removeClass('edit')
+      // Reload so unsaved field edits are discarded — simpler than tracking per-field
+      // initial values across the type/byoyomi/periods/etc. hide-show logic.
+      window.location.reload();
     } else {
       window.location.href = '/index';
     }
@@ -26,6 +28,15 @@ onLoad(() => {
 
   $('#parameters').on('click', e => {
     modal('parameters-modal');
+  });
+
+  $('#cancel-parameters').on('click', e => {
+    // Same rationale as the main #cancel handler: reload to discard unsaved edits.
+    // The global .close handler in main.js will close the modal; the reload happens
+    // after, with the original server-stored values back in the form.
+    if (typeof(tour_id) !== 'undefined') {
+      window.location.reload();
+    }
   });
 
   $('#validate').on('click', e => {
