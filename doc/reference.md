@@ -1000,14 +1000,18 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
       "firstname": "Jane",
       "country":   "FR",          // ISO-3166 alpha-2; pairgoth normalizes GB → UK
       "club":      "75Pa",
-      "level":     27,            // 1-30 = kyu (1k=30, 30k=1), 31-39 = dan (1d=31 .. 9d=39)
-      "rating":    1850,          // optional; if absent, pairgoth derives a default from level
+      "rank":      "5k",          // string: "30k".."1k", "1d".."9d", "1p".."9p" (1p..9p doubles as pro flag)
+      "rating":    1850,          // optional; if absent, pairgoth derives a default from rank
       "pin":       "12345678",    // optional EGF PIN — used as DatabaseId.EGF
       "rounds":    "1111100000"   // optional, one char per round; '1' = playing, '0' = skip
     }
     ```
 
     The `id` field is the website's primary key for that player, typically a registration id. Pairgoth stores it as `externalIds[EXT]` and uses it as the **primary** deduplication key on re-sync — taking precedence over `pin`, since a PIN entered wrong on the source side may be corrected later. Without an `id`, players without a PIN duplicate on every re-sync.
+
+    **Re-sync semantics.** Pairgoth matches each website player against existing registrants by external id (EXT > EGF > FFG > AGA). Unmatched players are inserted; matched players are updated last-wins on rank, rating, club, country, name and round participation (`rounds`) — the website is treated as the source of truth. Players whose payload is identical to the current registration are counted as unchanged. The operator gets a multi-line report (`X added / Y updated / Z unchanged / …`) at the end.
+
+    One safeguard is server-enforced: pairgoth refuses to drop a player from a round in which they are already paired. Such rejections are surfaced separately as `N blocked — already paired: <name> (round R), …` so the operator can spot a misordered flow. The intended procedure is **freeze the round on the website first, then resync** — that prevents the website from shipping a `rounds` mask that excludes a paired player.
 
 ### /pairings/{code}/{round}
 

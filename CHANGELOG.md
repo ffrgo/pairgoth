@@ -9,6 +9,11 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+### Changed
+
+- Webhook `/players/{code}` wire format: `level` (int 1-39) replaced by `rank` (string `"30k".."1k"`, `"1d".."9d"`, `"1p".."9p"`); `1p..9p` doubles as the pro flag. Lockstep change with the tournament website.
+- "Sync from website" now updates already-registered players too (last-wins on rank, rating, club, country, name, round participation, external ids) instead of silently skipping them. Returns a multi-line report (added / updated / unchanged / blocked / failed). Players paired in a round the website now drops are listed under "blocked — already paired" and surfaced as failures, prompting the operator to freeze the round on the website first and resync.
+
 # [0.20] - 2025-05-16
 
 - Reduce default value of the white/black balance weight from 1e6 to 1e3
