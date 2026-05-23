@@ -58,10 +58,12 @@
     justify-content: center;
     vertical-align: middle;
     max-height: 80px;
+    // Explicit size: the SVG has no intrinsic width/height, so percentages
+    // collapse to 0 in Firefox (Chrome falls back to the viewBox ratio).
     img {
       display: block;
-      width: 100%;
-      height: 100%;
+      width: 2.5em;
+      height: 2.5em;
       object-fit: contain;
     }
     &:not(.chained) {
