@@ -251,7 +251,7 @@ onLoad(() => {
   $('input.numeric').imask({
     mask: Number,
     scale: 0,
-    min: 0,
+    min: rankIntToRating(MIN_RANK), // -950 (30k); EGD ratings go negative for weak players
     max: 4000
   });
 
