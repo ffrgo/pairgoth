@@ -3,7 +3,16 @@ function publish(format, extension, encoding) {
   let shortName = form.val('shortName');
   let hdrs = headers();
   hdrs['Accept'] = `${format};charset=${encoding}`
-  fetch(`api/tour/${tour_id}/standings/${activeRound}`, {
+  let params = new URLSearchParams();
+  if ($('#publish-skip-unplayed')[0]?.checked) {
+    // drops never-paired + bye-only players; server also forces preliminary out in this case
+    params.set('drop_unplayed', 'true');
+  } else if (!$('#publish-skip-preliminary')[0]?.checked) {
+    // preliminary are excluded by default server-side; only opt them back in
+    params.set('include_preliminary', 'true');
+  }
+  let qs = params.toString();
+  fetch(`api/tour/${tour_id}/standings/${activeRound}${qs ? '?' + qs : ''}`, {
     headers: hdrs
   }).then(resp => {
     if (!resp.ok) throw "publish error";
@@ -87,6 +96,12 @@ onLoad(() => {
   });
   $('#publish').on('click', e => {
     modal('publish-modal');
+  });
+  $('#publish-skip-unplayed').on('change', e => {
+    let prelim = $('#publish-skip-preliminary')[0];
+    if (!prelim) return;
+    if (e.target.checked) { prelim.checked = true; prelim.disabled = true; }
+    else prelim.disabled = false;
   });
 /*
   $('#publish-modal').on('click', e => {

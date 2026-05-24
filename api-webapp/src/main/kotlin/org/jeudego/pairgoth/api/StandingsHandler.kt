@@ -10,6 +10,7 @@ import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.adjustedTime
 import org.jeudego.pairgoth.model.displayRank
+import org.jeudego.pairgoth.model.getID
 import java.io.PrintWriter
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
@@ -28,18 +29,29 @@ object StandingsHandler: PairgothApiHandler {
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
-        val includePreliminary = request.getParameter("include_preliminary")?.toBoolean() ?: false
+        val dropUnplayed = request.getParameter("drop_unplayed")?.toBoolean() ?: false
+        val includePreliminary = !dropUnplayed && (request.getParameter("include_preliminary")?.toBoolean() ?: false)
 
         val individualStandings = tournament is TeamTournament &&
                 tournament.type.individual &&
                 request.getParameter("individual_standings")?.toBoolean() == true
 
-        val sortedEntries = if (individualStandings) {
+        var sortedEntries = if (individualStandings) {
             tournament.getSortedTeamMembers(round)
         } else {
             tournament.getSortedPairables(round, includePreliminary)
         }
         tournament.populateStandings(sortedEntries, round, individualStandings)
+        if (dropUnplayed) {
+            // drop AFTER populating: populateStandings needs every paired player in the map to
+            // resolve opponents. Keep only entries who played a real (non-bye)
+            val played = (1..tournament.lastRound())
+                .flatMap { r -> (if (individualStandings) tournament.individualGames(r) else tournament.games(r)).values }
+                .filter { it.white != 0 && it.black != 0 }
+                .flatMap { listOf(it.white, it.black) }
+                .toSet()
+            sortedEntries = sortedEntries.filter { it.getID() in played }
+        }
 
         val acceptHeader = request.getHeader("Accept") as String?
         val accept = acceptHeader?.substringBefore(";")

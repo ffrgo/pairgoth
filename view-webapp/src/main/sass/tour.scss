@@ -54,6 +54,9 @@
       }
     }
   }
+  input[type="checkbox"]:disabled {
+    opacity: 1 !important;
+  }
   div.field:not(.hidden) {
     display: flex;
     flex-flow: column nowrap;

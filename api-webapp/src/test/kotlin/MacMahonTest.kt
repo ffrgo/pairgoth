@@ -48,4 +48,23 @@ class MacMahonTest {
         assertEquals(2, standings.size, "standings should list both players as of the last paired round")
     }
 
+    // exports can drop players who never played a real game. With 3 players the weakest gets
+    // a bye in round 1, so only that bye-only player must disappear when drop_unplayed=true.
+    @Test
+    fun `export can drop players who never played a real game`() {
+        val tourId = TestAPI.post("/api/tour", BasicTests.aMMTournament).asObject().getInt("id") ?: throw Error("tournament creation failed")
+        listOf(
+            Json.Object("name" to "Alpha", "firstname" to "A", "rating" to 1900, "rank" to -2, "country" to "FR", "club" to "C", "final" to true),
+            Json.Object("name" to "Beta", "firstname" to "B", "rating" to 1850, "rank" to -2, "country" to "FR", "club" to "C", "final" to true),
+            Json.Object("name" to "Ghost", "firstname" to "G", "rating" to 1000, "rank" to -11, "country" to "FR", "club" to "C", "final" to true)
+        ).forEach { TestAPI.post("/api/tour/$tourId/part", it).asObject().also { r -> assertTrue(r.getBoolean("success")!!) } }
+        TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray()
+        // asserted via the JSON standings (same filtered list; CSV/EGF/FFG share it). One of the
+        // three gets a bye in round 1, so drop_unplayed must remove exactly that bye-only player.
+        val full = TestAPI.get("/api/tour/$tourId/standings/1").asArray()
+        val filtered = TestAPI.get("/api/tour/$tourId/standings/1?drop_unplayed=true").asArray()
+        assertEquals(3, full.size, "unfiltered standings list all three")
+        assertEquals(2, filtered.size, "drop_unplayed removes the bye-only player")
+    }
+
 }
