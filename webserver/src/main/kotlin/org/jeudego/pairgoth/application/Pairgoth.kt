@@ -110,12 +110,30 @@ private fun publishProperties() {
             System.setProperty("pairgoth.$property", value)
         }
     }
-    // we want colorized output on linux
-    if (System.getProperty("os.name") == "Linux") {
-        System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", "false");
-    }
+    // #149: colour only when stdout can render ANSI. The shared Colorizer (used by the webapps) owns
+    // this decision; the launcher keeps the small private copy below because it must set Jetty's
+    // MESSAGE_ESCAPE before Jetty logging starts (the webapps' Colorizer isn't loaded yet) and
+    // webserver intentionally doesn't depend on pairgoth-common. Keep in sync with Colorizer (#149).
+    val colorCapable = System.getProperty("pairgoth.color")?.toBoolean() ?: terminalSupportsColor()
+    System.setProperty("pairgoth.color", colorCapable.toString())
+    System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", (!colorCapable).toString())
     // remember the current working directory
     System.setProperty("pairgoth.cwd", Paths.get("").toAbsolutePath().toString())
+}
+
+// #149: stdout ANSI-colour capability — a small copy of Colorizer.terminalSupportsColor() (common),
+// kept here because the launcher must decide before Jetty logging starts and webserver doesn't
+// depend on pairgoth-common. Keep in sync with Colorizer. NO_COLOR/FORCE_COLOR overrides first,
+// then require an attached console (redirected/daemon output stays clean), a non-dumb TERM, and on
+// Windows a modern terminal (Windows Terminal / ConEmu) rather than legacy conhost.
+private fun terminalSupportsColor(): Boolean {
+    if (System.getenv("NO_COLOR") != null) return false
+    if (System.getenv("FORCE_COLOR") != null || System.getenv("CLICOLOR_FORCE") == "1") return true
+    if (System.console() == null) return false
+    if (System.getenv("TERM") == "dumb") return false
+    val os = System.getProperty("os.name").lowercase()
+    return if (os.contains("win")) System.getenv("WT_SESSION") != null || System.getenv("ConEmuANSI") == "ON"
+    else true
 }
 
 private fun extractWarFiles() {

@@ -12,7 +12,21 @@ private val bold = AnsiFormat(Attribute.BOLD())
 
 object Colorizer {
 
-    val colorize = System.getProperty("os.name").lowercase(Locale.ROOT).contains(Regex("nix|nux|aix"))
+    // Emit ANSI colour only when stdout can render it. An explicit `pairgoth.color` system
+    // property wins ; otherwise detect terminal capability.
+    val colorize: Boolean = System.getProperty("pairgoth.color")?.toBoolean() ?: terminalSupportsColor()
+
+    // NO_COLOR / FORCE_COLOR overrides first, then require an attached console (so redirected or
+    // daemon output stays clean), a non-dumb TERM, and on Windows a modern terminal.
+    fun terminalSupportsColor(): Boolean {
+        if (System.getenv("NO_COLOR") != null) return false
+        if (System.getenv("FORCE_COLOR") != null || System.getenv("CLICOLOR_FORCE") == "1") return true
+        if (System.console() == null) return false
+        if (System.getenv("TERM") == "dumb") return false
+        val os = System.getProperty("os.name").lowercase(Locale.ROOT)
+        return if (os.contains("win")) System.getenv("WT_SESSION") != null || System.getenv("ConEmuANSI") == "ON"
+        else true
+    }
 
     fun blue(str: String) = if (colorize) Ansi.colorize(str, blue) else str
     fun green(str: String) = if (colorize) Ansi.colorize(str, green) else str

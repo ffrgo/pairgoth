@@ -11,6 +11,10 @@ smtp.password =
 
 # logging
 logger.level = trace
+# ANSI colour in the stdout log. Default: auto-detect — on for a colour-capable terminal
+# (incl. Windows Terminal), off for legacy consoles, redirected output (files/pipes) and services.
+# Set explicitly to force it on or off (also honors the NO_COLOR / FORCE_COLOR env vars).
+# color = true
 
 # display
 # Show pairings as "Black vs White" instead of the default "White vs Black".
