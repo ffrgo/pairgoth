@@ -118,7 +118,12 @@ class ApiServlet: HttpServlet() {
             // if payload is null, it means the handler already sent the response
             if (payload != null) {
                 setContentType(response)
-                payload.toString(response.writer)
+                // pretty-print the tournament export
+                if (request.getHeader("Accept")?.startsWith("application/pairgoth") == true) {
+                    response.writer.write(payload.toPrettyString())
+                } else {
+                    payload.toString(response.writer)
+                }
             }
 
         } catch (apiException: ApiException) {
