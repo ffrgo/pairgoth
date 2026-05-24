@@ -516,6 +516,7 @@ onLoad(() => {
       $('input[name="final"]')[0].value = true;
       $('#final-reg').addClass('final');
     }
+    $('#register').removeClass('disabled');
   });
   $('.reg-status').on('click', e => {
     let cell = e.target.closest('td');
