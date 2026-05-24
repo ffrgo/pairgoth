@@ -27,6 +27,8 @@ class CountriesTool {
 
     public fun getCountries() = countries.entries.sortedBy { it.value }
 
+    public fun name(code: String?): String = code?.lowercase()?.let { countries[it] } ?: ""
+
     companion object {
         val logger = LoggerFactory.getLogger("view")
         private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)([a-z]{2}))?)(?:;q=([0-9.]+))?", RegexOption.IGNORE_CASE)

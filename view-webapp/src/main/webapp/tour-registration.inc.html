@@ -46,7 +46,7 @@
         </select>
       </div>
       <div id="participation-stats">
-        $parts.size() participants, $utils.countFinals($parts) confirmed.
+        $parts.size() participants, <span id="confirmed-count">$utils.countFinals($parts)</span> confirmed.
       </div>
     </div>
 
@@ -84,7 +84,7 @@
             </td>
             <td>$part.name</td>
             <td>$part.firstname</td>
-            <td>$part.country.toUpperCase()</td>
+            <td title="$!countries.name($part.country)">$part.country.toUpperCase()</td>
             <td>$part.club</td>
   #if($utils.showRatings('egf', $tour.country.toLowerCase()))
             <td>$!part.egf </td>

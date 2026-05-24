@@ -182,7 +182,16 @@
         }
       });
     }
-    $('#overview').on('click', () => {
+    $('#overview').on('click', async () => {
+      let tour = await api.getJson(`tour/${tour_id}`);
+      if (tour !== 'error' && Array.isArray(tour.stats)) {
+        let body = $('#tournament-overview tbody')[0];
+        if (body) body.innerHTML = tour.stats.map((s, i) => {
+          let r = i + 1;
+          let ready = (r === activeRound) ? `<span id="known2">${s.ready}</span>` : `${s.ready}`;
+          return `<tr><td>${r}</td><td>${s.participants}</td><td>${s.paired}</td><td>${ready}/${s.games}</td></tr>`;
+        }).join('');
+      }
       modal('tournament-overview')
     });
   });

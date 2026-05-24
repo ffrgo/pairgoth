@@ -81,7 +81,7 @@
           <td>$part.place</td>
           <td>$esc.html($part.name)#if($part.firstname) $esc.html($part.firstname)#end</td>
           <td data-sort="$part.rating">#rank($part.rank $!part.pro)</td>
-          <td>#if($part.country)$part.country#end</td>
+          <td title="$!countries.name($part.country)">#if($part.country)$part.country#end</td>
           <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
   #foreach($r in [0..$mx])
@@ -152,7 +152,7 @@
           <td>$part.place</td>
           <td>$esc.html($part.name)#if($part.firstname) $esc.html($part.firstname)#end</td>
           <td data-sort="$part.rating">#rank($part.rank $!part.pro)</td>
-          <td>#if($part.country)$part.country#end</td>
+          <td title="$!countries.name($part.country)">#if($part.country)$part.country#end</td>
           <td>$number.format('0.#', $part.NBW)</td>
   #set($mx = $round - 1)
   #foreach($r in [0..$mx])

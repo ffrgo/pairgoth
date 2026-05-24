@@ -530,6 +530,8 @@ onLoad(() => {
       if (player !== 'error') {
         tr.toggleClass('final');
         cell.toggleClass('final');
+        let confirmed = $('#confirmed-count')[0];
+        if (confirmed) confirmed.innerText = parseInt(confirmed.innerText) + (newStatus ? 1 : -1);
         standingsUpToDate = false;
         pairablesUpToDate = false;
       }
