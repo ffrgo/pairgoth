@@ -20,4 +20,19 @@ class MacMahonTest {
         assertEquals(3, game.getInt("h"))
     }
 
+    // Production (non-legacy) pairs by the rating-derived effective rank, NOT the honorary grade.
+    // Both players carry the same grade (1d) but ratings 4 buckets apart (5k vs 1k): a grade-based
+    // handicap would be 0; the effective-rank handicap is 3. Guards the B"/effRank wiring against
+    // a regression that silently reverts pairing to the stored grade.
+    @Test
+    fun `handicap follows effective rank, not honorary grade`() {
+        val tourId = TestAPI.post("/api/tour", BasicTests.aMMTournament).asObject().getInt("id") ?: throw Error("tournament creation failed")
+        val weak = Json.Object("name" to "Weak", "firstname" to "P", "rating" to 1550, "rank" to 0, "country" to "FR", "club" to "Cl", "final" to true)
+        val strong = Json.Object("name" to "Strong", "firstname" to "P", "rating" to 1950, "rank" to 0, "country" to "FR", "club" to "Cl", "final" to true)
+        TestAPI.post("/api/tour/$tourId/part", weak).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        TestAPI.post("/api/tour/$tourId/part", strong).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        val game = TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray().getObject(0) ?: throw Error("pairing failed")
+        assertEquals(3, game.getInt("h"), "handicap must derive from rating (5k vs 1k), not the shared 1d grade")
+    }
+
 }

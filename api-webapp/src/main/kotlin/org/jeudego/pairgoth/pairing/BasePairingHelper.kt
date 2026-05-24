@@ -128,7 +128,7 @@ abstract class BasePairingHelper(
     open fun evalCriterion(pairable: Pairable, criterion: Criterion) = when (criterion) {
         Criterion.NONE -> 0.0
         Criterion.CATEGORY -> TODO()
-        Criterion.RANK -> pairable.rank.toDouble()
+        Criterion.RANK -> pairable.effectiveRank.toDouble()
         Criterion.RATING -> pairable.rating.toDouble()
         Criterion.NBW -> pairable.nbW
         Criterion.SOSW -> pairable.sos

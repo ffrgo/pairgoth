@@ -2,6 +2,8 @@ package org.jeudego.pairgoth.view
 
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.ratings.RatingsManager
+import org.jeudego.pairgoth.util.displayRank
+import org.jeudego.pairgoth.util.ratingToRank
 import org.jeudego.pairgoth.web.WebappManager
 import java.nio.file.Files
 import java.nio.file.Path
@@ -112,6 +114,12 @@ class PairgothTool {
     }
 
     fun getRatingsDates() = RatingsManager.getRatingsDates()
+
+    // Effective pairing rank for templates: derived from rating (floor() can't be done reliably
+    // in Velocity). `effectiveRank` returns the display string ("3k"/"1d"); `ratingRank` the int,
+    // to test whether a player's honorary grade actually differs from their effective rank.
+    fun effectiveRank(rating: Int): String = displayRank(ratingToRank(rating))
+    fun ratingRank(rating: Int): Int = ratingToRank(rating)
 
     fun getTeamables(players: Collection<Json.Object>, teams: Collection<Json.Object>): List<Json.Object> {
         val teamed = teams.flatMap { team ->

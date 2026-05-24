@@ -30,6 +30,6 @@ class SwissSolver(round: Int,
     override val mainLimits = Pair(0.0, round - 1.0)
 
     override fun computeWeightForBye(p: Pairable): Double{
-        return p.rank + 40 * p.main
+        return p.computedRank + 40 * p.main
     }
 }

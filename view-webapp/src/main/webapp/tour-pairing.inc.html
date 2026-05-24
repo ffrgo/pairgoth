@@ -77,11 +77,11 @@
               <div class="table" data-value="$game.t">${game.t}.</div>
 #if($blackFirst)
               <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
-              <div class="levels">#if($black)#rank($black.rank $!black.pro)#end&nbsp;/&nbsp;#if($white)#rank($white.rank $!white.pro)#end</div>
+              <div class="levels">#if($black)$utils.effectiveRank($black.rating)#end&nbsp;/&nbsp;#if($white)$utils.effectiveRank($white.rating)#end</div>
               <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
 #else
               <div class="white" data-id="$game.w">#if($white)$white.name#if($white.firstname) $white.firstname#end#{else}BIP#end</div>
-              <div class="levels">#if($white)#rank($white.rank $!white.pro)#end&nbsp;/&nbsp;#if($black)#rank($black.rank $!black.pro)#end</div>
+              <div class="levels">#if($white)$utils.effectiveRank($white.rating)#end&nbsp;/&nbsp;#if($black)$utils.effectiveRank($black.rating)#end</div>
               <div class="black" data-id="$game.b">#if($black)$black.name#if($black.firstname) $black.firstname#end#{else}BIP#end</div>
 #end
               <div class="handicap" data-value="$game.h">#if($game.h)h$game.h#{else}&nbsp;#end</div>

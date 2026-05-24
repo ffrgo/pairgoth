@@ -83,6 +83,25 @@ function updateChainState() {
   }
   if (chained) $('#chain-rating').addClass('chained');
   else $('#chain-rating').removeClass('chained');
+  updateLinkHints();
+}
+
+// When rating and rank are unlinked, the "Rank" field is an honorary grade decoupled from
+// strength. Spell that out in italic under each field: the rating's effective pairing rank,
+// and that the rank is just a label. When linked the two agree, so we show nothing.
+function updateLinkHints() {
+  let ratingEl = document.getElementById('rating');
+  let rankEl = document.getElementById('rank');
+  let ratingInfo = ratingEl && ratingEl.closest('.field') && ratingEl.closest('.field').querySelector('.info');
+  let rankInfo = rankEl && rankEl.closest('.field') && rankEl.closest('.field').querySelector('.info');
+  if (chained) {
+    if (ratingInfo) ratingInfo.innerHTML = '';
+    if (rankInfo) rankInfo.innerHTML = '';
+    return;
+  }
+  let rating = parseInt(ratingEl ? ratingEl.value : NaN);
+  if (ratingInfo) ratingInfo.innerHTML = isNaN(rating) ? '' : `<i>(effective rank: ${displayRank(ratingToRankInt(rating))})</i>`;
+  if (rankInfo) rankInfo.innerHTML = '<i>(honorary grade)</i>';
 }
 
 function searchResultShown() {
@@ -533,9 +552,11 @@ onLoad(() => {
     e.preventDefault();
     chained = !chained;
     $('#chain-rating').toggleClass('chained');
+    updateLinkHints();
   });
   $('#player input[name="rating"]').on('input', e=>{
     manualRating = true;
+    updateLinkHints();
   });
   $('#player select[name="rank"]').on('input', e=>{
     let rankValue = e.target.value;
@@ -547,6 +568,7 @@ onLoad(() => {
         ratingCtl.value = rankIntToRating(parseInt(rankValue));
       }
     }
+    updateLinkHints();
   });
   $('#filter-box i').on('click', e => {
     $('#filter')[0].value = '';

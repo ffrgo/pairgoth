@@ -73,12 +73,12 @@ class MacMahonSolver(round: Int,
         if (useMMS) {
             return pairable.mms.roundToInt() + Pairable.MIN_RANK
         } else {
-            return pairable.rank
+            return pairable.computedRank
         }
     }
 
     // mmBase: starting Mac-Mahon score of the pairable
-    val Pairable.mmBase: Double get() = min(max(rank, mmFloor), mmBar) + mmsZero + mmsCorrection
+    val Pairable.mmBase: Double get() = min(max(computedRank, mmFloor), mmBar) + mmsZero + mmsCorrection
     // mms: current Mac-Mahon score of the pairable
     val Pairable.mms: Double get() = score
 

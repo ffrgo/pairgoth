@@ -169,7 +169,14 @@ object OpenGotha {
         val canonicMap = mutableMapOf<String, Int>()
         // import players
         ogTournament.players.player.map { player ->
-            val (rank, pro) = parseRankAndProOrDefault(player.rank, -20, "player ${player.name} ${player.firstName}")
+            // OpenGotha `grade` is the honorary value (our stored `rank`); OG `rank` is its
+            // effective pairing rank, which we recompute from rating — warn if they disagree.
+            val gradeStr = player.grade.takeUnless { it.isNullOrEmpty() } ?: player.rank
+            val (rank, pro) = parseRankAndProOrDefault(gradeStr, -20, "player ${player.name} ${player.firstName}")
+            Pairable.parseRank(player.rank)?.let { ogEffective ->
+                val derived = Pairable.ratingToRank(player.rating)
+                if (ogEffective != derived) logger.warn("player ${player.name} ${player.firstName}: OpenGotha rank ${player.rank} differs from rating-derived ${displayRank(derived)} — pairing will use the rating-derived rank")
+            }
             Player(
                 id = nextPlayerId,
                 name = player.name,
@@ -270,7 +277,7 @@ object OpenGotha {
                             if (player.skip.contains(it)) 0 else 1 
                         }.joinToString("") 
                     }" rank="${
-                        player.displayRank()
+                        player.displayEffectiveRank()
                     }" rating="${
                         player.rating
                     }" ratingOrigin="" registeringStatus="${

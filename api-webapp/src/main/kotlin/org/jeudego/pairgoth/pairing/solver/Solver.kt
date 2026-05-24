@@ -257,7 +257,7 @@ sealed class Solver(
         return if (p1.id == ByePlayer.id || p2.id == ByePlayer.id) {
             val actualPlayer = if (p1.id == ByePlayer.id) p2 else p1
             // TODO maybe use a different formula than opengotha
-            val x = (actualPlayer.rank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
+            val x = (actualPlayer.computedRank - Pairable.MIN_RANK + actualPlayer.main) / (Pairable.MAX_RANK - Pairable.MIN_RANK + mainLimits.second)
             //concavityFunction(x, BaseCritParams.MAX_BYE_WEIGHT)
             //BaseCritParams.MAX_BYE_WEIGHT - (actualPlayer.rank + 2*actualPlayer.main)
             BaseCritParams.MAX_BYE_WEIGHT*(1 - x)
@@ -548,9 +548,16 @@ sealed class Solver(
         return clamp(pseudoRankWhite - pseudoRankBlack)
     }
 
+    // Effective rank used by every pairing decision (MMS groups, handicap, seeding fallback).
+    // In legacy (OpenGotha-emulation) mode we use the player's declared `rank`, reproducing OG
+    // exactly (as long as grade == rank), including its rank/rating drift. Otherwise we use the
+    // rating-derived effective rank: pairgoth correlates rank with rating (see Pairable.effectiveRank),
+    // so a player can't land in a higher MMS bucket than a higher-rated peer.
+    val Pairable.computedRank: Int get() = if (legacyMode) rank else effectiveRank
+
     // Has to be overridden if handicap is not based on rank
     open fun HandicapParams.pseudoRank(pairable: Pairable): Int {
-        return pairable.rank
+        return pairable.computedRank
     }
 
     fun roundScore(score: Double): Double {

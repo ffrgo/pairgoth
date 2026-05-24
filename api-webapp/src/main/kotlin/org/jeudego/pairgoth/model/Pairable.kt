@@ -41,6 +41,11 @@ fun String.toCanonicalName(): String {
 // Pairable
 
 sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
+    // `rank` is the HONORARY grade: a stored label that the organiser may decouple from rating
+    // via the link/unlink UI. Pairing must NEVER read it. Everything that decides who plays whom
+    // — MMS groups (mmBase), handicap, seeding and sorting — reads `effectiveRank` instead, which
+    // is always derived from rating. This is what makes unlink/link harmless.
+    val effectiveRank: Int get() = commonRatingToRank(rating)
     companion object {
         val MIN_RANK: Int = COMMON_MIN_RANK
         val MAX_RANK: Int = COMMON_MAX_RANK
@@ -81,10 +86,13 @@ object ByePlayer: Pairable(0, "bye", 0, Int.MIN_VALUE, true) {
 // re-exported from pairgoth-common util for callers that import org.jeudego.pairgoth.model.*
 fun displayRank(rank: Int) = org.jeudego.pairgoth.util.displayRank(rank)
 fun displayRank(rank: Int, pro: Int) = org.jeudego.pairgoth.util.displayRank(rank, pro)
+// Honorary grade display: stored rank + pro title.
 fun Pairable.displayRank() = when (val p = (this as? Player)?.pro ?: 0) {
     in Pairable.MIN_PRO..Pairable.MAX_PRO -> "${p}p"
     else -> displayRank(rank)
 }
+// Effective pairing rank display (rating-derived), plain k/d — never a pro title.
+fun Pairable.displayEffectiveRank() = displayRank(effectiveRank)
 
 private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
 

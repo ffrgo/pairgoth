@@ -102,7 +102,7 @@ class BasicTests: TestBase() {
         val aPlayer = Json.Object(
             "name" to "Burma",
             "firstname" to "Nestor",
-            "rating" to -500,
+            "rating" to 1550,   // EGD scale (5k); was -500 on the FFG "classement" scale
             "rank" to -5,
             "country" to "FR",
             "club" to "13Ma",
@@ -112,7 +112,7 @@ class BasicTests: TestBase() {
         val anotherPlayer = Json.Object(
             "name" to "Poirot",
             "firstname" to "Hercule",
-            "rating" to -100,
+            "rating" to 1950,   // EGD scale (1k); was -100 on the FFG "classement" scale
             "rank" to -1,
             "country" to "FR",
             "club" to "75Op"
