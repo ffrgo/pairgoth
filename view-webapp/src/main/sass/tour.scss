@@ -113,8 +113,11 @@
           border-radius: 500rem;
         }
       }
-      tr:not(.final) .participation {
-        opacity: 0.5;
+      tr:not(.final) {
+        font-style: italic;
+        .participation {
+          opacity: 0.5;
+        }
       }
     }
   }
