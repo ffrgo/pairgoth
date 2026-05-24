@@ -35,4 +35,17 @@ class MacMahonTest {
         assertEquals(3, game.getInt("h"), "handicap must derive from rating (5k vs 1k), not the shared 1d grade")
     }
 
+    // Standings for a round that exists in the schedule but isn't paired yet must not blow up:
+    // historyHelper(round+1) used to reach games(round+1) via usedTables and throw "invalid round".
+    @Test
+    fun `standings for a not-yet-paired round does not error`() {
+        val tourId = TestAPI.post("/api/tour", BasicTests.aMMTournament).asObject().getInt("id") ?: throw Error("tournament creation failed")
+        TestAPI.post("/api/tour/$tourId/part", BasicTests.aPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        TestAPI.post("/api/tour/$tourId/part", BasicTests.anotherPlayer).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray()
+        // round 2 is in the schedule (rounds=2) but unpaired — this used to throw "invalid round"
+        val standings = TestAPI.get("/api/tour/$tourId/standings/2").asArray()
+        assertEquals(2, standings.size, "standings should list both players as of the last paired round")
+    }
+
 }

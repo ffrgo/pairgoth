@@ -140,7 +140,10 @@ sealed class Tournament <P: Pairable>(
     }
 
     fun usedTables(round: Int): BitSet {
-        val assigned = games(round).values.map { it.table }.fold(BitSet()) { acc, table ->
+        // Read existing assignments only: a not-yet-paired round has no used tables (empty).
+        // Must NOT go through games(round), which throws "invalid round" / creates a phantom round
+        // — this is reached for future rounds via the standings/history path (historyHelper).
+        val assigned = (games.getOrNull(round - 1)?.values ?: emptyList()).map { it.table }.fold(BitSet()) { acc, table ->
             acc.set(table)
             acc
         }
