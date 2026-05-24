@@ -205,6 +205,8 @@ function fillPlayer(player) {
   form.val('egf', player.egf);
   form.val('aga', player.aga);
   form.val('ext', player.ext);
+  // search result carries the FFG echelle char in `license`; snapshot the L-vs-not bit
+  form.val('licensed', player.license ? String(player.license === 'L') : '');
   updateChainState();
   $('#needle')[0].value = '';
   initSearch();
@@ -371,6 +373,10 @@ onLoad(() => {
         player[origin] = value;
       }
     }
+    // FFG licence snapshot (FR), carried from the picked index entry
+    let licensed = form.val('licensed');
+    if (licensed === 'true') player.licensed = true;
+    else if (licensed === 'false') player.licensed = false;
     if ($('#player').hasClass('create')) {
       api.postJson(`tour/${tour_id}/part`, player)
         .then(player => {
@@ -413,6 +419,7 @@ onLoad(() => {
           form.val('ffg', player.ffg);
           form.val('aga', player.aga);
           form.val('ext', player.ext);
+          form.val('licensed', player.licensed == null ? '' : String(player.licensed));
           if (player.final) $('#final-reg').addClass('final');
           else $('#final-reg').removeClass('final');
           for (r = 1; r <= tour_rounds; ++r) {

@@ -195,6 +195,7 @@ object OpenGotha {
                 if (player.ffgLicence.isNotEmpty()) {
                     it.externalIds[DatabaseId.FFG] = player.ffgLicence
                 }
+                player.ffgLicenceStatus?.takeUnless { s -> s.isEmpty() }?.let { s -> it.licensed = (s == "L") }
                 if (player.egfPin.isNotEmpty()) {
                     it.externalIds[DatabaseId.EGF] = player.egfPin
                 }
@@ -266,7 +267,7 @@ object OpenGotha {
                         player.externalIds[DatabaseId.EGF] ?: ""
                     }" ffgLicence="${
                         player.externalIds[DatabaseId.FFG] ?: ""
-                    }" ffgLicenceStatus="" firstName="${
+                    }" ffgLicenceStatus="${when (player.licensed) { true -> "L"; false -> "-"; null -> "" }}" firstName="${
                         player.firstname.escapeXML()
                     }" grade="${
                         player.displayRank()

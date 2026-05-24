@@ -148,6 +148,8 @@ class Player(
     companion object
     // used to store external IDs ("FFG" => FFG ID, "EGF" => EGF PIN, "AGA" => AGA ID ...)
     val externalIds = mutableMapOf<DatabaseId, String>()
+    // FFG licence up to date, snapshot at registration (FR). null = unknown.
+    var licensed: Boolean? = null
     override fun toMutableJson() = Json.MutableObject(
         "id" to id,
         "name" to name,
@@ -161,6 +163,7 @@ class Player(
         if (skip.isNotEmpty()) json["skip"] = Json.Array(skip)
         if (mmsCorrection != 0) json["mmsCorrection"] = mmsCorrection
         if (pro != 0) json["pro"] = pro
+        if (licensed != null) json["licensed"] = licensed
         externalIds.forEach { (dbid, id) ->
             json[dbid.key] = id
         }
@@ -193,6 +196,7 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null, canoni
         it
     }
 ).also { player ->
+    player.licensed = json.getBoolean("licensed") ?: default?.licensed
     (json.getArray("skip") ?: default?.skip)?.let {
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
     }

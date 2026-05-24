@@ -67,6 +67,7 @@ erDiagram
     int mmsCorrection
     set skip
     map externalIds
+    bool licensed
   }
 
   Team {
@@ -159,6 +160,7 @@ Individual tournament participant.
 | mmsCorrection | int | MacMahon score correction |
 | skip | set | Skipped round numbers |
 | externalIds | map | External IDs (AGA, EGF, FFG) |
+| licensed | bool | FFG licence up to date (FR snapshot); absent = unknown |
 
 ### Team
 

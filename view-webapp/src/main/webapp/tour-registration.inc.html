@@ -90,7 +90,7 @@
             <td>$!part.egf </td>
   #end
   #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
-            <td>$!part.ffg</td>
+            <td#if("$!part.licensed" == "false") class="darkred"#end>$!part.ffg</td>
   #end
   ## display MMS correction on the screen, but not when printed
             <td data-sort="$part.rating">#rank($part.rank $!part.pro)#if($utils.ratingRank($part.rating) != $part.rank)<span class="noprint"> ($utils.effectiveRank($part.rating))</span>#end#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
@@ -270,6 +270,7 @@
               <label>FFG</label>
               <span class="info"></span>
               <input type="text" name="ffg" placeholder="FFG licence" spellcheck="false"/>
+              <input type="hidden" name="licensed"/>
             </div>
             <div class="four wide field">
               <label>AGA</label>
