@@ -1,26 +1,70 @@
-# webapp
-webapp.env = dev
-webapp.url = http://localhost:8080
+# Pairgoth configuration — copy to pairgoth.properties and uncomment what you need.
+# Full reference: doc/reference.md › Configuration. Values shown are the defaults.
 
-# smtp
-smtp.sender = 
-smtp.host = 
-smtp.port = 587
-smtp.user = 
-smtp.password = 
+# Environment: dev (CORS + extra logging) or prod
+# env = prod
 
-# logging
-logger.level = trace
-# ANSI colour in the stdout log. Default: auto-detect — on for a colour-capable terminal
-# (incl. Windows Terminal), off for legacy consoles, redirected output (files/pipes) and services.
-# Set explicitly to force it on or off (also honors the NO_COLOR / FORCE_COLOR env vars).
-# color = true
+# Mode: standalone (web+API) | server (API only) | client (web only)
+# mode = standalone
 
-# display
-# Show pairings as "Black vs White" instead of the default "White vs Black".
-# display.pairing.blackFirst = false
+# Authentication: none | sesame (shared password) | oauth
+# auth = none
+# auth.sesame = <password>                    # for auth=sesame
+# auth.shared_secret = <16 ascii chars>       # shared API/web secret (auto-generated in standalone)
 
-# session
-# Override HTTP session idle timeout default (minutes)
-# session.timeout.minutes = 240
+# OAuth (auth=oauth): providers among ffg,facebook,google,instagram,twitter
+# oauth.providers = ffg,google
+# oauth.ffg.client_id = <client_id>
+# oauth.ffg.secret = <client_secret>
 
+# Webapp (UI) connector
+# webapp.protocol = http
+# webapp.host = localhost                     # interface to bind (alias: webapp.interface)
+# webapp.port = 8080
+# webapp.context = /
+# webapp.external.url = http://localhost:8080 # external URL (OAuth redirects, client config)
+
+# API connector (standalone: port 8080, context /api/tour)
+# api.protocol = http
+# api.host = localhost
+# api.port = 8085
+# api.context = /api
+# api.external.url = http://localhost:8085/api
+
+# SSL/TLS (supports jar: URLs)
+# webapp.ssl.key = path/to/localhost.key
+# webapp.ssl.cert = path/to/localhost.crt
+# webapp.ssl.pass = <key passphrase>
+
+# Store: file (XML files) | memory (tests)
+# store = file
+# store.file.path = tournamentfiles           # relative to working directory
+
+# Ratings
+# ratings.path = ratings                       # cache directory for downloaded ratings
+# ratings.<source> = <url>                     # override source URL (aga|egf|ffg)
+# ratings.date = YYYY-MM-DD                    # freeze snapshot for multi-day events
+# ratings.<source>.enable = true|false         # available in Add Player search (default: EGF everywhere, FFG in FR)
+# ratings.<source>.show = true|false           # show source IDs on registration (same default rule)
+
+# SMTP (email notifications; not yet functional)
+# smtp.sender =
+# smtp.host =
+# smtp.port = 587
+# smtp.user =
+# smtp.password =
+
+# Logging
+# logger.level = info                          # trace|debug|info|warn|error
+# logger.format = [%level] %ip [%logger] %message
+# console.color = true                         # unset = auto-detect (honors NO_COLOR/FORCE_COLOR)
+
+# Webhook (push pairings/results/standings, pull players). Blank = disabled.
+# webhook.url = https://my-tournament-site.example/api/pairgoth
+# webhook.secret = a-shared-secret
+
+# Display
+# display.pairing.blackFirst = false           # show pairings as Black vs White
+
+# Session
+# session.timeout.minutes = 240                # HTTP session idle timeout (minutes)

@@ -61,7 +61,7 @@ Tests are located in `api-webapp/src/test/kotlin`
 
 You need maven installed.
 
-Copy and adapt `pairgoth.properties.example` towards `pairgoth.properties`, if needed. Otherwise pairgoth will use default properties (TODO - list them)
+Copy and adapt `pairgoth.properties.example` towards `pairgoth.properties`, if needed. Otherwise pairgoth uses sensible defaults. Every property is documented in [doc/reference.md › Configuration](doc/reference.md#configuration).
 
 Just running `./standalone.sh` or `./standalone.bat` shoud build and run the engine and the view webapps.
 

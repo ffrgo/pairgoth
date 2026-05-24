@@ -556,9 +556,12 @@ ratings.<source>.show = true | false
 
 Whether to show player IDs from this rating source on the registration page.
 
-Defaults:
-- For tournaments in France: FFG enabled and shown by default
-- Otherwise: all disabled by default
+`enable` makes the source available in the Add Player search
+
+Defaults when unset:
+- EGF: enabled and shown everywhere
+- FFG: enabled and shown only for French tournaments
+- Other sources (e.g. AGA): off
 
 ### SMTP
 
@@ -585,6 +588,14 @@ Log levels: `trace`, `debug`, `info`, `warn`, `error`
 
 Format placeholders: `%level`, `%ip`, `%logger`, `%message`
 
+#### Console colour
+
+```
+console.color = true | false
+```
+
+ANSI colour in the stdout log. Unset = auto-detect: on for a colour-capable terminal (including Windows Terminal), off for legacy consoles, redirected output and services. The `NO_COLOR` / `FORCE_COLOR` environment variables are also honoured.
+
 ### Webhook
 
 Pairgoth can push content (pairings, results, standings) to an external
@@ -609,6 +620,22 @@ Behavior:
   startup. **A failed health check is a fatal startup error** — the
   assumption being that the tournament site is supposed to already be running
   when the tournament director launches pairgoth.
+
+### Display
+
+```
+display.pairing.blackFirst = false
+```
+
+When `true`, pairings are shown as "Black vs White" instead of the default "White vs Black".
+
+### Session
+
+```
+session.timeout.minutes = 240
+```
+
+Overrides the HTTP session idle-timeout default (in minutes).
 
 ### Example configurations
 

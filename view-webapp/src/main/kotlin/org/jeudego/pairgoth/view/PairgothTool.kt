@@ -128,7 +128,16 @@ class PairgothTool {
         return players.filter { p -> !teamed.contains(p.getLong("id")) }
     }
 
-    // EGF ratings
-    fun displayRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
-    fun showRatings(ratings: String, country: String): Boolean = WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: (ratings.lowercase() != "ffg") || country.lowercase() == "fr"
+    // Default rating-source availability: EGF everywhere, FFG only for French tournaments, others off.
+    private fun ratingDefault(source: String, country: String) = when (source.lowercase()) {
+        "egf" -> true
+        "ffg" -> country.equals("FR", ignoreCase = true)
+        else -> false
+    }
+    // Whether the rating source's search button shows in the Add Player popup.
+    fun displayRatings(ratings: String, country: String): Boolean =
+        WebappManager.properties.getProperty("ratings.${ratings}.enable")?.toBoolean() ?: ratingDefault(ratings, country)
+    // Whether player IDs from this rating source show on the registration page.
+    fun showRatings(ratings: String, country: String): Boolean =
+        WebappManager.properties.getProperty("ratings.${ratings}.show")?.toBoolean() ?: ratingDefault(ratings, country)
 }

@@ -110,12 +110,9 @@ private fun publishProperties() {
             System.setProperty("pairgoth.$property", value)
         }
     }
-    // #149: colour only when stdout can render ANSI. The shared Colorizer (used by the webapps) owns
-    // this decision; the launcher keeps the small private copy below because it must set Jetty's
-    // MESSAGE_ESCAPE before Jetty logging starts (the webapps' Colorizer isn't loaded yet) and
-    // webserver intentionally doesn't depend on pairgoth-common. Keep in sync with Colorizer (#149).
-    val colorCapable = System.getProperty("pairgoth.color")?.toBoolean() ?: terminalSupportsColor()
-    System.setProperty("pairgoth.color", colorCapable.toString())
+    // Colour only when stdout can render ANSI. Code duplicated from pairgoth-common.
+    val colorCapable = System.getProperty("pairgoth.console.color")?.toBoolean() ?: terminalSupportsColor()
+    System.setProperty("pairgoth.console.color", colorCapable.toString())
     System.setProperty("org.eclipse.jetty.logging.appender.MESSAGE_ESCAPE", (!colorCapable).toString())
     // remember the current working directory
     System.setProperty("pairgoth.cwd", Paths.get("").toAbsolutePath().toString())

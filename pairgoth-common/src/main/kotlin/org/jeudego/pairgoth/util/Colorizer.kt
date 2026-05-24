@@ -12,9 +12,9 @@ private val bold = AnsiFormat(Attribute.BOLD())
 
 object Colorizer {
 
-    // Emit ANSI colour only when stdout can render it. An explicit `pairgoth.color` system
+    // Emit ANSI colour only when stdout can render it. An explicit `pairgoth.console.color` system
     // property wins ; otherwise detect terminal capability.
-    val colorize: Boolean = System.getProperty("pairgoth.color")?.toBoolean() ?: terminalSupportsColor()
+    val colorize: Boolean = System.getProperty("pairgoth.console.color")?.toBoolean() ?: terminalSupportsColor()
 
     // NO_COLOR / FORCE_COLOR overrides first, then require an attached console (so redirected or
     // daemon output stays clean), a non-dumb TERM, and on Windows a modern terminal.
