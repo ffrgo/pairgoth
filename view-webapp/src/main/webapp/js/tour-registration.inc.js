@@ -3,8 +3,6 @@ let searchTimer = undefined;
 let resultTemplate;
 let searchResult;
 let searchHighlight;
-let manualRating = false;
-let manualRank = false;
 let chained = false;
 
 // EGD-canonical rank/rating helpers (mirror pairgoth-common/util/RankRating.kt)
@@ -219,9 +217,11 @@ function addPlayers() {
   let status = form.val('final') || false;
   form.reset();
   form.val('final', status);
+  chained = true;
+  $('#chain-rating').addClass('chained');
+  updateLinkHints();
   $('#player').removeClass('edit').addClass('create');
   $('#register').removeClass('disabled');
-  updateChainState();
   modal('player');
   setTimeout(() => {
     $('#needle').focus();
@@ -547,8 +547,6 @@ onLoad(() => {
       else tr.removeClass('hidden');
     });
   });
-  manualRating = ($('#rating')[0].value !== '');
-  manualRank = ($('#rank')[0].value !== '');
   $('#chain-rating').on('click', e => {
     e.preventDefault();
     chained = !chained;
@@ -556,13 +554,12 @@ onLoad(() => {
     updateLinkHints();
   });
   $('#player input[name="rating"]').on('input', e=>{
-    manualRating = true;
     updateLinkHints();
   });
   $('#player select[name="rank"]').on('input', e=>{
     let rankValue = e.target.value;
     let ratingCtl = $('#player input[name="rating"]')[0];
-    if (chained && (!$('#rating')[0].value || !manualRating)) {
+    if (chained) {
       if (isProFormValue(rankValue)) {
         ratingCtl.value = proLevelToRating(proLevelOf(rankValue));
       } else if (rankValue !== '') {
@@ -674,7 +671,7 @@ onLoad(() => {
     return false;
   });
   $('#rating').on('input', e => {
-    if (chained && (!$('#rank')[0].value || !manualRank)) {
+    if (chained) {
       let rating = parseInt(e.target.value);
       if (isNaN(rating)) return true;
       let current = $('#rank')[0].value;
@@ -690,9 +687,6 @@ onLoad(() => {
         : `${ratingToRankInt(rating)}`;
     }
     return true;
-  });
-  $('#rank').on('input', e => {
-    manualRank = true;
   });
 
   // Webhook - sync players from the website. Inserts new players and updates existing ones
