@@ -14,6 +14,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.concurrent.TimeUnit
+import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream
 import kotlin.io.path.name
 import kotlin.io.path.useDirectoryEntries
 
@@ -150,9 +151,11 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
     protected fun fetchPayload(): String? {
         logger.info("Fetching ${origin.name} ratings from $url")
+        val zipped = url.path.endsWith(".zip", ignoreCase = true)
         if (url.protocol == "file") {
             return try {
-                File(url.toURI()).readText(defaultCharset())
+                val file = File(url.toURI())
+                if (zipped) unzipFirstEntry(file.readBytes()) else file.readText(defaultCharset())
             } catch (e: Exception) {
                 logger.error("Could not read ${origin.name} ratings from $url: ${e.javaClass.simpleName} ${e.message}")
                 null
@@ -170,6 +173,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
             client.newCall(request).execute().use { response ->
                 if (!response.isSuccessful) throw IOException("Could not fetch $origin ratings: unexpected code $response")
+                if (zipped) return unzipFirstEntry(response.body!!.bytes())
                 val contentType = response.headers["Content-Type"]?.toMediaType()
                 return response.body!!.source().readString(contentType?.charset() ?: defaultCharset())
             }
@@ -178,6 +182,19 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
             logger.debug("Could not refresh ${origin.name} ratings from ${url}", ioe)
             return null
         }
+    }
+
+    // Extract the first regular file of a zip archive as text (the EGD mirror ships allworld_lp zipped).
+    private fun unzipFirstEntry(bytes: ByteArray): String? {
+        ZipArchiveInputStream(bytes.inputStream()).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                if (!entry.isDirectory) return zip.readBytes().toString(defaultCharset())
+                entry = zip.nextEntry
+            }
+        }
+        logger.warn("${origin.name} zip archive at $url had no file entry")
+        return null
     }
     open fun defaultCharset() = StandardCharsets.UTF_8
     fun updated() = updated

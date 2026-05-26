@@ -196,6 +196,12 @@
             <artifactId>commons-fileupload</artifactId>
             <version>1.5</version>
         </dependency>
+        <!-- zip reader -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.27.1</version>
+        </dependency>
         <!-- proxy -->
         <dependency>
             <groupId>org.eclipse.jetty</groupId>

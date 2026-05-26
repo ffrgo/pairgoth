@@ -525,7 +525,7 @@ ratings.<source> = <url>
 URL override for the rating source. Schemes: `http://`, `https://`, `file://`. If not set, the built-in default URL for that source is used:
 
 - FFG: https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt
-- EGF: https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html
+- EGF: https://pairgoth.jeudego.org/egd/allworld_lp.zip (pairgoth-hosted mirror, zipped)
 - AGA: TBD
 
 Use this property to point at a local mirror or to a static file when the upstream is unreachable.

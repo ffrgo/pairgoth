@@ -10,7 +10,8 @@ import java.util.*
 
 object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("dd MMM yyyy", Locale.ENGLISH)
-    override val defaultURL = URL("https://www.europeangodatabase.eu/EGD/EGD_2_0/downloads/allworld_lp.html")
+    // pairgoth-hosted mirror of the EGD allworld_lp dump
+    override val defaultURL = URL("https://pairgoth.jeudego.org/egd/allworld_lp.zip")
     override fun parsePayload(payload: String): Pair<LocalDate, Json.Array>? {
         val ratingsDateString = payload.lines().firstOrNull { it.startsWith("(") }?.trim()?.removeSurrounding("(", ")")
             ?: run {
@@ -62,9 +63,12 @@ object EGFRatingsHandler: RatingsHandler(RatingsManager.Ratings.EGF) {
             }
         )
     }
+    // EGD disambiguation quirks: last names may carry parentheses, first names trailing digits
+    private val nameAtom = "[-._`'a-zA-ZÀ-ÿ()]"
+    private val firstnameAtom = "[-._`'a-zA-ZÀ-ÿ0-9]"
     //  19574643  Abad Jahin                            FR  38GJ   20k   --     15     2  T200202B
     var linePattern =
-        Regex("\\s+(?<egf>\\d{8})\\s+(?<name>$atom+)\\s(?<firstname>$atom+)?,?\\s+(?<country>[A-Z]{2})\\s+(?<club>\\S{1,4})\\s+(?<rank>[1-9][0-9]?[kdp])\\s+(?<promotion>[1-9][0-9]?[kdp]|--)\\s+(?<rating>-?[0-9]+)\\s+(?<nt>[0-9]+)\\s+(?<last>\\S+)\\s*")
+        Regex("\\s+(?<egf>\\d{8})\\s+(?<name>$nameAtom+)\\s(?<firstname>$firstnameAtom+)?,?\\s+(?<country>[A-Z]{2})\\s+(?<club>\\S{1,4})\\s+(?<rank>[1-9][0-9]?[kdp])\\s+(?<promotion>[1-9][0-9]?[kdp]|--)\\s+(?<rating>-?[0-9]+)\\s+(?<nt>[0-9]+)\\s+(?<last>\\S+)\\s*")
     val groups = arrayOf("egf", "name", "firstname", "country", "club", "rank", "rating")
     private val proSuffixRegex = Regex("([1-9])p", RegexOption.IGNORE_CASE)
 }
