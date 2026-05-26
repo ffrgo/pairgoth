@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse
 /**
  * POST /api/ratings-lookup
  * Body: { "egf": ["pin1", "pin2"], "ffg": ["lic1"], "aga": [...] }
- * Response: { "egf": {"pin1": {"rating": 2050, "pro": 0}, ...}, "ffg": {...}, "aga": {...} }
+ * Response: { "egf": {"pin1": {"rating": 2050, "pro": 0, "license": "L"}, ...}, "ffg": {...}, "aga": {...} }
+ * `license` is present only for entries that carry it (FFG, and FR-propagated EGF).
  *
  * Used by the registration-tab "Refresh ratings" feature to look up current rating + pro
  * for already-registered players in a single round-trip. Only IDs found in the active
@@ -46,6 +47,8 @@ class RatingsLookupServlet : HttpServlet() {
                     bucket[id] = Json.MutableObject().also {
                         player.getInt("rating")?.let { r -> it["rating"] = r }
                         (player["pro"] as? Number)?.toInt()?.takeIf { p -> p > 0 }?.let { p -> it["pro"] = p }
+                        // FFG echelle licence status for FR tournaments (also propagated onto FR EGF entries)
+                        player.getString("license")?.let { lic -> it["license"] = lic }
                     }
                 }
                 if (!bucket.isEmpty()) out[src] = bucket

@@ -364,7 +364,7 @@ onLoad(() => {
   });
   $('#dimmer').on('click', e => {
     let dialog = e.target.closest('.popup');
-    if (!dialog) close_modal();
+    if (!dialog && $('.shown.popup.no-dimmer-close').length === 0) close_modal();
   });
 
   /* Settings modal handlers - empty for now

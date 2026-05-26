@@ -85,6 +85,11 @@
 
   /* registration section */
 
+  #refresh-report-text {
+    white-space: pre-wrap;
+    margin: 0;
+  }
+
   #list-header {
     display: flex;
     flex-flow: row wrap;

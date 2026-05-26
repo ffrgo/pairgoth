@@ -482,6 +482,25 @@
       max-width: max(90vw, 1200px);
       width: 90vw;
     }
+    &.large {
+      top: 5vh;
+      left: 0;
+      right: 0;
+      transform: initial;
+      max-width: 90vw;
+      width: 90vw;
+      .popup-body {
+        max-width: 90vw;
+        width: 90vw;
+        max-height: 90vh;
+      }
+      @media (max-width: 600px) {
+        top: 2vh;
+        max-width: 96vw;
+        width: 96vw;
+        .popup-body { max-width: 96vw; width: 96vw; max-height: 95vh; }
+      }
+    }
     div.close {
       position: absolute;
       width: 30px;

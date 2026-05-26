@@ -386,6 +386,24 @@
 #end
 <div id="drop-changes" class="hidden">Drop changes?</div>
 <div id="unregister-player" class="hidden">Unregister this player?</div>
+<div id="refresh-report-modal" class="popup large no-dimmer-close">
+  <div class="popup-body">
+    <div class="popup-header">Ratings refresh</div>
+    <div class="popup-content">
+      <pre id="refresh-report-text"></pre>
+    </div>
+    <div class="popup-footer">
+      <button id="copy-refresh-report" type="button" class="ui blue right labeled icon floating button">
+        <i class="copy icon"></i>
+        Copy
+      </button>
+      <button type="button" class="ui gray right labeled icon floating close button">
+        <i class="times icon"></i>
+        Close
+      </button>
+    </div>
+  </div>
+</div>
 #[[
 <script id="result" type="text/template">
   {{for #data}}

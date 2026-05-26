@@ -131,6 +131,13 @@ function clearSearch() {
   searchHighlight = undefined;
 }
 
+// Fill and open the ratings-refresh change report (one "Name (level, rating) => (level, rating)" per line).
+function showRefreshReport(text) {
+  let el = $('#refresh-report-text')[0];
+  if (el) el.textContent = text;
+  modal('refresh-report-modal');
+}
+
 function search(needle) {
   needle = needle.trim();
   if (needle && (needle === '*' || needle.length > 2)) {
@@ -607,9 +614,9 @@ onLoad(() => {
   store.remove('scrollIntoView');
   let refreshReport = store('refreshReport');
   if (refreshReport) {
-    if (refreshReport.error) showError(refreshReport.msg);
-    else showSuccess(refreshReport.msg, true);
     store.remove('refreshReport');
+    if (refreshReport.text) showRefreshReport(refreshReport.text);
+    else showSuccess('Ratings refreshed', true);
   }
   if (store('macmahonGroups')) {
     modal('macmahon-groups');
@@ -866,16 +873,10 @@ onLoad(() => {
       return;
     }
 
-    // Chain test: are (rating, rank, pro) internally consistent? Pros chain on pro level,
-    // amateurs on rank. Used to decide whether to propagate rank/pro from the refreshed
-    // state or keep the player's manual override.
-    function isChained(rating, rank, pro) {
-      if (isNaN(rating)) return false;
-      if (pro > 0) return ratingToProLevel(rating) === pro;
-      return !isNaN(rank) && ratingToRankInt(rating) === rank;
-    }
-
-    let updated = 0, unchanged = 0, rankSkipped = [], mmsCorrected = [], notFound = [], failed = 0, lastError = null;
+    // Overwrite everything from the official source (rating, level, pro). The FFG licence
+    // snapshot is refreshed for FR tournaments only (and only where the source carries it).
+    let isFR = (tour_country || '').toLowerCase() === 'fr';
+    let changes = [], updated = 0, notFound = [], failed = 0, lastError = null;
     for (let p of registered) {
       // Pick the first source with a hit, in priority order.
       let hit = null;
@@ -884,60 +885,50 @@ onLoad(() => {
         if (id && lookup[src] && lookup[src][id]) { hit = lookup[src][id]; break; }
       }
       if (!hit || hit.rating == null) {
-        notFound.push(`${p.name} ${p.firstname || ''}`.trim());
+        // surface the looked-up id(s) so a source mismatch (e.g. only EGF while FFG is active) is visible
+        let ids = ['egf', 'ffg', 'aga'].filter(s => p[s]).map(s => `${s} ${p[s]}`).join(', ');
+        notFound.push(`${p.name} ${p.firstname || ''}`.trim() + (ids ? ` (${ids})` : ''));
         continue;
       }
       let newRating = parseInt(hit.rating);
       let newPro = hit.pro ? parseInt(hit.pro) : 0;
-      let oldRating = parseInt(p.rating);
-      let oldRank = parseInt(p.rank);
-      let oldPro = p.pro ? parseInt(p.pro) : 0;
-      let wasChained = isChained(oldRating, oldRank, oldPro);
-      // When chained, propagate everything; when not, keep rank/pro and only refresh rating.
-      let newRank = wasChained ? ratingToRankInt(newRating) : oldRank;
-      let proToApply = wasChained ? newPro : oldPro;
-      if (newRating === oldRating && newRank === oldRank && proToApply === oldPro) {
-        unchanged++;
-        continue;
-      }
+      let newRank = ratingToRankInt(newRating);
+      let oldRating = parseInt(p.rating), oldRank = parseInt(p.rank), oldPro = p.pro ? parseInt(p.pro) : 0;
+      let oldLicensed = (typeof p.licensed === 'boolean') ? p.licensed : null;
+      let newLicensed = (isFR && hit.license != null) ? (hit.license === 'L') : oldLicensed;
+      let levelChanged = newRating !== oldRating || newRank !== oldRank || newPro !== oldPro;
+      if (!levelChanged && newLicensed === oldLicensed) continue;
+      let payload = { id: p.id, rating: newRating, rank: newRank, pro: newPro };
+      if (isFR && hit.license != null) payload.licensed = newLicensed;
       try {
-        let resp = await api.putJson(`tour/${tour_id}/part/${p.id}`, {
-          id: p.id,
-          rating: newRating,
-          rank: newRank,
-          pro: proToApply
-        });
-        if (resp === 'error') {
-          failed++; lastError = `PUT failed for ${p.name}`;
-          continue;
-        }
+        let resp = await api.putJson(`tour/${tour_id}/part/${p.id}`, payload);
+        if (resp === 'error') { failed++; lastError = `PUT failed for ${p.name}`; continue; }
         updated++;
-        let label = `${p.name} ${p.firstname || ''}`.trim();
-        if (!wasChained && newRating !== oldRating) rankSkipped.push(label);
-        // Only flag mmsCorrection when the rank actually shifted (chained + new rank ≠ old rank).
-        // That's when the player's effective MM bracket has moved and the manual correction
-        // may no longer be appropriate. Untouched rank → MM bracket unchanged → no warning.
-        let mc = parseInt(p.mmsCorrection || 0);
-        if (mc !== 0 && wasChained && newRank !== oldRank) {
-          mmsCorrected.push(`${label} (${mc > 0 ? '+' : ''}${mc})`);
+        if (levelChanged) {
+          let name = `${p.name} ${p.firstname || ''}`.trim();
+          changes.push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
         }
-      } catch (err) {
-        failed++; lastError = err.message || String(err);
-      }
+      } catch (err) { failed++; lastError = err.message || String(err); }
     }
 
-    let parts = [];
-    parts.push(`${updated} updated`);
-    if (unchanged > 0) parts.push(`${unchanged} unchanged`);
-    if (rankSkipped.length > 0) parts.push(`${rankSkipped.length} rank kept (unchained: ${rankSkipped.join(', ')})`);
-    if (mmsCorrected.length > 0) parts.push(`${mmsCorrected.length} with MMS correction — review: ${mmsCorrected.join(', ')}`);
-    if (notFound.length > 0) parts.push(`${notFound.length} not found in ratings DB${notFound.length <= 5 ? ` (${notFound.join(', ')})` : ''}`);
-    if (failed > 0) parts.push(`${failed} failed${lastError ? ` (last: ${lastError})` : ''}`);
-    let msg = parts.join('; ');
-    // Stash the report and reload so the table reflects new rating/rank/pro values.
-    // The on-load handler below re-shows it as a sticky toast.
-    store('refreshReport', { msg: msg, error: failed > 0 });
-    if (updated > 0) setTimeout(() => window.location.reload(), 200);
-    else if (failed > 0) showError(msg); else showSuccess(msg, true);
+    changes.sort((a, b) => a.localeCompare(b));
+    notFound.sort((a, b) => a.localeCompare(b));
+    let text = changes.join('\n');
+    if (notFound.length) text += `${text ? '\n\n' : ''}Not found in ratings DB:\n${notFound.join('\n')}`;
+    if (failed) text += `${text ? '\n\n' : ''}${failed} failed${lastError ? ` (${lastError})` : ''}`;
+    if (updated > 0) {
+      // reload so the table reflects new values (incl. licence-only changes); report survives in storage
+      store('refreshReport', { text });
+      setTimeout(() => window.location.reload(), 200);
+    } else if (text) {
+      showRefreshReport(text); // only not-found / failed: nothing changed, no reload
+    } else {
+      showSuccess('Ratings refresh: no changes', true);
+    }
+  });
+  $('#copy-refresh-report').on('click', () => {
+    navigator.clipboard.writeText($('#refresh-report-text')[0].textContent)
+      .then(() => showSuccess('Copied to clipboard', true))
+      .catch(() => showError('Copy failed'));
   });
 });
