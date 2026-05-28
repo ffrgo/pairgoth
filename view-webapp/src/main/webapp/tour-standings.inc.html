@@ -221,6 +221,11 @@
 #end
           </div>
         </div>
+#if($tour.country && $tour.country.toLowerCase() == 'fr')
+        <div class="field echelle-note">
+          Result files (EGF and FFG) are to be sent to <a href="mailto:echelle@jeudego.org?subject=R%C3%A9sultats%20$esc.url($tour.name)">echelle@jeudego.org</a>
+        </div>
+#end
       </form>
     </div>
     <div class="popup-footer">
