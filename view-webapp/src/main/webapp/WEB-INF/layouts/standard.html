@@ -49,6 +49,9 @@
         <i class="fa fa-cog"></i>
       </div>
 *#
+      <div id="print" title="Print">
+        <i class="fa fa-print"></i>
+      </div>
       <div id="help" title="Help">
         <i class="fa fa-question-circle"></i>
       </div>
@@ -138,6 +141,7 @@
         $('#lang-list').removeClass('shown');
         $('#help-menu').toggleClass('shown');
       });
+      $('#print').on('click', e => window.print());
       $('.lang').on('click', e => {
         let lang = e.target.closest('.lang').data('lang');
         document.location.href = document.location.href.replace(/\/[a-z]{2}\//, `/${lang}/`);
