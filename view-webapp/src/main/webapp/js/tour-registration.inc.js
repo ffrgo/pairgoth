@@ -84,22 +84,28 @@ function updateChainState() {
   updateLinkHints();
 }
 
-// When rating and rank are unlinked, the "Rank" field is an honorary grade decoupled from
-// strength. Spell that out in italic under each field: the rating's effective pairing rank,
-// and that the rank is just a label. When linked the two agree, so we show nothing.
+// Derive rating from the current rank dropdown (pro -> canonical pro rating, else amateur rank rating).
+function syncRatingFromRank() {
+  let rankValue = $('#rank')[0].value;
+  let ratingCtl = $('#player input[name="rating"]')[0];
+  if (isProFormValue(rankValue)) ratingCtl.value = proLevelToRating(proLevelOf(rankValue));
+  else if (rankValue !== '') ratingCtl.value = rankIntToRating(parseInt(rankValue));
+}
+
+// When rating and rank are unlinked, the "Rank" field is an honorary grade used only for display.
 function updateLinkHints() {
   let ratingEl = document.getElementById('rating');
   let rankEl = document.getElementById('rank');
-  let ratingInfo = ratingEl && ratingEl.closest('.field') && ratingEl.closest('.field').querySelector('.info');
-  let rankInfo = rankEl && rankEl.closest('.field') && rankEl.closest('.field').querySelector('.info');
+  let ratingInfo = ratingEl && ratingEl.closest('.field') && ratingEl.closest('.field').querySelector('.hint');
+  let rankInfo = rankEl && rankEl.closest('.field') && rankEl.closest('.field').querySelector('.hint');
   if (chained) {
     if (ratingInfo) ratingInfo.innerHTML = '';
     if (rankInfo) rankInfo.innerHTML = '';
     return;
   }
   let rating = parseInt(ratingEl ? ratingEl.value : NaN);
-  if (ratingInfo) ratingInfo.innerHTML = isNaN(rating) ? '' : `<i>(effective rank: ${displayRank(ratingToRankInt(rating))})</i>`;
-  if (rankInfo) rankInfo.innerHTML = '<i>(honorary grade)</i>';
+  if (ratingInfo) ratingInfo.innerHTML = isNaN(rating) ? '' : `<i>Effective rank used for pairing: ${displayRank(ratingToRankInt(rating))}</i>`;
+  if (rankInfo) rankInfo.innerHTML = '<i>Honorary rank used for display only.</i>';
 }
 
 function searchResultShown() {
@@ -567,21 +573,15 @@ onLoad(() => {
     e.preventDefault();
     chained = !chained;
     $('#chain-rating').toggleClass('chained');
+    // Relinking reconciles from rank to rating.
+    if (chained) syncRatingFromRank();
     updateLinkHints();
   });
   $('#player input[name="rating"]').on('input', e=>{
     updateLinkHints();
   });
   $('#player select[name="rank"]').on('input', e=>{
-    let rankValue = e.target.value;
-    let ratingCtl = $('#player input[name="rating"]')[0];
-    if (chained) {
-      if (isProFormValue(rankValue)) {
-        ratingCtl.value = proLevelToRating(proLevelOf(rankValue));
-      } else if (rankValue !== '') {
-        ratingCtl.value = rankIntToRating(parseInt(rankValue));
-      }
-    }
+    if (chained) syncRatingFromRank();
     updateLinkHints();
   });
   $('#filter-box i').on('click', e => {

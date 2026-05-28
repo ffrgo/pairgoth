@@ -296,6 +296,7 @@
   /* UI fixes */
 
   .ui.form, .ui.segment, .ui.form .field > label { font-size: 1em; }
+  .ui.form .field > .hint { font-size: 0.85em; color: #888; }
   .ui.form .fields { margin-bottom: 0; }
   span > input[type="radio"] { vertical-align: text-top; }
   span > input[type="text"] { vertical-align: baseline; width: initial; }
