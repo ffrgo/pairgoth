@@ -371,6 +371,7 @@ class TeamTournament(
         )
 
         override fun toDetailedJson() = toMutableJson().also { json ->
+            json["rating"] = rating
             json["rank"] = rank
             country?.also { json["country"] = it }
             club?.also { json["club"] = it }
