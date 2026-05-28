@@ -7,6 +7,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
+## [0.25] - 2026-05-28
+
+### Added
+
+- French tournaments: unlicenced player licences are displayed in red.
+- Option to drop players who didn't play any game (on by default).
+
+### Changed
+
+- Rating/rank: when unlinked, the rank becomes an honorary grade — pairing always uses the rating-derived rank.
+- EGD ratings are now fetched through a proxy to bypass Cloudflare bot protection; Refresh Ratings feature polished.
+- Preliminary players shown in italic.
+- Pretty-print tournament JSON export.
+- Reviewed terminal colors / no-colors handling.
+- Synchronized config-properties documentation between code, `doc/` and `pairgoth.properties.example`.
+
+### Fixed
+
+- Negative ratings are now allowed as input.
+- Chain button display problem on older Firefox versions.
+- Toggling final/preliminary in player edit now enables Save.
+- Suppressed a spurious invalid-round error.
+
 ## [0.24] - 2026-05-22
 
 ### Added
@@ -21,6 +44,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - `session.timeout.minutes` property override for the HTTP session idle timeout (WAR default raised to 240 min).
 - `display.pairing.blackFirst` property to set the Black-vs-White display order at the deployment level (replaces the per-user cookie).
 - Sync-from-website now updates already-registered players (last-wins on rank, rating, club, country, name, round participation, external ids) and returns a structured report (added / updated / unchanged / blocked / failed).
+- French tournaments: reminder in the publish dialog to send the EGF and FFG result files to `echelle@jeudego.org` (with a pre-addressed mailto link).
 
 ### Changed
 
