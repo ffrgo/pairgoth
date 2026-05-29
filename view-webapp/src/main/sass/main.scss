@@ -639,6 +639,8 @@
     }
   }
 
+  .print-abbr { display: none; }
+
   @media screen {
     #players-list {
       font-size: smaller;
@@ -816,6 +818,32 @@
     /* #players-list tr > :first-child {           */
     /*   display: none;                            */
     /* }                                           */
+
+    /* Fixed layout forces the table to the page width, so the rightmost
+       (Participation) column can't be pushed off the paper by a long name.
+       Text cells wrap/break instead of truncating - no arbitrary length limit. */
+    #players-list #players {
+      table-layout: fixed;
+      width: 100%;
+      th { white-space: normal; overflow: hidden; }
+      /* only data cells break mid-word (long surnames); headers use print abbreviations instead */
+      td { white-space: normal; word-break: break-word; overflow: hidden; }
+      th .print-abbr { display: inline; }
+      /* Proportional column widths (relative weights; browsers scale the
+         present subset to fill the table, so optional columns don't matter). */
+      col.col-reg           { width: 5%; }
+      col.col-name          { width: 18%; }
+      col.col-firstname     { width: 17%; }
+      col.col-country       { width: 7%; }
+      col.col-club          { width: 10%; }
+      col.col-pin           { width: 12%; }
+      col.col-ffg           { width: 11%; }
+      col.col-rank          { width: 7%; }
+      col.col-rating        { width: 8%; }
+      col.col-mms           { width: 7%; }
+      col.col-team          { width: 12%; }
+      col.col-participation { width: 16%; }
+    }
 
     #players-list #players .participation .ui.label {
       background: none;

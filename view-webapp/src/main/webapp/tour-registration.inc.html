@@ -52,11 +52,33 @@
 
     <div id="players-list" class="roundbox">
       <table id="players" class="ui celled selectable striped table">
+        <colgroup>
+          <col class="col-reg"/>
+          <col class="col-name"/>
+          <col class="col-firstname"/>
+          <col class="col-country"/>
+          <col class="col-club"/>
+#if($utils.showRatings('egf', $tour.country.toLowerCase()))
+          <col class="col-pin"/>
+#end
+#if($utils.showRatings('ffg', $tour.country.toLowerCase()))
+          <col class="col-ffg"/>
+#end
+          <col class="col-rank"/>
+          <col class="col-rating"/>
+#if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
+          <col class="col-mms"/>
+#end
+#if($tour.type != 'INDIVIDUAL')
+          <col class="col-team"/>
+#end
+          <col class="col-participation"/>
+        </colgroup>
         <thead>
           <th>Reg</th>
           <th>Name</th>
           <th>First name</th>
-          <th>Country</th>
+          <th><span class="noprint">Country</span><span class="print-abbr">Ctr</span></th>
           <th>Club</th>
 #if($utils.showRatings('egf', $tour.country.toLowerCase()))
           <th>PIN</th>
@@ -64,7 +86,7 @@
 #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
           <th>FFG</th>
 #end
-          <th>Rank</th>
+          <th><span class="noprint">Rank</span><span class="print-abbr">_BLANK_RANK_ABBR Rank</span></th>
           ## TableSort bug which inverts specified sort...
           <th data-sort-default="1" aria-sort="ascending">Rating</th>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
