@@ -8,6 +8,7 @@ import com.republicate.kson.toJsonObject
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.HistoryHelper
+import org.jeudego.pairgoth.pairing.solver.MatchingEnumeration
 import org.jeudego.pairgoth.pairing.solver.PairingListener
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
@@ -79,10 +80,41 @@ sealed class Tournament <P: Pairable>(
 
     open fun unpair(round: Int) {
         games(round).clear()
+        repairEnumerations.remove(round)
     }
 
     open fun unpair(round: Int, id: ID) {
         games(round).remove(id)
+    }
+
+    // Transient "find another optimal pairing" enumerators, keyed by round (last batch wins).
+    // Workflow state, never serialized; lost on restart (then the feature is simply unavailable).
+    val repairEnumerations = mutableMapOf<Int, MatchingEnumeration>()
+
+    /** Whether an alternative optimal pairing can be searched for the round's last pairing batch. */
+    fun canRepair(round: Int): Boolean {
+        if (this is TeamTournament) return false
+        val enumeration = repairEnumerations[round] ?: return false
+        val batchGames = games(round).values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
+        return batchGames.isNotEmpty() && batchGames.none { it.result != Game.Result.UNKNOWN }
+    }
+
+    /**
+     * Replaces the last batch's games with the next distinct optimal pairing. Returns the removed
+     * game ids and the new games, or null when no other optimal pairing exists (or it is blocked,
+     * e.g. a result was already entered). Nothing is changed when null is returned.
+     */
+    fun repair(round: Int): Pair<List<ID>, List<Game>>? {
+        if (!canRepair(round)) return null
+        val enumeration = repairEnumerations[round]!!
+        val roundGames = games(round)
+        val batchGames = roundGames.values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
+        val freedTables = batchGames.map { it.table }.filter { it != 0 }
+        val newGames = enumeration.nextGames(freedTables) ?: return null
+        val removed = batchGames.map { it.id }
+        removed.forEach { roundGames.remove(it) }
+        newGames.forEach { roundGames[it.id] = it }
+        return removed to newGames
     }
 
     // games per id for each round

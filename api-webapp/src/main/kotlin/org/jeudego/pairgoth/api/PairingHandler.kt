@@ -37,7 +37,8 @@ object PairingHandler: PairgothApiHandler {
         val ret = Json.MutableObject(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
             "pairables" to pairables,
-            "unpairables" to unpairables
+            "unpairables" to unpairables,
+            "canRepair" to tournament.canRepair(round)
         )
         if (tournament is TeamTournament) {
             ret["individualGames"] = tournament.individualGames(round).values.map { it.toJson() }.toJsonArray()
@@ -49,6 +50,17 @@ object PairingHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
+
+        // "find another optimal pairing" for the last batch: no payload, replaces games in place
+        if (request.getParameter("another")?.toBoolean() == true) {
+            val repaired = tournament.repair(round) ?: return Json.Object("alternative" to false)
+            val (removedIds, newGames) = repaired
+            val newGamesJson = newGames.map { it.toJson() }.toJsonArray()
+            tournament.dispatchEvent(GamesDeleted, request, Json.Object("round" to round, "games" to removedIds.toJsonArray()))
+            tournament.dispatchEvent(GamesAdded, request, Json.Object("round" to round, "games" to newGamesJson))
+            return newGamesJson
+        }
+
         val payload = getArrayPayload(request)
         if (payload.isEmpty()) badRequest("nobody to pair")
         // CB TODO - change convention to empty array for all players
