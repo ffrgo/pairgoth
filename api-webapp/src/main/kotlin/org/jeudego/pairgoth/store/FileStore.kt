@@ -17,6 +17,7 @@ import java.nio.file.PathMatcher
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.readText
 import kotlin.io.path.useDirectoryEntries
@@ -54,6 +55,16 @@ class FileStore(pathStr: String): Store {
 
     private fun lastModified(path: Path) = displayFormat.format(Date(path.toFile().lastModified()))
 
+    // In-memory instance cache: the loaded Tournament is the live object across requests (so transient
+    // in-memory state survives), avoiding a full re-parse of the .tour file on every API call. Keyed
+    // by id; invalidated when the file's mtime no longer matches what we loaded/wrote (external edit).
+    private data class Cached(val tournament: Tournament<*>, val mtime: Long)
+    private val cache = ConcurrentHashMap<ID, Cached>()
+
+    private fun fileFor(id: ID): Path? = path.useDirectoryEntries("${id.toString().padStart(LEFT_PAD, '0')}-*.tour") { entries ->
+        entries.firstOrNull()
+    }
+
 
     override fun getTournaments(): Map<ID, Map<String, String>> {
         return path.useDirectoryEntries("*.tour") { entries ->
@@ -75,14 +86,14 @@ class FileStore(pathStr: String): Store {
         file.printWriter().use { out ->
             out.println(json.toPrettyString())
         }
+        cache[tournament.id] = Cached(tournament, file.lastModified())
     }
 
     override fun getTournament(id: ID): Tournament<*>? {
-        val file = path.useDirectoryEntries("${id.toString().padStart(LEFT_PAD, '0')}-*.tour") { entries ->
-            entries.map { entry ->
-                entry.fileName.toString()
-            }.firstOrNull() ?: throw Error("no such tournament")
-        }
+        val filePath = fileFor(id) ?: throw Error("no such tournament")
+        val mtime = filePath.toFile().lastModified()
+        cache[id]?.let { if (it.mtime == mtime) return it.tournament }
+        val file = filePath.fileName.toString()
         val json = Json.parse(path.resolve(file).readText())?.asObject() ?: throw Error("could not read tournament")
         val tournament = Tournament.fromJson(json, canonicalize = false)
         var maxPlayerId = 0
@@ -126,8 +137,11 @@ class FileStore(pathStr: String): Store {
                 }
             )
         }
-        _nextPlayerId.set(maxPlayerId + 1)
-        _nextGameId.set(maxGameId + 1)
+        // monotonic: never let another (lower-max) tournament's load drag the shared counters down,
+        // which — now that cache hits skip this reset — would otherwise reissue colliding ids
+        _nextPlayerId.updateAndGet { max(it, maxPlayerId + 1) }
+        _nextGameId.updateAndGet { max(it, maxGameId + 1) }
+        cache[id] = Cached(tournament, mtime)
         return tournament
     }
 
@@ -158,6 +172,7 @@ class FileStore(pathStr: String): Store {
     }
 
     override fun deleteTournament(tournament: Tournament<*>) {
+        cache.remove(tournament.id)
         val filename = tournament.filename()
         val file = path.resolve(filename).toFile()
         if (!file.exists()) throw Error("File $filename does not exist")

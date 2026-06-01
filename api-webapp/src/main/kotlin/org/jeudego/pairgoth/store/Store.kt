@@ -6,6 +6,7 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.server.ApiServlet.Companion.USER_KEY
 import org.jeudego.pairgoth.server.WebappManager
 import java.nio.file.Path
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import javax.servlet.http.HttpServletRequest
 
@@ -28,16 +29,18 @@ interface Store {
     fun deleteTournament(tournament: Tournament<*>)
 }
 
+// FileStore is kept as a singleton per root path: its in-memory tournament cache must persist
+// across requests (getStore is called on every request).
+private val fileStores = ConcurrentHashMap<String, FileStore>()
+private fun fileStore(rootPath: String) = fileStores.getOrPut(rootPath) { FileStore(rootPath) }
+
 fun getStore(request: HttpServletRequest): Store {
     val storeType = WebappManager.getMandatoryProperty("store")
     return when (val auth = WebappManager.getMandatoryProperty("auth")) {
         "none", "sesame" ->
             when (storeType) {
                 "memory" -> MemoryStore
-                "file" -> {
-                    val filePath = WebappManager.properties.getProperty("store.file.path") ?: "."
-                    FileStore(filePath)
-                }
+                "file" -> fileStore(WebappManager.properties.getProperty("store.file.path") ?: ".")
                 else -> throw Error("invalid store type: $storeType")
             }
         "oauth" -> {
@@ -47,7 +50,7 @@ fun getStore(request: HttpServletRequest): Store {
                 rootPath = "$rootPath/$email"
                 Path.of(rootPath).toFile().mkdirs()
             }
-            FileStore(rootPath)
+            fileStore(rootPath)
         }
         else -> throw Error("invalid auth: $auth")
     }
