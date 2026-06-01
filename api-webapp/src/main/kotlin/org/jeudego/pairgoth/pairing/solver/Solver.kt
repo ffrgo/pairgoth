@@ -160,7 +160,7 @@ sealed class Solver(
             chosenByePlayer = chosenByePlayer,
             batch = (nameSortedPairables.map { it.id } +
                 if (chosenByePlayer != ByePlayer) listOf(chosenByePlayer.id) else emptyList()).toSet(),
-            current = sorted.map { setOf(it[0], it[1]) }.toSet()
+            initial = sorted.map { setOf(it[0], it[1]) }.toSet()
         )
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
@@ -671,9 +671,10 @@ sealed class Solver(
 
 /**
  * Transient, in-memory state backing "find another optimal pairing" for the last pairing operation
- * on a round. Holds a live [PerfectMatchingEnumerator]; each [nextGames] call advances it to the
- * next distinct optimum (skipping the one currently shown), or returns null once optima are
- * exhausted — a trustworthy "no other optimal pairing". Never serialized; lost on restart.
+ * on a round. Remembers the pairings shown so far (index 0 = the originally committed one) and which
+ * is active, so the user can navigate prev/next; [forward] generates new distinct optima lazily via
+ * the live [PerfectMatchingEnumerator] and appends them, returning null once they are exhausted — a
+ * trustworthy "no other optimal pairing". Never serialized; lost on restart.
  */
 class MatchingEnumeration(
     private val solver: Solver,
@@ -681,13 +682,33 @@ class MatchingEnumeration(
     private val orientation: Map<Set<Pairable>, Pair<Pairable, Pairable>>,
     private val chosenByePlayer: Pairable,
     val batch: Set<ID>,
-    private var current: Set<Set<Pairable>>
+    initial: Set<Set<Pairable>>
 ) {
-    fun nextGames(freedTables: List<Int>): List<Game>? {
-        var pairs = enumerator.next()?.pairs
-        while (pairs != null && pairs == current) pairs = enumerator.next()?.pairs
-        val chosen = pairs ?: return null
-        current = chosen
-        return solver.assemble(chosen, orientation, chosenByePlayer, freedTables)
+    private val history = mutableListOf(initial)
+    private var active = 0
+    private var exhausted = false
+
+    val activeIndex get() = active
+    /** Total number of optimal pairings — known only once the enumeration has been exhausted. */
+    val total get() = if (exhausted) history.size else null
+
+    /** Moves to the next remembered pairing, or generates a new distinct optimum; null if none left. */
+    fun forward(freedTables: List<Int>): List<Game>? {
+        if (active == history.lastIndex) {
+            if (exhausted) return null // don't re-query past the last one once we've hit it
+            var pairs = enumerator.next()?.pairs
+            while (pairs != null && pairs in history) pairs = enumerator.next()?.pairs
+            if (pairs == null) { exhausted = true; return null }
+            history.add(pairs)
+        }
+        active++
+        return solver.assemble(history[active], orientation, chosenByePlayer, freedTables)
+    }
+
+    /** Moves back to the previous remembered pairing; null if already at the first. */
+    fun backward(freedTables: List<Int>): List<Game>? {
+        if (active == 0) return null
+        active--
+        return solver.assemble(history[active], orientation, chosenByePlayer, freedTables)
     }
 }

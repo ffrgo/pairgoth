@@ -59,12 +59,6 @@
             <i class="angle double right icon"></i>
             Pair
           </button>
-#if($roundPairing.canRepair)
-          <button id="another" class="ui blue right labeled icon floating button" title="find another optimal pairing for the last paired group">
-            <i class="random icon"></i>
-            Another
-          </button>
-#end
           <button id="unpair" class="ui orange right labeled icon floating button">
             <i class="angle double left icon"></i>
             Unpair
@@ -75,6 +69,16 @@
           </button>
         </div>
         <div>
+#if($roundPairing.canRepair)
+#set($pairingPos = $roundPairing.pairingActive + 1)
+#set($pairingTotal = $roundPairing.pairingTotal)
+#set($atLast = $pairingTotal > 0 && $roundPairing.pairingActive == $pairingTotal - 1)
+          <div id="pairing-pre-action" style="text-align:center; margin-bottom:.5em;">
+            <button id="pairing-prev" class="ui icon button"#if($roundPairing.pairingActive == 0) disabled#end title="previous optimal pairing"><i class="angle left icon"></i></button>
+            <span style="margin:0 .5em;">optimal pairing $pairingPos#if($pairingTotal > 0) / $pairingTotal#end</span>
+            <button id="pairing-next" class="ui icon button"#if($atLast) disabled#end title="next optimal pairing"><i class="angle right icon"></i></button>
+          </div>
+#end
           <div id="paired" class="multi-select" title="#if($blackFirst)black vs. white#{else}white vs. black#end">##
 #foreach($game in $games)
   #set($white = $pmap[$game.w])

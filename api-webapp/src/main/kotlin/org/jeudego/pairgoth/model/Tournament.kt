@@ -91,7 +91,7 @@ sealed class Tournament <P: Pairable>(
     // Workflow state, never serialized; lost on restart (then the feature is simply unavailable).
     val repairEnumerations = mutableMapOf<Int, MatchingEnumeration>()
 
-    /** Whether an alternative optimal pairing can be searched for the round's last pairing batch. */
+    /** Whether the round's last pairing batch can be navigated among alternative optimal pairings. */
     fun canRepair(round: Int): Boolean {
         if (this is TeamTournament) return false
         val enumeration = repairEnumerations[round] ?: return false
@@ -99,18 +99,25 @@ sealed class Tournament <P: Pairable>(
         return batchGames.isNotEmpty() && batchGames.none { it.result != Game.Result.UNKNOWN }
     }
 
+    /** Index of the currently active remembered pairing (0 = the committed one). */
+    fun pairingActiveIndex(round: Int) = repairEnumerations[round]?.activeIndex ?: 0
+
+    /** Total optimal pairings for the round's last batch, or -1 if not yet known (still enumerating). */
+    fun pairingTotal(round: Int) = if (canRepair(round)) (repairEnumerations[round]!!.total ?: -1) else -1
+
     /**
-     * Replaces the last batch's games with the next distinct optimal pairing. Returns the removed
-     * game ids and the new games, or null when no other optimal pairing exists (or it is blocked,
-     * e.g. a result was already entered). Nothing is changed when null is returned.
+     * Replaces the last batch's games with the next (forward) or previous (backward) optimal pairing.
+     * Forward generates a new distinct optimum when at the end of the remembered list. Returns the
+     * removed game ids and the new games, or null when there is none in that direction (or it is
+     * blocked, e.g. a result was already entered). Nothing is changed when null is returned.
      */
-    fun repair(round: Int): Pair<List<ID>, List<Game>>? {
+    fun navigatePairing(round: Int, forward: Boolean): Pair<List<ID>, List<Game>>? {
         if (!canRepair(round)) return null
         val enumeration = repairEnumerations[round]!!
         val roundGames = games(round)
         val batchGames = roundGames.values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
         val freedTables = batchGames.map { it.table }.filter { it != 0 }
-        val newGames = enumeration.nextGames(freedTables) ?: return null
+        val newGames = (if (forward) enumeration.forward(freedTables) else enumeration.backward(freedTables)) ?: return null
         val removed = batchGames.map { it.id }
         removed.forEach { roundGames.remove(it) }
         newGames.forEach { roundGames[it.id] = it }

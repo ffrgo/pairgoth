@@ -37,16 +37,13 @@ function unpair(games) {
     });
 }
 
-// Replace the last paired group with another optimal pairing (same total weight), if one exists.
-function another() {
-  api.postJson(`tour/${tour_id}/pair/${activeRound}?another=true`, {})
+// Navigate alternative optimal pairings of the last paired group (same total weight).
+// dir 'next' moves to / generates the next one, 'prev' steps back through the remembered ones.
+// Reload on any non-error answer: even "no other" flips the known-total state (disables Next, shows /N).
+function navigatePairing(dir) {
+  api.postJson(`tour/${tour_id}/pair/${activeRound}?nav=${dir}`, {})
     .then(rst => {
-      if (rst === 'error') return;
-      if (rst && rst.alternative === false) {
-        showSuccess('No other optimal pairing found');
-      } else {
-        document.location.reload();
-      }
+      if (rst !== 'error') document.location.reload();
     });
 }
 
@@ -214,8 +211,11 @@ onLoad(()=>{
     }
     pair(parts);
   });
-  $('#another').on('click', e => {
-    another();
+  $('#pairing-prev').on('click', e => {
+    navigatePairing('prev');
+  });
+  $('#pairing-next').on('click', e => {
+    navigatePairing('next');
   });
   $('#unpair').on('click', e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
