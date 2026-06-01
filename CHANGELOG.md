@@ -7,7 +7,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
-## [Unreleased]
+## [0.27]
+
+### Added
+
+- Per instance tournaments file caching, to avoid re-parsing tournament files at each call (stored files are checked for freshness)
+
+### Fixed
 
 ## [0.26] - 2026-06-22
 
