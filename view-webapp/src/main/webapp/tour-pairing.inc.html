@@ -59,6 +59,12 @@
             <i class="angle double right icon"></i>
             Pair
           </button>
+#if($roundPairing.canRepair)
+          <button id="another" class="ui blue right labeled icon floating button" title="find another optimal pairing for the last paired group">
+            <i class="random icon"></i>
+            Another
+          </button>
+#end
           <button id="unpair" class="ui orange right labeled icon floating button">
             <i class="angle double left icon"></i>
             Unpair

@@ -37,6 +37,19 @@ function unpair(games) {
     });
 }
 
+// Replace the last paired group with another optimal pairing (same total weight), if one exists.
+function another() {
+  api.postJson(`tour/${tour_id}/pair/${activeRound}?another=true`, {})
+    .then(rst => {
+      if (rst === 'error') return;
+      if (rst && rst.alternative === false) {
+        showSuccess('No other optimal pairing found');
+      } else {
+        document.location.reload();
+      }
+    });
+}
+
 function renumberTables() {
   let payload = {}
   let tablesExclusionControl = $('#exclude-tables');
@@ -200,6 +213,9 @@ onLoad(()=>{
       parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     }
     pair(parts);
+  });
+  $('#another').on('click', e => {
+    another();
   });
   $('#unpair').on('click', e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));

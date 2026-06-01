@@ -14,6 +14,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Team tournaments: a board's colours can be overridden from the result screen (swap), without changing the match result.
+- "Another" button on the pairings page: when the last paired group has several optimal pairings of equal total weight, browse them one by one (each click yields a distinct one, or reports none left). Backed by a Murty-based optimal perfect-matching enumerator over the pairing graph (GitLab #42). In-memory only, for the round's last pairing operation.
 
 ### Fixed
 
