@@ -100,6 +100,7 @@ class FileStore(pathStr: String): Store {
     /** Reconstructs a Tournament from a stored (full) tournament JSON, bumping the shared id counters. */
     private fun buildTournament(json: Json.Object): Tournament<*> {
         val tournament = Tournament.fromJson(json, canonicalize = false)
+        tournament.lastAction = json.getString("lastAction")
         var maxPlayerId = 0
         var maxGameId = 0
         val players = json["players"] as Json.Array? ?: Json.Array()
@@ -190,7 +191,18 @@ class FileStore(pathStr: String): Store {
         if (!file.toFile().isFile) return null
         val json = Json.parse(file.readText())?.asObject() ?: return null
         // restore = a new (undoable) mutation: archives the current state, writes the snapshot as current
-        return buildTournament(json).also { replaceTournament(it, "restore") }
+        return buildTournament(json).also {
+            it.lastAction = "Restore" + (json.getString("lastAction")?.let { o -> ": $o" } ?: "")
+            replaceTournament(it, "restore")
+        }
+    }
+
+    override fun snapshotAction(id: ID, snapshot: String): String? {
+        val prefix = "${id.toString().padStart(LEFT_PAD, '0')}-"
+        if (snapshot.contains('/') || snapshot.contains('\\') || !snapshot.startsWith(prefix)) return null
+        val file = path.resolve("history").resolve(snapshot)
+        if (!file.toFile().isFile) return null
+        return Json.parse(file.readText())?.asObject()?.getString("lastAction")
     }
 
     override fun deleteTournament(tournament: Tournament<*>) {

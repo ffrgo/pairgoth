@@ -6,6 +6,7 @@ import com.republicate.kson.Json
 import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ExplainHandler
+import org.jeudego.pairgoth.api.HistoryHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
@@ -106,6 +107,7 @@ class ApiServlet: HttpServlet() {
                         "res" -> ResultsHandler
                         "standings" -> StandingsHandler
                         "team" -> TeamHandler
+                        "history" -> HistoryHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
                 // "player" -> PlayerHandler
