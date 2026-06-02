@@ -93,8 +93,12 @@ class FileStore(pathStr: String): Store {
         val filePath = fileFor(id) ?: throw Error("no such tournament")
         val mtime = filePath.toFile().lastModified()
         cache[id]?.let { if (it.mtime == mtime) return it.tournament }
-        val file = filePath.fileName.toString()
-        val json = Json.parse(path.resolve(file).readText())?.asObject() ?: throw Error("could not read tournament")
+        val json = Json.parse(filePath.readText())?.asObject() ?: throw Error("could not read tournament")
+        return buildTournament(json).also { cache[id] = Cached(it, mtime) }
+    }
+
+    /** Reconstructs a Tournament from a stored (full) tournament JSON, bumping the shared id counters. */
+    private fun buildTournament(json: Json.Object): Tournament<*> {
         val tournament = Tournament.fromJson(json, canonicalize = false)
         var maxPlayerId = 0
         var maxGameId = 0
@@ -141,34 +145,52 @@ class FileStore(pathStr: String): Store {
         // which — now that cache hits skip this reset — would otherwise reissue colliding ids
         _nextPlayerId.updateAndGet { max(it, maxPlayerId + 1) }
         _nextGameId.updateAndGet { max(it, maxGameId + 1) }
-        cache[id] = Cached(tournament, mtime)
         return tournament
     }
 
-    override fun replaceTournament(tournament: Tournament<*>) {
+    override fun replaceTournament(tournament: Tournament<*>, actionSlug: String?) {
         val filename = tournament.filename()
-        // short name may have changed
-        path.useDirectoryEntries("${tournament.id.toString().padStart(LEFT_PAD, '0')}-*.tour") { entries ->
-            entries.mapNotNull { entry ->
-                entry.toFile()
-            }.firstOrNull()
-        }?.let { file ->
+        // archive the current state (short name may have changed → locate by id) before overwriting
+        fileFor(tournament.id)?.let { current ->
             val history = path.resolve("history").toFile()
             if (!history.exists() && !history.mkdir()) {
                 throw Error("cannot create 'history' sub-directory")
             }
-            val dest = path.resolve("history/${filename}-${timestamp}").toFile()
-            if (dest.exists()) {
-                // it means the user performed several actions in the same second...
-                // drop the last occurrence
-                dest.delete()
-            }
-            if (!file.renameTo(dest)) {
-                throw Error("Cannot rename ${file.path} to ${dest.path}")
+            val ts = timestamp
+            val dest = path.resolve("history/${historySnapshotName(filename, ts, sameSecondCount(tournament.id, ts), actionSlug)}").toFile()
+            if (!current.toFile().renameTo(dest)) {
+                throw Error("Cannot rename $current to ${dest.path}")
             }
         }
-
         addTournament(tournament)
+    }
+
+    /** How many snapshots already exist for this tournament in the given second (the next seq). */
+    private fun sameSecondCount(id: ID, ts: String): Int {
+        val history = path.resolve("history")
+        if (!history.toFile().isDirectory) return 0
+        return history.useDirectoryEntries("${id.toString().padStart(LEFT_PAD, '0')}-*.tour-$ts*") { it.count() }
+    }
+
+    override fun listHistory(id: ID): List<HistorySnapshot> {
+        val history = path.resolve("history")
+        if (!history.toFile().isDirectory) return emptyList()
+        return history.useDirectoryEntries("${id.toString().padStart(LEFT_PAD, '0')}-*.tour-*") { entries ->
+            entries.mapNotNull { parseHistorySnapshot(it.fileName.toString()) }
+                .sortedByDescending { it.order }
+                .toList()
+        }
+    }
+
+    override fun restore(id: ID, snapshot: String): Tournament<*>? {
+        // guard against path traversal and foreign snapshots
+        val prefix = "${id.toString().padStart(LEFT_PAD, '0')}-"
+        if (snapshot.contains('/') || snapshot.contains('\\') || !snapshot.startsWith(prefix) || parseHistorySnapshot(snapshot) == null) return null
+        val file = path.resolve("history").resolve(snapshot)
+        if (!file.toFile().isFile) return null
+        val json = Json.parse(file.readText())?.asObject() ?: return null
+        // restore = a new (undoable) mutation: archives the current state, writes the snapshot as current
+        return buildTournament(json).also { replaceTournament(it, "restore") }
     }
 
     override fun deleteTournament(tournament: Tournament<*>) {

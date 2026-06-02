@@ -15,8 +15,9 @@ interface PairgothApiHandler: ApiHandler {
 
     fun Tournament<*>.dispatchEvent(event: Event, request: HttpServletRequest, data: Json? = null) {
         Event.dispatch(event, Json.Object("tournament" to id, "data" to data))
-        // when storage is not in memory, the tournament has to be persisted
+        // when storage is not in memory, the tournament has to be persisted; the event's slug names
+        // the history snapshot so the operator can later undo this action
         if (event != Event.TournamentAdded && event != Event.TournamentDeleted)
-            getStore(request).replaceTournament(this)
+            getStore(request).replaceTournament(this, event.slug)
     }
 }

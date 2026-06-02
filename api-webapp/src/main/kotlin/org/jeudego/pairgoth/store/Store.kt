@@ -25,8 +25,15 @@ interface Store {
     fun getTournaments(): Map<ID, Map<String, String>>
     fun addTournament(tournament: Tournament<*>)
     fun getTournament(id: ID): Tournament<*>?
-    fun replaceTournament(tournament: Tournament<*>)
+    fun replaceTournament(tournament: Tournament<*>, actionSlug: String? = null)
     fun deleteTournament(tournament: Tournament<*>)
+    /** Past snapshots of a tournament, newest first. Empty when the store keeps no history. */
+    fun listHistory(id: ID): List<HistorySnapshot> = emptyList()
+    /**
+     * Restores a past [snapshot] as the current state, recorded as a new (undoable) "restore"
+     * mutation. Returns the restored tournament, or null if unsupported / snapshot not found.
+     */
+    fun restore(id: ID, snapshot: String): Tournament<*>? = null
 }
 
 // FileStore is kept as a singleton per root path: its in-memory tournament cache must persist
