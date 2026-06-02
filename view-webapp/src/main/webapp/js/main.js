@@ -397,6 +397,80 @@ onLoad(() => {
   }
 });
 
+// --- Undo / history (header button → modal listing past actions, top-anchored multi-select) ---
+// The list shows actions newest-first; clicking a row selects it and every newer one (you can only
+// undo a contiguous run from "now"), then "Undo selected" restores the state before the oldest one.
+let undoTour = undefined, undoCursor = null, undoDone = false, undoLoading = false, undoSelected = -1;
+
+function loadUndoPage() {
+  if (undoDone || undoLoading) return Promise.resolve();
+  undoLoading = true;
+  let url = `tour/${undoTour}/history?count=20` + (undoCursor ? `&before=${undoCursor}` : '');
+  return api.getJson(url).then(rst => {
+    if (rst === 'error' || !rst || !rst.entries) { undoDone = true; return; }
+    let list = $('#undo-list')[0];
+    rst.entries.forEach(e => {
+      let item = document.createElement('div');
+      item.className = 'listitem';
+      item.setAttribute('data-restore', e.restoreKey);
+      let action = document.createElement('span');
+      action.className = 'action';
+      action.textContent = e.label || (e.category ? e.category.replace(/-/g, ' ') : '(earlier version)');
+      let when = document.createElement('span');
+      when.className = 'when';
+      when.textContent = e.time;
+      item.appendChild(action);
+      item.appendChild(when);
+      list.appendChild(item);
+    });
+    undoCursor = rst.nextBefore;
+    if (!undoCursor) undoDone = true;
+  }).finally(() => { undoLoading = false; });
+}
+
+function openUndo() {
+  undoTour = $('#undo')[0].getAttribute('data-tour');
+  undoCursor = null; undoDone = false; undoSelected = -1;
+  $('#undo-list')[0].clearChildren();
+  $('#undo-confirm').addClass('disabled');
+  loadUndoPage().then(() => {
+    if ($('#undo-list .listitem').length === 0) {
+      $('#undo-list')[0].insertAdjacentHTML('beforeend', '<div class="listitem empty">Nothing to undo</div>');
+    }
+    modal('undo-modal');
+  });
+}
+
+function selectUndoThrough(item) {
+  let children = $('#undo-list')[0].childNodes.filter('.listitem');
+  let to = item.index('.listitem');
+  for (let j = 0; j < children.length; ++j) {
+    if (j <= to) children.item(j).addClass('selected');
+    else children.item(j).removeClass('selected');
+  }
+  undoSelected = to;
+  $('#undo-confirm').removeClass('disabled');
+}
+
+onLoad(() => {
+  $('#undo').on('click', e => openUndo());
+  $('#undo-list').on('click', e => {
+    let item = e.target.closest('.listitem');
+    if (item && !item.hasClass('empty')) selectUndoThrough(item);
+  });
+  $('#undo-list').on('scroll', e => {
+    let el = e.target;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 20) loadUndoPage();
+  });
+  $('#undo-confirm').on('click', e => {
+    if (undoSelected < 0) return;
+    let key = $('#undo-list')[0].childNodes.filter('.listitem').item(undoSelected).getAttribute('data-restore');
+    api.postJson(`tour/${undoTour}/history`, { snapshot: key }).then(rst => {
+      if (rst !== 'error') document.location.reload();
+    });
+  });
+});
+
 // Element.clearChildren method
 if( typeof Element.prototype.clearChildren === 'undefined' ) {
   Object.defineProperty(Element.prototype, 'clearChildren', {

@@ -192,7 +192,8 @@ class FileStore(pathStr: String): Store {
         val json = Json.parse(file.readText())?.asObject() ?: return null
         // restore = a new (undoable) mutation: archives the current state, writes the snapshot as current
         return buildTournament(json).also {
-            it.lastAction = "Restore" + (json.getString("lastAction")?.let { o -> ": $o" } ?: "")
+            // name the restore by its target so the undo list reads e.g. "Restore to Pair (round 3)"
+            it.lastAction = "Restore to " + (json.getString("lastAction") ?: "an earlier version")
             replaceTournament(it, "restore")
         }
     }

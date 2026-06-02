@@ -40,7 +40,7 @@ object HistoryHandler: PairgothApiHandler {
             val label = if (gi == 0) tournament.lastAction else store.snapshotAction(tournament.id, archives[gi - 1].filename)
             Json.MutableObject(
                 "restoreKey" to snap.filename,
-                "category" to (snap.slug ?: "unknown"),
+                "category" to snap.slug, // null for legacy snapshots → UI shows "(earlier version)"
                 "label" to label,
                 "order" to snap.order,
                 "time" to displayTime(snap.timestamp)
