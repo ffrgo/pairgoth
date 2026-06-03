@@ -471,6 +471,32 @@ onLoad(() => {
   });
 });
 
+// --- Collaborative SSE client (pipe-proof) ---
+// Connects to the tournament event stream (proxied to the api), filters to the current tournament,
+// and logs what arrives. `history-gap` (jeasse) means replay was incomplete → resync by reloading.
+// EventSource auto-reconnects and re-sends Last-Event-Id, so jeasse replays events missed in a blip.
+const SSE_EVENTS = ['TournamentUpdated', 'PlayerAdded', 'PlayerUpdated', 'PlayerDeleted',
+  'TeamAdded', 'TeamUpdated', 'TeamDeleted', 'GamesAdded', 'GamesDeleted', 'GameUpdated',
+  'ResultUpdated', 'ResultsCleared', 'TablesRenumbered'];
+
+onLoad(() => {
+  if (typeof tour_id === 'undefined') return;
+  // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events
+  // (served directly same-origin in standalone; proxied via /api/tour/* in client mode)
+  let source = new EventSource('/api/tour/events');
+  source.addEventListener('history-gap', e => {
+    console.warn('[sse] history gap — reloading to resync');
+    document.location.reload();
+  });
+  SSE_EVENTS.forEach(name => source.addEventListener(name, e => {
+    let payload = JSON.parse(e.data);
+    if (payload && payload.tournament === tour_id) {
+      console.log(`[sse] ${name} #${e.lastEventId}`, payload.data);
+    }
+  }));
+  source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
+});
+
 // Element.clearChildren method
 if( typeof Element.prototype.clearChildren === 'undefined' ) {
   Object.defineProperty(Element.prototype, 'clearChildren', {
