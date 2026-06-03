@@ -71,6 +71,10 @@ object TournamentHandler: PairgothApiHandler {
         // CB TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
         val payload = getObjectPayload(request).toMutableJsonObject()
+        // a criteria change from the standings view arrives as a sparse {pairing:{placement:...}}
+        // payload; flag it so the event is sourced at the standings tab rather than information
+        val placementOnly = payload.keys == setOf("pairing") &&
+            payload.getObject("pairing")?.keys == setOf("placement")
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
         // specific handling for 'excludeTables'
@@ -134,7 +138,7 @@ object TournamentHandler: PairgothApiHandler {
                 clear()
                 putAll(tournament.games(round))
             }
-            updated.dispatchEvent(TournamentUpdated, request, updated.toJson())
+            updated.dispatchEvent(if (placementOnly) StandingsUpdated else TournamentUpdated, request, updated.toJson())
         }
         return Json.Object("success" to true)
     }

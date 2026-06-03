@@ -471,13 +471,40 @@ onLoad(() => {
   });
 });
 
-// --- Collaborative SSE client (pipe-proof) ---
-// Connects to the tournament event stream (proxied to the api), filters to the current tournament,
-// and logs what arrives. `history-gap` (jeasse) means replay was incomplete → resync by reloading.
-// EventSource auto-reconnects and re-sends Last-Event-Id, so jeasse replays events missed in a blip.
-const SSE_EVENTS = ['TournamentUpdated', 'PlayerAdded', 'PlayerUpdated', 'PlayerDeleted',
-  'TeamAdded', 'TeamUpdated', 'TeamDeleted', 'GamesAdded', 'GamesDeleted', 'GameUpdated',
-  'ResultUpdated', 'ResultsCleared', 'TablesRenumbered'];
+// --- Collaborative SSE client ---
+// Subscribes to the tournament event stream (proxied to the api), filters to the current tournament,
+// and marks the affected tabs stale. `history-gap` (jeasse) means replay was incomplete → resync by
+// reloading. EventSource auto-reconnects and re-sends Last-Event-Id, so jeasse replays missed events.
+
+// Workflow order: a change originating at tab i invalidates every tab j >= i (downstream derives
+// from upstream). Each mutating event maps to its source tab. A standings-criteria change comes as a
+// sparse PUT the api flags as StandingsUpdated, so it's sourced at standings (affects only standings).
+const TAB_ORDER = ['information', 'registration', 'teams', 'pairing', 'results', 'standings'];
+const EVENT_SOURCE_TAB = {
+  TournamentUpdated: 'information',
+  PlayerAdded: 'registration', PlayerUpdated: 'registration', PlayerDeleted: 'registration',
+  TeamAdded: 'teams', TeamUpdated: 'teams', TeamDeleted: 'teams',
+  GamesAdded: 'pairing', GamesDeleted: 'pairing', GameUpdated: 'pairing', TablesRenumbered: 'pairing',
+  ResultUpdated: 'results', ResultsCleared: 'results',
+  StandingsUpdated: 'standings'
+};
+// Staleness is held as the '.stale' class on the menu item (single source of truth, queried by
+// chooseStep, reset on reload) — no visual badge by design. The current tab is left alone here
+// (its dynamic/warn handling is a later cycle).
+function currentStep() {
+  return (window.location.hash || '').substring(1) || $('.step.active')[0]?.attr('data-step');
+}
+
+function markStaleFrom(sourceStep) {
+  let from = TAB_ORDER.indexOf(sourceStep);
+  if (from < 0) return;
+  let current = currentStep();
+  for (let i = from; i < TAB_ORDER.length; ++i) {
+    let step = TAB_ORDER[i];
+    if (step === current) continue;
+    $(`.step[data-step="${step}"]`).addClass('stale');
+  }
+}
 
 onLoad(() => {
   if (typeof tour_id === 'undefined') return;
@@ -488,11 +515,11 @@ onLoad(() => {
     console.warn('[sse] history gap — reloading to resync');
     document.location.reload();
   });
-  SSE_EVENTS.forEach(name => source.addEventListener(name, e => {
+  Object.keys(EVENT_SOURCE_TAB).forEach(name => source.addEventListener(name, e => {
     let payload = JSON.parse(e.data);
-    if (payload && payload.tournament === tour_id) {
-      console.log(`[sse] ${name} #${e.lastEventId}`, payload.data);
-    }
+    if (payload && payload.tournament !== tour_id) return;
+    console.log(`[sse] ${name} #${e.lastEventId} → stale from ${EVENT_SOURCE_TAB[name]}`, payload.data); // TODO drop after testing
+    markStaleFrom(EVENT_SOURCE_TAB[name]);
   }));
   source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
 });

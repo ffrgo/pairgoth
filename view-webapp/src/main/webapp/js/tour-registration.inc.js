@@ -552,8 +552,6 @@ onLoad(() => {
         cell.toggleClass('final');
         let confirmed = $('#confirmed-count')[0];
         if (confirmed) confirmed.innerText = parseInt(confirmed.innerText) + (newStatus ? 1 : -1);
-        standingsUpToDate = false;
-        pairablesUpToDate = false;
       }
     });
     e.preventDefault();
@@ -679,8 +677,6 @@ onLoad(() => {
       if (player !== 'error') {
         part.toggleClass('red');
         part.toggleClass('green');
-        standingsUpToDate = false;
-        pairablesUpToDate = false;
       }
     });
     e.preventDefault();

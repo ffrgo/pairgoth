@@ -539,6 +539,11 @@
     .step {
       padding-top: 0.5em;
       padding-bottom: 0.5em;
+      // '.stale' = this tab's data changed elsewhere; kept as pure state (chooseStep reloads it on
+      // entry, reset on reload). No visual badge by design: a "something changed, but not what" dot
+      // is more noise than signal (operators coordinate; the undo history shows what actually changed).
+      // To re-enable a badge later: &.stale { position: relative; &::after { content:''; position:
+      // absolute; top:.4em; right:.4em; width:.55em; height:.55em; border-radius:50%; background:orange; } }
     }
   }
 

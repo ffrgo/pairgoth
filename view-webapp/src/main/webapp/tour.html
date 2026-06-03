@@ -81,8 +81,6 @@
   const tour_country = '$!tour.country';
   let activeRound = ${round};
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
-  let standingsUpToDate = true;
-  let pairablesUpToDate = true;
   const teamSize = $tour.teamSize;
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
@@ -113,9 +111,9 @@
     $('.step').removeClass('active');
     $(`.step[data-step="${step}"], #${step}-tab`).addClass('active');
     window.location.hash = `#${step}`;
-    if (step === 'standings' && !standingsUpToDate) {
-      window.location.reload();
-    } else if (step === 'pairing' && !pairablesUpToDate) {
+    // a tab marked stale by an SSE event (another operator's change, or our own) is refreshed on
+    // entry; the '.stale' class is the state (reset by the reload)
+    if ($(`.step[data-step="${step}"]`)[0]?.hasClass('stale')) {
       window.location.reload();
     }
   }

@@ -18,7 +18,6 @@ function setResult(id, result, previous) {
         }
         let resultCell = row.find('td.result');
         resultCell.text(dispResult).data('result', result);
-        standingsUpToDate = false;
 
         if (previous === '?') {
           let indicator = $('#known')[0];
