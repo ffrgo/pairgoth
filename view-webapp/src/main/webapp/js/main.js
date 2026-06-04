@@ -575,13 +575,23 @@ function onCurrentTabAffected(affected) {
   else window.location.reload();
 }
 
+// In-place patch handlers registered per event by the tab modules (tour-results.inc.js etc.). A
+// handler receives the event data, patches the on-screen (source) tab, and returns true if it fully
+// handled it; returning falsy falls through to the coarse reload/warn (e.g. a player identity change
+// that can't be patched in place).
+const sseEffects = {};
+function sseEffect(name, fn) { sseEffects[name] = fn; }
+
 // Collaborative-mode dispatch for one event: every affected tab (j >= source) off-screen goes stale
-// (reload on entry); the on-screen tab, if affected (its index >= source index), takes its effect.
-// Coarse reload/warn for now — finer per-event patches (results cell, registration mask bit2/3) next.
+// (reload on entry); the on-screen tab, if affected (its index >= source index), is patched in place
+// when a handler is registered for (event, source tab), else coarsely reloaded/warned.
 function handleCollaborativeEvent(name, source, data) {
   markStaleFrom(source);                                                   // off-screen downstream tabs
   if (TAB_ORDER.indexOf(currentStep()) < TAB_ORDER.indexOf(source)) return; // on-screen tab is upstream → unaffected
-  onCurrentTabAffected(name === 'PlayerUpdated' ? data?.id : undefined);
+  // an in-place patch is only meaningful on the tab the change originated from (downstream tabs derive
+  // from it and must reload/warn)
+  let patched = currentStep() === source && sseEffects[name] && sseEffects[name](data);
+  if (!patched) onCurrentTabAffected(name === 'PlayerUpdated' ? data?.id : undefined);
 }
 
 onLoad(() => {

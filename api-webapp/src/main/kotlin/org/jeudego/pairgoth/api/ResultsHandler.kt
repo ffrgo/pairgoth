@@ -41,7 +41,7 @@ object ResultsHandler: PairgothApiHandler {
         if (tournament is TeamTournament && tournament.type.individual) {
             tournament.propagateIndividualResult(round, game)
         }
-        tournament.dispatchEvent(Event.ResultUpdated, request, Json.Object("round" to round, "data" to game))
+        tournament.dispatchEvent(Event.ResultUpdated, request, Json.Object("round" to round, "data" to game.toJson()))
         return Json.Object("success" to true)
     }
 

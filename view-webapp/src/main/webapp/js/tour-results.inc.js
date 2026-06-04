@@ -1,57 +1,61 @@
-function setResult(id, result, previous) {
-  api.putJson(`tour/${tour_id}/res/${activeRound}`, { id: id, result: result })
-    .then(res => {
-      if (res !== 'error') {
-        let row = $(`#results-list tr#result-${id}`);
-        row.find('td').removeClass('winner').removeClass('looser');
-        let white = row.find('td.white');
-        let black = row.find('td.black');
-        let dispResult = result;
-        switch (result) {
-          case '?': break;
-          case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = '1-0'; break;
-          case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = '0-1'; break;
-          case '=': dispResult = '½-½'; break;
-          case 'X': break;
-          case '#': white.addClass('winner'); black.addClass('winner'); dispResult = '1-1'; break;
-          case '0': white.addClass('looser'); black.addClass('looser'); dispResult = '0-0'; break;
-        }
-        let resultCell = row.find('td.result');
-        resultCell.text(dispResult).data('result', result);
+// Patch one result row (cells + the "known" counters) from a {id, result} descriptor. `previous` is
+// the prior symbol: passed by the local click, derived from the cell for an SSE echo (shared primitive,
+// called by both the direct effect and the ResultUpdated SSE handler).
+function applyResult({ id, result, previous }) {
+  let row = $(`#results-list tr#result-${id}`);
+  if (row.length === 0) return;
+  let resultCell = row.find('td.result');
+  if (previous === undefined) previous = resultCell.data('result');
+  row.find('td').removeClass('winner').removeClass('looser');
+  let white = row.find('td.white');
+  let black = row.find('td.black');
+  let dispResult = result;
+  switch (result) {
+    case '?': break;
+    case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = '1-0'; break;
+    case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = '0-1'; break;
+    case '=': dispResult = '½-½'; break;
+    case 'X': break;
+    case '#': white.addClass('winner'); black.addClass('winner'); dispResult = '1-1'; break;
+    case '0': white.addClass('looser'); black.addClass('looser'); dispResult = '0-0'; break;
+  }
+  resultCell.text(dispResult).data('result', result);
+  // the "known" counters track played games: bump when a result appears/disappears
+  let delta = (previous === '?' && result !== '?') ? 1 : (previous !== '?' && result === '?') ? -1 : 0;
+  if (delta) ['#known', '#known2'].forEach(sel => {
+    let ind = $(sel)[0];
+    if (ind) ind.innerText = parseInt(ind.innerText) + delta;
+  });
+}
 
-        if (previous === '?') {
-          let indicator = $('#known')[0];
-          let known = parseInt(indicator.innerText);
-          indicator.innerText = ++known;
-          // and again for overview
-          indicator = $('#known2')[0];
-          known = parseInt(indicator.innerText);
-          indicator.innerText = ++known;
-        } else if (result === '?') {
-          let indicator = $('#known')[0];
-          let known = parseInt(indicator.innerText);
-          indicator.innerText = --known;
-          // and again for overview
-          indicator = $('#known2')[0];
-          known = parseInt(indicator.innerText);
-          indicator.innerText = --known;
-        }
-      }
-    })
+function clearResultsCells() {
+  $('#results-list tbody tr').forEach(tr => {
+    let id = tr.attr('id')?.replace('result-', '');
+    if (id) applyResult({ id, result: '?' });
+  });
+}
+
+function setResult(id, result, previous) {
+  mutate({
+    url: `tour/${tour_id}/res/${activeRound}`, body: { id: id, result: result },
+    source: 'results', effect: () => applyResult({ id, result, previous })
+  });
 }
 
 function clearResults() {
-  api.deleteJson(`tour/${tour_id}/res/${activeRound}`)
-    .then(res => {
-      if (res !== 'error') {
-        document.location.reload();
-      }
-    })
+  mutate({
+    method: 'delete', url: `tour/${tour_id}/res/${activeRound}`,
+    source: 'results', effect: () => clearResultsCells()
+  });
 }
 
 const results = [ '?', 'w', 'b', '=', 'X', '#', '0' ];
 
 onLoad(()=>{
+  // collaborative echoes: patch the cell in place (game json carries the result symbol in 'r')
+  sseEffect('ResultUpdated', data => { applyResult({ id: data.data.id, result: data.data.r }); return true; });
+  sseEffect('ResultsCleared', () => { clearResultsCells(); return true; });
+
   new Tablesort($('#results-table')[0]);
   $('#results-table .player').on('click', e => {
     let cell = e.target.closest('.player');
