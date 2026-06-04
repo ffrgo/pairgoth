@@ -506,6 +506,27 @@ function markStaleFrom(sourceStep) {
   }
 }
 
+// Single choke point for every tournament-mutating click — the collaborative/direct branch lives
+// here, not at the ~30 call sites.
+//   collaborative : POST only — the server's SSE echo drives the data effect for everyone, the actor
+//                   included (no local effect → no double-apply, observers never stale).
+//   direct        : POST, then apply the local effect on the response + mark downstream tabs stale
+//                   for this single op (today's behaviour, no EventSource open).
+// `effect` is the tournament-STATE change (patch a cell, add a row); it shares its DOM primitive with
+// the matching SSE handler (written once, two callers). Actor-local UI (close the dialog, clear the
+// form, success tick) is NOT passed here — `await mutate(...)` then do it inline; it runs in both modes.
+// `source` defaults to the current tab (the actor is on the originating tab); override it for the rare
+// cross-tab op (e.g. a pairable's participation changed from the pairing step → source 'registration').
+async function mutate({ method = 'put', url, body = {}, source, effect }) {
+  let rst = await (api[`${method}Json`]).call(api, url, body);
+  if (rst === 'error') return rst;              // api.js already surfaced the error
+  if (!collaborative) {
+    if (effect) effect(rst);                    // local state effect on the response
+    markStaleFrom(source || currentStep());     // this op's own cross-tab staleness
+  }
+  return rst;                                   // for actor-local follow-up (both modes)
+}
+
 onLoad(() => {
   if (typeof tour_id === 'undefined') return;
   // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events

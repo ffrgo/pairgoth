@@ -52,6 +52,10 @@ class ViewServlet : VelocityViewServlet() {
         val blackFirst = WebappManager.properties.getProperty("display.pairing.blackFirst")?.toBoolean() ?: false
         context.put("blackFirst", blackFirst)
 
+        // deployment profile ('dev' or 'prod') — the collaborative-SSE client uses it to decide
+        // whether to run full-SSE (dev always; prod requires HTTP/2, checked client-side).
+        context.put("env", WebappManager.properties.getProperty("env") ?: "dev")
+
         /*
         val menu = menuEntries!![uri]
         var title: String? = null
