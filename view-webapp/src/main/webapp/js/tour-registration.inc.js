@@ -250,6 +250,49 @@ function bulkUpdate(players) {
     .then((values) => window.location.reload());
 }
 
+// --- Shared row-patch primitives (the direct toggle effect AND the PlayerUpdated SSE echo call these,
+//     setting state from the new value so they're idempotent) ---
+function setRowFinal(id, final) {
+  let tr = $(`#players tr[data-id="${id}"]`);
+  if (tr.length === 0 || tr.hasClass('final') === final) return;
+  let cell = tr.find('td.reg-status');
+  if (final) { tr.addClass('final'); cell.addClass('final'); }
+  else { tr.removeClass('final'); cell.removeClass('final'); }
+  let confirmed = $('#confirmed-count')[0];
+  if (confirmed) confirmed.innerText = parseInt(confirmed.innerText) + (final ? 1 : -1);
+}
+
+function setRowParticipation(id, skip) {
+  let tr = $(`#players tr[data-id="${id}"]`);
+  if (tr.length === 0) return;
+  let skipSet = new Set((skip || []).map(Number));
+  tr.find('.participation label').forEach(label => {
+    let playing = !skipSet.has(parseInt(label.innerText));
+    label.addClass(playing ? 'green' : 'red');
+    label.removeClass(playing ? 'red' : 'green');
+  });
+}
+
+function removePlayerRow(id) {
+  let tr = $(`#players tr[data-id="${id}"]`);
+  if (tr.length === 0) return;
+  if (tr.hasClass('final')) {
+    let confirmed = $('#confirmed-count')[0];
+    if (confirmed) confirmed.innerText = parseInt(confirmed.innerText) - 1;
+  }
+  tr[0].remove();
+}
+
+// PlayerUpdated echo: patch reg-status (bit 2) / participation (bit 4) in place; identity (bit 1) can't
+// be patched (MMS, conditional columns, sort) → return falsy to fall through to reload/warn.
+function patchPlayerRow(player) {
+  let changes = player.changes || 0;
+  if (changes & 1) return false;
+  if (changes & 2) setRowFinal(player.id, player.final);
+  if (changes & 4) setRowParticipation(player.id, player.skip);
+  return true;
+}
+
 function navigateResults(ev) {
   console.log(`searchHighlight = ${searchHighlight}`);
   let lines = $('.result-line');
@@ -282,6 +325,11 @@ function navigateResults(ev) {
 let tableSort;
 
 onLoad(() => {
+  // collaborative echoes: bit2/3 patch the row in place; identity/add → reload; delete → drop the row
+  sseEffect('PlayerUpdated', player => patchPlayerRow(player));
+  sseEffect('PlayerAdded', () => false);
+  sseEffect('PlayerDeleted', data => { removePlayerRow(data.id); return true; });
+
   $('input.numeric').imask({
     mask: Number,
     scale: 0,
@@ -543,16 +591,9 @@ onLoad(() => {
     let tr = e.target.closest('tr');
     let id = tr.data('id');
     let newStatus = !cell.hasClass('final');
-    api.putJson(`tour/${tour_id}/part/${id}`, {
-      id: id,
-      final: newStatus
-    }).then(player => {
-      if (player !== 'error') {
-        tr.toggleClass('final');
-        cell.toggleClass('final');
-        let confirmed = $('#confirmed-count')[0];
-        if (confirmed) confirmed.innerText = parseInt(confirmed.innerText) + (newStatus ? 1 : -1);
-      }
+    mutate({
+      url: `tour/${tour_id}/part/${id}`, body: { id: id, final: newStatus },
+      source: 'registration', effect: () => setRowFinal(id, newStatus)
     });
     e.preventDefault();
     return false;
@@ -670,14 +711,10 @@ onLoad(() => {
     let skip = new Set(part.closest('.participation').find('label.red').map(it => parseInt(it.innerText)));
     if (skip.has(round)) skip.delete(round);
     else skip.add(round);
-    api.putJson(`tour/${tour_id}/part/${id}`, {
-      id: id,
-      skip: Array.from(skip)
-    }).then(player => {
-      if (player !== 'error') {
-        part.toggleClass('red');
-        part.toggleClass('green');
-      }
+    let skipArr = Array.from(skip);
+    mutate({
+      url: `tour/${tour_id}/part/${id}`, body: { id: id, skip: skipArr },
+      source: 'registration', effect: () => setRowParticipation(id, skipArr)
     });
     e.preventDefault();
     return false;
