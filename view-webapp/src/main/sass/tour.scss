@@ -547,6 +547,28 @@
     }
   }
 
+  /* collaborative SSE: read-only freeze of the on-screen tab (no overwrite path) */
+  body.read-only .tab-content.active {
+    opacity: 0.6;
+    button, input, select, textarea, .listitem {
+      pointer-events: none;
+    }
+  }
+  #sse-readonly-banner {
+    display: none;
+  }
+  body.read-only #sse-readonly-banner {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.4em 1em;
+    background: #ffe9b0;
+  }
+
   @media(max-width: 1600px) {
     .ui.steps > .step:not(.active) {
       padding-left: 1.2em;

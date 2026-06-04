@@ -257,4 +257,21 @@
     </div>
   </div>
 </div>
+<!-- collaborative SSE: shown when a remote change hits the on-screen tab while it has unsaved work -->
+<div id="sse-warn-modal" class="popup no-dimmer-close">
+  <div class="popup-body">
+    <div class="popup-content">
+      <p>Another operator just changed data shown on this tab, but you have unsaved work here.
+        Reload to get the latest version (your unsaved changes here will be lost), or keep this tab read-only.</p>
+    </div>
+    <div class="popup-footer">
+      <button type="button" id="sse-warn-readonly" class="ui gray floating button">Keep read-only</button>
+      <button type="button" id="sse-warn-reload" class="ui blue floating button">Reload</button>
+    </div>
+  </div>
+</div>
+<div id="sse-readonly-banner">
+  <span>This tab is read-only — it shows outdated data.</span>
+  <button type="button" id="sse-readonly-reload" class="ui mini blue button">Reload</button>
+</div>
 #end
