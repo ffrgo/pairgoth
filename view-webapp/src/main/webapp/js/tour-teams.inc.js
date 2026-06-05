@@ -54,13 +54,60 @@ function leave(teamId, playerId) {
 
 function showTeam(teamId) {
   let team = teams.get(teamId);
-  $('#composition')[0].clearChildren();
-  $('#composition').attr('title', team.name).removeClass('hidden');
+  let comp = $('#composition')[0];
+  comp.clearChildren();
+  $('#composition').removeClass('hidden');
   $('#composition').data('id', teamId);
+  // real, editable title (team name + pencil), replacing the former .multi-select pseudo-title
+  let header = document.createElement('div');
+  header.className = 'comp-title';
+  let nameSpan = document.createElement('span');
+  nameSpan.className = 'comp-name';
+  nameSpan.textContent = team.name;
+  header.appendChild(nameSpan);
+  header.insertAdjacentHTML('beforeend', '<i class="ui pencil edit icon"></i>');
+  comp.appendChild(header);
   for (i = 0; i < team.players.length; ++i) {
     let listitem = `<div data-id="${team.players[i]}" class="listitem"><span>${team.names[i]}</span><span>${displayRank(team.ranks[i])}&nbsp;<i class="ui red sign out icon"></i></span></div>`
-    $('#composition')[0].insertAdjacentHTML('beforeend', listitem);
+    comp.insertAdjacentHTML('beforeend', listitem);
   }
+}
+
+// Inline-rename the team from the composition header: pencil/title click swaps the name for an input;
+// Enter (or blur) saves, Escape cancels.
+function startRenameTeam() {
+  let teamId = parseInt($('#composition').data('id'));
+  let titleEl = $('#composition .comp-title')[0];
+  if (!titleEl || titleEl.querySelector('input')) return;
+  let current = teams.get(teamId).name;
+  let input = document.createElement('input');
+  input.className = 'comp-name-edit';
+  input.type = 'text';
+  input.value = current;
+  titleEl.clearChildren();
+  titleEl.appendChild(input);
+  input.focus();
+  input.select();
+  let done = false;
+  let finish = save => {
+    if (done) return;
+    done = true;
+    let v = input.value.trim();
+    if (save && v && v !== current) renameTeam(teamId, v);  // PUT → reload on success
+    else showTeam(teamId);                                  // restore the header
+  };
+  input.addEventListener('keydown', ev => {
+    if (ev.key === 'Enter') { ev.preventDefault(); finish(true); }
+    else if (ev.key === 'Escape') { ev.preventDefault(); finish(false); }
+  });
+  input.addEventListener('blur', () => finish(true));
+}
+
+function renameTeam(teamId, name) {
+  let team = teams.get(teamId);
+  // teamFromJson requires the players array, so send it alongside the new name
+  api.putJson(`tour/${tour_id}/team/${teamId}`, { name: name, players: team.players })
+    .then(rst => { if (rst !== 'error') window.location.reload(); });
 }
 
 onLoad(() => {
@@ -132,11 +179,16 @@ onLoad(() => {
   });
    */
   $('#composition').on('click', e => {
-    console.log('click')
+    // remove a player from the team (red sign-out icon on a member line)
     if (e.target.matches('.listitem i')) {
-      let team = parseInt(e.target.closest('.multi-select').data('id'));
+      let team = parseInt($('#composition').data('id'));
       let player = parseInt(e.target.closest('.listitem').data('id'));
       leave(team, player);
+      return;
+    }
+    // edit the team name (click the title line / pencil)
+    if (e.target.closest('.comp-title')) {
+      startRenameTeam();
     }
   });
 });

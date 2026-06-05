@@ -295,16 +295,74 @@
     max-width: max(50vw, 20em);
   }
 
-  #composition.multi-select .listitem {
-    cursor: default;
-    i.icon {
+  /* #composition is intentionally NOT a .multi-select: no multi-selection here, just a team's member
+     list with an editable name header. Reproduces the multi-select box look without the pseudo-title
+     (the title is a real, editable .comp-title element) or the selection styles. */
+  #composition {
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 8vh;
+    max-height: 30vh;
+    min-width: 20vw;
+    max-width: max(30vw, 15em);
+    border: solid 2px darkgray;
+    border-radius: 5px;
+    padding: 0 0.2em;
+    .comp-title {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      width: 100%;
+      background-color: white;
+      white-space: nowrap;
+      font-size: smaller;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      @media (hover: hover) {
-        display: none;
+      .edit.icon {
+        position: absolute;   /* out of flow so the name stays centered */
+        right: 0.3em;
+        visibility: hidden;
+        font-size: 0.9em;
+      }
+      &:hover .edit.icon {
+        visibility: visible;
+      }
+      input.comp-name-edit {
+        font: inherit;
+        flex: 1;
+        min-width: 0;
+        padding: 0;
+        border: none;
+        border-bottom: 1px solid gray;
+        background: transparent;
       }
     }
-    &:hover {
+    .listitem {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      gap: 1em;
+      user-select: none;
+      cursor: default;
+      &:hover {
+        background-color: rgba(50, 50, 50, .2);
+      }
+      &:nth-child(2n) {
+        background-color: rgba(0, 0, 50, .1);
+      }
       i.icon {
+        cursor: pointer;
+        @media (hover: hover) {
+          display: none;
+        }
+      }
+      &:hover i.icon {
         display: inline;
       }
     }
@@ -412,7 +470,7 @@
     gap: 1em;
     max-width: max(10em, 20vw);
   }
-  #unpairables, #previous_games, #composition {
+  #unpairables, #previous_games {
     display: flex;
     flex-flow: column nowrap;
     min-height: 10vh;
