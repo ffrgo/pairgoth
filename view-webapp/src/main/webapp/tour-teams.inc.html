@@ -40,6 +40,11 @@
       </div>
     </div>
   </div>
+#if($teams && $teams.size())
+  <div id="print-teams">
+#teamsTable($teams)
+  </div>
+#end
 </div>
 <script type="text/javascript">
   // XXXXXX

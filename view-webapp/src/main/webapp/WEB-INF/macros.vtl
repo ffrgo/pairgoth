@@ -87,3 +87,22 @@ $number.format('#0.00 €', $ttc)##
       </tbody>
     </table>
 #end
+
+#macro(teamsTable $teams)
+    <table class="ui striped table">
+      <thead>
+      <tr>
+        <th>Team</th>
+        <th>Members</th>
+      </tr>
+      </thead>
+      <tbody>
+  #foreach($team in $teams)
+      <tr>
+        <td class="left">${team.name}#if($team.country) ($team.country)#end</td>
+        <td class="left">#foreach($name in $team.names)${name} (#rank($team.ranks[$foreach.index] 0))#if($foreach.hasNext), #end#end</td>
+      </tr>
+  #end
+      </tbody>
+    </table>
+#end

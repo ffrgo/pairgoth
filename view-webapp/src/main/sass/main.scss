@@ -814,6 +814,12 @@
       display: none;
     }
 
+    /* teams tab: print the constituted teams as a table, not the multi-select lists */
+    #teams-tab {
+      #teams-content { display: none !important; }
+      #print-teams { display: block; }
+    }
+
     /* should final/preliminary column be printed? */
     /* #players-list tr > :first-child {           */
     /*   display: none;                            */
