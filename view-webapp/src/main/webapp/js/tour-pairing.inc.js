@@ -87,25 +87,39 @@ function editPairable(pairable) {
   modal('edit-pairable');
 }
 
+// Recompute a player's skip array for the activeRound toggle, preserving the other rounds (read from
+// the registration table, present in the DOM even on the pairing tab).
+function skipForPlayer(pid, pairable) {
+  let skip = pairable ? [] : [ activeRound ];
+  $(`#players tr[data-id="${pid}"] td.participating label`).forEach((label, i) => {
+    let round = i + 1;
+    if (round !== activeRound && label.hasClass('red')) skip.push(round);
+  });
+  return skip;
+}
+
 function updatePairable() {
   let form = $('#pairable-form')[0];
   let id = form.val('id');
-  let status = form.val('pairable');
-  let origSkip = $(`#players tr[data-id="${id}"] td.participating label`)
-    .map(disk => disk.hasClass('red'));
-  let skip = status ? [] : [ activeRound ];
-  for (let i = 0; i < origSkip.length; ++i) {
-    let round = i + 1;
-    if (round !== activeRound && origSkip[i]) skip.push(round);
-  }
-  api.putJson(`tour/${tour_id}/part/${id}`, {
-    id: id,
-    skip: skip
-  }).then(player => {
-      if (player !== 'error') {
-        window.location.reload();
-      }
+  let pairable = form.val('pairable');
+  if (teamSize > 1) {
+    // a team has no skip of its own (pairability is derived from its players being all active) — so
+    // drop/restore the whole team for the round by toggling each of its players, confirming the drop
+    api.getJson(`tour/${tour_id}/team/${id}`).then(team => {
+      if (team === 'error' || !team.players) return;
+      if (!pairable && !confirm(
+        `Team "${team.name}" will be dropped from round ${activeRound}: its ${team.players.length} players will be marked absent. Proceed?`
+      )) return;
+      Promise.all(team.players.map(pid =>
+        api.putJson(`tour/${tour_id}/part/${pid}`, { id: pid, skip: skipForPlayer(pid, pairable) })
+      )).then(rsts => {
+        if (rsts.every(r => r !== 'error')) window.location.reload();
+      });
     });
+  } else {
+    api.putJson(`tour/${tour_id}/part/${id}`, { id: id, skip: skipForPlayer(id, pairable) })
+      .then(player => { if (player !== 'error') window.location.reload(); });
+  }
 }
 
 function showOpponents(player) {
