@@ -561,9 +561,18 @@ function enterReadOnly() {
   $(`.step[data-step="${currentStep()}"]`).addClass('stale');
 }
 
+// Debounced: a remote change to the on-screen tab while it's busy warns the operator — but our own
+// reload-based mutation also echoes back, and would briefly flash this modal before the local reload
+// fires. Delaying the modal lets that reload (page navigation) preempt it; a genuine remote change
+// (no local reload) still warns, just ~300ms later. A failed mutation dispatches no echo, so the only
+// echoes in flight are successes, which reload.
+let warnTimer = null;
 function warnReloadOrReadonly() {
-  if (readOnly || $('#sse-warn-modal').hasClass('shown')) return;
-  modal('sse-warn-modal');
+  if (readOnly || warnTimer || $('#sse-warn-modal').hasClass('shown')) return;
+  warnTimer = setTimeout(() => {
+    warnTimer = null;
+    if (!readOnly && !$('#sse-warn-modal').hasClass('shown')) modal('sse-warn-modal');
+  }, 300);
 }
 
 // What an affecting echo does to the on-screen tab when no finer patch applies: reload, or — if a
