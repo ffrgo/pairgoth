@@ -604,6 +604,10 @@ onLoad(() => {
 
 onLoad(() => {
   if (typeof tour_id === 'undefined') return;
+  // Collaborative mode only opens an SSE stream — it needs one per tab, hence HTTP/2 (or dev). In
+  // direct mode we open none (HTTP/1.1's ~6-conn/origin limit would break multi-tab): mutate()'s local
+  // effect + stale-marking cover the single operator; cross-browser real-time is the accepted degradation.
+  if (!collaborative) return;
   // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events
   // (served directly same-origin in standalone; proxied via /api/tour/* in client mode)
   let source = new EventSource('/api/tour/events');
@@ -614,11 +618,7 @@ onLoad(() => {
   Object.keys(EVENT_SOURCE_TAB).forEach(name => source.addEventListener(name, e => {
     let payload = JSON.parse(e.data);
     if (payload && payload.tournament !== tour_id) return;
-    console.log(`[sse] ${name} #${e.lastEventId}`, payload.data); // TODO drop after testing
-    // collaborative ⇒ live per-event handling; otherwise legacy stale-marking (direct-mode EventSource
-    // gating + call-site flip to mutate() come in a later step)
-    if (collaborative) handleCollaborativeEvent(name, EVENT_SOURCE_TAB[name], payload.data);
-    else markStaleFrom(EVENT_SOURCE_TAB[name]);
+    handleCollaborativeEvent(name, EVENT_SOURCE_TAB[name], payload.data);
   }));
   source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
 });
