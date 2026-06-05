@@ -34,6 +34,14 @@ class AclFileStore(aclDirStr: String, private val root: FileStore): Store {
         if (!granted(id)) throw Error("no access to tournament #$id")
     }
 
+    // The provisioned name for a granted-but-not-yet-created (dangling) id, else null. Lets the landing
+    // show a create form prefilled with the EGC-chosen name instead of an "invalid id" error.
+    fun provisionedName(id: ID): String? {
+        if (!aclDir.toFile().isDirectory || root.exists(id)) return null
+        val entry = aclDir.useDirectoryEntries("${pad(id)}-*.tour") { it.firstOrNull() } ?: return null
+        return aclFilenameRegex.matchEntire(entry.fileName.toString())?.groupValues?.get(2)
+    }
+
     override fun getTournaments(): Map<ID, Map<String, String>> {
         if (!aclDir.toFile().isDirectory) return emptyMap()
         return aclDir.useDirectoryEntries("*.tour") { entries ->

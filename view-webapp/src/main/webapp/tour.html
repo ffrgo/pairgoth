@@ -25,7 +25,7 @@
   </optgroup>
 #end
 #if($params.id)
-  #if (!$tour)
+  #if (!$tour && !$prefill)
 <div class="section">
   <h2 class="error">Invalid tournament id</h2>
 </div>
@@ -75,6 +75,9 @@
 <div id="required_field" class="hidden">Required field</div>
 <script type="text/javascript">
   const apiToken = '$!api.bearer';
+  // external auth: id of a provisioned (not-yet-created) tournament we landed on — the create POST
+  // must reuse it so the file matches the granted symlink
+  const newTournamentId = #if($prefill)$prefill.id#{else}null#end;
 #if($tour)
   const tour_id = ${tour.id};
   const tour_rounds = ${tour.rounds};

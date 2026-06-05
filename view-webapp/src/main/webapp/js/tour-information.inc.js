@@ -291,10 +291,15 @@ onLoad(() => {
           }
         });
     } else {
+      // external auth: reuse the provisioned id so the created file matches the granted symlink
+      if (typeof newTournamentId !== 'undefined' && newTournamentId) tour.id = newTournamentId;
       api.postJson('tour', tour)
         .then(tour => {
           if (tour !== 'error') {
-            window.location.href += `?id=${tour.id}`;
+            let search = `id=${tour.id}`;
+            // a provisioned landing is already at ?id=N → assigning the same search won't navigate, so reload
+            if (`?${search}` === window.location.search) window.location.reload();
+            else window.location.search = search;
           }
         });
     }

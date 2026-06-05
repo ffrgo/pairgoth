@@ -33,8 +33,15 @@
 #end
 </blockquote>
 *#
+#set($prefill = false)
 #if($params.id)
-  #set($tour = $api.get("tour/${params.id}"))
+  #set($tour = $api.tournament($params.id))
+  ## external auth: a granted but not-yet-created tournament → keep the whole object as $prefill and
+  ## fall into tour.html's existing "new tournament" path (create form, prefilled)
+  #if($tour.provisioned)
+    #set($prefill = $tour)
+    #set($tour = false)
+  #end
 #end
   <div id="header" class="horz flex">
     <div id="logo">

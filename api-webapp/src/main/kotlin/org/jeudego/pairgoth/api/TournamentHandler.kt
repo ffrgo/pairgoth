@@ -15,6 +15,7 @@ import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.server.ApiServlet
 import org.jeudego.pairgoth.server.Event.*
+import org.jeudego.pairgoth.store.AclFileStore
 import org.jeudego.pairgoth.store.getStore
 import org.w3c.dom.Element
 import javax.servlet.http.HttpServletRequest
@@ -29,7 +30,8 @@ object TournamentHandler: PairgothApiHandler {
             else ->
                 when {
                     ApiServlet.isJson(accept) -> {
-                        getStore(request).getTournament(id)?.let { tour ->
+                        val store = getStore(request)
+                        store.getTournament(id)?.let { tour ->
                             if (accept == "application/pairgoth") {
                                 tour.toFullJson()
                             } else {
@@ -40,7 +42,13 @@ object TournamentHandler: PairgothApiHandler {
                                     json["frozen"] = tour.frozen != null
                                 }
                             }
-                        } ?: badRequest("no tournament with id #${id}")
+                        }
+                        // external auth: a granted but not-yet-created (dangling) id → tell the view to
+                        // offer a prefilled create form rather than an error
+                        ?: (store as? AclFileStore)?.provisionedName(id)?.let { name ->
+                            Json.Object("provisioned" to true, "id" to id, "name" to name)
+                        }
+                        ?: badRequest("no tournament with id #${id}")
                     }
                     ApiServlet.isXml(accept) -> {
                         val export = getStore(request).getTournament(id)?.let { OpenGotha.export(it) } ?: badRequest("no tournament with id #${id}")

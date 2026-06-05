@@ -78,6 +78,9 @@ class ApiTool {
     }
 
     fun get(url: String) = prepare(url).process()
+    // a single tournament by id: the result is the tournament json, an {error}, or — in external auth —
+    // a {provisioned:true, id, name} marker for a granted-but-not-yet-created tournament
+    fun tournament(id: Any) = get("tour/$id")
     fun post(url: String, payload: Json) = prepare(url)
         .post(payload.toRequestBody())
         .process()
