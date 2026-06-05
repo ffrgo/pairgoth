@@ -53,6 +53,24 @@ class AuthFilter: Filter {
             return
         }
 
+        // external auth: a trusting front proxy (EGC) injects the operator's email in a header; we
+        // establish/refresh the session from it. The deployment guarantees the trust (the proxy sets
+        // the header, strips any client-supplied copy, and pairgoth is not directly reachable).
+        if (auth == "external" && !whitelisted(uri) && !forwarded) {
+            val headerName = WebappManager.properties.getProperty("auth.external.header") ?: "X-Remote-Email"
+            val email = request.getHeader(headerName)?.trim()
+            val current = (session?.getAttribute(SESSION_KEY_USER) as? Json.Object)?.getString("email")
+            if (!email.isNullOrEmpty()) {
+                if (email != current) handleSuccessfulLogin(request, Json.Object("email" to email))
+            } else if (current == null) {
+                // no proxy-injected identity and no session → a direct hit bypassing the proxy
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                return
+            }
+            chain.doFilter(req, resp)
+            return
+        }
+
         if (auth == "none" || whitelisted(uri) || forwarded || session?.getAttribute(SESSION_KEY_USER) != null) {
             chain.doFilter(req, resp)
         } else {

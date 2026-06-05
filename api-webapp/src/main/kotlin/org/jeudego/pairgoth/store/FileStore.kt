@@ -65,6 +65,11 @@ class FileStore(pathStr: String): Store {
         entries.firstOrNull()
     }
 
+    // does a tournament file exist in this store? (used by AclFileStore to tell a real tournament from
+    // a dangling ACL symlink — provisioned but not yet created)
+    internal fun exists(id: ID): Boolean = fileFor(id) != null
+    internal fun fileMTime(id: ID): Long = fileFor(id)?.toFile()?.lastModified() ?: 0L
+
 
     override fun getTournaments(): Map<ID, Map<String, String>> {
         return path.useDirectoryEntries("*.tour") { entries ->

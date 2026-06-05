@@ -45,7 +45,7 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
         val auth = properties.getProperty("auth") ?: "none"
         context.setAttribute("auth", auth)
         when (auth) {
-            "none", "sesame" -> {}
+            "none", "sesame", "external" -> {}
             "oauth" -> {
                 properties.getProperty("oauth.providers")?.let {
                     val providers = it.split(Regex("\\s*,\\s*"))

@@ -43,6 +43,12 @@ interface Store {
 private val fileStores = ConcurrentHashMap<String, FileStore>()
 private fun fileStore(rootPath: String) = fileStores.getOrPut(rootPath) { FileStore(rootPath) }
 
+// external auth: a per-user ACL view over the shared root FileStore (canonical store stays the root,
+// so cache / SSE / history / concurrency are shared across the operators of a tournament)
+private val aclStores = ConcurrentHashMap<String, AclFileStore>()
+private fun aclStore(rootPath: String, email: String) =
+    aclStores.getOrPut("$rootPath/$email") { AclFileStore("$rootPath/$email", fileStore(rootPath)) }
+
 fun getStore(request: HttpServletRequest): Store {
     val storeType = WebappManager.getMandatoryProperty("store")
     return when (val auth = WebappManager.getMandatoryProperty("auth")) {
@@ -60,6 +66,13 @@ fun getStore(request: HttpServletRequest): Store {
                 Path.of(rootPath).toFile().mkdirs()
             }
             fileStore(rootPath)
+        }
+        "external" -> {
+            if (storeType == "memory") throw Error("invalid store type for external: $storeType")
+            val rootPath = WebappManager.properties.getProperty("store.file.path") ?: "."
+            val email = (request.getAttribute(USER_KEY) as Json.Object?)?.getString("email")
+                ?: throw Error("missing user email for external auth")
+            aclStore(rootPath, email)
         }
         else -> throw Error("invalid auth: $auth")
     }
