@@ -99,6 +99,13 @@ private fun readProperties() {
             serverProps[key.removePrefix("pairgoth.")] = value
         }
     }
+    // standalone serves everything on one connector: derive the external URLs from it when not
+    // explicitly set, so changing webapp.port doesn't require keeping three properties in sync
+    if (mode == "standalone") {
+        val base = "${serverProps["webapp.protocol"]}://${serverProps["webapp.host"]}:${serverProps["webapp.port"]}"
+        serverProps.putIfAbsent("webapp.external.url", base)
+        serverProps.putIfAbsent("api.external.url", "$base/api/")
+    }
 }
 
 private fun publishProperties() {
