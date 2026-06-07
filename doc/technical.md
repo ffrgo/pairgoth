@@ -51,16 +51,18 @@ Values:
 - `none` - No authentication required
 - `sesame` - Shared unique password
 - `oauth` - Email and/or OAuth accounts
+- `external` - SSO delegated to a fronting website
 
 #### Shared secret
 
-When running in client or server mode with authentication enabled:
+When running with authentication enabled:
 
 ```
 auth.shared_secret = <16 ascii characters string>
 ```
 
-This secret is shared between API and View webapps. Auto-generated in standalone mode.
+This secret is shared between API and View webapps. Set it explicitly for any real
+authentication mode (with `auth = none` it is not used).
 
 #### Sesame password
 
@@ -69,6 +71,38 @@ When using sesame authentication:
 ```
 auth.sesame = <password>
 ```
+
+#### External (SSO) authentication
+
+In `external` mode, pairgoth delegates authentication to a fronting website (an event
+site, typically) which owns the accounts and the access rights. The contract:
+
+- The fronting site authenticates the operator, then hands them over to pairgoth on
+  `/sso?ticket=<ticket>&goto=<path>`. The ticket is the payload `email:expiryMillis:nonce`,
+  AES-encrypted with `auth.shared_secret` (URL-safe base64 — the same cryptograph as the
+  API bearers); it must expire shortly (~60 seconds) and is accepted once. `goto` is the
+  relative path to land on (default `/index`).
+- Sessionless requests are redirected to the fronting site's login page:
+
+```
+auth.external.login_url = <url>
+```
+
+  with the originally requested path appended as the `goto` parameter, so deep links into
+  pairgoth transparently round-trip through the fronting site.
+- Tournament visibility is per operator: the store directory contains one directory per
+  email, holding ACL symlinks `NNNNNN-name.tour` pointing to the root tournament files.
+  The symlinks — and the tournament id allocation — are managed by the fronting site,
+  never by pairgoth. A dangling symlink stands for a provisioned, not-yet-created
+  tournament: the operator lands on a prefilled creation form.
+- Admin accounts bypass the per-operator view and get the unscoped root store:
+
+```
+auth.external.admin = <comma-separated emails>
+```
+
+  This is typically how the fronting site's server-to-server client (authenticated through
+  the regular API token flow) creates tournaments with explicit ids and reads everything.
 
 ### OAuth configuration
 
