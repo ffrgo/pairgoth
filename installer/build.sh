@@ -21,3 +21,6 @@ unzip -d target/files resources/jre.zip
 # installer script
 sed -r -e "s/@VERSION@/$VERSION.0.0/g" resources/installer.nsi > target/installer.nsi
 cat target/installer.nsi | makensis -V4 -
+
+# versioned artifact alongside the stable-named one (the site links the stable name)
+cp target/install-pairgoth.exe target/install-pairgoth-$VERSION.exe
