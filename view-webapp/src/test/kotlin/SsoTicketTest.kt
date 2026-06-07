@@ -14,8 +14,8 @@ class SsoTicketTest: TestBase() {
         @JvmStatic
         fun secret() {
             // honour an externally-provided secret (the mint helper must match the running server)
-            BaseWebappManager.properties.setProperty("auth.shared_secret",
-                System.getProperty("pairgoth.auth.shared_secret") ?: "0123456789ABCDEF")
+            BaseWebappManager.properties.setProperty("auth.external.secret",
+                System.getProperty("pairgoth.auth.external.secret") ?: "0123456789ABCDEF")
         }
     }
 
@@ -65,7 +65,7 @@ class SsoTicketTest: TestBase() {
 
     // Mint helper, to curl a running instance before the EGC client exists:
     //   mvn -pl view-webapp test -Dtest='SsoTicketTest#mintHelper' \
-    //       -Dpairgoth.auth.shared_secret=<the server's secret> -Dticket.email=alice@egc.com
+    //       -Dpairgoth.auth.external.secret=<the server's secret> -Dticket.email=alice@egc.com
     // then browse: /sso?ticket=<printed>&goto=/index
     @Test
     fun mintHelper() {

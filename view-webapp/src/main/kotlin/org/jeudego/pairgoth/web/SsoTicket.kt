@@ -8,8 +8,9 @@ import java.util.concurrent.TimeUnit
 
 /**
  * External-auth SSO ticket. The fronting site (EGC) authenticates the operator, then hands them over
- * to pairgoth on `/sso?ticket=...&goto=...`. The ticket is AES-encrypted with `auth.shared_secret`
- * (URL-safe base64, same cryptograph as the API bearers), payload `email:expiryMillis:nonce`,
+ * to pairgoth on `/sso?ticket=...&goto=...`. The ticket is AES-encrypted with `auth.external.secret`
+ * — a secret dedicated to the fronting-site relationship, so the internal view↔api
+ * `auth.shared_secret` never leaves pairgoth — payload `email:expiryMillis:nonce` (URL-safe base64),
  * valid once and shortly.
  */
 object SsoTicket {
@@ -17,7 +18,10 @@ object SsoTicket {
     // can never be replayed after its cache eviction
     private const val MAX_TTL_MILLIS = 2 * 60_000L
 
-    private val cryptograph = AESCryptograph().apply { init(sharedSecret) }
+    private val cryptograph = AESCryptograph().apply {
+        init(BaseWebappManager.properties.getProperty("auth.external.secret")
+            ?: throw Error("missing property auth.external.secret"))
+    }
     private val consumed: Cache<String, Boolean> = Caffeine.newBuilder()
         .expireAfterWrite(2 * MAX_TTL_MILLIS, TimeUnit.MILLISECONDS)
         .maximumSize(10_000)

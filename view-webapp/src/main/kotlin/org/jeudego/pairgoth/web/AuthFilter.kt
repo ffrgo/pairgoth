@@ -60,12 +60,22 @@ class AuthFilter: Filter {
         if (auth == "external") {
             val loginUrl by lazy { WebappManager.getMandatoryProperty("auth.external.login_url") }
             if (uri.replace(Regex("^/../"), "/") == "/sso") {
+                // server-to-server callers ask for JSON and get the session's opaque api bearer
+                // (so the internal auth.shared_secret never leaves pairgoth); browsers get redirects
+                val json = request.getHeader("Accept")?.contains("application/json") == true
                 val email = request.getParameter("ticket")?.let { SsoTicket.validate(it) }
                 if (email == null) {
-                    response.sendRedirect(loginUrl)
+                    if (json) {
+                        response.status = HttpServletResponse.SC_UNAUTHORIZED
+                        response.contentType = "application/json; charset=UTF-8"
+                        response.writer.println(Json.Object("error" to "invalid ticket"))
+                    } else response.sendRedirect(loginUrl)
                 } else {
                     handleSuccessfulLogin(request, Json.Object("email" to email))
-                    response.sendRedirect(SsoTicket.safeGoto(request.getParameter("goto")))
+                    if (json) {
+                        response.contentType = "application/json; charset=UTF-8"
+                        response.writer.println(Json.Object("bearer" to getBearer(request)))
+                    } else response.sendRedirect(SsoTicket.safeGoto(request.getParameter("goto")))
                 }
             } else if (whitelisted(uri) || forwarded || session?.getAttribute(SESSION_KEY_USER) != null) {
                 chain.doFilter(req, resp)

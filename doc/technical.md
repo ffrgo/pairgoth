@@ -53,6 +53,18 @@ Values:
 - `oauth` - Email and/or OAuth accounts
 - `external` - SSO delegated to a fronting website
 
+#### Secrets overview
+
+Each secret serves exactly one trust relationship:
+
+| Property | Shared between | Purpose |
+|----------|----------------|---------|
+| `auth.shared_secret` | view ↔ api webapps | encrypts the API bearers — internal, never leaves pairgoth |
+| `auth.sesame` | operators ↔ pairgoth | the shared password of the `sesame` mode |
+| `auth.external.secret` | fronting site → pairgoth | encrypts the SSO tickets of the `external` mode |
+| `oauth.<provider>.secret` | pairgoth ↔ OAuth provider | the provider's client secret |
+| `webhook.secret` | pairgoth → tournament website | authenticates outbound webhook publishing |
+
 #### Shared secret
 
 When running with authentication enabled:
@@ -79,9 +91,14 @@ site, typically) which owns the accounts and the access rights. The contract:
 
 - The fronting site authenticates the operator, then hands them over to pairgoth on
   `/sso?ticket=<ticket>&goto=<path>`. The ticket is the payload `email:expiryMillis:nonce`,
-  AES-encrypted with `auth.shared_secret` (URL-safe base64 — the same cryptograph as the
-  API bearers); it must expire shortly (~60 seconds) and is accepted once. `goto` is the
-  relative path to land on (default `/index`).
+  AES-encrypted (URL-safe base64) with a secret dedicated to this relationship:
+
+```
+auth.external.secret = <16+ ascii characters string>
+```
+
+  It must expire shortly (~60 seconds) and is accepted once. `goto` is the relative path
+  to land on (default `/index`).
 - Sessionless requests are redirected to the fronting site's login page:
 
 ```
@@ -101,8 +118,11 @@ auth.external.login_url = <url>
 auth.external.admin = <comma-separated emails>
 ```
 
-  This is typically how the fronting site's server-to-server client (authenticated through
-  the regular API token flow) creates tournaments with explicit ids and reads everything.
+- Server-to-server: calling `/sso` with `Accept: application/json` returns
+  `{"bearer": ...}` instead of redirecting — an opaque token for direct API calls
+  (`Authorization: Bearer ...`). This is how the fronting site's backend, with an admin
+  ticket, creates tournaments with explicit ids and reads everything; the internal
+  `auth.shared_secret` never leaves pairgoth.
 
 ### OAuth configuration
 
