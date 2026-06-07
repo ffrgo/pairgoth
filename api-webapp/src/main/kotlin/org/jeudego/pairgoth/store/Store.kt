@@ -72,7 +72,11 @@ fun getStore(request: HttpServletRequest): Store {
             val rootPath = WebappManager.properties.getProperty("store.file.path") ?: "."
             val email = (request.getAttribute(USER_KEY) as Json.Object?)?.getString("email")
                 ?: throw Error("missing user email for external auth")
-            aclStore(rootPath, email)
+            // admins (the EGC server-to-server client, typically) get the unscoped root store:
+            // full index, any id readable, tournaments creatable with explicit EGC-allocated ids
+            val admins = WebappManager.properties.getProperty("auth.external.admin")
+                ?.split(',')?.map { it.trim() } ?: emptyList()
+            if (email in admins) fileStore(rootPath) else aclStore(rootPath, email)
         }
         else -> throw Error("invalid auth: $auth")
     }
