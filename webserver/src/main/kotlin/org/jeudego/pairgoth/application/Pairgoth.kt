@@ -234,8 +234,44 @@ private fun launchServer() {
         }
         // launch server
         start()
+        checkVersion()
         join()
     }
+}
+
+// Best-effort published-version check (the site footer carries 'pairgoth vX.Y'): report a newer
+// version to the operator, with the update channel adapted to a git checkout. Stays silent when
+// offline or suppressed (version.check=false).
+private fun checkVersion() {
+    if (serverProps.getProperty("version.check")?.toBoolean() == false) return
+    Thread {
+        try {
+            val current = serverProps.getProperty("version")?.substringBefore('-') ?: return@Thread
+            val body = URL("https://pairgoth.jeudego.org/en").openConnection().apply {
+                connectTimeout = 5000
+                readTimeout = 5000
+            }.getInputStream().use { String(it.readBytes(), StandardCharsets.UTF_8) }
+            val published = Regex("pairgoth v([0-9][0-9.]*)").find(body)?.groupValues?.get(1) ?: return@Thread
+            if (isNewer(published, current)) {
+                val update =
+                    if (File("./.git").exists()) "git pull and rebuild to update"
+                    else "download it from https://pairgoth.jeudego.org"
+                println("pairgoth v$published has been published (you are running v$current): $update")
+            }
+        } catch (t: Throwable) {
+            // best-effort: stay silent offline
+        }
+    }.apply { isDaemon = true }.start()
+}
+
+private fun isNewer(published: String, current: String): Boolean {
+    val p = published.split('.').map { it.toIntOrNull() ?: 0 }
+    val c = current.split('.').map { it.toIntOrNull() ?: 0 }
+    for (i in 0 until maxOf(p.size, c.size)) {
+        val diff = p.getOrElse(i) { 0 } - c.getOrElse(i) { 0 }
+        if (diff != 0) return diff > 0
+    }
+    return false
 }
 
 private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
