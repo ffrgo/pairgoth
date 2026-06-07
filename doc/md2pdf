@@ -3,6 +3,12 @@
 # HTML doc generation. Needs 'pandoc'.
 
 INPUT=$1
+if [ "$INPUT" = "all" ]; then
+  # full manual: the split docs are merged at generation time only
+  INPUT=manual.md
+  cat tutorial.md reference.md pairing.md technical.md > $INPUT
+  trap 'rm -f manual.md' EXIT
+fi
 BASE=$(basename -s .md $INPUT)
 
 if test -f "$BASE.css"
