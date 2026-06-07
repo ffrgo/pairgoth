@@ -45,7 +45,9 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
         val auth = properties.getProperty("auth") ?: "none"
         context.setAttribute("auth", auth)
         when (auth) {
-            "none", "sesame", "external" -> {}
+            "none", "sesame" -> {}
+            // fail fast: the sessionless redirect needs it on every request
+            "external" -> getMandatoryProperty("auth.external.login_url")
             "oauth" -> {
                 properties.getProperty("oauth.providers")?.let {
                     val providers = it.split(Regex("\\s*,\\s*"))

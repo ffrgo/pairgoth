@@ -167,6 +167,12 @@
             <artifactId>pairgoth-common</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <!-- consumed-nonces cache of the external-auth SSO tickets -->
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.1.8</version>
+        </dependency>
         <!-- main dependencies -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>

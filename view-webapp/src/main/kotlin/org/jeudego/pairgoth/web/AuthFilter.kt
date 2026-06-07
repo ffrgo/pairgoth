@@ -10,6 +10,7 @@ import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.view.ApiTool
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.security.MessageDigest
 import javax.servlet.Filter
@@ -53,21 +54,25 @@ class AuthFilter: Filter {
             return
         }
 
-        // external auth: a trusting front proxy (EGC) injects the operator's email in a header; we
-        // establish/refresh the session from it. The deployment guarantees the trust (the proxy sets
-        // the header, strips any client-supplied copy, and pairgoth is not directly reachable).
-        if (auth == "external" && !whitelisted(uri) && !forwarded) {
-            val headerName = WebappManager.properties.getProperty("auth.external.header") ?: "X-Remote-Email"
-            val email = request.getHeader(headerName)?.trim()
-            val current = (session?.getAttribute(SESSION_KEY_USER) as? Json.Object)?.getString("email")
-            if (!email.isNullOrEmpty()) {
-                if (email != current) handleSuccessfulLogin(request, Json.Object("email" to email))
-            } else if (current == null) {
-                // no proxy-injected identity and no session → a direct hit bypassing the proxy
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
-                return
+        // external auth: operators authenticate on the fronting site (EGC), which hands them over
+        // with a short-lived one-time ticket on /sso; sessionless requests bounce to its login page
+        // carrying the original target as `goto`. (/sso is only honoured in this mode.)
+        if (auth == "external") {
+            val loginUrl by lazy { WebappManager.getMandatoryProperty("auth.external.login_url") }
+            if (uri.replace(Regex("^/../"), "/") == "/sso") {
+                val email = request.getParameter("ticket")?.let { SsoTicket.validate(it) }
+                if (email == null) {
+                    response.sendRedirect(loginUrl)
+                } else {
+                    handleSuccessfulLogin(request, Json.Object("email" to email))
+                    response.sendRedirect(SsoTicket.safeGoto(request.getParameter("goto")))
+                }
+            } else if (whitelisted(uri) || forwarded || session?.getAttribute(SESSION_KEY_USER) != null) {
+                chain.doFilter(req, resp)
+            } else {
+                val target = uri + (request.queryString?.let { "?$it" } ?: "")
+                response.sendRedirect("$loginUrl?goto=${URLEncoder.encode(target, StandardCharsets.UTF_8)}")
             }
-            chain.doFilter(req, resp)
             return
         }
 
