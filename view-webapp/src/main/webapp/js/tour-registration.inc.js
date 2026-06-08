@@ -246,8 +246,9 @@ function addPlayers() {
 }
 
 function bulkUpdate(players) {
-  Promise.all(players.map(p => api.putJson(`tour/${tour_id}/part/${p.id}`, p)))
-    .then((values) => window.location.reload());
+  // single bulk upsert (one event server-side) instead of a per-player PUT loop
+  api.postJson(`tour/${tour_id}/part`, players)
+    .then(rst => { if (rst !== 'error') window.location.reload(); });
 }
 
 // --- Shared row-patch primitives (the direct toggle effect AND the PlayerUpdated SSE echo call these,
@@ -757,23 +758,9 @@ onLoad(() => {
       showError(data.message || 'Invalid response from website');
       return;
     }
-    let existing = await api.getJson(`tour/${tour_id}/part`);
-    if (existing === 'error' || !Array.isArray(existing)) return;
 
-    let byExt = {}, byEgf = {}, byFfg = {}, byAga = {};
-    for (let p of existing) {
-      if (p.ext) byExt[p.ext] = p;
-      if (p.egf) byEgf[p.egf] = p;
-      if (p.ffg) byFfg[p.ffg] = p;
-      if (p.aga) byAga[p.aga] = p;
-    }
-    let findMatch = pl =>
-      (pl.ext && byExt[pl.ext]) ||
-      (pl.egf && byEgf[pl.egf]) ||
-      (pl.ffg && byFfg[pl.ffg]) ||
-      (pl.aga && byAga[pl.aga]) ||
-      null;
-
+    // Translate the website wire format to pairgoth player payloads; the server does the matching
+    // (by external id), the merge and the journal in one shot (one event, not one per player).
     function buildPayload(wp) {
       // Wire format: `rank` is a string ("10k", "2d", "1p"). 1p..9p doubles as the pro flag.
       let parsed = parseRankAndPro(wp.rank);
@@ -799,74 +786,26 @@ onLoad(() => {
       };
     }
 
-    let norm = s => (s == null ? '' : String(s)).trim().toLowerCase();
-    // Server upcases country and rewrites GB→UK on store; align here so re-sync of a UK player
-    // doesn't show as "updated" every time.
-    let cnorm = c => { let s = norm(c); return s === 'gb' ? 'uk' : s; };
-    let normSkip = a => Array.isArray(a) ? Array.from(new Set(a.map(Number))).sort((x, y) => x - y).join(',') : '';
-    function isUnchanged(payload, current) {
-      return norm(payload.name) === norm(current.name)
-          && norm(payload.firstname) === norm(current.firstname)
-          && cnorm(payload.country) === cnorm(current.country)
-          && norm(payload.club) === norm(current.club)
-          && parseInt(payload.rank) === parseInt(current.rank)
-          && parseInt(payload.rating) === parseInt(current.rating)
-          && (parseInt(payload.pro) || 0) === (parseInt(current.pro) || 0)
-          && normSkip(payload.skip) === normSkip(current.skip || [])
-          && norm(payload.egf) === norm(current.egf)
-          && norm(payload.ffg) === norm(current.ffg)
-          && norm(payload.aga) === norm(current.aga)
-          && norm(payload.ext) === norm(current.ext);
-    }
+    let report = await api.postJson(`tour/${tour_id}/part`, data.players.map(buildPayload));
+    if (report === 'error') return;
 
-    let added = 0, updated = 0, unchanged = 0, failed = 0, lastError = null;
-    let blocked = []; // [{ label, round }] — paired in the round being dropped
-    for (let wp of data.players) {
-      let payload = buildPayload(wp);
-      let label = `${payload.name} ${payload.firstname || ''}`.trim();
-      let match = findMatch(payload);
-      if (!match) {
-        let resp = await api.post(`tour/${tour_id}/part`, payload);
-        if (resp.ok) {
-          added++;
-        } else {
-          let body = await resp.json().catch(() => ({}));
-          failed++;
-          lastError = body.error || `HTTP ${resp.status}`;
-        }
-        continue;
-      }
-      if (isUnchanged(payload, match)) {
-        unchanged++;
-        continue;
-      }
-      payload.id = match.id;
-      let resp = await api.put(`tour/${tour_id}/part/${match.id}`, payload);
-      if (resp.ok) {
-        updated++;
-      } else {
-        let body = await resp.json().catch(() => ({}));
-        let err = body.error || `HTTP ${resp.status}`;
-        failed++;
-        let m = err.match(/player is playing in round #(\d+)/);
-        if (m) blocked.push({ label, round: parseInt(m[1]) });
-        else lastError = err;
-      }
-    }
-
+    // Journal → operator report; split the paired-player rejections into a distinct "blocked" line
+    // (correct procedure: freeze the round on the website first, then resync).
+    let failed = report.failed || [];
+    let blocked = failed.map(f => {
+      let m = (f.reason || '').match(/round #(\d+)/);
+      return m ? `${f.player} (round ${m[1]})` : null;
+    }).filter(Boolean);
+    let other = failed.filter(f => !/round #\d+/.test(f.reason || ''));
     let lines = [];
-    if (added > 0) lines.push(`  ${added} added`);
-    if (updated > 0) lines.push(`  ${updated} updated`);
-    if (unchanged > 0) lines.push(`  ${unchanged} unchanged`);
-    if (blocked.length > 0) {
-      let names = blocked.map(x => `${x.label} (round ${x.round})`).join(', ');
-      lines.push(`  ${blocked.length} blocked — already paired: ${names}`);
-    }
-    let other = failed - blocked.length;
-    if (other > 0) lines.push(`  ${other} other failed${lastError ? ` — last: ${lastError}` : ''}`);
+    if (report.added) lines.push(`  ${report.added} added`);
+    if (report.updated) lines.push(`  ${report.updated} updated`);
+    if (report.unchanged) lines.push(`  ${report.unchanged} unchanged`);
+    if (blocked.length) lines.push(`  ${blocked.length} blocked — already paired: ${blocked.join(', ')}`);
+    if (other.length) lines.push(`  ${other.length} other failed — last: ${other[other.length - 1].reason}`);
     let msg = lines.length === 0 ? 'Sync: nothing to do' : 'Sync results:\n' + lines.join('\n');
-    let hasError = failed > 0;
-    if (added > 0 || updated > 0) {
+    let hasError = failed.length > 0;
+    if (report.added || report.updated) {
       // Stash and reload so the table reflects the new state. The on-load handler re-shows it.
       store('refreshReport', { msg, error: hasError });
       setTimeout(() => window.location.reload(), 200);
@@ -909,7 +848,7 @@ onLoad(() => {
     // Overwrite everything from the official source (rating, level, pro). The FFG licence
     // snapshot is refreshed for FR tournaments only (and only where the source carries it).
     let isFR = (tour_country || '').toLowerCase() === 'fr';
-    let changes = [], updated = 0, notFound = [], failed = 0, lastError = null;
+    let changes = [], notFound = [], payloads = [];
     for (let p of registered) {
       // Pick the first source with a hit, in priority order.
       let hit = null;
@@ -933,16 +872,21 @@ onLoad(() => {
       if (!levelChanged && newLicensed === oldLicensed) continue;
       let payload = { id: p.id, rating: newRating, rank: newRank, pro: newPro };
       if (isFR && hit.license != null) payload.licensed = newLicensed;
-      try {
-        let resp = await api.putJson(`tour/${tour_id}/part/${p.id}`, payload);
-        if (resp === 'error') { failed++; lastError = `PUT failed for ${p.name}`; continue; }
-        updated++;
-        if (levelChanged) {
-          let name = `${p.name} ${p.firstname || ''}`.trim();
-          changes.push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
-        }
-      } catch (err) { failed++; lastError = err.message || String(err); }
+      payloads.push(payload);
+      // the change-log is computed client-side from old vs looked-up new (the server journal only counts)
+      if (levelChanged) {
+        let name = `${p.name} ${p.firstname || ''}`.trim();
+        changes.push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
+      }
     }
+
+    let failed = 0, lastError = null;
+    if (payloads.length) {
+      let report = await api.postJson(`tour/${tour_id}/part`, payloads);
+      if (report === 'error') { failed = payloads.length; lastError = 'bulk update failed'; }
+      else { failed = (report.failed || []).length; lastError = report.failed?.[0]?.reason || null; }
+    }
+    let updated = payloads.length - failed;
 
     changes.sort((a, b) => a.localeCompare(b));
     notFound.sort((a, b) => a.localeCompare(b));

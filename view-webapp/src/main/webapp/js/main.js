@@ -483,6 +483,7 @@ const TAB_ORDER = ['information', 'registration', 'teams', 'pairing', 'results',
 const EVENT_SOURCE_TAB = {
   TournamentUpdated: 'information',
   PlayerAdded: 'registration', PlayerUpdated: 'registration', PlayerDeleted: 'registration',
+  PlayersImported: 'registration',
   TeamAdded: 'teams', TeamUpdated: 'teams', TeamDeleted: 'teams',
   GamesAdded: 'pairing', GamesDeleted: 'pairing', GameUpdated: 'pairing', TablesRenumbered: 'pairing',
   ResultUpdated: 'results', ResultsCleared: 'results',

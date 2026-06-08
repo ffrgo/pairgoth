@@ -12,6 +12,7 @@ enum class Event(val slug: String) {
     PlayerAdded("add-player"),
     PlayerUpdated("edit-player"),
     PlayerDeleted("del-player"),
+    PlayersImported("import-players"),
     TeamAdded("add-team"),
     TeamUpdated("edit-team"),
     TeamDeleted("del-team"),

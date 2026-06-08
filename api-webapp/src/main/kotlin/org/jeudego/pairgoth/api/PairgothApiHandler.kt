@@ -33,6 +33,7 @@ interface PairgothApiHandler: ApiHandler {
             Event.PlayerAdded -> "Add player${playerName()}"
             Event.PlayerUpdated -> "Edit player${playerName()}"
             Event.PlayerDeleted -> "Remove player"
+            Event.PlayersImported -> "Import players"
             Event.TeamAdded -> "Add team"
             Event.TeamUpdated -> "Edit team"
             Event.TeamDeleted -> "Remove team"
