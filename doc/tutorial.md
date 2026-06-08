@@ -91,3 +91,12 @@ The **Publish** button on the standings tab offers:
 - **website** — push standings to your tournament website through the [webhook](technical) (pairings and results have the same button on their tabs).
 
 The OpenGotha XML export of the whole tournament is available through the [API](technical), and the `.tour` files themselves are portable JSON — copying them is a complete backup.
+
+## Connecting to an event website
+
+If your tournament has a website (a club page, a federation site, or a larger platform), pairgoth can
+**publish** its pairings, results and standings there, and **sync** the player roster from it — the
+Publish and Sync buttons. For a single club tournament that's all there is to it; larger, multi-event
+setups (think a national championship or the EGC) can go further with single sign-on and per-operator
+access. The shapes are summarized in the [reference](reference#connecting-to-an-event-website) and
+configured in the [technical documentation](technical#deployment-profiles).

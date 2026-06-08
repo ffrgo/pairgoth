@@ -278,3 +278,19 @@ Player IDs can be linked to external rating databases:
 | EGF | European Go Federation |
 | FFG | French Go Association |
 
+
+## Connecting to an event website
+
+Pairgoth can work alone, but it is designed to plug into an "event" website (a club page, a federation
+site, or a large platform like the EGC). Three typical setups, simplest first:
+
+- **Publish from a laptop** — you run pairgoth locally and *publish* pairings, results and standings to
+  your event page with the Publish / Sync buttons. Nothing else to set up beyond the website's address.
+- **Single hosted event** — pairgoth runs on a server and your event site drives it (registers players,
+  reads pairings/results/standings), behind one shared password.
+- **Multi-event platform (EGC-scale)** — the event site signs operators in and controls which
+  tournaments each may see. This is the only setup with real complexity, and **small organizers never
+  need it.**
+
+Configuration for each — addresses, secrets, single sign-on — is in the
+[technical documentation](technical#deployment-profiles).

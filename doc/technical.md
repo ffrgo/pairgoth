@@ -2,6 +2,28 @@
 
 [TOC]
 
+## Deployment profiles
+
+pairgoth integrates with an "event" site (a club page, a federation site, an EGC-scale platform) on two
+independent planes: pairgoth **pushing** to the event (the *webhook*), and the event **driving** pairgoth
+(the *API*). Which you set up depends on how pairgoth is reached and how complex the event is —
+**most organizers only need the first row.**
+
+| Profile | pairgoth runs… | Integration | Auth | Secrets |
+|---|---|---|---|---|
+| **local-publish** | on the organizer's laptop (not reachable from outside) | pairgoth *pushes* pairings/results/standings to the event site; the operator clicks Publish / Sync | `none` or `sesame` | `webhook.url` + `webhook.secret` |
+| **hosted-sesame** | on a reachable server, one event | the event site *drives* pairgoth over its API (create, push the roster, read pairings/results/standings as JSON) | `sesame` (shared password) | `auth.shared_secret` |
+| **hosted-SSO-ACL** *(advanced — EGC-scale)* | on a reachable server, many events and operators | the event site is an SSO front with per-operator tournament visibility and id allocation | `external` | `auth.shared_secret`, `auth.external.secret` |
+
+- The two planes are **independent** — configure only what you need. A hosted event that drives the API
+  needs no webhook; a laptop that only publishes needs no API auth beyond `sesame`. Configuring two
+  directions (and two secrets) is only for setups that genuinely want both.
+- A **small organizer** stops at the first one or two rows. The third — per-operator ACL, SSO tickets,
+  an admin store — exists only for multi-tournament platforms (the EGC), and is documented apart under
+  [External (SSO) authentication](#external-sso-authentication); ignore it otherwise.
+- Details by plane: the push side is the [Webhook specification](#pairgoth-webhook-specification); the
+  drive side is the [API specification](#pairgoth-api-specification) (incl. bulk roster import).
+
 ## Configuration
 
 *How to tune the `pairgoth.properties` file.*
@@ -500,6 +522,15 @@ When authentication is enabled, all requests require an `Authorization` header.
     Rank values: -30 (30k) to 8 (9D). Rating in EGF-style (100 = 1 stone).
 
     *output* `{ "success": true, "id": #pid }`
+
++ `POST /api/tour/#tid/part` (with a json **array** body) Bulk-import a roster
+
+    The array form is an idempotent upsert, meant for an event site pushing its whole roster: each
+    entry is matched by `id`, else by external id (`ext` → `egf` → `ffg` → `aga`), else created; a
+    partial entry merges onto the matched player. The whole roster is applied in one transaction and
+    recorded as a single history entry.
+
+    *output* a journal `{ "success": true, "added": n, "updated": n, "unchanged": n, "failed": [ { "player": "...", "reason": "..." } ] }` — e.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch.
 
 + `PUT /api/tour/#tid/part/#pid` Modify a player registration
 
