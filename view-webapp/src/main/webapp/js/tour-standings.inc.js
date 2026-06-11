@@ -1,3 +1,20 @@
+let standingsColumns; // initialized onLoad — store2 is loaded after this script
+
+function applyStandingsColumns() {
+  let tab = $('#standings-tab')[0];
+  tab.classList.toggle('hide-country', !standingsColumns.country);
+  tab.classList.toggle('hide-club', !standingsColumns.club);
+}
+
+// publish what the screen shows: clone the table, drop the hidden columns
+function visibleTableHtml(table) {
+  if (!table) return undefined;
+  let clone = table.cloneNode(true);
+  if (!standingsColumns.country) clone.querySelectorAll('.col-country').forEach(cell => cell.remove());
+  if (!standingsColumns.club) clone.querySelectorAll('.col-club').forEach(cell => cell.remove());
+  return clone.outerHTML;
+}
+
 function publish(format, extension, encoding) {
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
@@ -34,7 +51,7 @@ function filenameFromContentDisposition(header) {
 }
 
 function publishHtml() {
-  let html = $('#standings-table')[0].outerHTML;
+  let html = visibleTableHtml($('#standings-table')[0]);
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
   let blob = new Blob(['\uFEFF', html], {type: 'text/html;charset=utf-8'});
@@ -54,6 +71,16 @@ function freeze() {
 
 onLoad(() => {
   new Tablesort($('#standings-table')[0]);
+  standingsColumns = Object.assign({country: true, club: true}, store('standingsColumns'));
+  $('#show-country')[0].checked = standingsColumns.country;
+  $('#show-club')[0].checked = standingsColumns.club;
+  applyStandingsColumns();
+  $('#standings-columns input').on('change', e => {
+    standingsColumns.country = $('#show-country')[0].checked;
+    standingsColumns.club = $('#show-club')[0].checked;
+    store('standingsColumns', standingsColumns);
+    applyStandingsColumns();
+  });
   $('.criterium').on('click', e => {
     let alreadyOpen = e.target.closest('select');
     if (alreadyOpen) return;
@@ -127,13 +154,13 @@ onLoad(() => {
       showError('Tournament short name is required for publishing');
       return;
     }
-    let teamHtml = $('#standings-table')[0]?.outerHTML;
+    let teamHtml = visibleTableHtml($('#standings-table')[0]);
     if (!teamHtml) {
       showError('No standings to publish');
       return;
     }
     // TEAM* tournaments expose a second table (#individual-standings-table); ship both, wrapped to distinguish.
-    let individualHtml = $('#individual-standings-table')[0]?.outerHTML;
+    let individualHtml = visibleTableHtml($('#individual-standings-table')[0]);
     let payload = individualHtml
       ? `<div class="standings-section team-standings">${teamHtml}</div>` +
         `<div class="standings-section individual-standings">${individualHtml}</div>`

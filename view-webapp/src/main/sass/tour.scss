@@ -556,6 +556,7 @@
     background-color: #eeeeee;
     margin-left: auto;
     margin-right: auto;
+    margin-bottom: 0;
 
     .criterium {
       position: relative;
@@ -573,6 +574,20 @@
     }
     #params-submit {
       justify-content: space-around;
+    }
+  }
+  #standings-columns {
+    margin: 0.3em auto;
+    font-size: 0.85em;
+    font-style: italic;
+    label {
+      margin: 0 0.5em;
+      cursor: pointer;
+    }
+  }
+  #standings-tab {
+    &.hide-country .col-country, &.hide-club .col-club {
+      display: none;
     }
   }
   #standings-container {
