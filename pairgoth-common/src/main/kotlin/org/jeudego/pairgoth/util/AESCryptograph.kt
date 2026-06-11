@@ -1,6 +1,6 @@
 package org.jeudego.pairgoth.util
 
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import javax.crypto.Cipher
 import javax.crypto.Cipher.DECRYPT_MODE
 import javax.crypto.Cipher.ENCRYPT_MODE
@@ -17,7 +17,8 @@ import javax.crypto.spec.SecretKeySpec
 class AESCryptograph : Cryptograph {
 
     override fun init(key: String) {
-        val bytes = key.toByteArray(Charset.defaultCharset())
+        // UTF-8, not the platform default: external parties (EGC, seagull) mint tickets too
+        val bytes = key.toByteArray(StandardCharsets.UTF_8)
         if (bytes.size < 16) {
             throw Error("not enough secret bytes")
         }
@@ -32,7 +33,7 @@ class AESCryptograph : Cryptograph {
 
     override fun encrypt(str: String): ByteArray {
         return try {
-            encrypt.doFinal(str.toByteArray(Charset.defaultCharset()))
+            encrypt.doFinal(str.toByteArray(StandardCharsets.UTF_8))
         } catch (e: Exception) {
             throw RuntimeException("encryption failed failed", e)
         }
@@ -40,7 +41,7 @@ class AESCryptograph : Cryptograph {
 
     override fun decrypt(bytes: ByteArray): String {
         return try {
-            String(decrypt.doFinal(bytes), Charset.defaultCharset())
+            String(decrypt.doFinal(bytes), StandardCharsets.UTF_8)
         } catch (e: Exception) {
             throw RuntimeException("encryption failed failed", e)
         }
