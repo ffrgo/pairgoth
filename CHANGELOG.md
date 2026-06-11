@@ -32,6 +32,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Manual game edit: the white player was validated against the black id (copy-paste), letting an invalid white through.
 - A failed view→api call now logs the method, URL and `api.external.url` source, instead of a bare connection error.
 - Team tournaments: toggling a team's participation on the pairing page now drops/restores all of its players for that round (a team has no skip of its own).
+- Docker packaging refreshed: current LTS Java image (was an EOL JDK 18), configuration read from `docker/pairgoth.properties` (one shared example file at the repository root, now also covering external auth), `run.sh` picks up a freshly built engine, dead jetty mount removed.
 - EGF export: even-game tournaments (swiss, or McMahon at zero correction) now get the `.h9` extension instead of `.h0`.
 - Changing the standalone port (`webapp.port`) no longer requires updating `webapp.external.url`/`api.external.url` by hand: they are derived from the connector when not explicitly set.
 - A malformed or stale API bearer now gets a 401 instead of a 500.

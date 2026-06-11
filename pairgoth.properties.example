@@ -7,7 +7,7 @@
 # Mode: standalone (web+API) | server (API only) | client (web only)
 # mode = standalone
 
-# Authentication: none | sesame (shared password) | oauth
+# Authentication: none | sesame (shared password) | oauth | external (fronting site SSO)
 # auth = none
 # auth.sesame = <password>                    # for auth=sesame
 # auth.shared_secret = <16 ascii chars>       # shared API/web secret (auto-generated in standalone)
@@ -16,6 +16,11 @@
 # oauth.providers = ffg,google
 # oauth.ffg.client_id = <client_id>
 # oauth.ffg.secret = <client_secret>
+
+# External auth (auth=external): the fronting site owns the accounts, see doc/technical.md
+# auth.external.login_url = <fronting site login page>
+# auth.external.secret = <16 ascii chars>     # SSO ticket secret shared with the fronting site
+# auth.external.admin =                       # comma-separated emails with unrestricted access
 
 # Webapp (UI) connector
 # webapp.protocol = http
