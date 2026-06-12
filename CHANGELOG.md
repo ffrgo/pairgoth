@@ -43,6 +43,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - A malformed or stale API bearer now gets a 401 instead of a 500.
 - SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
 - Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
+- The tournament store directory is created at API startup rather than on first use.
 - Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
 - EGF export: even-game tournaments (swiss, or McMahon at zero correction) get the `.h9` extension instead of `.h0`.
 - `webapp.external.url` / `api.external.url` are derived from the connector when not explicitly set.

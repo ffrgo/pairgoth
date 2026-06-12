@@ -43,6 +43,14 @@ interface Store {
 private val fileStores = ConcurrentHashMap<String, FileStore>()
 private fun fileStore(rootPath: String) = fileStores.getOrPut(rootPath) { FileStore(rootPath) }
 
+// eager init at webapp startup: a virgin deployment must have its store directory
+// before any API access (host-side ACL scripts guard on the directory existing)
+fun initStore() {
+    if (WebappManager.getMandatoryProperty("store") == "file") {
+        fileStore(WebappManager.properties.getProperty("store.file.path") ?: ".")
+    }
+}
+
 // external auth: a per-user ACL view over the shared root FileStore (canonical store stays the root,
 // so cache / SSE / history / concurrency are shared across the operators of a tournament)
 private val aclStores = ConcurrentHashMap<String, AclFileStore>()
