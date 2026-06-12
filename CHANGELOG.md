@@ -23,6 +23,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - "external" auth mode for embedded deployments: a fronting website (e.g. an event site) owns the accounts and hands operators over to pairgoth with a short-lived, single-use SSO ticket on `/sso` (encrypted with a dedicated `auth.external.secret` — pairgoth's internal secret never leaves the host); sessionless requests bounce to the site's login page and back, so deep links into pairgoth work transparently. Tournament visibility is per operator, controlled by ACL symlinks in the store directory (managed by the fronting site, which also allocates tournament ids); access can be granted before a tournament exists — the operator then lands on a creation form prefilled with the provisioned name. Admin emails (`auth.external.admin`) get unrestricted access; the fronting site's backend obtains an opaque API bearer through the same `/sso` door (JSON mode).
 
 - Standings: a "Display" line under the placement criteria lets the operator show or hide the country and club columns (the club column is new); the choice is remembered in the browser and carried into the published HTML standings (file and website).
+- Optional cleartext HTTP/2 (`webapp.h2c`) on the plain connector, letting a TLS-terminating reverse proxy keep HTTP/2 end-to-end; HTTP/1.1 clients are still served.
 
 ### Fixed
 

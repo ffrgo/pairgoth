@@ -1,5 +1,5 @@
 # Pairgoth configuration — copy to pairgoth.properties and uncomment what you need.
-# Full reference: doc/reference.md › Configuration. Values shown are the defaults.
+# Full reference: doc/technical.md › Configuration. Values shown are the defaults.
 
 # Environment: dev (CORS + extra logging) or prod
 # env = prod
@@ -40,6 +40,10 @@
 # webapp.ssl.key = path/to/localhost.key
 # webapp.ssl.cert = path/to/localhost.crt
 # webapp.ssl.pass = <key passphrase>
+
+# Cleartext HTTP/2 (h2c) on the plain connector, to keep h2 end-to-end behind a
+# TLS-terminating reverse proxy; HTTP/1.1 clients are still served
+# webapp.h2c = false
 
 # Store: file (XML files) | memory (tests)
 # store = file

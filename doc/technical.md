@@ -212,6 +212,16 @@ webapp.ssl.pass = <key passphrase>
 
 Supports `jar:` URLs for embedded resources.
 
+### Cleartext HTTP/2 (h2c)
+
+Behind a TLS-terminating reverse proxy, HTTP/2 can be kept end-to-end by letting the proxy speak cleartext HTTP/2 to pairgoth (e.g. haproxy `server ... proto h2`):
+
+```
+webapp.h2c = false
+```
+
+When enabled, the plain connector accepts both HTTP/1.1 and h2c on the same port: regular clients keep using HTTP/1.1, the proxy connects with h2c prior knowledge. Ignored on an HTTPS connector, where HTTP/2 is already negotiated via ALPN.
+
 ### Store
 
 Persistent storage for tournaments.

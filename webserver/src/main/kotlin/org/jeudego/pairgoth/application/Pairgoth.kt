@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.application
 
 import org.apache.commons.io.FileUtils
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory
 import org.eclipse.jetty.server.HttpConfiguration
 import org.eclipse.jetty.server.HttpConnectionFactory
@@ -219,10 +220,11 @@ private fun launchServer() {
         else -> throw Error("invalid mode: $mode")
     }
     val secure = webappUrl.protocol == "https"
+    val h2c = serverProps.getProperty("webapp.h2c")?.toBoolean() ?: false
 
     // create server
     val server =
-        if (secure) Server()
+        if (secure || h2c) Server()
         else Server(webappUrl.port)
 
     server.apply {
@@ -230,6 +232,9 @@ private fun launchServer() {
         handler = ContextHandlerCollection(*webAppContexts.toTypedArray())
         if (secure) {
             val connector = buildSecureConnector(server, webappUrl.port)
+            addConnector(connector)
+        } else if (h2c) {
+            val connector = buildH2cConnector(server, webappUrl.port)
             addConnector(connector)
         }
         // launch server
@@ -289,6 +294,16 @@ private fun createContext(webapp: String, contextPath: String) = WebAppContext()
             }
         })
     }
+}
+
+// Cleartext HTTP/2, so a TLS-terminating reverse proxy can keep h2 end-to-end.
+// HTTP/1.1 comes first (the default protocol): browsers never speak h2c, the
+// proxy uses prior knowledge, upgrade-capable clients can switch.
+private fun buildH2cConnector(server: Server, port: Int): ServerConnector {
+    val httpConfig = HttpConfiguration()
+    val connector = ServerConnector(server, HttpConnectionFactory(httpConfig), HTTP2CServerConnectionFactory(httpConfig))
+    connector.port = port
+    return connector
 }
 
 private fun buildSecureConnector(server: Server, port: Int): ServerConnector {
