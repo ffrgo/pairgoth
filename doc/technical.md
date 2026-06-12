@@ -222,6 +222,12 @@ webapp.h2c = false
 
 When enabled, the plain connector accepts both HTTP/1.1 and h2c on the same port: regular clients keep using HTTP/1.1, the proxy connects with h2c prior knowledge. Ignored on an HTTPS connector, where HTTP/2 is already negotiated via ALPN.
 
+### Collaborative editing
+
+Several operators can work on the same tournament at once: changes propagate live to every screen over Server-Sent Events. Results and registration toggles update in place; other affected tabs reload on entry, and a tab with unsaved work prompts to reload or continue read-only.
+
+Live propagation activates when the browser reaches pairgoth over HTTP/2 (SSE needs its multiplexing — HTTP/1.1 browsers cap concurrent connections per origin); otherwise pairgoth degrades gracefully to single-operator editing. In production that means either HTTPS (HTTP/2 via ALPN) or h2c behind a TLS-terminating proxy (above). Development mode (`env = dev`) always activates it.
+
 ### Store
 
 Persistent storage for tournaments.
@@ -371,6 +377,14 @@ session.timeout.minutes = 240
 ```
 
 Overrides the HTTP session idle-timeout default (in minutes).
+
+### Version check
+
+```
+version.check = true
+```
+
+At startup, pairgoth checks in the background whether a newer version has been published and prints an update hint. Set to `false` to suppress (it stays silent offline anyway).
 
 ### Example configurations
 

@@ -77,3 +77,6 @@
 
 # Session
 # session.timeout.minutes = 240                # HTTP session idle timeout (minutes)
+
+# Startup check for a newer published version
+# version.check = true

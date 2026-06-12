@@ -13,17 +13,20 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
-- Team tournaments: a board's colours can be overridden from the result screen (swap), without changing the match result.
-- Bulk roster import: an event website can push a whole roster to `POST /api/tour/{id}/part` (json array) in one idempotent request — matched by id then external id, partial entries merged, returning a per-player journal. The in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions now use it too, so a roster operation is one history entry instead of one per player. Deployment "profiles" (local-publish / hosted-sesame / hosted-SSO-ACL) are documented, layered so a club organizer never meets the EGC-scale complexity.
-- Version check at startup: pairgoth reports a newer published version (suppressible with `version.check=false`), pointing at `git pull` for a git checkout and at the download site otherwise; `standalone.sh` also asks before launching an outdated build.
-- Documentation: the single reference book is split per audience — reference (model), pairing (new: how pairing works and every parameter), technical (new: configuration, API and webhook specifications) — with navigation between the books, and the tutorial is now a real hands-on walkthrough. `md2pdf all` still produces a single full manual.
-- Optimal-pairing navigator on the pairings page: when the last paired group has several optimal pairings of equal total weight, a prev/next line lets the operator browse them. Next generates a new distinct one (or steps to an already-seen one); prev steps back through those visited. The total `/ N` is shown once all have been found. Backed by a Murty-based optimal perfect-matching enumerator over the pairing graph (GitLab #42). In-memory only, for the round's last pairing operation.
-- Undo / history: an "Undo" button in the header opens a list of past actions (newest first, each labelled and timestamped); select a contiguous range from the top and restore the tournament to just before the oldest selected action. Every mutation is already snapshotted; a restore is itself an (undoable) action. Loaded tournaments are now cached in memory across requests (the `.tour` is no longer re-parsed on every API call), with file-mtime invalidation so hand-edits to the `.tour` are still honoured.
-- Collaborative editing: several operators can work the same tournament at once, with changes propagated live over Server-Sent Events. Results and player registration (final / participation toggles) update in place on every screen; other tabs refresh automatically, and a tab with unsaved work prompts to reload or stay read-only rather than losing it. Requires HTTP/2 (or dev mode); otherwise it degrades gracefully to single-operator local editing.
-- "external" auth mode for embedded deployments: a fronting website (e.g. an event site) owns the accounts and hands operators over to pairgoth with a short-lived, single-use SSO ticket on `/sso` (encrypted with a dedicated `auth.external.secret` — pairgoth's internal secret never leaves the host); sessionless requests bounce to the site's login page and back, so deep links into pairgoth work transparently. Tournament visibility is per operator, controlled by ACL symlinks in the store directory (managed by the fronting site, which also allocates tournament ids); access can be granted before a tournament exists — the operator then lands on a creation form prefilled with the provisioned name. Admin emails (`auth.external.admin`) get unrestricted access; the fronting site's backend obtains an opaque API bearer through the same `/sso` door (JSON mode).
-
-- Standings: a "Display" line under the placement criteria lets the operator show or hide the country and club columns (the club column is new); the choice is remembered in the browser and carried into the published HTML standings (file and website).
+- Team tournaments: a board's colours can be overridden from the result screen, without changing the match result.
+- Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).
+- Version check at startup, suppressible with `version.check = false`.
+- Documentation split per audience: reference (model), pairing (new), technical (new: configuration, API and webhook specifications, deployment profiles), hands-on tutorial.
+- Optimal-pairing navigator: when several optimal pairings of equal weight exist, a prev/next line on the pairing tab browses them (GitLab #42).
+- Undo: an "Undo" button in the header lists past actions, labelled and timestamped; restore the tournament to just before any of them.
+- Collaborative editing: several operators can work the same tournament at once, changes propagated live over Server-Sent Events (requires HTTP/2; degrades gracefully to single-operator editing).
+- "external" auth mode: a fronting website owns the accounts and hands operators over with single-use SSO tickets, with per-operator tournament visibility (ACL symlinks) and an admin list; its backend obtains an API bearer through the same door.
+- Standings: country and club column display toggles (the club column is new), remembered in the browser and carried into the published HTML standings.
 - Optional cleartext HTTP/2 (`webapp.h2c`) on the plain connector, letting a TLS-terminating reverse proxy keep HTTP/2 end-to-end; HTTP/1.1 clients are still served.
+
+### Changed
+
+- Loaded tournaments are cached in memory across requests; hand-edits to the `.tour` files are still picked up.
 
 ### Fixed
 
@@ -38,6 +41,10 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - EGF export: even-game tournaments (swiss, or McMahon at zero correction) now get the `.h9` extension instead of `.h0`.
 - Changing the standalone port (`webapp.port`) no longer requires updating `webapp.external.url`/`api.external.url` by hand: they are derived from the connector when not explicitly set.
 - A malformed or stale API bearer now gets a 401 instead of a 500.
+- SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
+- Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
+- EGF export: even-game tournaments (swiss, or McMahon at zero correction) get the `.h9` extension instead of `.h0`.
+- `webapp.external.url` / `api.external.url` are derived from the connector when not explicitly set.
 
 ## [0.25] - 2026-05-28
 
