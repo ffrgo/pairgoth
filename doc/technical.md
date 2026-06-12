@@ -722,7 +722,8 @@ Configuration is described in [Webhook](#webhook) under the Configuration sectio
 performs `GET <webhook.url>/health` at startup; a failed check is fatal.
 
 All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate
-it on every endpoint and return `401` on mismatch.
+it on every `{code}`-scoped endpoint and return `401` on mismatch. `/health` is instance-scoped and **may** be served
+unauthenticated; it must expose nothing beyond `status`, `name` and `version`.
 
 JSON responses follow the shape `{ "status": true | false, "message"?: string, … }`. A `false` status reaches the pairgoth UI as the error message.
 
@@ -732,7 +733,7 @@ The path component `{code}` is the tournament's `shortName` — used as a stable
 
 Pairgoth calls the following endpoints, all relative to `webhook.url`:
 
-+ /health                     GET    Auth-gated health check
++ /health                     GET    Health check (auth optional)
 + /players/{code}             GET    Pull registered players
 + /pairings/{code}/{round}    POST   Push pairings or results HTML
 + /standings/{code}/{round}   POST   Push standings HTML
