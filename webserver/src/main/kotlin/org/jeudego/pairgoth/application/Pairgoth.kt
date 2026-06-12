@@ -28,6 +28,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.security.KeyFactory
 import java.security.KeyStore
+import java.security.SecureRandom
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
 import java.security.spec.PKCS8EncodedKeySpec
@@ -106,7 +107,15 @@ private fun readProperties() {
         val base = "${serverProps["webapp.protocol"]}://${serverProps["webapp.host"]}:${serverProps["webapp.port"]}"
         serverProps.putIfAbsent("webapp.external.url", base)
         serverProps.putIfAbsent("api.external.url", "$base/api/")
+        // the secret must be generated here, once: the two wars have separate classloaders,
+        // each would otherwise generate its own
+        serverProps.putIfAbsent("auth.shared_secret", randomSecret())
     }
+}
+
+private val secretChars = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+private fun randomSecret() = SecureRandom().let { rnd ->
+    CharArray(16) { secretChars[rnd.nextInt(secretChars.size)] }.concatToString()
 }
 
 private fun publishProperties() {

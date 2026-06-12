@@ -95,8 +95,10 @@ When running with authentication enabled:
 auth.shared_secret = <16 ascii characters string>
 ```
 
-This secret is shared between API and View webapps. Set it explicitly for any real
-authentication mode (with `auth = none` it is not used).
+This secret is shared between API and View webapps. In standalone mode it is
+auto-generated at startup when not set. In server and client modes, set it
+explicitly — to the same value on both sides — for any real authentication mode
+(with `auth = none` it is not used).
 
 #### Sesame password
 
