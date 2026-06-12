@@ -36,7 +36,13 @@ object TokenHandler: ApiHandler {
         logger.trace("Found authentication header: $authorize")
         if (authorize != null && authorize.startsWith("$AUTH_PREFIX ")) {
             val bearer = authorize.substring(AUTH_PREFIX.length + 1)
-            val clear = cryptograph.webDecrypt(bearer)
+            // an undecryptable bearer is "not authenticated", not a server error
+            val clear = try {
+                cryptograph.webDecrypt(bearer)
+            } catch (t: Throwable) {
+                logger.trace("Undecryptable bearer", t)
+                return null
+            }
             logger.trace("Decrypted bearer: $clear")
             val parts = clear.split(':')
             if (parts.size == 2) {
