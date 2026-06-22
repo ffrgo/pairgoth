@@ -25,7 +25,19 @@ object ResultsHandler: PairgothApiHandler {
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         val payload = getObjectPayload(request)
         val game = tournament.individualGames(round)[payload.getInt("id")] ?: badRequest("invalid game id")
-        game.result = Game.Result.fromSymbol(payload.getChar("result") ?: badRequest("missing result"))
+        // per-board colour override (team tournaments only): swap the board's colours and flip its result,
+        // so who-won is unchanged — overrides the board's derived colour without touching the match result
+        if (payload.getBoolean("swap") == true) {
+            if (tournament !is TeamTournament || !tournament.type.individual) badRequest("colour swap only applies to team boards")
+            val white = game.white; game.white = game.black; game.black = white
+            game.result = when (game.result) {
+                Game.Result.WHITE -> Game.Result.BLACK
+                Game.Result.BLACK -> Game.Result.WHITE
+                else -> game.result
+            }
+        } else {
+            game.result = Game.Result.fromSymbol(payload.getChar("result") ?: badRequest("missing result"))
+        }
         if (tournament is TeamTournament && tournament.type.individual) {
             tournament.propagateIndividualResult(round, game)
         }

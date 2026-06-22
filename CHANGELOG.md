@@ -9,6 +9,10 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+### Added
+
+- Team tournaments: a board's colours can be overridden from the result screen (swap), without changing the match result.
+
 ### Fixed
 
 - Team tournaments: a match result now reflects which teams won their boards, not which stones won — a 2-0 sweep no longer reads as a draw, and entering a result right after pairing no longer fails.

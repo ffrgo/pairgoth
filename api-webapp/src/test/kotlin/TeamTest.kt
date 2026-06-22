@@ -132,4 +132,21 @@ class TeamTest {
         assertEquals("b", after.getString("r"), "the winning team now plays black, so the match reads as a black win")
         assertTrue(boards(tid).all { it.getString("r") != "?" }, "individual results must survive a colour swap")
     }
+
+    // Per-board override from the result screen: swapping one board's colours flips that board's
+    // colours/result (keeping its winner) and must NOT change the match result.
+    @Test
+    fun `swapping one board's colours leaves the match result unchanged`() {
+        val (tid, tg) = sweptTeamMatch()
+        val board = boards(tid).first()
+        val bw = board.getInt("w"); val bb = board.getInt("b"); val bres = board.getString("r")
+        TestAPI.put("/api/tour/$tid/res/1", Json.parse("""{"id":${board.getInt("id")},"swap":true}"""))
+        val after = boards(tid).first { it.getInt("id") == board.getInt("id") }
+        assertEquals(bb, after.getInt("w"), "the board colours must be swapped")
+        assertEquals(bw, after.getInt("b"))
+        assertEquals(if (bres == "w") "b" else if (bres == "b") "w" else bres, after.getString("r"),
+            "the board result must flip so its winner is unchanged")
+        assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
+            "a per-board colour override must not change the match result")
+    }
 }
