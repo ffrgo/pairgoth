@@ -27,6 +27,9 @@
 #end
         <th>hd</th>
         <th>result</th>
+#if($tour.type.startsWith('TEAM'))
+        <th class="noprint"></th>
+#end
       </thead>
       <tbody>
 #set($dispRst = {'?':'?', 'w':'1-0', 'b':'0-1', '=':'½-½', 'X':'X', '#':'1-1', '0':'0-0'})
@@ -51,6 +54,9 @@
 #end
           <td class="handicap centered">$!game.h</td>
           <td class="result centered" data-sort="$game.r" data-result="$game.r">#if($blackFirst)$dispRstInv[$game.r]#{else}$dispRst[$game.r]#end</td>
+#if($tour.type.startsWith('TEAM'))
+          <td class="noprint centered"><button type="button" class="swap-colours ui mini icon button" title="Swap this board's colours"><i class="fa fa-exchange"></i></button></td>
+#end
         </tr>
   #end
 #end

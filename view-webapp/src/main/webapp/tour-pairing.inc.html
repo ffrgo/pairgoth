@@ -161,6 +161,9 @@
             </select>
           </div>
         </div>
+#if($tour.type.startsWith('TEAM'))
+        <p class="team-colour-note"><em>Swapping colours here flips every board of this match &mdash; results are kept. To override one board's colours, use the result screen.</em></p>
+#end
       </div>
       <div class="popup-footer">
         <button id="cancel-pairing" type="button" class="ui gray right labeled icon floating close button">

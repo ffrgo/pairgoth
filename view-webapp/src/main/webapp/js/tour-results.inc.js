@@ -77,6 +77,12 @@ onLoad(()=>{
     let newResult = '?';
     setResult(gameId, newResult, oldResult);
   });
+  // team boards only: override a single board's colours (the match result is unaffected)
+  $('#results-table .swap-colours').on('click', e => {
+    let gameId = e.target.closest('tr').data('id');
+    api.putJson(`tour/${tour_id}/res/${activeRound}`, { id: gameId, swap: true })
+      .then(res => { if (res !== 'error') document.location.reload(); });
+  });
   $('#results-filter').on('click', e => {
     let filter = $('#results-filter input')[0];
     filter.checked = !filter.checked;
