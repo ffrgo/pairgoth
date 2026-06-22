@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Team tournaments: deleting a player who belongs to a team is now refused — it used to leave a dangling member and make the whole tournament unloadable.
 - Manual game edit: the white player was validated against the black id (copy-paste), letting an invalid white through.
 
 ## [0.25] - 2026-05-28

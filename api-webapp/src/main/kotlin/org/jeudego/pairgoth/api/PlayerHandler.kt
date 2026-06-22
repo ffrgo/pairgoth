@@ -80,6 +80,11 @@ object PlayerHandler: PairgothApiHandler {
         if (player.final && tournament.pairedPlayers().contains(id)) {
             badRequest("player is playing")
         }
+        // a team member cannot be deleted directly: it would leave a dangling id in the team,
+        // which silently shrinks the team and makes the tournament unloadable on the next reload
+        if (tournament is TeamTournament) tournament.getPlayerTeam(id)?.let {
+            badRequest("player belongs to team #${it.id}")
+        }
         tournament.players.remove(id) ?: badRequest("invalid player id")
         tournament.dispatchEvent(PlayerDeleted, request, Json.Object("id" to id))
         return Json.Object("success" to true)
