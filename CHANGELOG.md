@@ -9,11 +9,8 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
-## [0.26] - 2026-06-22
-
 ### Added
 
-- Team tournaments: a board's colours can be overridden from the result screen, without changing the match result.
 - Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).
 - Version check at startup, suppressible with `version.check = false`.
 - Documentation split per audience: reference (model), pairing (new), technical (new: configuration, API and webhook specifications, deployment profiles), hands-on tutorial.
@@ -30,23 +27,28 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
+- Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
+- The tournament store directory is created at API startup rather than on first use.
+- Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
+
+## [0.26] - 2026-06-22
+
+### Added
+
+- Team tournaments: a board's colours can be overridden from the result screen (swap), without changing the match result.
+
+### Fixed
+
 - Team tournaments: fixed team tournament results behavior
 - Team tournaments: editing a paired team match no longer wipes the entered board results ; a table move keeps them, swapping the two teams' colours cascades to every board, and only a genuinely new matchup rebuilds the boards.
 - Team tournaments: deleting a player who belongs to a team is now refused — it used to leave a dangling member and make the whole tournament unloadable.
 - Manual game edit: the white player was validated against the black id (copy-paste), letting an invalid white through.
 - A failed view→api call now logs the method, URL and `api.external.url` source, instead of a bare connection error.
 - Team tournaments: toggling a team's participation on the pairing page now drops/restores all of its players for that round (a team has no skip of its own).
-- SSO tickets and API bearers are now encoded in UTF-8 regardless of the platform default charset, so tickets minted by a fronting site (always UTF-8) can't mismatch on a JVM with a different locale.
-- Docker packaging refreshed: current LTS Java image (was an EOL JDK 18), configuration read from `docker/pairgoth.properties` (one shared example file at the repository root, now also covering external auth), `run.sh` picks up a freshly built engine, dead jetty mount removed.
 - EGF export: even-game tournaments (swiss, or McMahon at zero correction) now get the `.h9` extension instead of `.h0`.
 - Changing the standalone port (`webapp.port`) no longer requires updating `webapp.external.url`/`api.external.url` by hand: they are derived from the connector when not explicitly set.
 - A malformed or stale API bearer now gets a 401 instead of a 500.
-- SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
-- Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
-- The tournament store directory is created at API startup rather than on first use.
-- Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
-- EGF export: even-game tournaments (swiss, or McMahon at zero correction) get the `.h9` extension instead of `.h0`.
-- `webapp.external.url` / `api.external.url` are derived from the connector when not explicitly set.
 
 ## [0.25] - 2026-05-28
 
