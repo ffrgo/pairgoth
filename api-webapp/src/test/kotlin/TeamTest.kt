@@ -68,10 +68,9 @@ class TeamTest {
         Tournament.fromJson(tournament.toFullJson())
     }
 
-    // A team match result must reflect which TEAMS won their boards, not which stone colours won.
-    // Boards alternate colours, so counting white stones turned a 2-0 sweep into a "draw".
-    @Test
-    fun `team result follows team wins, not stone colours`() {
+    // Builds a TEAM2 with two full teams, pairs round 1 (one match over two boards), and lets the
+    // board-0 white team win EVERY board (whatever stones it holds). Returns (tournamentId, teamGame).
+    private fun sweptTeamMatch(): Pair<Int, Json.Object> {
         MemoryStore.reset()
         val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
         fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
@@ -82,22 +81,55 @@ class TeamTest {
             .asObject().getInt("id") ?: fail("no team id")
         addTeam("Alphas", addPlayer("Alpha", 1900), addPlayer("Beta", 1800))
         addTeam("Gammas", addPlayer("Gamma", 1700), addPlayer("Delta", 1600))
-        // pair round 1 -> one team match over two boards (colours alternate between boards)
         TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
         val pairing = TestAPI.get("/api/tour/$tid/pair/1").asObject()
         val teamGame = pairing.getArray("games")?.getJson(0)?.asObject() ?: fail("no team game")
-        val whiteTeamId = teamGame.getInt("w") ?: fail("no white team")
-        val whiteTeamPlayers = TestAPI.get("/api/tour/$tid/team/$whiteTeamId").asObject()
+        val whiteTeamPlayers = TestAPI.get("/api/tour/$tid/team/${teamGame.getInt("w")}").asObject()
             .getArray("players")!!.map { (it as Number).toInt() }.toSet()
-        // let the white team win EVERY board, whatever stones it holds on each
         pairing.getArray("individualGames")!!.forEach { obj ->
             val ig = obj as Json.Object
             val whiteTeamHoldsWhite = whiteTeamPlayers.contains(ig.getInt("w"))
             TestAPI.put("/api/tour/$tid/res/1",
                 Json.parse("""{"id":${ig.getInt("id")},"result":"${if (whiteTeamHoldsWhite) "w" else "b"}"}"""))
         }
-        val teamResult = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games")!!
-            .map { it as Json.Object }.first { it.getInt("id") == teamGame.getInt("id") }.getString("r")
-        assertEquals("w", teamResult, "the white team swept both boards — the match must be a white win, not a draw")
+        return tid to teamGame
+    }
+
+    private fun teamGame(tid: Int, id: Int?) = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        .getArray("games")!!.map { it as Json.Object }.first { it.getInt("id") == id }
+    private fun boards(tid: Int) = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        .getArray("individualGames")!!.map { it as Json.Object }
+
+    // A team match result must reflect which TEAMS won their boards, not which stone colours won.
+    // Boards alternate colours, so counting white stones turned a 2-0 sweep into a "draw".
+    @Test
+    fun `team result follows team wins, not stone colours`() {
+        val (tid, tg) = sweptTeamMatch()
+        assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
+            "the white team swept both boards — the match must be a white win, not a draw")
+    }
+
+    // A table move keeps the same two teams: results must survive, boards must follow to the new table.
+    @Test
+    fun `editing a team game's table keeps its results`() {
+        val (tid, tg) = sweptTeamMatch()
+        val (w, b, id) = Triple(tg.getInt("w"), tg.getInt("b"), tg.getInt("id"))
+        TestAPI.put("/api/tour/$tid/pair/1", Json.parse("""{"id":$id,"w":$w,"b":$b,"h":"0","t":"7"}"""))
+        assertEquals("w", teamGame(tid, id).getString("r"), "team result must survive a table move")
+        assertTrue(boards(tid).all { it.getString("r") != "?" }, "individual results must survive a table move")
+        assertTrue(boards(tid).all { it.getInt("t") == 7 }, "boards must follow the team game to its new table")
+    }
+
+    // Swapping the team colours (same two teams) cascades to all boards: the winner is unchanged,
+    // it just plays the other colour now — and the entered results survive.
+    @Test
+    fun `swapping a team game's colours flips the result but keeps the winner and results`() {
+        val (tid, tg) = sweptTeamMatch()
+        val (w, b, id) = Triple(tg.getInt("w"), tg.getInt("b"), tg.getInt("id"))
+        TestAPI.put("/api/tour/$tid/pair/1", Json.parse("""{"id":$id,"w":$b,"b":$w,"h":"0"}"""))
+        val after = teamGame(tid, id)
+        assertEquals(b, after.getInt("w"), "the team game colours must be swapped")
+        assertEquals("b", after.getString("r"), "the winning team now plays black, so the match reads as a black win")
+        assertTrue(boards(tid).all { it.getString("r") != "?" }, "individual results must survive a colour swap")
     }
 }

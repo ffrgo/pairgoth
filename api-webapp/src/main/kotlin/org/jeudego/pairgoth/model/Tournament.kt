@@ -342,11 +342,32 @@ class TeamTournament(
         } == true
     }
 
-    fun propagateTeamGameEdition(round: Int, id: ID) {
-        // recreate individual games
+    fun applyTeamGameEdition(round: Int, id: ID, previousWhite: ID, previousBlack: ID) {
+        if (!type.individual) return
         val teamGame = games(round)[id] ?: error("Game with id $id not found")
-        individualGames.remove(id)
-        pairIndividualGames(round, teamGame)
+        val sameOpponents = setOf(teamGame.white, teamGame.black) == setOf(previousWhite, previousBlack)
+        when {
+            // a new matchup: the old boards are meaningless, rebuild them
+            // (the handler forbids reaching here while results exist)
+            !sameOpponents -> {
+                individualGames.remove(id)
+                pairIndividualGames(round, teamGame)
+            }
+            // same two teams, colours swapped: cascade the swap to every board, keeping who won
+            teamGame.white != previousWhite -> individualGames[id]?.forEach { board ->
+                val w = board.white; board.white = board.black; board.black = w
+                board.result = when (board.result) {
+                    Game.Result.WHITE -> Game.Result.BLACK
+                    Game.Result.BLACK -> Game.Result.WHITE
+                    else -> board.result
+                }
+                board.table = teamGame.table
+            }
+            // only the table moved: boards follow, results untouched
+            else -> individualGames[id]?.forEach { it.table = teamGame.table }
+        }
+        // keep the team result coherent with the (possibly recoloured or rebuilt) boards
+        teamGame.result = teamMatchResult(teamGame, individualGames[id] ?: emptySet())
     }
 
     fun pairedTeams() = super.pairedPlayers()

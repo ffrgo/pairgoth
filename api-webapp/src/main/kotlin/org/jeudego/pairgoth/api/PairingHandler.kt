@@ -98,12 +98,17 @@ object PairingHandler: PairgothApiHandler {
             val playing = (tournament.games(round).values).filter { it.id != gameId }.flatMap {
                 listOf(it.black, it.white)
             }.toSet()
-            if ((game.result != Game.Result.UNKNOWN ||
-                    tournament is TeamTournament && tournament.hasIndividualResults(game.id)) && (
-                    game.black != payload.getInt("b") ||
-                    game.white != payload.getInt("w") ||
-                    game.handicap != payload.getInt("h")
-            )) badRequest("Game already has a result")
+            val hasResult = game.result != Game.Result.UNKNOWN ||
+                    (tournament is TeamTournament && tournament.hasIndividualResults(game.id))
+            // for teams a colour swap (same two teams) or a table move keeps the results; only a new matchup discards them
+            val changesPairing =
+                if (tournament is TeamTournament)
+                    setOf(payload.getInt("w"), payload.getInt("b")) != setOf(game.white, game.black)
+                else
+                    game.black != payload.getInt("b") || game.white != payload.getInt("w") || game.handicap != payload.getInt("h")
+            if (hasResult && changesPairing) badRequest("Game already has a result")
+            val previousWhite = game.white
+            val previousBlack = game.black
             game.black = payload.getID("b") ?: badRequest("missing black player id")
             game.white = payload.getID("w") ?: badRequest("missing white player id")
 
@@ -125,7 +130,7 @@ object PairingHandler: PairgothApiHandler {
                 game.forcedTable = true
             }
             if (tournament is TeamTournament) {
-                tournament.propagateTeamGameEdition(round, game.id)
+                tournament.applyTeamGameEdition(round, game.id, previousWhite, previousBlack)
             }
             tournament.dispatchEvent(GameUpdated, request, Json.Object("round" to round, "game" to game.toJson()))
             if (game.table != previousTable) {
