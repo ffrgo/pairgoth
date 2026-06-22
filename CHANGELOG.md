@@ -20,6 +20,10 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Team tournaments: deleting a player who belongs to a team is now refused — it used to leave a dangling member and make the whole tournament unloadable.
 - Manual game edit: the white player was validated against the black id (copy-paste), letting an invalid white through.
 - A failed view→api call now logs the method, URL and `api.external.url` source, instead of a bare connection error.
+- Team tournaments: toggling a team's participation on the pairing page now drops/restores all of its players for that round (a team has no skip of its own).
+- EGF export: even-game tournaments (swiss, or McMahon at zero correction) now get the `.h9` extension instead of `.h0`.
+- Changing the standalone port (`webapp.port`) no longer requires updating `webapp.external.url`/`api.external.url` by hand: they are derived from the connector when not explicitly set.
+- A malformed or stale API bearer now gets a 401 instead of a 500.
 
 ## [0.25] - 2026-05-28
 
