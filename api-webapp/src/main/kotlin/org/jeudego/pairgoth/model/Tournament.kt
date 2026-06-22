@@ -409,36 +409,36 @@ class TeamTournament(
     }
 
     fun propagateIndividualResult(round: Int, game: Game) {
-        val inverseMap = individualGames.inverse.map { it.key.id to it.value }.toMap()
-        val teamGameID = inverseMap[game.id]
-        val score = individualGames[teamGameID]?.sumOf { game ->
-            when (game.result) {
-                Game.Result.WHITE -> 1
-                Game.Result.BLACK -> -1
-                else -> 0
-            } as Int
-        } ?:  error("Team game not found: $teamGameID")
-        val teamGame = games[round - 1].get(teamGameID) ?: error("Team game not found: $teamGameID")
-        teamGame.result =
-            if (score < type.playersNumber / 2.0) Game.Result.BLACK
-            else if (score > type.playersNumber / 2.0) Game.Result.WHITE
-            else Game.Result.UNKNOWN
+        // the forward map is always populated; the bimap inverse is not maintained by pairIndividualGames
+        val teamGameID = individualGames.entries.find { (_, boards) -> boards.any { it.id == game.id } }?.key
+            ?: error("No team game found for individual game ${game.id}")
+        val teamGame = games(round)[teamGameID] ?: error("Team game not found: $teamGameID")
+        teamGame.result = teamMatchResult(teamGame, individualGames[teamGameID] ?: emptySet())
     }
 
     fun propagateIndividualResults(round: Int) {
-        for (teamGame in games(round).values) {
-            val score = individualGames[teamGame.id]?.sumOf { game ->
-                when (game.result) {
-                    Game.Result.WHITE -> 1
-                    Game.Result.BLACK -> -1
-                    else -> 0
-                } as Int
-            } ?:  error("Team game not found: $teamGame.id")
-            val teamGame = games[round - 1].get(teamGame.id) ?: error("Team game not found: $teamGame.id")
-            teamGame.result =
-                if (score < type.playersNumber / -2.0) Game.Result.BLACK
-                else if (score > type.playersNumber / 2.0) Game.Result.WHITE
-                else Game.Result.UNKNOWN
+        games(round).values.forEach { teamGame ->
+            val boards = individualGames[teamGame.id] ?: return@forEach
+            teamGame.result = teamMatchResult(teamGame, boards)
+        }
+    }
+
+    // A board win counts for the WINNER's team, whatever stone colours they held on that board.
+    // Board colours alternate between boards, so counting white stones would misreport the match
+    // (a 2-0 sweep used to read as a draw).
+    private fun teamMatchResult(teamGame: Game, boards: Collection<Game>): Game.Result {
+        val score = boards.sumOf { board ->
+            val points: Int = when (board.result) {
+                Game.Result.WHITE -> if (getPlayerTeam(board.white)?.id == teamGame.white) 1 else -1
+                Game.Result.BLACK -> if (getPlayerTeam(board.black)?.id == teamGame.white) 1 else -1
+                else -> 0
+            }
+            points
+        }
+        return when {
+            score > 0 -> Game.Result.WHITE
+            score < 0 -> Game.Result.BLACK
+            else -> Game.Result.UNKNOWN
         }
     }
 }
