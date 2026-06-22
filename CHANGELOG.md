@@ -9,6 +9,8 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+## [0.26] - 2026-06-22
+
 ### Added
 
 - Team tournaments: a board's colours can be overridden from the result screen (swap), without changing the match result.
