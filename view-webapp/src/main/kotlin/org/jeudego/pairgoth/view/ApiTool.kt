@@ -36,8 +36,8 @@ class ApiTool {
 
     private fun Json.toRequestBody() = toString().toRequestBody(JSON.toMediaType())
     private fun Request.Builder.process(): Json {
+        val apiReq = build()
         try {
-            val apiReq = build()
             if (logger.isTraceEnabled) {
                 logger.trace(">> ${apiReq.method} ${apiReq.url}")
                 apiReq.headers.forEach { header ->
@@ -71,7 +71,8 @@ class ApiTool {
                 }
             }
         } catch (e: Throwable) {
-            logger.error("api call failed", e)
+            // name the call and where its target came from, so a bare ConnectException is diagnosable
+            logger.error("api call to ${apiReq.method} ${apiReq.url} failed (api.external.url=$apiRoot)", e)
             return Json.Object("error" to e.message)
         }
     }
