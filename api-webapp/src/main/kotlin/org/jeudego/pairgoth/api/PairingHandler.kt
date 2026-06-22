@@ -112,7 +112,7 @@ object PairingHandler: PairgothApiHandler {
             // temporary
             //payload.getInt("dudd")?.let { game.drawnUpDown = it }
             val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
-            val white = tournament.pairables[game.black] ?: badRequest("invalid white player id")
+            val white = tournament.pairables[game.white] ?: badRequest("invalid white player id")
             if (!black.final) badRequest("black registration status is not final")
             if (!white.final) badRequest("white registration status is not final")
             if (black.skip.contains(round)) badRequest("black is not playing this round")

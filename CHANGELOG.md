@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- Manual game edit: the white player was validated against the black id (copy-paste), letting an invalid white through.
+
 ## [0.25] - 2026-05-28
 
 ### Added
