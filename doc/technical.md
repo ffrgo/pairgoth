@@ -763,6 +763,7 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
 + /players/{code}             GET    Pull registered players
 + /pairings/{code}/{round}    POST   Push pairings or results HTML
 + /standings/{code}/{round}   POST   Push standings HTML
++ /presences/{code}/{round}   POST   Push a referee's presence change back
 
 ### /health
 
@@ -824,6 +825,26 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
     *body* HTML fragment, see [Published payload](#published-payload). For TEAM* tournaments, the body contains both the team standings table and the individual standings table, each wrapped in a `<div class="standings-section team-standings">` / `<div class="standings-section individual-standings">`.
 
     *output* `{ "status": true }` on success; `{ "status": false, "message": string }` on error.
+
+### /presences/{code}/{round}
+
++ `POST /presences/{code}/{round}` — mirror a referee's per-round presence change back to the website.
+
+    *Content-Type* `application/json; charset=UTF-8`
+
+    *body* a JSON array of presence entries for the given round:
+
+    ```json
+    [ { "id": 12345, "present": false } ]
+    ```
+
+    The `id` is the website's own player id (what pairgoth stores as `externalIds[EXT]` and receives as `id` from [`/players/{code}`](#playerscode)). `present` is `true` when the player plays the round, `false` when they skip it.
+
+    *output* `{ "status": true }` on success; `{ "status": false, "message": string }` on error.
+
+    The website owns presences (online (un)registration), but the referee may override one on the floor — typically a no-show. Pairgoth pushes only the **changed** entry, for the affected round, immediately after the change is applied locally, so a later resync doesn't revert it. Only website-sourced players (those that have an `id`/`EXT`) are pushed; presence changes on referee-added players are not — and **player removal is never synced at all** (see below). Failures are non-fatal on the pairgoth side: the local change stands and the operator is warned to update the website by hand.
+
+    Player **removal** is the one operation deliberately left unsynced in both directions: a referee deleting a player in pairgoth, or a registrant withdrawing on the website, must be mirrored manually on the other side. (A website deletion that shipped via `/players/{code}` would otherwise have to delete a player pairgoth may already have paired.)
 
 ### Published payload
 

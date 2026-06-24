@@ -274,6 +274,28 @@ function setRowParticipation(id, skip) {
   });
 }
 
+// The website (EGC) is the source of truth for per-round presence. When the referee flips a
+// player's participation here, mirror just that change back so a later resync won't revert it.
+// Only website-sourced players (with an ext id) are pushed — plain events have none, so this is
+// a no-op for them. Best-effort and silent on success; a failure only warns (the local change
+// already stuck), since player *removal* is the only op deliberately left for manual mirroring.
+async function pushPresence(ext, round, present) {
+  let code = $('#tournament-infos')[0].val('shortName');
+  if (!ext || !code) return;
+  // Mirror the website's own id type: it ships a numeric id from /players/{code}, so send a number back.
+  let id = /^\d+$/.test(String(ext)) ? Number(ext) : ext;
+  try {
+    let resp = await api.post(`webhook/presences/${code}/${round}`, [{ id: id, present: present }]);
+    let json = await resp.json().catch(() => null);
+    if (!resp.ok || (json && json.status === false)) {
+      let m = (json && json.message) ? `: ${json.message}` : '';
+      showError(`Presence updated locally but not pushed to the website${m}. Update it there by hand.`);
+    }
+  } catch (ignored) {
+    showError('Presence updated locally but not pushed to the website (unreachable). Update it there by hand.');
+  }
+}
+
 function removePlayerRow(id) {
   let tr = $(`#players tr[data-id="${id}"]`);
   if (tr.length === 0) return;
@@ -705,19 +727,22 @@ onLoad(() => {
   $('.player-fields').on('change input', e => {
     $('#register').removeClass('disabled');
   });
-  $('.participation label').on('click', e => {
+  $('.participation label').on('click', async e => {
+    e.preventDefault();
     let part = e.target;
-    let id = part.closest('tr').data('id');
+    let tr = part.closest('tr');
+    let id = tr.data('id');
+    let ext = tr.data('ext');
     let round = parseInt(part.text());
     let skip = new Set(part.closest('.participation').find('label.red').map(it => parseInt(it.innerText)));
     if (skip.has(round)) skip.delete(round);
     else skip.add(round);
     let skipArr = Array.from(skip);
-    mutate({
+    let rst = await mutate({
       url: `tour/${tour_id}/part/${id}`, body: { id: id, skip: skipArr },
       source: 'registration', effect: () => setRowParticipation(id, skipArr)
     });
-    e.preventDefault();
+    if (rst !== 'error' && rst !== 'readonly') pushPresence(ext, round, !skip.has(round));
     return false;
   });
   $('#rating').on('input', e => {

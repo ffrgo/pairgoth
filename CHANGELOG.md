@@ -20,6 +20,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - "external" auth mode: a fronting website owns the accounts and hands operators over with single-use SSO tickets, with per-operator tournament visibility (ACL symlinks) and an admin list; its backend obtains an API bearer through the same door.
 - Standings: country and club column display toggles (the club column is new), remembered in the browser and carried into the published HTML standings.
 - Optional cleartext HTTP/2 (`webapp.h2c`) on the plain connector, letting a TLS-terminating reverse proxy keep HTTP/2 end-to-end; HTTP/1.1 clients are still served.
+- Presence write-back: a referee toggling a website-sourced player's per-round participation pushes the change back to the website (`POST <webhook.url>/presences/{code}/{round}`), so a later resync keeps it.
 
 ### Changed
 
