@@ -274,25 +274,28 @@ function setRowParticipation(id, skip) {
   });
 }
 
-// The website (EGC) is the source of truth for per-round presence. When the referee flips a
-// player's participation here, mirror just that change back so a later resync won't revert it.
-// Only website-sourced players (with an ext id) are pushed — plain events have none, so this is
-// a no-op for them. Best-effort and silent on success; a failure only warns (the local change
-// already stuck), since player *removal* is the only op deliberately left for manual mirroring.
+// The website (EGC) is the source of truth for per-round presence. Mirror a referee's per-round
+// participation flip back to it. Only website-sourced players (with an ext id) are pushed — plain
+// events have none, so this is a no-op for them. Returns:
+//   'noop'   — no ext/code: not website-sourced, nothing to push (caller proceeds locally).
+//   'ok'     — the website accepted the change.
+//   { message } — the website rejected it or was unreachable; `message` is its reason.
+// An *add* (red→green) is gated on 'ok' (the website owns registration choices and may refuse a
+// round the player isn't registered for); a *removal* commits regardless and only soft-warns.
 async function pushPresence(ext, round, present) {
   let code = $('#tournament-infos')[0].val('shortName');
-  if (!ext || !code) return;
+  if (!ext || !code) return 'noop';
   // Mirror the website's own id type: it ships a numeric id from /players/{code}, so send a number back.
   let id = /^\d+$/.test(String(ext)) ? Number(ext) : ext;
   try {
     let resp = await api.post(`webhook/presences/${code}/${round}`, [{ id: id, present: present }]);
     let json = await resp.json().catch(() => null);
     if (!resp.ok || (json && json.status === false)) {
-      let m = (json && json.message) ? `: ${json.message}` : '';
-      showError(`Presence updated locally but not pushed to the website${m}. Update it there by hand.`);
+      return { message: (json && json.message) || `HTTP ${resp.status}` };
     }
+    return 'ok';
   } catch (ignored) {
-    showError('Presence updated locally but not pushed to the website (unreachable). Update it there by hand.');
+    return { message: 'website unreachable' };
   }
 }
 
@@ -738,11 +741,30 @@ onLoad(() => {
     if (skip.has(round)) skip.delete(round);
     else skip.add(round);
     let skipArr = Array.from(skip);
-    let rst = await mutate({
+    let present = !skip.has(round);
+    let commit = () => mutate({
       url: `tour/${tour_id}/part/${id}`, body: { id: id, skip: skipArr },
       source: 'registration', effect: () => setRowParticipation(id, skipArr)
     });
-    if (rst !== 'error' && rst !== 'readonly') pushPresence(ext, round, !skip.has(round));
+    // Add (red→green) of a website-sourced player on an EGC deployment: gate the local change on a
+    // confirmed push — the website may refuse a round the player isn't registered for. The label only
+    // flips via the effect/echo, so aborting is just not committing (nothing to revert).
+    if (present && webhook && ext) {
+      let pushed = await pushPresence(ext, round, true);
+      if (pushed !== 'ok' && pushed !== 'noop') {
+        showError(`The website refused this presence change: ${pushed.message}. Not applied.`);
+        return false;
+      }
+      await commit();
+      return false;
+    }
+    // Removal (or non-website player): commit locally, then mirror back best-effort.
+    let rst = await commit();
+    if (rst !== 'error' && rst !== 'readonly') {
+      let pushed = await pushPresence(ext, round, present);
+      if (pushed !== 'ok' && pushed !== 'noop')
+        showError(`Presence updated locally but not pushed to the website: ${pushed.message}. Update it there by hand.`);
+    }
     return false;
   });
   $('#rating').on('input', e => {

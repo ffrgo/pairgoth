@@ -92,6 +92,8 @@
   // It needs one stream per tab → requires HTTP/2 multiplexing (HTTP/1.1's ~6-conn/origin limit
   // breaks multi-tab); dev always qualifies. Otherwise we run direct (local effect on response).
   const env = '$env';
+  // A webhook (EGC) is configured: the registration tab gates a presence add on a confirmed push.
+  const webhook = $webhook;
   const collaborative = env === 'dev' ||
     performance.getEntriesByType('navigation')[0]?.nextHopProtocol === 'h2';
   // #[[
