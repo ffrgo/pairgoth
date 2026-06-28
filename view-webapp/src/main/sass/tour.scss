@@ -257,6 +257,30 @@
       display: flex;
       flex-flow: row wrap;
     }
+    .popup-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1em;
+      /* the checkbox sits in a 1.5em header — pin it to the normal body size, not bold */
+      label { font-size: 1rem; font-weight: normal; }
+    }
+    /* "Only players playing all rounds": hide anyone with a non-empty skip set */
+    &.allrounds-only .listitem[data-skip]:not([data-skip="0"]) {
+      display: none;
+    }
+    /* italic per-list footer "<n> players[, <m> selected]" — sticky at the bottom, mirroring the
+       title's sticky :before header; data-footer is kept current in JS */
+    .multi-select:after {
+      position: sticky;
+      bottom: 0;
+      width: 100%;
+      background-color: white;
+      content: attr(data-footer);
+      white-space: nowrap;
+      font-style: italic;
+      z-index: 2;
+    }
   }
 
   /* teams section */

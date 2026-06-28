@@ -822,6 +822,30 @@ onLoad(() => {
       }));
     bulkUpdate(players);
   });
+  // Mac Mahon dialog: per-list italic footer "<n> players[, <m> selected]", refreshed on selection
+  // (each list box dispatches a 'listitems' event) and on filter toggle. Counts reflect what's shown:
+  // when "Only players playing all rounds" is on, players with a non-empty skip set (data-skip != 0)
+  // are hidden via a container class and excluded from the count.
+  let mmGroups = ['under-group', 'top-group', 'super-group'].map(id => $('#' + id)[0]).filter(Boolean);
+  function mmFooter(box) {
+    let onlyAll = $('#macmahon-groups').hasClass('allrounds-only');
+    let items = Array.from(box.querySelectorAll('.listitem'))
+      .filter(i => !onlyAll || i.getAttribute('data-skip') === '0');
+    let selected = items.filter(i => i.classList.contains('selected')).length;
+    box.setAttribute('data-footer', selected ? `${items.length} players, ${selected} selected`
+                                             : `${items.length} players`);
+  }
+  mmGroups.forEach(box => { box.on('listitems', () => mmFooter(box)); mmFooter(box); });
+  $('#mm-allrounds-filter').on('change', e => {
+    if (e.target.checked) {
+      $('#macmahon-groups').addClass('allrounds-only');
+      // drop selection on now-hidden players so a move never promotes someone you can't see
+      $('#macmahon-groups .listitem.selected').forEach(i => {
+        if (i.getAttribute('data-skip') !== '0') { i.removeClass('selected'); i.attr('draggable', false); }
+      });
+    } else $('#macmahon-groups').removeClass('allrounds-only');
+    mmGroups.forEach(mmFooter);
+  });
   $('.player-fields').on('change input', e => {
     $('#register').removeClass('disabled');
   });

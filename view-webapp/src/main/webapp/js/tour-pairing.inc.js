@@ -175,6 +175,7 @@ onLoad(()=>{
       }
       let children = box.childNodes.filter('.listitem');
       for (let j = from; j <= to; ++j) {  new Tablesort($('#players')[0]);
+        if (children.item(j).offsetParent === null) continue; // never range-select a filter-hidden item
         children.item(j).addClass('selected');
         children.item(j).attr('draggable', true);
       }
