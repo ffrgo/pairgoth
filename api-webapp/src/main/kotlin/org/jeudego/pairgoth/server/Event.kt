@@ -13,6 +13,8 @@ enum class Event(val slug: String) {
     PlayerUpdated("edit-player"),
     PlayerDeleted("del-player"),
     PlayersImported("import-players"),
+    RatingsRefreshed("refresh-ratings"),
+    MMGroupsUpdated("mm-groups"),
     TeamAdded("add-team"),
     TeamUpdated("edit-team"),
     TeamDeleted("del-team"),

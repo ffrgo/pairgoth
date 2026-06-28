@@ -81,9 +81,16 @@ object PlayerHandler: PairgothApiHandler {
                 failed.add(Json.Object("player" to label, "reason" to (e.message ?: "error")))
             }
         }
-        // one event / one history snapshot — and none at all when nothing actually changed
+        // one event / one history snapshot — and none at all when nothing actually changed. The event
+        // (hence the undo-list label and history slug) reflects the *intent* the caller declares via
+        // ?reason=, so a Mac Mahon group edit or a ratings refresh isn't mislabelled as a roster import.
+        val event = when (request.getParameter("reason")) {
+            "mms" -> MMGroupsUpdated
+            "ratings" -> RatingsRefreshed
+            else -> PlayersImported
+        }
         if (added.isNotEmpty() || updated.isNotEmpty())
-            tournament.dispatchEvent(PlayersImported, request, Json.Object("added" to added.size, "updated" to updated.size))
+            tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
         return Json.Object("success" to true,
             "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed)
     }

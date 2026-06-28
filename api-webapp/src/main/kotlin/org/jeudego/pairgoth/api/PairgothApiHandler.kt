@@ -34,6 +34,8 @@ interface PairgothApiHandler: ApiHandler {
             Event.PlayerUpdated -> "Edit player${playerName()}"
             Event.PlayerDeleted -> "Remove player"
             Event.PlayersImported -> "Import players"
+            Event.RatingsRefreshed -> "Refresh ratings"
+            Event.MMGroupsUpdated -> "Mac Mahon groups"
             Event.TeamAdded -> "Add team"
             Event.TeamUpdated -> "Edit team"
             Event.TeamDeleted -> "Remove team"

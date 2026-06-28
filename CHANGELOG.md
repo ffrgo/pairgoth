@@ -29,6 +29,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Mac Mahon group edits and ratings refreshes are now labelled as such in the undo/history list, instead of all sharing the roster-import label (they were already snapshotted and undoable, just indistinguishable).
 - SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
 - Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
 - The tournament store directory is created at API startup rather than on first use.
