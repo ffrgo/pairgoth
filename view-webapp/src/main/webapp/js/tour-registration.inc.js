@@ -290,6 +290,42 @@ function bulkUpdate(players) {
     .then(rst => { if (rst !== 'error') window.location.reload(); });
 }
 
+// Split the rounds into the event's two weeks. The model has no per-round dates, so spread the
+// rounds evenly across the day span and cut at the 7-day mark (a balanced two-week event then
+// divides in two); fall back to plain halving when the dates are unusable. `days` is the inclusive
+// span, used by the caller to decide whether the event lasts more than one week at all.
+function weekSplit() {
+  let R = tour_rounds;
+  let start = Date.parse(tour_startDate), end = Date.parse(tour_endDate);
+  let days = (!isNaN(start) && !isNaN(end)) ? Math.round((end - start) / 86400000) + 1 : 0;
+  let w1 = 0;
+  if (days > 7) {
+    for (let r = 1; r <= R; ++r) if (Math.floor((r - 1) * days / R) + 1 <= 7) w1++;
+  } else {
+    w1 = Math.floor(R / 2);
+  }
+  w1 = Math.min(Math.max(w1, 1), R - 1);
+  let week1 = [], week2 = [];
+  for (let r = 1; r <= R; ++r) (r <= w1 ? week1 : week2).push(r);
+  return { week1, week2, days };
+}
+
+// Keep only players present (≥1 round) in each *checked* week; both checked → present in both weeks.
+// A player's present rounds are the green participation labels on their row. Uses its own class so it
+// composes with the reglist-mode (.filtered) and search (.hidden) filters.
+function applyWeekFilter(w1Rounds, w2Rounds) {
+  $('#players tbody tr').forEach(tr => {
+    let hide = false;
+    if (w1Rounds || w2Rounds) {
+      let present = new Set();
+      tr.querySelectorAll('.participation label.green').forEach(l => present.add(parseInt(l.textContent)));
+      let inWeek = rounds => rounds.some(r => present.has(r));
+      if ((w1Rounds && !inWeek(w1Rounds)) || (w2Rounds && !inWeek(w2Rounds))) hide = true;
+    }
+    if (hide) tr.addClass('week-filtered'); else tr.removeClass('week-filtered');
+  });
+}
+
 // --- Shared row-patch primitives (the direct toggle effect AND the PlayerUpdated SSE echo call these,
 //     setting state from the new value so they're idempotent) ---
 function setRowFinal(id, final) {
@@ -604,6 +640,26 @@ onLoad(() => {
       $('td.reg-status:not(.final)').forEach(node => node.parentNode.addClass('filtered'));
     }
   });
+  // Per-week presence filter — only for a multi-week event with at least one player. Persistent,
+  // unchecked by default. The chosen round ranges are surfaced in the labels' tooltips (inspectable).
+  let ws = weekSplit();
+  if (tour_rounds >= 2 && ws.days > 7 && $('#players tbody tr').length > 0) {
+    let range = a => a.length > 1 ? `rounds ${a[0]}–${a[a.length - 1]}` : `round ${a[0]}`;
+    $('#week1-filter')[0].closest('label').attr('title', range(ws.week1));
+    $('#week2-filter')[0].closest('label').attr('title', range(ws.week2));
+    let saved = store('reglistWeeks') || {};
+    $('#week1-filter')[0].checked = !!saved.week1;
+    $('#week2-filter')[0].checked = !!saved.week2;
+    let apply = () => {
+      let w1 = $('#week1-filter')[0].checked, w2 = $('#week2-filter')[0].checked;
+      store('reglistWeeks', { week1: w1, week2: w2 });
+      applyWeekFilter(w1 ? ws.week1 : null, w2 ? ws.week2 : null);
+    };
+    $('#week1-filter').on('change', apply);
+    $('#week2-filter').on('change', apply);
+    $('#week-filter').removeClass('hidden');
+    apply(); // honour the restored state on load
+  }
   document.on('click', e => {
     let resultLine = e.target.closest('.result-line');
     if (resultLine) {

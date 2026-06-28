@@ -81,6 +81,8 @@
 #if($tour)
   const tour_id = ${tour.id};
   const tour_rounds = ${tour.rounds};
+  const tour_startDate = '$!tour.startDate';
+  const tour_endDate = '$!tour.endDate';
   const tour_country = '$!tour.country';
   let activeRound = ${round};
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
