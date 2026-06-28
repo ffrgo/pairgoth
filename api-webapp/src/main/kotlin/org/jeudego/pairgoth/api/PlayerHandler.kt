@@ -49,7 +49,11 @@ object PlayerHandler: PairgothApiHandler {
      * which is why this lives here and not in a per-player browser loop.
      */
     private fun bulkUpsert(tournament: Tournament<*>, roster: Json.Array, request: HttpServletRequest): Json {
-        var added = 0; var updated = 0; var unchanged = 0
+        // Per-section journals (names / {player, changes} / {player, reason}) rather than bare counts,
+        // so the operator report can detail who changed and how, not just how many.
+        val added = Json.MutableArray()
+        val updated = Json.MutableArray()
+        val unchanged = Json.MutableArray()
         val failed = Json.MutableArray()
         roster.forEach { entry ->
             if (entry !is Json.Object) { failed.add(Json.Object("reason" to "not a json object")); return@forEach }
@@ -62,22 +66,34 @@ object PlayerHandler: PairgothApiHandler {
                 if (existing == null) {
                     val player = Player.fromJson(p)
                     tournament.players[player.id] = player
-                    added++
+                    added.add(label)
                 } else {
                     val merged = Player.fromJson(p, existing)
                     participationConflict(tournament, existing, merged)?.let { badRequest(it) }
-                    if (existing.toJson() == merged.toJson()) unchanged++
-                    else { tournament.players[existing.id] = merged; updated++ }
+                    val before = existing.toJson(); val after = merged.toJson()
+                    if (before == after) unchanged.add(label)
+                    else {
+                        tournament.players[existing.id] = merged
+                        updated.add(Json.Object("player" to label, "changes" to diffLabel(before, after)))
+                    }
                 }
             } catch (e: ApiException) {
                 failed.add(Json.Object("player" to label, "reason" to (e.message ?: "error")))
             }
         }
         // one event / one history snapshot — and none at all when nothing actually changed
-        if (added > 0 || updated > 0)
-            tournament.dispatchEvent(PlayersImported, request, Json.Object("added" to added, "updated" to updated))
+        if (added.isNotEmpty() || updated.isNotEmpty())
+            tournament.dispatchEvent(PlayersImported, request, Json.Object("added" to added.size, "updated" to updated.size))
         return Json.Object("success" to true,
             "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed)
+    }
+
+    /** Compact human diff of two player snapshots: "field old→new, …" over the keys that changed (id aside). */
+    private fun diffLabel(before: Json.Object, after: Json.Object): String {
+        val keys = LinkedHashSet(before.keys).apply { addAll(after.keys); remove("id") }
+        fun show(v: Any?) = v?.toString() ?: "∅"
+        return keys.filter { before[it] != after[it] }
+            .joinToString(", ") { "$it ${show(before[it])}→${show(after[it])}" }
     }
 
     private fun externalIdsOf(p: Json.Object): Map<DatabaseId, String> =

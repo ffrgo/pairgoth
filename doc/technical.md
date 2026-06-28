@@ -558,7 +558,7 @@ When authentication is enabled, all requests require an `Authorization` header.
     partial entry merges onto the matched player. The whole roster is applied in one transaction and
     recorded as a single history entry.
 
-    *output* a journal `{ "success": true, "added": n, "updated": n, "unchanged": n, "failed": [ { "player": "...", "reason": "..." } ] }` — e.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch.
+    *output* a journal `{ "success": true, "added": [ "Name Firstname", … ], "updated": [ { "player": "Name Firstname", "changes": "rating 2627→2630, rank 5→6" }, … ], "unchanged": [ "Name Firstname", … ], "failed": [ { "player": "...", "reason": "..." } ] }` — each section lists its players (counts are the array lengths); `changes` is a compact field-level diff. E.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch.
 
 + `PUT /api/tour/#tid/part/#pid` Modify a player registration
 

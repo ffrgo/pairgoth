@@ -137,11 +137,50 @@ function clearSearch() {
   searchHighlight = undefined;
 }
 
-// Fill and open the ratings-refresh change report (one "Name (level, rating) => (level, rating)" per line).
-function showRefreshReport(text) {
-  let el = $('#refresh-report-text')[0];
-  if (el) el.textContent = text;
+// Clipboard fallback for non-secure (plain HTTP) contexts where navigator.clipboard is absent.
+function legacyCopy(text) {
+  let ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (ignored) {}
+  document.body.removeChild(ta);
+  return ok;
+}
+
+// Fill and open the operation report modal: one collapsible <details> box per section
+// ({ label, items }) — summary = the count line, body = the per-item lines. Shared by
+// ratings-refresh and the EGC sync; `title` names the source.
+function showReport(title, sections) {
+  let header = $('#refresh-report-modal .popup-header')[0];
+  if (header) header.textContent = title;
+  let box = $('#refresh-report-text')[0];
+  box.innerHTML = '';
+  (sections || []).forEach(s => {
+    let det = document.createElement('details');
+    let sum = document.createElement('summary');
+    sum.textContent = s.label;
+    det.appendChild(sum);
+    if (s.items && s.items.length) {
+      let pre = document.createElement('pre');
+      pre.textContent = s.items.join('\n');
+      det.appendChild(pre);
+    }
+    box.appendChild(det);
+  });
   modal('refresh-report-modal');
+}
+
+// Flatten the shown report to plain text (every section, regardless of expand state) for the clipboard.
+function reportToText() {
+  return $('#refresh-report-text details').map(d => {
+    let sum = d.querySelector('summary').textContent;
+    let body = d.querySelector('pre');
+    return body && body.textContent ? `${sum}\n${body.textContent}` : sum;
+  }).join('\n\n');
 }
 
 function search(needle) {
@@ -680,7 +719,7 @@ onLoad(() => {
   let refreshReport = store('refreshReport');
   if (refreshReport) {
     store.remove('refreshReport');
-    if (refreshReport.text) showRefreshReport(refreshReport.text);
+    if (refreshReport.sections && refreshReport.sections.length) showReport(refreshReport.title, refreshReport.sections);
     else showSuccess('Ratings refreshed', true);
   }
   if (store('macmahonGroups')) {
@@ -836,30 +875,31 @@ onLoad(() => {
     let report = await api.postJson(`tour/${tour_id}/part`, data.players.map(buildPayload));
     if (report === 'error') return;
 
-    // Journal → operator report; split the paired-player rejections into a distinct "blocked" line
-    // (correct procedure: freeze the round on the website first, then resync).
+    // Journal → operator report, one collapsible box per section. The server returns per-section
+    // lists (names / {player, changes} / {player, reason}); paired-player rejections are split into
+    // a distinct "blocked" box (correct procedure: freeze the round on the website first, then resync).
+    let added = report.added || [], updated = report.updated || [], unchanged = report.unchanged || [];
     let failed = report.failed || [];
-    let blocked = failed.map(f => {
-      let m = (f.reason || '').match(/round #(\d+)/);
-      return m ? `${f.player} (round ${m[1]})` : null;
-    }).filter(Boolean);
+    let blocked = failed.filter(f => /round #\d+/.test(f.reason || ''));
     let other = failed.filter(f => !/round #\d+/.test(f.reason || ''));
-    let lines = [];
-    if (report.added) lines.push(`  ${report.added} added`);
-    if (report.updated) lines.push(`  ${report.updated} updated`);
-    if (report.unchanged) lines.push(`  ${report.unchanged} unchanged`);
-    if (blocked.length) lines.push(`  ${blocked.length} blocked — already paired: ${blocked.join(', ')}`);
-    if (other.length) lines.push(`  ${other.length} other failed — last: ${other[other.length - 1].reason}`);
-    let msg = lines.length === 0 ? 'Sync: nothing to do' : 'Sync results:\n' + lines.join('\n');
-    let hasError = failed.length > 0;
-    if (report.added || report.updated) {
-      // Stash and reload so the table reflects the new state. The on-load handler re-shows it.
-      store('refreshReport', { msg, error: hasError });
+    let sections = [];
+    if (added.length) sections.push({ label: `${added.length} added`, items: added });
+    if (updated.length) sections.push({ label: `${updated.length} updated`, items: updated.map(u => `${u.player} — ${u.changes}`) });
+    if (blocked.length) sections.push({ label: `${blocked.length} blocked (already paired — freeze the round on the website first)`,
+      items: blocked.map(f => `${f.player} (${(f.reason || '').match(/round #\d+/)[0]})`) });
+    if (other.length) sections.push({ label: `${other.length} failed`, items: other.map(f => `${f.player || '?'}: ${f.reason}`) });
+    if (unchanged.length) sections.push({ label: `${unchanged.length} unchanged`, items: unchanged });
+
+    if (added.length || updated.length) {
+      // Stash and reload so the table reflects the new state; the on-load handler re-shows the report.
+      store('refreshReport', { title: 'Sync from EGC', sections });
       setTimeout(() => window.location.reload(), 200);
-    } else if (hasError) {
-      showError(msg);
+    } else if (blocked.length || other.length) {
+      showReport('Sync from EGC', sections); // nothing changed but problems to surface
     } else {
-      showSuccess(msg, true);
+      // Pure no-op (at most "N unchanged"): a one-line toast, no modal.
+      showSuccess(unchanged.length ? `Sync from EGC: ${unchanged.length} player(s) already up to date`
+                                   : 'Sync from EGC: nothing to do', true);
     }
   });
 
@@ -937,22 +977,33 @@ onLoad(() => {
 
     changes.sort((a, b) => a.localeCompare(b));
     notFound.sort((a, b) => a.localeCompare(b));
-    let text = changes.join('\n');
-    if (notFound.length) text += `${text ? '\n\n' : ''}Not found in ratings DB:\n${notFound.join('\n')}`;
-    if (failed) text += `${text ? '\n\n' : ''}${failed} failed${lastError ? ` (${lastError})` : ''}`;
+    let sections = [];
+    if (changes.length) sections.push({ label: `${changes.length} updated`, items: changes });
+    if (notFound.length) sections.push({ label: `${notFound.length} not found in ratings DB`, items: notFound });
+    if (failed) sections.push({ label: `${failed} failed`, items: lastError ? [lastError] : [] });
     if (updated > 0) {
-      // reload so the table reflects new values (incl. licence-only changes); report survives in storage
-      store('refreshReport', { text });
+      // reload so the table reflects new values (incl. licence-only changes); report survives in storage.
+      // licence-only updates leave `sections` empty → the on-load handler falls back to a plain toast.
+      store('refreshReport', { title: 'Ratings refresh', sections });
       setTimeout(() => window.location.reload(), 200);
-    } else if (text) {
-      showRefreshReport(text); // only not-found / failed: nothing changed, no reload
+    } else if (sections.length) {
+      showReport('Ratings refresh', sections); // only not-found / failed: nothing changed, no reload
     } else {
       showSuccess('Ratings refresh: no changes', true);
     }
   });
   $('#copy-refresh-report').on('click', () => {
-    navigator.clipboard.writeText($('#refresh-report-text')[0].textContent)
-      .then(() => showSuccess('Copied to clipboard', true))
-      .catch(() => showError('Copy failed'));
+    let text = reportToText();
+    // navigator.clipboard exists only in secure contexts (HTTPS / localhost); over plain HTTP it's
+    // undefined, so fall back to the legacy execCommand path.
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text)
+        .then(() => showSuccess('Copied to clipboard', true))
+        .catch(() => showError('Copy failed'));
+    } else if (legacyCopy(text)) {
+      showSuccess('Copied to clipboard', true);
+    } else {
+      showError('Copy failed');
+    }
   });
 });

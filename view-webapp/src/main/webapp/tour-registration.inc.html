@@ -159,9 +159,9 @@
       </button>
 #end
 #if($webhookConfigured)
-      <button id="sync-website" class="ui right labeled icon floating button" title="Sync players from website">
+      <button id="sync-website" class="ui orange right labeled icon floating button" title="Sync players from EGC">
         <i class="fa fa-cloud-download"></i>
-        Sync from website
+        Sync from EGC
       </button>
 #end
       <button id="refresh-ratings" class="ui right labeled icon floating button" title="Refresh ratings of registered players from EGD/FFG">
@@ -408,11 +408,16 @@
 #end
 <div id="drop-changes" class="hidden">Drop changes?</div>
 <div id="unregister-player" class="hidden">Unregister this player?</div>
+<style type="text/css">
+  .report-sections > details { margin: .2em 0; }
+  .report-sections > details > summary { cursor: pointer; font-weight: bold; }
+  .report-sections > details > pre { margin: .3em 0 .6em 1.2em; white-space: pre-wrap; }
+</style>
 <div id="refresh-report-modal" class="popup large no-dimmer-close">
   <div class="popup-body">
     <div class="popup-header">Ratings refresh</div>
     <div class="popup-content">
-      <pre id="refresh-report-text"></pre>
+      <div id="refresh-report-text" class="report-sections"></div>
     </div>
     <div class="popup-footer">
       <button id="copy-refresh-report" type="button" class="ui blue right labeled icon floating button">
