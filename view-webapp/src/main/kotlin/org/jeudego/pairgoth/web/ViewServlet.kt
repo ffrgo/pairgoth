@@ -56,10 +56,6 @@ class ViewServlet : VelocityViewServlet() {
         // whether to run full-SSE (dev always; prod requires HTTP/2, checked client-side).
         context.put("env", WebappManager.properties.getProperty("env") ?: "dev")
 
-        // is a webhook configured? the registration client gates a presence *add* (red→green) on a
-        // successful push to the website when so; a no-webhook deployment never blocks the toggle.
-        context.put("webhook", !WebappManager.properties.getProperty("webhook.url").isNullOrBlank())
-
         /*
         val menu = menuEntries!![uri]
         var title: String? = null

@@ -93,7 +93,7 @@
   // breaks multi-tab); dev always qualifies. Otherwise we run direct (local effect on response).
   const env = '$env';
   // A webhook (EGC) is configured: the registration tab gates a presence add on a confirmed push.
-  const webhook = $webhook;
+  const webhook = $webhookConfigured;
   const collaborative = env === 'dev' ||
     performance.getEntriesByType('navigation')[0]?.nextHopProtocol === 'h2';
   // #[[
