@@ -360,9 +360,11 @@ Behavior:
   related UI buttons (Sync from website, Publish pairings/results/standings)
   are not shown.
 - If `webhook.url` is set, pairgoth performs a `GET /health` against it at
-  startup. **A failed health check is a fatal startup error** — the
-  assumption being that the tournament site is supposed to already be running
-  when the tournament director launches pairgoth.
+  startup. **A failed health check is only logged as a warning** (not fatal):
+  the tournament site is normally already running, but a co-located peer (e.g.
+  a sibling docker container) may simply not be up yet — pairgoth keeps
+  serving, and pushes/pulls retry at runtime. A missing `webhook.secret` while
+  `webhook.url` is set is still a fatal misconfiguration.
 
 ### Display
 
@@ -745,7 +747,7 @@ Pairgoth's role:
 - **Push** content (pairings, results, standings) to the website when the operator clicks a Publish button.
 
 Configuration is described in [Webhook](#webhook) under the Configuration section. When `webhook.url` is set, pairgoth
-performs `GET <webhook.url>/health` at startup; a failed check is fatal.
+performs `GET <webhook.url>/health` at startup; a failed check is logged as a warning, not fatal.
 
 All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate
 it on every `{code}`-scoped endpoint and return `401` on mismatch. `/health` is instance-scoped and **may** be served

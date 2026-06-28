@@ -63,7 +63,10 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
             else -> throw Error("Unhandled auth: $auth")
         }
 
-        // Validate webhook at startup (fatal error if configured but unhealthy)
+        // Probe the webhook at startup. A missing secret is a hard misconfiguration (fatal). An
+        // unreachable or unhealthy webhook is only warned about, not fatal: a docker peer may simply
+        // not be up yet, and runtime pushes/pulls already degrade gracefully — so it must never take
+        // pairgoth's own startup down. One-line warning, no stacktrace.
         val webhookUrl = properties.getProperty("webhook.url")?.takeIf { it.isNotBlank() }
         context.setAttribute("webhookConfigured", webhookUrl != null)
         webhookUrl?.let { url ->
@@ -72,12 +75,12 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
             val healthUrl = "${url.removeSuffix("/")}/health"
             try {
                 val resp = JsonApiClient.get(healthUrl, header("X-Pairgoth-Secret", secret)) as Json.Object
-                if (resp.getBoolean("status") != true) {
-                    throw Error("webhook at $url returned status=false: ${resp.getString("message") ?: "(no message)"}")
-                }
-                logger.info("webhook at $url healthy: ${resp.getString("name") ?: "(unnamed)"}")
+                if (resp.getBoolean("status") == true)
+                    logger.info("webhook at $url healthy: ${resp.getString("name") ?: "(unnamed)"}")
+                else
+                    logger.warn("webhook at $url reachable but unhealthy: ${resp.getString("message") ?: "(no message)"}")
             } catch (e: Exception) {
-                throw Error("webhook health check failed for $healthUrl: ${e.message}", e)
+                logger.warn("webhook at $url not reachable at startup (${e.message}); continuing — pushes/pulls will retry at runtime")
             }
         }
 

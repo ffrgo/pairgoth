@@ -25,6 +25,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Loaded tournaments are cached in memory across requests; hand-edits to the `.tour` files are still picked up.
+- A failed webhook health check at startup is now a warning instead of a fatal error, so a co-located webhook peer (e.g. a sibling container) that isn't up yet no longer takes pairgoth down. A missing `webhook.secret` is still fatal.
 
 ### Fixed
 
