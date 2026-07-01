@@ -369,6 +369,10 @@ async function pushPresence(ext, round, present) {
     if (!resp.ok || (json && json.status === false)) {
       return { message: (json && json.message) || `HTTP ${resp.status}` };
     }
+    // 200 + status:true can still carry a per-id refusal in `rejected` (e.g. not
+    // registered for this round). We push one id, so ours appearing there = refused.
+    if (json && Array.isArray(json.rejected) && json.rejected.map(String).includes(String(id)))
+      return { message: `player not registered for this round` };
     return 'ok';
   } catch (ignored) {
     return { message: 'website unreachable' };
