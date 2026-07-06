@@ -4,7 +4,9 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 
 // Canonical rating ↔ rank conversion, matching the EGD GoR scheme:
-//   1d centred at 2100, step 100, lower-edge bucketing (1d = [2050, 2150), 1k = [1950, 2050)).
+//   1d centred at 2100, step 100, bucket edges at xx50 (1d = [2050, 2150), 1k = [1950, 2050)).
+//   rankToRating returns the band centre (the EGD nominal), so a rank-derived rating maps
+//   back to the same rank under ±49 points of drift instead of sitting on the bucket edge.
 //   FFG scale = EGD scale - 2050 (FFG natively uses 0 as the 1k/1d boundary).
 //   Pro grades: 1p = 2700, step 30 up to 9p = 2940. Pro overlaps amateur 7d..9d
 //   in strength; the `pro` field on Player carries the title separately from rank.
@@ -21,7 +23,7 @@ const val PRO_STEP: Int = 30           // step between pro grades
 fun ratingToRank(rating: Int): Int =
     floor((rating - 2050) / 100.0).toInt().coerceIn(MIN_RANK, MAX_RANK)
 
-fun rankToRating(rank: Int): Int = 2050 + 100 * rank
+fun rankToRating(rank: Int): Int = 2100 + 100 * rank
 
 fun ratingToPro(rating: Int): Int =
     ((rating - PRO_BASE_RATING).toDouble() / PRO_STEP).roundToInt().plus(1).coerceIn(MIN_PRO, MAX_PRO)

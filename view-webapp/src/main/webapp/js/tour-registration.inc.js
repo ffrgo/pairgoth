@@ -10,7 +10,7 @@ const MIN_RANK = -30, MAX_RANK = 8, MIN_PRO = 1, MAX_PRO = 9;
 const PRO_BASE_RATING = 2700, PRO_STEP = 30;
 function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 function ratingToRankInt(r) { return clamp(Math.floor((r - 2050) / 100), MIN_RANK, MAX_RANK); }
-function rankIntToRating(k) { return 2050 + 100 * k; }
+function rankIntToRating(k) { return 2100 + 100 * k; } // band centre (EGD nominal), not the xx50 edge
 function ratingToProLevel(r) { return clamp(Math.round((r - PRO_BASE_RATING) / PRO_STEP) + 1, MIN_PRO, MAX_PRO); }
 function proLevelToRating(p) { return PRO_BASE_RATING + PRO_STEP * (p - 1); }
 function isProFormValue(v) { return typeof v === 'string' && /^p[1-9]$/i.test(v); }
@@ -439,7 +439,7 @@ onLoad(() => {
   $('input.numeric').imask({
     mask: Number,
     scale: 0,
-    min: rankIntToRating(MIN_RANK), // -950 (30k); EGD ratings go negative for weak players
+    min: rankIntToRating(MIN_RANK), // -900: EGD's hard GoR floor (30k nominal)
     max: 4000
   });
 
