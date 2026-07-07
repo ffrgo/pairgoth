@@ -989,10 +989,9 @@ onLoad(() => {
   });
 
   // Refresh ratings — pulls latest rating/rank/pro for already-registered players from EGD/FFG.
-  // Source priority when a player has multiple external IDs: EGF > FFG > AGA. Rank is updated
-  // only when the player's current (rating, rank) are chained; rating and pro are always
-  // updated. The summary toast lists rank-skipped players so the organiser can spot manual
-  // overrides that would otherwise be silently kept.
+  // Source priority when a player has multiple external IDs: EGF > FFG > AGA. An honorary rank
+  // (rank decoupled from rating — the edit form's "unchained" state) is kept: only the rating
+  // is refreshed. The report lists those separately so the organiser can spot them.
   $('#refresh-ratings').on('click', async e => {
     e.preventDefault();
     let players = await api.getJson(`tour/${tour_id}/part`);
@@ -1020,7 +1019,7 @@ onLoad(() => {
     // Overwrite everything from the official source (rating, level, pro). The FFG licence
     // snapshot is refreshed for FR tournaments only (and only where the source carries it).
     let isFR = (tour_country || '').toLowerCase() === 'fr';
-    let changes = [], notFound = [], payloads = [];
+    let changes = [], honoraryChanges = [], notFound = [], payloads = [];
     for (let p of registered) {
       // Pick the first source with a hit, in priority order.
       let hit = null;
@@ -1035,20 +1034,25 @@ onLoad(() => {
         continue;
       }
       let newRating = parseInt(hit.rating);
-      let newPro = hit.pro ? parseInt(hit.pro) : 0;
-      let newRank = ratingToRankInt(newRating);
       let oldRating = parseInt(p.rating), oldRank = parseInt(p.rank), oldPro = p.pro ? parseInt(p.pro) : 0;
+      // Honorary rank = rank decoupled from rating (unchained): the organiser's grade wins,
+      // only the rating is refreshed — the payload omits rank/pro so the merge keeps them.
+      let honorary = oldRank !== ratingToRankInt(oldRating);
+      let newPro = honorary ? oldPro : (hit.pro ? parseInt(hit.pro) : 0);
+      let newRank = honorary ? oldRank : ratingToRankInt(newRating);
       let oldLicensed = (typeof p.licensed === 'boolean') ? p.licensed : null;
       let newLicensed = (isFR && hit.license != null) ? (hit.license === 'L') : oldLicensed;
       let levelChanged = newRating !== oldRating || newRank !== oldRank || newPro !== oldPro;
       if (!levelChanged && newLicensed === oldLicensed) continue;
-      let payload = { id: p.id, rating: newRating, rank: newRank, pro: newPro };
+      let payload = honorary ? { id: p.id, rating: newRating }
+                             : { id: p.id, rating: newRating, rank: newRank, pro: newPro };
       if (isFR && hit.license != null) payload.licensed = newLicensed;
       payloads.push(payload);
       // the change-log is computed client-side from old vs looked-up new (the server journal only counts)
       if (levelChanged) {
         let name = `${p.name} ${p.firstname || ''}`.trim();
-        changes.push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
+        (honorary ? honoraryChanges : changes)
+          .push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
       }
     }
 
@@ -1061,9 +1065,11 @@ onLoad(() => {
     let updated = payloads.length - failed;
 
     changes.sort((a, b) => a.localeCompare(b));
+    honoraryChanges.sort((a, b) => a.localeCompare(b));
     notFound.sort((a, b) => a.localeCompare(b));
     let sections = [];
     if (changes.length) sections.push({ label: `${changes.length} updated`, items: changes });
+    if (honoraryChanges.length) sections.push({ label: `${honoraryChanges.length} rating updated, honorary rank kept`, items: honoraryChanges });
     if (notFound.length) sections.push({ label: `${notFound.length} not found in ratings DB`, items: notFound });
     if (failed) sections.push({ label: `${failed} failed`, items: lastError ? [lastError] : [] });
     if (updated > 0) {
