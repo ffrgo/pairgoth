@@ -946,7 +946,7 @@ onLoad(() => {
           if (wp.rounds[i] === '0') skip.push(i + 1);
         }
       }
-      return {
+      let payload = {
         name: wp.lastname, firstname: wp.firstname,
         country: (wp.country || '').toLowerCase(),
         club: wp.club || '',
@@ -955,6 +955,10 @@ onLoad(() => {
         ext: wp.id != null ? String(wp.id) : null,
         final: true, skip
       };
+      // Level lock: the website flags its rating-exception players; only pass the flag through
+      // when the wire carries it — an absent flag must never silently unlock.
+      if (wp.locked != null) payload.locked = !!wp.locked;
+      return payload;
     }
 
     let report = await api.postJson(`tour/${tour_id}/part`, data.players.map(buildPayload));
@@ -1001,6 +1005,11 @@ onLoad(() => {
       showError('No registered player has an external ID (EGF/FFG/AGA) to refresh from.');
       return;
     }
+    // Locked players (rating exceptions, flagged by the website) are skipped up front — the server
+    // would preserve them anyway, but skipping keeps the change-log and the journal truthful.
+    let lockedSkipped = registered.filter(p => p.locked)
+      .map(p => `${p.name} ${p.firstname || ''}`.trim()).sort((a, b) => a.localeCompare(b));
+    registered = registered.filter(p => !p.locked);
     if (!confirm(`Refresh ratings for ${registered.length} registered player(s) from EGD/FFG?`)) return;
 
     // Bulk lookup
@@ -1070,6 +1079,7 @@ onLoad(() => {
     let sections = [];
     if (changes.length) sections.push({ label: `${changes.length} updated`, items: changes });
     if (honoraryChanges.length) sections.push({ label: `${honoraryChanges.length} rating updated, honorary rank kept`, items: honoraryChanges });
+    if (lockedSkipped.length) sections.push({ label: `${lockedSkipped.length} locked (level preserved)`, items: lockedSkipped });
     if (notFound.length) sections.push({ label: `${notFound.length} not found in ratings DB`, items: notFound });
     if (failed) sections.push({ label: `${failed} failed`, items: lastError ? [lastError] : [] });
     if (updated > 0) {

@@ -68,7 +68,13 @@ object PlayerHandler: PairgothApiHandler {
                     tournament.players[player.id] = player
                     added.add(label)
                 } else {
-                    val merged = Player.fromJson(p, existing)
+                    // Level lock: rating/rank/pro of a locked player survive every bulk import
+                    // (the refresh loops know nothing of exceptions). An explicit locked:false
+                    // unlocks and applies its values in one shot; an absent flag never unlocks.
+                    val source = if (existing.locked && p.getBoolean("locked") != false)
+                        Json.MutableObject(p).also { it.remove("rating"); it.remove("rank"); it.remove("pro") }
+                    else p
+                    val merged = Player.fromJson(source, existing)
                     participationConflict(tournament, existing, merged)?.let { badRequest(it) }
                     val before = existing.toJson(); val after = merged.toJson()
                     if (before == after) unchanged.add(label)

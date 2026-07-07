@@ -558,6 +558,12 @@ When authentication is enabled, all requests require an `Authorization` header.
     partial entry merges onto the matched player. The whole roster is applied in one transaction and
     recorded as a single history entry.
 
+    An entry may carry `"locked": true` to mark the player as a **rating exception** (official
+    rating known wrong): from then on, that player's `rating`/`rank`/`pro` survive every bulk
+    upsert — including this endpoint and the ratings refresh — until an entry with an explicit
+    `"locked": false` unlocks them (which applies its own values in one shot). An absent flag
+    never changes the lock state. Manual per-player edits (`PUT`) are not restricted.
+
     *output* a journal `{ "success": true, "added": [ "Name Firstname", … ], "updated": [ { "player": "Name Firstname", "changes": "rating 2627→2630, rank 5→6" }, … ], "unchanged": [ "Name Firstname", … ], "failed": [ { "player": "...", "reason": "..." } ] }` — each section lists its players (counts are the array lengths); `changes` is a compact field-level diff. E.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch.
 
 + `PUT /api/tour/#tid/part/#pid` Modify a player registration

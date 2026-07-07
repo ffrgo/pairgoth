@@ -150,6 +150,10 @@ class Player(
     val externalIds = mutableMapOf<DatabaseId, String>()
     // FFG licence up to date, snapshot at registration (FR). null = unknown.
     var licensed: Boolean? = null
+    // Level lock: rating/rank/pro survive bulk imports (website sync and ratings refresh) —
+    // the exception marker for players whose official rating is known wrong. Populated by
+    // the website (EGC flags its EGD-override players); no pairgoth UI. Manual edits still apply.
+    var locked: Boolean = false
     override fun toMutableJson() = Json.MutableObject(
         "id" to id,
         "name" to name,
@@ -164,6 +168,7 @@ class Player(
         if (mmsCorrection != 0) json["mmsCorrection"] = mmsCorrection
         if (pro != 0) json["pro"] = pro
         if (licensed != null) json["licensed"] = licensed
+        if (locked) json["locked"] = true
         externalIds.forEach { (dbid, id) ->
             json[dbid.key] = id
         }
@@ -197,6 +202,7 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null, canoni
     }
 ).also { player ->
     player.licensed = json.getBoolean("licensed") ?: default?.licensed
+    player.locked = json.getBoolean("locked") ?: default?.locked ?: false
     (json.getArray("skip") ?: default?.skip)?.let {
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
     }

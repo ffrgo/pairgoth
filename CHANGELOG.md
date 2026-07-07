@@ -21,15 +21,18 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Standings: country and club column display toggles (the club column is new), remembered in the browser and carried into the published HTML standings.
 - Optional cleartext HTTP/2 (`webapp.h2c`) on the plain connector, letting a TLS-terminating reverse proxy keep HTTP/2 end-to-end; HTTP/1.1 clients are still served.
 - Presence write-back: a referee toggling a website-sourced player's per-round participation pushes the change back to the website (`POST <webhook.url>/presences/{code}/{round}`), so a later resync keeps it. Marking a player *present* again is gated on the website accepting it (it may refuse a round the player isn't registered for); marking *absent* commits locally then mirrors back best-effort.
+- Level lock: a bulk-import entry may carry `"locked": true` to mark a player as a rating exception — their rating/rank/pro then survive website syncs and ratings refreshes until an explicit `"locked": false`. Manual edits still apply; no UI, the flag is meant to be set by the event site.
 
 ### Changed
 
 - Loaded tournaments are cached in memory across requests; hand-edits to the `.tour` files are still picked up.
 - A failed webhook health check at startup is now a warning instead of a fatal error, so a co-located webhook peer (e.g. a sibling container) that isn't up yet no longer takes pairgoth down. A missing `webhook.secret` is still fatal.
+- Rank-to-rating conversion now anchors ranks at the EGD band centre (1d = 2100) instead of the weak edge (2050), so a rank-derived rating tolerates ±49 points of drift without flipping rank.
 
 ### Fixed
 
 - Mac Mahon group edits and ratings refreshes are now labelled as such in the undo/history list, instead of all sharing the roster-import label (they were already snapshotted and undoable, just indistinguishable).
+- The ratings refresh no longer overwrites honorary ranks (rank decoupled from rating in the edit form): for those players only the rating is refreshed, and the report lists them separately.
 - SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.
 - Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
 - The tournament store directory is created at API startup rather than on first use.
