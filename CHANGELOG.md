@@ -31,6 +31,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- A `ratings.date` freeze predating every cached ratings snapshot no longer breaks the hourly ratings refresh with an unexplained exception (and player search with it): the affected source now logs a clear warning and is reported unavailable.
 - Mac Mahon group edits and ratings refreshes are now labelled as such in the undo/history list, instead of all sharing the roster-import label (they were already snapshotted and undoable, just indistinguishable).
 - The ratings refresh no longer overwrites honorary ranks (rank decoupled from rating in the edit form): for those players only the rating is refreshed, and the report lists them separately.
 - SSO tickets and API bearers are encoded in UTF-8 regardless of the platform default charset.

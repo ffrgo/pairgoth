@@ -102,7 +102,10 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         //  - frozen and settled (no future EGD publication can be ≤ freeze), or
         //  - cache mtime is within the cooldown window.
         if ((frozen && freezeSettled) || cacheFresh) {
-            return effective()?.let { initIfNeeded(it) } ?: false
+            val toLoad = effective()
+            // toLoad == null implies frozen: cacheFresh alone guarantees latestCached != null
+            if (toLoad == null) logger.warn("ratings.date=$freeze active but no cached ${origin.name} snapshot at or before that date; ${origin.name} ratings unavailable")
+            return toLoad?.let { initIfNeeded(it) } ?: false
         }
 
         val payload = fetchPayload()
@@ -146,7 +149,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
     fun fetchPlayers(): Json.Array {
         updated = updateIfNeeded()
-        return players
+        return if (ready) players else Json.Array()
     }
 
     protected fun fetchPayload(): String? {

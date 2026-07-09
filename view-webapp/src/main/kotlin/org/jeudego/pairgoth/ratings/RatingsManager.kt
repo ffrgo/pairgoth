@@ -35,7 +35,7 @@ object RatingsManager: Runnable {
         );
     }
 
-    fun activeMask() = ratingsHandlers.entries.filter { it.value.active && it.value.ready }.map { it.key.flag }.reduce { a,b -> a or b }
+    fun activeMask() = ratingsHandlers.entries.filter { it.value.active && it.value.ready }.map { it.key.flag }.fold(0) { a,b -> a or b }
 
     val timer = Timer()
     lateinit var players: Json.MutableArray
