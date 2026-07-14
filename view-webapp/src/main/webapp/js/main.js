@@ -631,6 +631,11 @@ onLoad(() => {
     handleCollaborativeEvent(name, EVENT_SOURCE_TAB[name], payload.data);
   }));
   source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
+  // bfcache keeps navigated-away documents alive: each parked page's open EventSource holds one of
+  // HTTP/1.1's ~6 conns/origin, so a few quick round navigations stall the next page load for ~45s.
+  // Release the socket on leave; on restore, reload (no Last-Event-Id → missed events are unrecoverable).
+  window.on('pagehide', () => source.close());
+  window.on('pageshow', e => { if (e.persisted) document.location.reload(); });
 });
 
 // Element.clearChildren method

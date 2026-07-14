@@ -280,7 +280,9 @@ onLoad(()=>{
   $('#update-pairable').on('click', e => {
     updatePairable();
   });
-  window.on('unload', e => {
+  // pagehide, not unload: Chrome's permissions policy blocks unload handlers (and unload would
+  // exclude the page from bfcache)
+  window.on('pagehide', e => {
     store('pairablesScroll', $('#pairables')[0].scrollTop);
     store('unpairablesScroll', $('#unpairables')[0].scrollTop);
     store('pairedScroll', $('#paired')[0].scrollTop);
