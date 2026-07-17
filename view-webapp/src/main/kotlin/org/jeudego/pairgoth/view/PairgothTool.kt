@@ -61,8 +61,8 @@ class PairgothTool {
         // TODO "EXR" to "Succeeded achievements", // Exploits reussis
 
         // For the two criteria below see the user documentation
-        // TODO "SDC" to "Simplified direct confrontation", // Simplified direct confrontation
-        // TODO "DC" to "Direct confrontation", // Direct confrontation
+        "DC" to "Direct confrontation",
+        "SDC" to "Simplified direct confrontation",
     )
 
     fun getResultsStats(games: Collection<Json.Object>): Json.Object {

@@ -110,7 +110,7 @@ onLoad(() => {
     if (!$('#params-submit').hasClass('hidden')) {
       api.putJson(`tour/${tour_id}`, {
         pairing: {
-          placement: $('.criterium select').map(elem => elem.value)
+          placement: $('.criterium select').map(elem => elem.value).filter(value => value !== 'NONE')
         }
       }).then(rst => {
         if (rst !== 'error') {
