@@ -263,10 +263,21 @@ Tiebreak criteria for standings, in order of priority.
 | CATEGORY | Player category |
 | RANK | Player rank |
 | RATING | Player rating |
-| DC | Direct confrontation |
-| SDC | Simplified direct confrontation |
+| DC | Direct confrontation (see below) |
+| SDC | Simplified direct confrontation (see below) |
 | EXT | Exploits attempted |
 | EXR | Exploits successful |
+
+#### Direct confrontation (DC and SDC)
+
+Both criteria order players that are tied on every criterion placed before them, using only the games those tied players played against each other. Only even games with a plain win/loss result count; when two players met several times their results are summed, so a 1-1 split cancels out.
+
+- **DC** ranks the tied group by "who beat whom". Victory cycles (A beats B, B beats C, C beats A) are neutralized: wins inside a cycle are ignored, and every member of the cycle inherits the cycle's collective wins and losses against the rest of the group, so beating one member of a cycle counts as beating them all. The group is then filled from the bottom: among the players left with no remaining victory, the ones ranked lowest by the criteria placed *after* DC go last. The DC number itself is only meaningful within the group (higher is better).
+- **SDC** applies only when every pair of tied players has a decided result between them; each player then scores the number of tied opponents they beat. Otherwise everyone in the group scores 0.
+
+Only one of DC/SDC should appear in the placement criteria.
+
+The standings tab offers four placement-criterion slots; a slot left on NONE is ignored.
 
 ### External Databases
 

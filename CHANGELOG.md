@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Standings: direct confrontation placement criteria (DC, SDC), OpenGotha-compatible; the standings tab now offers four placement-criterion slots (a slot left on NONE is ignored).
 - Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).
 - Version check at startup, suppressible with `version.check = false`.
 - Documentation split per audience: reference (model), pairing (new), technical (new: configuration, API and webhook specifications, deployment profiles), hands-on tutorial.
