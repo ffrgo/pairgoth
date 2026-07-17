@@ -1,5 +1,6 @@
 package org.jeudego.pairgoth.test
 
+import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.pairing.DirectConfrontation
 import org.junit.jupiter.api.Test
@@ -93,4 +94,56 @@ class DirectConfrontationTest: TestBase() {
     private var nextGameId = 1
     private fun game(white: Int, black: Int, result: Game.Result, handicap: Int = 0) =
         Game(id = nextGameId++, table = nextGameId, white = white, black = black, handicap = handicap, result = result)
+
+    @Test
+    fun `040 end-to-end - DC orders head-to-head winners within tied groups`() {
+        val tourId = TestAPI.post("/api/tour", Json.Object(
+            "type" to "INDIVIDUAL",
+            "name" to "DC Swiss",
+            "shortName" to "dc-swiss",
+            "startDate" to "2026-07-01",
+            "endDate" to "2026-07-03",
+            "country" to "FR",
+            "location" to "Grenoble",
+            "online" to false,
+            "timeSystem" to Json.Object("type" to "FISCHER", "mainTime" to 1800, "increment" to 15),
+            "rounds" to 3,
+            "pairing" to Json.Object("type" to "SWISS")
+        )).asObject().getInt("id")!!
+        TestAPI.put("/api/tour/$tourId", Json.Object(
+            "pairing" to Json.Object("placement" to Json.Array("NBW", "DC", "SOSW", "SOSOSW"))
+        ))
+
+        // the intended DC losers (B over A, D over C) get the HIGHER ratings, so the final
+        // order proves DC acted: without it the rating tiebreak would invert both pairs
+        val ids = listOf("A" to 1800, "B" to 1900, "C" to 1600, "D" to 1700).associate { (name, rating) ->
+            name to TestAPI.post("/api/tour/$tourId/part", Json.Object(
+                "name" to name, "firstname" to "p", "rating" to rating,
+                "rank" to (rating - 2050) / 100, "country" to "FR", "club" to "13Ma", "final" to true
+            )).asObject().getInt("id")!!
+        }
+        // full round robin over 3 rounds; intended winners: A>B, A>C, D>A, B>C, B>D, C>D
+        // -> NBW: A 2, B 2, C 1, D 1; head-to-head: A beat B, C beat D... (C>D above)
+        val winners = mapOf(
+            setOf("A", "B") to "A", setOf("A", "C") to "A", setOf("A", "D") to "D",
+            setOf("B", "C") to "B", setOf("B", "D") to "B", setOf("C", "D") to "C"
+        )
+        val byId = ids.entries.associate { (name, id) -> id to name }
+        for (round in 1..3) {
+            TestAPI.post("/api/tour/$tourId/pair/$round", Json.Array("all"))
+            TestAPI.get("/api/tour/$tourId/res/$round").asArray().forEach { g ->
+                g as Json.Object
+                val white = byId[g.getInt("w")!!]!!
+                val black = byId[g.getInt("b")!!]!!
+                val result = if (winners[setOf(white, black)] == white) "w" else "b"
+                TestAPI.put("/api/tour/$tourId/res/$round", Json.parse("""{"id":${g.getInt("id")},"result":"$result"}"""))
+            }
+        }
+
+        val standings = TestAPI.get("/api/tour/$tourId/standings/3").asArray().map {
+            (it as Json.Object).getString("name")!!
+        }
+        // A above B (NBW 2, A beat B), C above D (NBW 1, C beat D), despite lower ratings
+        assertEquals(listOf("A", "B", "C", "D"), standings)
+    }
 }
