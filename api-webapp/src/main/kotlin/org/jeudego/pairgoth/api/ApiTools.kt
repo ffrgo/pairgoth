@@ -20,7 +20,8 @@ import kotlin.math.min
 
 fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
-    if (frozen != null) {
+    // the frozen snapshot is the published final standings
+    if (frozen != null && round == rounds) {
         return ArrayList(frozen!!.map { it -> it as Json.Object })
     }
 

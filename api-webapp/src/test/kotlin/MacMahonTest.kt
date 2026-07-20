@@ -67,4 +67,36 @@ class MacMahonTest {
         assertEquals(2, filtered.size, "drop_unplayed removes the bye-only player")
     }
 
+    // The frozen snapshot is the published FINAL standings. It must not hijack earlier rounds:
+    // round-0 MMS is the mmBase the Mac Mahon groups dialog keys on, and used to come back
+    // as final scores once the tournament was published (no 5d+ visible around the bar).
+    @Test
+    fun `frozen standings only serve the final round`() {
+        val tourId = TestAPI.post("/api/tour", BasicTests.aMMTournament).asObject().getInt("id") ?: throw Error("tournament creation failed")
+        // mmBar defaults to 0 (1d): Alpha 1d → mmBase 30, Beta 5k → mmBase 25
+        val alpha = Json.Object("name" to "Alpha", "firstname" to "A", "rating" to 2050, "rank" to 0, "country" to "FR", "club" to "C", "final" to true)
+        val beta = Json.Object("name" to "Beta", "firstname" to "B", "rating" to 1550, "rank" to -5, "country" to "FR", "club" to "C", "final" to true)
+        val alphaId = TestAPI.post("/api/tour/$tourId/part", alpha).asObject().getInt("id")!!
+        TestAPI.post("/api/tour/$tourId/part", beta).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        val game = TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all")).asArray().getObject(0) ?: throw Error("pairing failed")
+        val alphaRes = if (game.getInt("w") == alphaId) "w" else "b"
+        TestAPI.put("/api/tour/$tourId/res/1", Json.parse("""{"id":${game.getInt("id")},"result":"$alphaRes"}""")).asObject()
+
+        fun mms(standings: Json.Array, name: String) =
+            standings.map { it as Json.Object }.first { it.getString("name") == name }.getDouble("MMS")
+
+        val frozen = TestAPI.put("/api/tour/$tourId/standings", Json.Object()).asObject()
+        assertTrue(frozen.getString("status") == "ok", "freeze failed")
+        val finalStandings = TestAPI.get("/api/tour/$tourId/standings/2").asArray()
+
+        val initial = TestAPI.get("/api/tour/$tourId/standings/0").asArray()
+        assertEquals(30.0, mms(initial, "Alpha"), "round-0 MMS must be Alpha's mmBase, not the frozen final score")
+        assertEquals(25.0, mms(initial, "Beta"), "round-0 MMS must be Beta's mmBase, not the frozen final score")
+
+        // flip the result: the final round keeps serving the snapshot, earlier rounds recompute
+        TestAPI.put("/api/tour/$tourId/res/1", Json.parse("""{"id":${game.getInt("id")},"result":"${if (alphaRes == "w") "b" else "w"}"}""")).asObject()
+        assertEquals(mms(finalStandings, "Alpha"), mms(TestAPI.get("/api/tour/$tourId/standings/2").asArray(), "Alpha"), "final round must still serve the frozen snapshot")
+        assertEquals(26.0, mms(TestAPI.get("/api/tour/$tourId/standings/1").asArray(), "Beta"), "intermediate rounds must recompute (Beta now has the win)")
+    }
+
 }

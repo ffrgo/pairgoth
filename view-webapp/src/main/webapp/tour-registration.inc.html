@@ -27,7 +27,7 @@
 </script>
     #set($mmbase = [])
   #end
-  #set($mmsMap = $utils.getMmsMap($mmbase))
+  #set($mmsMap = $utils.getMmsMap($mmbase, 30 + $tour.pairing.mmBar + 1))
   #set($mmsPlayersMap = $utils.getMmsPlayersMap($mmbase))
 #end
 
