@@ -489,8 +489,9 @@ sealed class Solver(
 
         // Same club and club group (TODO club group)
         var clubRatio = 0.0
-        // To match OpenGotha, only do a case insensitive comparison of the first four characters.
-        val commonClub = p1.club?.take(4)?.uppercase() == p2.club?.take(4)?.uppercase()
+        // Case insensitive comparison of the first four characters (OpenGotha compatible),
+        // but "no club" (blank or placeholder) never matches anyone.
+        val commonClub = p1.clubKey != null && p1.clubKey == p2.clubKey
         val commonGroup = false // TODO
 
         // Local club adjustment (non-legacy mode only):

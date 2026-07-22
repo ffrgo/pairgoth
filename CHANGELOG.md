@@ -32,6 +32,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Same-club avoidance no longer treats club-less players as clubmates: an empty club or a placeholder ("xxxx", "NoCb") never matches, and such players can't be detected as the host club either.
 - The Mac Mahon groups dialog of a published tournament showed groups keyed on *final* scores (mid-field players around the bar, no top player in sight): the frozen standings snapshot now only serves the final round, and earlier rounds — notably round 0, whose MMS is the initial Mac Mahon score the dialog keys on — are computed again. The bar+1 list is also a catch-all now: corrections beyond +1 (OpenGotha imports) stay visible there instead of vanishing.
 - A `ratings.date` freeze predating every cached ratings snapshot no longer breaks the hourly ratings refresh with an unexplained exception (and player search with it): the affected source now logs a clear warning and is reported unavailable.
 - Mac Mahon group edits and ratings refreshes are now labelled as such in the undo/history list, instead of all sharing the roster-import label (they were already snapshotted and undoable, just indistinguishable).
