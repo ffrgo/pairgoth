@@ -40,6 +40,8 @@ object TournamentHandler: PairgothApiHandler {
                                     json["stats"] = tour.stats()
                                     json["teamSize"] = tour.type.playersNumber
                                     json["frozen"] = tour.frozen != null
+                                    val lastPairing = tour.lastPairing
+                                    json["syncNeeded"] = lastPairing != null && lastPairing > (tour.lastSync ?: 0)
                                 }
                             }
                         }

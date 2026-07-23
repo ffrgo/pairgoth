@@ -18,6 +18,7 @@ interface PairgothApiHandler: ApiHandler {
         // when storage is not in memory, the tournament has to be persisted; the event's slug names
         // the history snapshot (category), and lastAction is the human label, for the undo view
         if (event != Event.TournamentAdded && event != Event.TournamentDeleted) {
+            if (event == Event.GamesAdded) lastPairing = System.currentTimeMillis()
             lastAction = actionLabel(event, data)
             getStore(request).replaceTournament(this, event.slug)
         }

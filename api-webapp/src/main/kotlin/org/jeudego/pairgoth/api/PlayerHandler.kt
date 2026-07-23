@@ -102,6 +102,9 @@ object PlayerHandler: PairgothApiHandler {
             "ratings" -> RatingsRefreshed
             else -> PlayersImported
         }
+        // stamp even when nothing changed (no event): "synced, all up to date" must silence the
+        // pair-without-sync confirm too; the cached instance carries it, the file catches up later
+        if (event == PlayersImported) tournament.lastSync = System.currentTimeMillis()
         if (added.isNotEmpty() || updated.isNotEmpty())
             tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
         // partial payloads (?reason= — ratings refresh, mm group edits) can't tell removed from omitted

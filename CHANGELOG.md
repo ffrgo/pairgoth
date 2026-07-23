@@ -11,6 +11,8 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Pairing a fresh round with an external website configured now asks for confirmation when no roster sync happened since the previous pairing (stale presences guard).
+
 - Standings: direct confrontation placement criteria (DC, SDC), OpenGotha-compatible; the standings tab now offers four placement-criterion slots (a slot left on NONE is ignored).
 - Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).
 - Version check at startup, suppressible with `version.check = false`.

@@ -66,6 +66,11 @@ sealed class Tournament <P: Pairable>(
     // label of the action that produced the current state (drives the undo/history view); persisted full-json only
     var lastAction: String? = null
 
+    // server-clock stamps driving the "pair without a website sync" confirm; persisted full-json only.
+    // lastSync is also stamped on no-op syncs (no event, no write) — the cached instance carries it.
+    var lastSync: Long? = null
+    var lastPairing: Long? = null
+
     // pairing
     open fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         // Minimal check on round number.
@@ -631,6 +636,12 @@ fun Tournament<*>.toFullJson(): Json.Object {
     }
     if (lastAction != null) {
         json["lastAction"] = lastAction
+    }
+    if (lastSync != null) {
+        json["lastSync"] = lastSync
+    }
+    if (lastPairing != null) {
+        json["lastPairing"] = lastPairing
     }
     return json
 }

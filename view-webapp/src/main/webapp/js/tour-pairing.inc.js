@@ -204,7 +204,14 @@ onLoad(()=>{
     }
     box.dispatchEvent(new CustomEvent('listitems'));
   });
-  $('#pair').on('click', e => {
+  $('#pair').on('click', async e => {
+    // EGC deployments: launching a round without a website sync since the previous pairing likely
+    // means stale presences — confirm. Fresh GET (another operator may have synced meanwhile);
+    // only for a still-empty round: a partially paired round means adjusting, not launching.
+    if (webhook && $('#paired .listitem').length === 0) {
+      let tour = await api.getJson(`tour/${tour_id}`);
+      if (tour !== 'error' && tour.syncNeeded && !confirm($('#confirm-unsynced-pairing').text())) return;
+    }
     let parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     if (parts.length === 0) {
       $('#pairables .listitem').addClass('selected');
