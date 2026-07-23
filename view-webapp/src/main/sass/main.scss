@@ -835,20 +835,22 @@
       /* only data cells break mid-word (long surnames); headers use print abbreviations instead */
       td { white-space: normal; word-break: break-word; overflow: hidden; }
       th .print-abbr { display: inline; }
+      /* club stays on one line and clips (EGD caps clubs at 4 chars anyway) */
+      td.club { white-space: nowrap; }
       /* Proportional column widths (relative weights; browsers scale the
          present subset to fill the table, so optional columns don't matter). */
       col.col-reg           { width: 5%; }
       col.col-name          { width: 18%; }
       col.col-firstname     { width: 17%; }
       col.col-country       { width: 7%; }
-      col.col-club          { width: 10%; }
+      col.col-club          { width: 6%; }
       col.col-pin           { width: 12%; }
       col.col-ffg           { width: 11%; }
       col.col-rank          { width: 7%; }
       col.col-rating        { width: 8%; }
       col.col-mms           { width: 7%; }
       col.col-team          { width: 12%; }
-      col.col-participation { width: 16%; }
+      col.col-participation { width: 20%; }
     }
 
     #players-list #players .participation .ui.label {
