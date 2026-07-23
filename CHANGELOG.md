@@ -23,6 +23,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Optional cleartext HTTP/2 (`webapp.h2c`) on the plain connector, letting a TLS-terminating reverse proxy keep HTTP/2 end-to-end; HTTP/1.1 clients are still served.
 - Presence write-back: a referee toggling a website-sourced player's per-round participation pushes the change back to the website (`POST <webhook.url>/presences/{code}/{round}`), so a later resync keeps it. Marking a player *present* again is gated on the website accepting it (it may refuse a round the player isn't registered for); marking *absent* commits locally then mirrors back best-effort.
 - Level lock: a bulk-import entry may carry `"locked": true` to mark a player as a rating exception — their rating/rank/pro then survive website syncs and ratings refreshes until an explicit `"locked": false`. Manual edits still apply; no UI, the flag is meant to be set by the event site.
+- Bulk roster import reports players removed on the source side: registered players a full-roster import leaves untouched come back in a `missing` journal section (shown as "removed on website (kept here)" after a sync) — reported only, never deleted.
 
 ### Changed
 

@@ -5,6 +5,7 @@ import com.republicate.kson.toJsonArray
 import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.DatabaseId
+import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
@@ -55,6 +56,10 @@ object PlayerHandler: PairgothApiHandler {
         val updated = Json.MutableArray()
         val unchanged = Json.MutableArray()
         val failed = Json.MutableArray()
+        // A roster import carries the full source roster, so any pre-existing player it leaves
+        // untouched has been removed on the source side. Report-only: pairgoth never deletes.
+        val preExisting = tournament.players.values.toList()
+        val touched = mutableSetOf<ID>()
         roster.forEach { entry ->
             if (entry !is Json.Object) { failed.add(Json.Object("reason" to "not a json object")); return@forEach }
             val p = entry
@@ -63,6 +68,8 @@ object PlayerHandler: PairgothApiHandler {
             try {
                 val existing = p.getInt("id")?.let { tournament.players[it] }
                     ?: tournament.findPlayerByExternalIds(externalIdsOf(p))
+                // touched at resolution, not on success: a blocked update is still present upstream
+                existing?.let { touched.add(it.id) }
                 if (existing == null) {
                     val player = Player.fromJson(p)
                     tournament.players[player.id] = player
@@ -97,8 +104,13 @@ object PlayerHandler: PairgothApiHandler {
         }
         if (added.isNotEmpty() || updated.isNotEmpty())
             tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
+        // partial payloads (?reason= — ratings refresh, mm group edits) can't tell removed from omitted
+        val missing = Json.MutableArray()
+        if (event == PlayersImported)
+            preExisting.filter { it.id !in touched }.forEach { missing.add("${it.name} ${it.firstname}") }
         return Json.Object("success" to true,
-            "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed)
+            "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed,
+            "missing" to missing)
     }
 
     /** Compact human diff of two player snapshots: "field old→new, …" over the keys that changed (id aside). */

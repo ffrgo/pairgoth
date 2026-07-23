@@ -968,7 +968,7 @@ onLoad(() => {
     // lists (names / {player, changes} / {player, reason}); paired-player rejections are split into
     // a distinct "blocked" box (correct procedure: freeze the round on the website first, then resync).
     let added = report.added || [], updated = report.updated || [], unchanged = report.unchanged || [];
-    let failed = report.failed || [];
+    let failed = report.failed || [], missing = report.missing || [];
     let blocked = failed.filter(f => /round #\d+/.test(f.reason || ''));
     let other = failed.filter(f => !/round #\d+/.test(f.reason || ''));
     let sections = [];
@@ -977,13 +977,14 @@ onLoad(() => {
     if (blocked.length) sections.push({ label: `${blocked.length} blocked (already paired — freeze the round on the website first)`,
       items: blocked.map(f => `${f.player} (${(f.reason || '').match(/round #\d+/)[0]})`) });
     if (other.length) sections.push({ label: `${other.length} failed`, items: other.map(f => `${f.player || '?'}: ${f.reason}`) });
+    if (missing.length) sections.push({ label: `${missing.length} removed on website (kept here)`, items: missing });
     if (unchanged.length) sections.push({ label: `${unchanged.length} unchanged`, items: unchanged });
 
     if (added.length || updated.length) {
       // Stash and reload so the table reflects the new state; the on-load handler re-shows the report.
       store('refreshReport', { title: 'Sync from EGC', sections });
       setTimeout(() => window.location.reload(), 200);
-    } else if (blocked.length || other.length) {
+    } else if (blocked.length || other.length || missing.length) {
       showReport('Sync from EGC', sections); // nothing changed but problems to surface
     } else {
       // Pure no-op (at most "N unchanged"): a one-line toast, no modal.
