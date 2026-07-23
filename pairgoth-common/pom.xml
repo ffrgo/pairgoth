@@ -136,7 +136,7 @@
         <dependency>
             <groupId>com.republicate.kson</groupId>
             <artifactId>essential-kson-jvm</artifactId>
-            <version>2.4</version>
+            <version>${kson.version}</version>
         </dependency>
         <!-- tests -->
         <dependency>

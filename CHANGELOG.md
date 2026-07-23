@@ -42,6 +42,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Standalone with authentication no longer requires an explicit `auth.shared_secret`: the launcher generates it once for both webapps (each webapp used to generate its own, breaking the internal token exchange).
 - The tournament store directory is created at API startup rather than on first use.
 - Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
+- Website re-sync no longer crashes when a player's round participation changed length: json array comparison was broken in essential-kson (crash on shorter, false equality on longer) — fixed upstream, dependency bumped 2.4 → 2.15 (Kotlin toolchain 2.1 → 2.3 to match).
 
 ## [0.26] - 2026-06-22
 
