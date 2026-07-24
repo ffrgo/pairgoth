@@ -22,6 +22,13 @@ import javax.servlet.http.HttpServletResponse
 
 object PairingHandler: PairgothApiHandler {
 
+    // SPECIFIC EGC2026 CHANGES - room constraints: tables > 1000 are displayed on top (1001, 1002, ..., 1, 2, ...)
+    private fun displayOrder(game: Game) = when {
+        game.table == 0 -> Int.MAX_VALUE
+        game.table > 1000 -> game.table - 1_000_000
+        else -> game.table
+    }
+
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
@@ -31,9 +38,7 @@ object PairingHandler: PairgothApiHandler {
         }.toSet()
         val unpairables = tournament.pairables.values.filter { it.final && !it.canPlay(round) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
         val pairables = tournament.pairables.values.filter { it.final && it.canPlay(round) && !playing.contains(it.id) }.sortedByDescending { it.rating }.map { it.id }.toJsonArray()
-        val games = tournament.games(round).values.sortedBy {
-            if (it.table == 0) Int.MAX_VALUE else it.table
-        }
+        val games = tournament.games(round).values.sortedBy(::displayOrder)
         val ret = Json.MutableObject(
             "games" to games.map { it.toJson() }.toCollection(Json.MutableArray()),
             "pairables" to pairables,
@@ -185,9 +190,7 @@ object PairingHandler: PairgothApiHandler {
             (whitePosition + blackPosition)
         }
         if (changed) {
-            val games = tournament.games(round).values.sortedBy {
-                if (it.table == 0) Int.MAX_VALUE else it.table
-            }
+            val games = tournament.games(round).values.sortedBy(::displayOrder)
             tournament.dispatchEvent(
                 TablesRenumbered, request,
                 Json.Object(
