@@ -8,6 +8,7 @@ import org.jeudego.pairgoth.web.WebappManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.Locale
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
 
@@ -140,4 +141,7 @@ class PairgothTool {
     // Whether player IDs from this rating source show on the registration page.
     fun showRatings(ratings: String, country: String): Boolean =
         WebappManager.properties.getProperty("ratings.${ratings}.show")?.toBoolean() ?: ratingDefault(ratings, country)
+    // Display label for a rating source (a deployment can rebrand EXT, e.g. "EGC").
+    fun ratingLabel(ratings: String): String =
+        WebappManager.properties.getProperty("ratings.${ratings}.label") ?: ratings.uppercase(Locale.ROOT)
 }

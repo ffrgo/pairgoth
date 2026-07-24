@@ -24,10 +24,10 @@ class SearchServlet: HttpServlet() {
             val query = request.getAttribute(PAYLOAD_KEY) as Json.Object? ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no payload")
             val needle =  query.getString("needle") ?: throw ApiException(HttpServletResponse.SC_BAD_REQUEST, "no needle")
             val country = query.getString("countryFilter")
-            val aga =  query.getBoolean("aga") ?: false
-            val egf =  query.getBoolean("egf") ?: false
-            val ffg =  query.getBoolean("ffg") ?: false
-            payload = RatingsManager.search(needle, aga, egf, ffg, country)
+            val sources = RatingsManager.Ratings.values().fold(0) { mask, source ->
+                if (query.getBoolean(source.name.lowercase(Locale.ROOT)) == true) mask or source.flag else mask
+            }
+            payload = RatingsManager.search(needle, sources, country)
             setContentType(response)
             payload.toString(response.writer)
         } catch (ioe: IOException) {

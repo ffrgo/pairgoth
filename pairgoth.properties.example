@@ -52,9 +52,11 @@
 # Ratings
 # ratings.path = ratings                       # cache directory for downloaded ratings
 # ratings.<source> = <url>                     # override source URL (aga|egf|ffg)
-# ratings.date = YYYY-MM-DD                    # freeze snapshot for multi-day events
+# ratings.ext = <url>                          # external registry roster (JSON); unset = source off
+# ratings.date = YYYY-MM-DD                    # freeze snapshot for multi-day events (not applied to ext)
 # ratings.<source>.enable = true|false         # available in Add Player search (default: EGF everywhere, FFG in FR)
 # ratings.<source>.show = true|false           # show source IDs on registration (same default rule)
+# ratings.<source>.label = <text>              # button/column label for a source (default: uppercase code)
 
 # SMTP (email notifications; not yet functional)
 # smtp.sender =

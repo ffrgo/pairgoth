@@ -17,7 +17,8 @@ object RatingsManager: Runnable {
     enum class Ratings(val flag: Int) {
         AGA(1),
         EGF(2),
-        FFG(4);
+        FFG(4),
+        EXT(8);
         companion object {
             fun valueOf(mask: Int): Ratings {
                 if (mask.countOneBits() != 1) throw Error("wrong use")
@@ -31,7 +32,8 @@ object RatingsManager: Runnable {
         mapOf(
             Pair(Ratings.AGA, AGARatingsHandler),
             Pair(Ratings.EGF, EGFRatingsHandler),
-            Pair(Ratings.FFG, FFGRatingsHandler)
+            Pair(Ratings.FFG, FFGRatingsHandler),
+            Pair(Ratings.EXT, EXTRatingsHandler)
         );
     }
 
@@ -107,17 +109,15 @@ object RatingsManager: Runnable {
         if (!file.mkdirs() && !file.isDirectory) throw Error("Property pairgoth.ratings.path must be a directory")
     }
 
-    fun search(needle: String, aga: Boolean, egf: Boolean, ffg: Boolean, country: String?): Json.Array {
+    fun search(needle: String, sources: Int, country: String?): Json.Array {
         try {
             updateLock.readLock().lock()
-            var mask = 0
-            if (aga && ratingsHandlers[Ratings.AGA]!!.active) mask = mask or Ratings.AGA.flag
-            if (egf && ratingsHandlers[Ratings.EGF]!!.active) mask = mask or Ratings.EGF.flag
-            if (ffg && ratingsHandlers[Ratings.FFG]!!.active) mask = mask or Ratings.FFG.flag
+            val mask = sources and ratingsHandlers.entries.filter { it.value.active }
+                .fold(0) { a, e -> a or e.key.flag }
             return if (needle == "*") {
                 sortedPlayers(mask, country)
             } else {
-                val matches = index.match(needle, mask, country)
+                val matches = index.match(needle, mask, activeMask(), country)
                 matches.map { it -> players[it] }.toCollection(Json.MutableArray())
             }
         } finally {

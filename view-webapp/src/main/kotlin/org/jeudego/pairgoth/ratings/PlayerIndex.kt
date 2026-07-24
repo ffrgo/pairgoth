@@ -74,7 +74,8 @@ class PlayerIndex {
         logger.info("indexed $count players")
     }
 
-    fun match(needle: String, origins: Int, country: String?): List<Int> {
+    // origins = requested source flags, activeMask = flags actually present in the index
+    fun match(needle: String, origins: Int, activeMask: Int, country: String?): List<Int> {
         if (needle.trim().matches(Regex("\\d+"))) {
             // PIN search
             val pin = needle.trim().toInt()
@@ -92,39 +93,29 @@ class PlayerIndex {
             if (terms.isEmpty()) return emptyList()
             logger.info("Search query: $terms")
             val fuzzy = queryParser.parse(terms)
-            val activeMask = RatingsManager.activeMask()
-            val query = when (origins.countOneBits()) {
-                0 -> return emptyList()
-                1 -> {
-                    val filter = TermQuery(Term(ORIGIN, RatingsManager.Ratings.codeOf(origins)))
+            val query = when {
+                origins == 0 -> return emptyList()
+                // every indexed origin is included: no filter needed
+                activeMask and origins.inv() == 0 -> fuzzy
+                else -> {
+                    val included = BooleanQuery.Builder()
+                    RatingsManager.Ratings.values().filter { (it.flag and origins) != 0 }.forEach {
+                        included.add(TermQuery(Term(ORIGIN, it.name.lowercase(Locale.ROOT))), BooleanClause.Occur.SHOULD)
+                    }
                     BooleanQuery.Builder()
+                        // without minShouldMatch(1), FILTER-only hits would match with the
+                        // needle contributing nothing but score (junk tail up to MAX_HITS)
+                        .setMinimumNumberShouldMatch(1)
                         .add(fuzzy, BooleanClause.Occur.SHOULD)
-                        .add(filter, BooleanClause.Occur.FILTER)
+                        .add(included.build(), BooleanClause.Occur.FILTER)
                         .build()
                 }
-                2 -> {
-                    if (activeMask.countOneBits() > 2) {
-                        val filter =
-                            TermQuery(
-                                Term(
-                                    ORIGIN,
-                                    RatingsManager.Ratings.codeOf((origins xor activeMask) and activeMask)
-                                )
-                            )
-                        BooleanQuery.Builder()
-                            .add(fuzzy, BooleanClause.Occur.SHOULD)
-                            .add(filter, BooleanClause.Occur.MUST_NOT)
-                            .build()
-                    } else fuzzy
-                }
-
-                3 -> fuzzy
-                else -> throw Error("wrong origins mask")
             }.let {
                 if (country == null) it
                 else {
                     val countryFilter = TermQuery(Term(COUNTRY, country.lowercase(Locale.ROOT)))
                     BooleanQuery.Builder()
+                        .setMinimumNumberShouldMatch(1)
                         .add(it, BooleanClause.Occur.SHOULD)
                         .add(countryFilter, BooleanClause.Occur.FILTER)
                         .build()

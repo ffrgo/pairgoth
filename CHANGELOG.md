@@ -26,6 +26,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Presence write-back: a referee toggling a website-sourced player's per-round participation pushes the change back to the website (`POST <webhook.url>/presences/{code}/{round}`), so a later resync keeps it. Marking a player *present* again is gated on the website accepting it (it may refuse a round the player isn't registered for); marking *absent* commits locally then mirrors back best-effort.
 - Level lock: a bulk-import entry may carry `"locked": true` to mark a player as a rating exception — their rating/rank/pro then survive website syncs and ratings refreshes until an explicit `"locked": false`. Manual edits still apply; no UI, the flag is meant to be set by the event site.
 - Bulk roster import reports players removed on the source side: registered players a full-roster import leaves untouched come back in a `missing` journal section (shown as "removed on website (kept here)" after a sync) — reported only, never deleted.
+- External registry player source (`ratings.ext = <url>`): a tournament website's roster, served as JSON, becomes searchable in the Add Player popup alongside the rating databases (inactive when the property is unset). It is a participant registry, not a ratings authority, so the `ratings.date` freeze and the ratings refresh both leave it alone; `ratings.<source>.enable`/`.show`/`.label` configure it like any source (off and hidden by default). Roster caches are date-granular, so a same-day registration only shows up the next day.
 
 ### Changed
 
@@ -45,6 +46,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - The tournament store directory is created at API startup rather than on first use.
 - Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
 - Website re-sync no longer crashes when a player's round participation changed length: json array comparison was broken in essential-kson (crash on shorter, false equality on longer) — fixed upstream, dependency bumped 2.4 → 2.15 (Kotlin toolchain 2.1 → 2.3 to match).
+- Player search over a single source (or filtered by country) no longer pads the results up to the 20-hit cap with non-matching entries of that source (Lucene `BooleanQuery` `minimumNumberShouldMatch` fix in `PlayerIndex`).
 
 ## [0.26] - 2026-06-22
 

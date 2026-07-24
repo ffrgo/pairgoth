@@ -304,7 +304,38 @@ Whether to show player IDs from this rating source on the registration page.
 Defaults when unset:
 - EGF: enabled and shown everywhere
 - FFG: enabled and shown only for French tournaments
-- Other sources (e.g. AGA): off
+- Other sources (e.g. AGA, ext): off
+
+#### Source label
+
+```
+ratings.<source>.label = <text>
+```
+
+Display label for the source's search button and registration column. Defaults to the uppercase source code (e.g. `EGF`); an EGC deployment might set `ratings.ext.label = EGC`.
+
+#### External registry (ext)
+
+```
+ratings.ext = <url>
+```
+
+Activates a fourth, generic source: a tournament website's roster served as JSON, searchable in the Add Player popup alongside the rating databases. The source is inactive when the property is unset (no behaviour change otherwise). Schemes: `http://`, `https://`, `file://` (the latter is handy for testing).
+
+The URL serves:
+
+```
+{ "date": "YYYY-MM-DD", "players": [ { "name", "firstname", "country", "club", "rank", "rating", "ext" }, ... ] }
+```
+
+Field conventions match EGF entries: `rank` is a display string (`"4k"`), `rating` an int, `country` a 2-letter code. `ext` is the registry's own player id and lands in the player's external ids (`DatabaseId.EXT`).
+
+Like any source, `ratings.ext.enable`, `ratings.ext.show` and `ratings.ext.label` apply; ext defaults to off and hidden for both. Two behaviours set ext apart, because it is a participant registry rather than a ratings snapshot:
+
+- The global `ratings.date` freeze does **not** apply to ext — freezing it would hide late registrants.
+- The refresh-ratings feature (EGD/FFG/AGA) ignores ext — it is not a ratings authority.
+
+Known limitation: roster caches are date-granular (`EXT-yyyyMMdd.json`) and a same-day refetch is a no-op, so a registration made today only appears in pairgoth tomorrow. Same-day walk-ins can be typed manually in the Add Player popup.
 
 ### SMTP
 
