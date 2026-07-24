@@ -68,6 +68,9 @@
 #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
           <col class="col-ffg"/>
 #end
+#if($utils.showRatings('ext', $tour.country.toLowerCase()))
+          <col class="col-ext"/>
+#end
           <col class="col-rank"/>
           <col class="col-rating"/>
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
@@ -89,6 +92,9 @@
 #end
 #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
           <th>FFG</th>
+#end
+#if($utils.showRatings('ext', $tour.country.toLowerCase()))
+          <th>$utils.ratingLabel('ext')</th>
 #end
           <th><span class="noprint">Rank</span><span class="print-abbr">_BLANK_RANK_ABBR Rank</span></th>
           ## TableSort bug which inverts specified sort...
@@ -117,6 +123,9 @@
   #end
   #if($utils.showRatings('ffg', $tour.country.toLowerCase()))
             <td#if("$!part.licensed" == "false") class="darkred"#end>$!part.ffg</td>
+  #end
+  #if($utils.showRatings('ext', $tour.country.toLowerCase()))
+            <td>$!part.ext</td>
   #end
   ## display MMS correction on the screen, but not when printed
             <td data-sort="$part.rating">#rank($part.rank $!part.pro)#if($utils.ratingRank($part.rating) != $part.rank)<span class="noprint"> ($utils.effectiveRank($part.rating))</span>#end#if($part.mmsCorrection)<span class="noprint"> (#if($part.mmsCorrection > 0)+#end$part.mmsCorrection)</span>#end</td>
@@ -199,6 +208,9 @@
 #if($utils.displayRatings('ffg', $tour.country.toLowerCase()))
   #set($needleWidth = $needleWidth - 2)
 #end
+#if($utils.displayRatings('ext', $tour.country.toLowerCase()))
+  #set($needleWidth = $needleWidth - 2)
+#end
 #set($cssWidth = { 8: 'eight', 10: 'ten', 12: 'twelve' })
         <div class="needle $cssWidth[$needleWidth] wide field">
           <div class="ui icon input">
@@ -236,6 +248,17 @@
               <div class="circle"></div>
             </div>
             <label>FFG</label>
+          </div>
+        </div>
+#end
+#if($utils.displayRatings('ext', $tour.country.toLowerCase()))
+        <div class="two wide centered field">
+          <div class="toggle" title="${utils.ratingsDates.ext|'no ext ratings'}">
+            <input id="ext" name="ext" type="checkbox" checked value="true"/>
+            <div class="search-param checkbox">
+              <div class="circle"></div>
+            </div>
+            <label>$utils.ratingLabel('ext')</label>
           </div>
         </div>
 #end
@@ -305,7 +328,7 @@
               <input type="text" name="aga" placeholder="AGA id" spellcheck="false"/>
             </div>
             <div class="four wide field">
-              <label>EXT</label>
+              <label>$utils.ratingLabel('ext')</label>
               <span class="info"></span>
               <input type="text" name="ext" placeholder="External id" spellcheck="false"/>
             </div>
@@ -443,7 +466,7 @@
 #[[
 <script id="result" type="text/template">
   {{for #data}}
-    <div class="result-line" data-index="{{:#getIndex()}}" data-name="{{:name}}">[{{:origin}}{{if origin === 'EGF'}} {{:egf}}{{/if}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
+    <div class="result-line" data-index="{{:#getIndex()}}" data-name="{{:name}}">[{{if origin === 'EXT'}}]]#$utils.ratingLabel('ext')#[[{{else}}{{:origin}}{{/if}}{{if origin === 'EGF'}} {{:egf}}{{/if}}] {{:country}} - {{:name}} {{:firstname}} {{:rank}} ({{:club}}) {{if country === 'FR' && license !== 'L'}}<span class="darkred">non licencié</span>{{/if}}</div>
   {{/for}}
 </script>
 <script type="text/javascript" src="/lib/jsrender-1.0.13/jsrender.min.js"></script>

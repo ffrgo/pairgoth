@@ -187,12 +187,12 @@ function search(needle) {
   needle = needle.trim();
   if (needle && (needle === '*' || needle.length > 2)) {
     let form = $('#search-form')[0];
-    let search = {
-      needle: needle,
-      // aga: form.val('aga'),
-      egf: form.val('egf'),
-      ffg: form.val('ffg')
-    }
+    let search = { needle: needle };
+    // a disabled source has no toggle in the DOM (template-gated); only read the ones present
+    // (form.val() on a missing field would log an error) — EXT is off by default, so this matters.
+    ['egf', 'ffg', 'ext'].forEach(src => {
+      if (form.find(`[name="${src}"]`).length) search[src] = form.val(src);
+    });
     let country = form.val('countryFilter');
     if (country) search.countryFilter = country;
     api.postJson('search', search)
@@ -534,7 +534,7 @@ onLoad(() => {
       skip: form.find('input.participation').map((input,i) => [i+1, input.checked]).filter(arr => !arr[1]).map(arr => arr[0]),
       final: form.val('final')
     }
-    for (let origin of ['egf', 'ffg']) {
+    for (let origin of ['egf', 'ffg', 'ext']) {
       let value = form.val(origin);
       if (value) {
         player[origin] = value;
@@ -609,9 +609,10 @@ onLoad(() => {
   });
   let searchFormState = store('searchFormState')
   if (searchFormState) {
-    for (let id of ["countryFilter", /* "aga", */ "egf", "ffg", "browse"]) {
+    for (let id of ["countryFilter", /* "aga", */ "egf", "ffg", "ext", "browse"]) {
       let ctl = $(`#${id}`);
-      if (ctl.length !== 0) {
+      // a state predating a newly enabled source must not override its default (checked)
+      if (ctl.length !== 0 && id in searchFormState) {
         ctl[0].checked = searchFormState[id];
       }
     }
@@ -628,10 +629,12 @@ onLoad(() => {
     let searchFormState = {
       countryFilter: !!form.val('countryFilter'),
       // aga: search.aga,
-      egf: !!form.val('egf'),
-      ffg: !!form.val('ffg'),
       browse: !!form.val('browse')
     };
+    // only persist sources whose toggle is present (a disabled source is template-gated out)
+    ['egf', 'ffg', 'ext'].forEach(src => {
+      if (form.find(`[name="${src}"]`).length) searchFormState[src] = !!form.val(src);
+    });
     store('searchFormState', searchFormState);
     clearSearch();
     initSearch();
