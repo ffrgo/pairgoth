@@ -271,6 +271,8 @@ function addPlayers() {
   let status = form.val('final') || false;
   form.reset();
   form.val('final', status);
+  // already-paired rounds default to unchecked for a late registrant
+  pairedRounds.forEach(r => form.val(`r${r}`, false));
   chained = true;
   $('#chain-rating').addClass('chained');
   updateLinkHints();

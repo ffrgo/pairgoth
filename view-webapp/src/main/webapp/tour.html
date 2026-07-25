@@ -85,6 +85,8 @@
   const tour_endDate = '$!tour.endDate';
   const tour_country = '$!tour.country';
   let activeRound = ${round};
+  // rounds that already have games — a newly added player defaults to skipping them
+  const pairedRounds = [#foreach($r in [1..$tour.rounds])#if($tour.stats[$r - 1].games > 0)$r,#end#end];
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
   const teamSize = $tour.teamSize;
 #end
