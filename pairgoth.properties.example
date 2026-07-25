@@ -57,6 +57,7 @@
 # ratings.<source>.enable = true|false         # available in Add Player search (default: EGF everywhere, FFG in FR)
 # ratings.<source>.show = true|false           # show source IDs on registration (same default rule)
 # ratings.<source>.label = <text>              # button/column label for a source (default: uppercase code)
+# ratings.rank_authoritative = false           # bulk imports: rank wins over an out-of-band rating (snapped to band centre)
 
 # SMTP (email notifications; not yet functional)
 # smtp.sender =

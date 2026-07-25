@@ -337,6 +337,19 @@ Like any source, `ratings.ext.enable`, `ratings.ext.show` and `ratings.ext.label
 
 Known limitation: roster caches are date-granular (`EXT-yyyyMMdd.json`) and a same-day refetch is a no-op, so a registration made today only appears in pairgoth tomorrow. Same-day walk-ins can be typed manually in the Add Player popup.
 
+#### Rank authority
+
+```
+ratings.rank_authoritative = true | false
+```
+
+Which of the two imported level fields wins when a [bulk import](#pairgoth-api-specification) entry carries a rank and a rating that disagree (the rating falls outside the rank's 100-point band):
+
+- `false` (default): the rating is authoritative. Both values are imported as sent; the registration form shows the pair as unlinked (the rank is an honorary grade, pairing strength comes from the rating).
+- `true`: the rank is authoritative. The rating is snapped to the rank's nominal value (band centre, e.g. 1d → 2100), so every imported player lands with rank and rating linked. In-band ratings are kept as-is (finer-grained). A manual unlink in the registration form does not survive the next sync — level exceptions belong on the source side, or behind the `locked` flag.
+
+Meant for deployments where the event site is the level authority (e.g. an EGC pushing referee-validated ranks).
+
 ### SMTP
 
 SMTP configuration for email notifications. Not yet functional.
@@ -594,6 +607,10 @@ When authentication is enabled, all requests require an `Authorization` header.
     upsert — including this endpoint and the ratings refresh — until an entry with an explicit
     `"locked": false` unlocks them (which applies its own values in one shot). An absent flag
     never changes the lock state. Manual per-player edits (`PUT`) are not restricted.
+
+    When [`ratings.rank_authoritative`](#rank-authority) is set, an entry carrying both `rank` and
+    `rating` gets its out-of-band rating snapped to the rank's nominal value before the merge
+    (locked players remain immune).
 
     *output* a journal `{ "success": true, "added": [ "Name Firstname", … ], "updated": [ { "player": "Name Firstname", "changes": "rating 2627→2630, rank 5→6" }, … ], "unchanged": [ "Name Firstname", … ], "failed": [ { "player": "...", "reason": "..." } ], "missing": [ "Name Firstname", … ] }` — each section lists its players (counts are the array lengths); `changes` is a compact field-level diff. E.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch. `missing` lists the pre-existing players the payload did not touch: since an import carries the full source roster, those have been removed on the source side — reported only, never deleted (empty for partial payloads, i.e. when `reason` is set).
 
