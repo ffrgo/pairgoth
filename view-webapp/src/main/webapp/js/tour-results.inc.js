@@ -12,8 +12,8 @@ function applyResult({ id, result, previous }) {
   let dispResult = result;
   switch (result) {
     case '?': break;
-    case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = '1-0'; break;
-    case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = '0-1'; break;
+    case 'w': white.addClass('winner'); black.addClass('looser'); dispResult = blackFirst ? '0-1' : '1-0'; break;
+    case 'b': black.addClass('winner'); white.addClass('looser'); dispResult = blackFirst ? '1-0' : '0-1'; break;
     case '=': dispResult = '½-½'; break;
     case 'X': break;
     case '#': white.addClass('winner'); black.addClass('winner'); dispResult = '1-1'; break;
