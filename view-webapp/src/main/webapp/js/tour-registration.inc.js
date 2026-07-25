@@ -744,6 +744,8 @@ onLoad(() => {
     // Relinking reconciles from rank to rating.
     if (chained) syncRatingFromRank();
     updateLinkHints();
+    // syncRatingFromRank writes the field programmatically — no input event, enable Save ourselves
+    $('#register').removeClass('disabled');
   });
   $('#player input[name="rating"]').on('input', e=>{
     updateLinkHints();
