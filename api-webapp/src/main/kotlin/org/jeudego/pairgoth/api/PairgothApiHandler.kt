@@ -47,6 +47,7 @@ interface PairgothApiHandler: ApiHandler {
             Event.ResultsCleared -> "Clear results$ofRound"
             Event.TablesRenumbered -> "Renumber tables$ofRound"
             Event.TournamentUpdated -> "Edit tournament settings"
+            Event.PairingParamsUpdated -> "Edit pairing parameters"
             else -> event.slug.replace('-', ' ')
         }
     }

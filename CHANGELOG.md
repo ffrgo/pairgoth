@@ -48,6 +48,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Docker packaging refreshed: current LTS Java image, configuration read from `docker/pairgoth.properties`, `run.sh` picks up a freshly built engine.
 - Website re-sync no longer crashes when a player's round participation changed length: json array comparison was broken in essential-kson (crash on shorter, false equality on longer) — fixed upstream, dependency bumped 2.4 → 2.15 (Kotlin toolchain 2.1 → 2.3 to match).
 - Player search over a single source (or filtered by country) no longer pads the results up to the 20-hit cap with non-matching entries of that source (Lucene `BooleanQuery` `minimumNumberShouldMatch` fix in `PlayerIndex`).
+- The Advanced-parameters dialog no longer reloads the page on Update or Cancel, so pending edits in the main tournament form survive a trip through the dialog (they used to be silently discarded). Its updates now dispatch a dedicated `PairingParamsUpdated` event, labelled "Edit pairing parameters" in the undo list.
 
 ## [0.26] - 2026-06-22
 

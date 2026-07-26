@@ -26,14 +26,25 @@ onLoad(() => {
     return false;
   });
 
+  // The dialog commits/cancels only itself, never via reload — a reload would discard
+  // in-progress main-form edits (the two scopes are independent).
+  let paramsSnapshot = null;
+  function parametersControls() {
+    return $('#parameters-form')[0].find('input, select');
+  }
+
+  function syncMainClubDetails() {
+    $('#mainClubDetails')[0].style.display = $('#mainClubAdjustment')[0].checked ? '' : 'none';
+  }
+
   $('#parameters').on('click', e => {
+    paramsSnapshot = [...parametersControls()].map(c => c.type === 'checkbox' ? c.checked : c.value);
     modal('parameters-modal');
     updateMainClubReadout();
   });
 
-  // Toggle visibility of the threshold/readout block when the adjustment checkbox flips.
   $('#mainClubAdjustment').on('change', e => {
-    $('#mainClubDetails')[0].style.display = e.target.checked ? '' : 'none';
+    syncMainClubDetails();
     if (e.target.checked) updateMainClubReadout();
   });
   $('input[name="mainClubDetectionThreshold"]').on('input change', updateMainClubReadout);
@@ -70,11 +81,14 @@ onLoad(() => {
   }
 
   $('#cancel-parameters').on('click', e => {
-    // Same rationale as the main #cancel handler: reload to discard unsaved edits.
-    // The global .close handler in main.js will close the modal; the reload happens
-    // after, with the original server-stored values back in the form.
-    if (typeof(tour_id) !== 'undefined') {
-      window.location.reload();
+    // Restore the dialog to its on-open state; the global .close handler in main.js
+    // closes the modal.
+    if (paramsSnapshot) {
+      [...parametersControls()].forEach((c, i) => {
+        if (c.type === 'checkbox') c.checked = paramsSnapshot[i];
+        else c.value = paramsSnapshot[i];
+      });
+      syncMainClubDetails();
     }
   });
 
@@ -304,7 +318,7 @@ onLoad(() => {
         });
     }
   });
-  $('#update-parameters').on('click', e => {
+  $('#update-parameters').on('click', async e => {
     let form = $('#parameters-form')[0];
     let tour = {
       pairing: {
@@ -344,12 +358,51 @@ onLoad(() => {
         }
       }
     }
-    api.putJson(`tour/${tour_id}`, tour)
-      .then(tour => {
-        if (tour !== 'error') {
-          window.location.reload();
-        }
-      });
+    let rst = await mutate({ url: `tour/${tour_id}`, body: tour, source: 'information' });
+    if (rst !== 'error' && rst !== 'readonly') close_modal();
+  });
+
+  // Model json → dialog controls; inverse of the payload built by #update-parameters.
+  // Guards on control presence (some fields are Mac Mahon-only).
+  function patchParametersForm(pairing) {
+    let form = $('#parameters-form')[0];
+    const set = (name, value) => { let c = form.find(`[name="${name}"]`)[0]; if (c) c.value = value; };
+    const check = (name, on) => { let c = form.find(`[name="${name}"]`)[0]; if (c) c.checked = !!on; };
+    let { base, main, secondary, geo, handicap } = pairing;
+    set('randomness', base.random == 0 ? 'none' : base.deterministic ? 'deterministic' : 'non-deterministic');
+    check('colorBalance', base.colorBalanceWeight);
+    check('roundDownScore', main.roundDownScore);
+    set('mmsValueAbsent', main.mmsValueAbsent);
+    set('sosValueAbsentUseBase', main.sosValueAbsentUseBase);
+    set('firstSeedLastRound', main.firstSeedLastRound);
+    check('firstSeedAddRating', main.firstSeedAddCrit === 'RATING');
+    set('firstSeed', main.firstSeed);
+    check('secondSeedAddRating', main.secondSeedAddCrit === 'RATING');
+    set('secondSeed', main.secondSeed);
+    check('upDownCompensate', main.upDownCompensate);
+    set('upDownUpperMode', main.upDownUpperMode);
+    set('upDownLowerMode', main.upDownLowerMode);
+    set('rankThreshold', secondary.rankThreshold);
+    check('winsThreshold', secondary.winsThreshold);
+    check('barThreshold', secondary.barThreshold);
+    set('mmsDiffCountry', geo.mmsDiffCountry);
+    set('mmsDiffClub', geo.mmsDiffClub);
+    check('avoidSameFamily', geo.avoidSameFamily);
+    check('mainClubAdjustment', geo.mainClubAdjustment);
+    set('mainClubDetectionThreshold', Math.round((geo.mainClubDetectionThreshold || 0.4) * 100));
+    check('useMMS', handicap.useMMS);
+    set('ceiling', handicap.ceiling);
+    syncMainClubDetails();
+  }
+
+  // Advanced params live only in the dialog: patch it in place (a no-op for the actor,
+  // a refresh for observers) instead of the coarse reload/warn — this is what keeps
+  // in-progress main-form edits alive across a parameters update.
+  sseEffect('PairingParamsUpdated', tour => {
+    patchParametersForm(tour.pairing);
+    paramsSnapshot = null; // dialog now shows server state; a later open re-snapshots
+    if ($('#parameters-modal').hasClass('shown')) updateMainClubReadout();
+    return true;
   });
   let shortName = $('input[name="shortName"]');
   manualShortName = (shortName[0].value !== '');

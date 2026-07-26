@@ -481,7 +481,7 @@ onLoad(() => {
 // sparse PUT the api flags as StandingsUpdated, so it's sourced at standings (affects only standings).
 const TAB_ORDER = ['information', 'registration', 'teams', 'pairing', 'results', 'standings'];
 const EVENT_SOURCE_TAB = {
-  TournamentUpdated: 'information',
+  TournamentUpdated: 'information', PairingParamsUpdated: 'information',
   PlayerAdded: 'registration', PlayerUpdated: 'registration', PlayerDeleted: 'registration',
   PlayersImported: 'registration', RatingsRefreshed: 'registration', MMGroupsUpdated: 'registration',
   TeamAdded: 'teams', TeamUpdated: 'teams', TeamDeleted: 'teams',
