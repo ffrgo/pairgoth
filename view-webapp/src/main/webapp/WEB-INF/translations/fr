@@ -11,6 +11,7 @@
 : the	: le projet
 Add player	Ajouter
 Advanced parameters	Paramètres avancés
+All	Toutes
 At its core,	&nbsp;
 Browse	Parcourir les sources de
 Byo-yomi periods	Périodes de byo-yomi
@@ -18,6 +19,7 @@ Byo-yomi stones	Pierres de byo-yomi
 Byo-yomi time	Durée du byo-yomi
 Canadian byo-yomi	Byo-yomi canadien
 Cancel	Annuler
+Custom:	Sélection :
 Change	Mettre à jour
 Chinese rules	Règles chinoises
 Choose format	Choix du format
@@ -42,6 +44,7 @@ Encoding	Encodage
 Enter the magic word	Entrer le mot magique
 Example tournament	Tournoi
 Exclude table numbers:	Exclure les numéros de table :
+Table numbers to print:	Numéros de table à imprimer :
 Export	Exporter
 Export tournament	Exporter le tournoi
 Family name	Nom de famille
@@ -62,6 +65,7 @@ Increment	Incrément
 Individual players	Joueurs individuels
 Information	Information
 Invalid tournament id	Identifiant de tournoi invalide
+Invalid table numbers	Numéros de table invalides
 Japanese rules	Règles japonaises
 Komi	Komi
 Launch	Lancer

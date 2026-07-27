@@ -236,6 +236,28 @@ onLoad(()=>{
   $('#renumber-tables').on('click', e => {
     renumberTables();
   });
+  $('#result-sheets').on('click', e => {
+    modal('result-sheets-modal');
+  });
+  // typing in the custom field implies choosing it
+  $('#result-sheets-form [name="tables"]').on('focus', e => {
+    $('#result-sheets-form')[0].val('tables-choice', 'custom');
+  });
+  $('#print-result-sheets').on('click', e => {
+    let form = $('#result-sheets-form')[0];
+    let url = `result-sheets?id=${tour_id}&round=${activeRound}`;
+    if (form.val('tables-choice') === 'custom') {
+      let tables = form.val('tables').trim();
+      // same syntax as the tables exclusion field (see validateTablesExclusion server-side)
+      if (tables === '' || !/^(?:(?:\s+|,)*\d+(?:-\d+)?)*$/.test(tables)) {
+        showError(msg('invalid-tables-selection'));
+        return;
+      }
+      url += `&tables=${encodeURIComponent(tables)}`;
+    }
+    close_modal();
+    window.open(url, '_blank');
+  });
   $('#pairing-form [name]').on('input', e => {
     $('#update-pairing').removeClass('disabled');
   });

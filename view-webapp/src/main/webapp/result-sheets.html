@@ -31,8 +31,13 @@
   #stop
 #end
 #set($games = $utils.removeBye($roundPairing.games))
+#if("$!params.tables" != "")
+  #set($games = $utils.filterTables($games, $params.tables))
+#end
 #set($pages = ($games.size() + 3) / 4)
 #set($items = $pages * 4)
+## NB [1..0] would count down — guard the empty case (custom tables selection matching no game)
+#if($items > 0)
 #foreach($i in [1..$items])
   #set($j = ($i - 1) / 4 + (($i - 1) % 4) * $pages)
   #if($j < $games.size())
@@ -94,6 +99,7 @@
   #if($foreach.index % 4 == 3)
   </div>
   #end
+#end
 #end
 </div>
 <script type="text/javascript">

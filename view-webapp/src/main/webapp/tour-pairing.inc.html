@@ -100,7 +100,7 @@
 #*      *#</div>
 #if(!$tour.type.startsWith('TEAM'))
           <div class="pairing-post-actions">
-            <a href="result-sheets?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></a>
+            <button id="result-sheets" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></button>
             <a href="explain?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">explain pairing <i class="fa fa-external-link"></i></a>
 #if($webhookConfigured)
             <button id="publish-pairings" class="ui mini yellow floating icon button">publish to website <i class="fa fa-cloud-upload"></i></button>
@@ -218,8 +218,37 @@
   </div>
 </div>
 
+<div id="result-sheets-modal" class="popup">
+  <div class="popup-body">
+    <form id="result-sheets-form" class="ui form edit">
+      <div class="popup-content">
+        <div class="grouped fields">
+          <label>Table numbers to print:</label>
+          <div class="field">
+            <label><input type="radio" name="tables-choice" value="all" checked/> All</label>
+          </div>
+          <div class="field">
+            <label><input type="radio" name="tables-choice" value="custom"/> Custom: <input type="text" name="tables" placeholder="ex: 1-34, 38, 45-77"/></label>
+          </div>
+        </div>
+      </div>
+      <div class="popup-footer">
+        <button id="cancel-result-sheets" type="button" class="ui gray right labeled icon floating close button">
+          <i class="times icon"></i>
+          Cancel
+        </button>
+        <button id="print-result-sheets" type="button" class="ui green right labeled icon floating button">
+          <i class="check icon"></i>
+          OK
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 ## For dynamic texts to be translated, they must be somewhere in the html source.
 ## TODO - gather all "text only" nodes like this somewhere
 <div id="previous_games_prefix" class="hidden">Games of </div>
 <div id="confirm-unsynced-pairing" class="hidden">No website sync since the last pairing — presences may be stale. Pair anyway?</div>
+<div id="invalid-tables-selection" class="hidden">Invalid table numbers</div>
 <div id="previous_games_postfix" class="hidden"></div>
