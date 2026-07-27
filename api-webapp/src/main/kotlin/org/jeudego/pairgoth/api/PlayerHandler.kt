@@ -62,7 +62,8 @@ object PlayerHandler: PairgothApiHandler {
         val unchanged = Json.MutableArray()
         val failed = Json.MutableArray()
         // A roster import carries the full source roster, so any pre-existing player it leaves
-        // untouched has been removed on the source side. Report-only: pairgoth never deletes.
+        // untouched has been removed on the source side. Never deleted here, but unregistered
+        // from the rounds still open to them (see the `missing` journal below).
         val preExisting = tournament.players.values.toList()
         val touched = mutableSetOf<ID>()
         val rankAuthoritative = WebappManager.properties.getProperty("ratings.rank_authoritative")?.toBoolean() ?: false
@@ -111,12 +112,30 @@ object PlayerHandler: PairgothApiHandler {
         // stamp even when nothing changed (no event): "synced, all up to date" must silence the
         // pair-without-sync confirm too; the cached instance carries it, the file catches up later
         if (event == PlayersImported) tournament.lastSync = System.currentTimeMillis()
-        if (added.isNotEmpty() || updated.isNotEmpty())
-            tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
-        // partial payloads (?reason= — ratings refresh, mm group edits) can't tell removed from omitted
+        // partial payloads (?reason= — ratings refresh, mm group edits) can't tell removed from omitted.
+        // A missing player is kept but unregistered from every round still open to them — the round
+        // filter mirrors participationConflict, so already-paired rounds (and paired-team rounds)
+        // stay untouched; the journal entry carries the change when there is one.
         val missing = Json.MutableArray()
-        if (event == PlayersImported)
-            preExisting.filter { it.id !in touched }.forEach { missing.add("${it.name} ${it.firstname}") }
+        var unregistered = 0
+        if (event == PlayersImported) preExisting.filter { it.id !in touched }.forEach { player ->
+            val remaining = (1..tournament.rounds).filter { round ->
+                round !in player.skip &&
+                    (round > tournament.lastRound() || player.id !in tournament.pairedPlayers(round)) &&
+                    (tournament !is TeamTournament || round > tournament.lastRound() ||
+                        tournament.getPlayerTeam(player.id).let { it == null || it.id !in tournament.pairedTeams() })
+            }
+            val entry = Json.MutableObject("player" to "${player.name} ${player.firstname}")
+            if (remaining.isNotEmpty()) {
+                player.skip.addAll(remaining)
+                unregistered++
+                entry["changes"] = "unregistered from round${if (remaining.size > 1) "s" else ""} ${remaining.joinToString(", ")}"
+            }
+            missing.add(entry)
+        }
+        if (added.isNotEmpty() || updated.isNotEmpty() || unregistered > 0)
+            tournament.dispatchEvent(event, request, Json.Object(
+                "added" to added.size, "updated" to updated.size, "unregistered" to unregistered))
         return Json.Object("success" to true,
             "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed,
             "missing" to missing)

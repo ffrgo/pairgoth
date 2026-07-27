@@ -3,11 +3,13 @@ package org.jeudego.pairgoth.test
 import com.republicate.kson.Json
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 /**
  * A roster import carries the full source roster: pre-existing players it leaves untouched
- * have been removed on the source side and land in the journal's `missing` section — report
- * only, never deleted. Partial payloads (?reason=) can't tell removed from omitted: no report.
+ * have been removed on the source side and land in the journal's `missing` section — kept,
+ * never deleted, but unregistered from the rounds still open to them (paired rounds stay).
+ * Partial payloads (?reason=) can't tell removed from omitted: no report, no change.
  */
 class BulkMissingTest : TestBase() {
 
@@ -22,7 +24,7 @@ class BulkMissingTest : TestBase() {
             "location" to "Test Location",
             "online" to false,
             "timeSystem" to Json.Object("type" to "SUDDEN_DEATH", "mainTime" to 3600),
-            "rounds" to 1,
+            "rounds" to 2,
             "pairing" to Json.Object("type" to "MAC_MAHON")
         )
         fun player(ext: String, name: String) = Json.Object(
@@ -32,7 +34,7 @@ class BulkMissingTest : TestBase() {
     }
 
     @Test
-    fun `untouched players are reported missing on full sync, kept, and ignored on partial payloads`() {
+    fun `missing players are kept but unregistered from open rounds`() {
         val resp = TestAPI.post("/api/tour", tournament).asObject()
         val tourId = resp.getInt("id") ?: throw Error("tournament creation failed")
 
@@ -40,12 +42,24 @@ class BulkMissingTest : TestBase() {
             Json.Array(player("101", "Alpha"), player("102", "Beta"))).asObject()
         assertEquals(2, report.getArray("added")!!.size)
         assertEquals(0, report.getArray("missing")!!.size)
+        TestAPI.post("/api/tour/$tourId/pair/1", Json.Array("all"))
 
-        // Beta gone from the source roster: reported missing but still registered.
+        // Beta gone from the source roster: kept and reported; the paired round 1 stays,
+        // the open round 2 is unregistered and the journal entry says so.
         report = TestAPI.post("/api/tour/$tourId/part", Json.Array(player("101", "Alpha"))).asObject()
-        assertEquals(1, report.getArray("missing")!!.size)
-        assertEquals("Beta Test", report.getArray("missing")!![0])
-        assertEquals(2, TestAPI.get("/api/tour/$tourId/part").asArray().size)
+        var entry = report.getArray("missing")!![0] as Json.Object
+        assertEquals("Beta Test", entry.getString("player"))
+        assertEquals("unregistered from round 2", entry.getString("changes"))
+        val players = TestAPI.get("/api/tour/$tourId/part").asArray()
+        assertEquals(2, players.size)
+        val beta = players.map { it as Json.Object }.first { it.getString("name") == "Beta" }
+        assertEquals(listOf(2), beta.getArray("skip")!!.map { (it as Number).toInt() })
+
+        // Resync: still missing, nothing left to unregister — no change reported.
+        report = TestAPI.post("/api/tour/$tourId/part", Json.Array(player("101", "Alpha"))).asObject()
+        entry = report.getArray("missing")!![0] as Json.Object
+        assertEquals("Beta Test", entry.getString("player"))
+        assertNull(entry.getString("changes"))
 
         // Partial payload (ratings refresh): omission is not removal.
         report = TestAPI.post("/api/tour/$tourId/part?reason=ratings", Json.Array(player("101", "Alpha"))).asObject()

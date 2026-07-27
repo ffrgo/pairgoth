@@ -984,10 +984,13 @@ onLoad(() => {
     if (blocked.length) sections.push({ label: `${blocked.length} blocked (already paired — freeze the round on the website first)`,
       items: blocked.map(f => `${f.player} (${(f.reason || '').match(/round #\d+/)[0]})`) });
     if (other.length) sections.push({ label: `${other.length} failed`, items: other.map(f => `${f.player || '?'}: ${f.reason}`) });
-    if (missing.length) sections.push({ label: `${missing.length} removed on website (kept here)`, items: missing });
+    // The server unregisters a missing player from the rounds still open to them; the entry
+    // carries a `changes` line when it did, and a real change means the table must reload.
+    if (missing.length) sections.push({ label: `${missing.length} removed on website (kept here)`,
+      items: missing.map(m => m.changes ? `${m.player} — ${m.changes}` : m.player) });
     if (unchanged.length) sections.push({ label: `${unchanged.length} unchanged`, items: unchanged });
 
-    if (added.length || updated.length) {
+    if (added.length || updated.length || missing.some(m => m.changes)) {
       // Stash and reload so the table reflects the new state; the on-load handler re-shows the report.
       store('refreshReport', { title: 'Sync from EGC', sections });
       setTimeout(() => window.location.reload(), 200);
