@@ -101,7 +101,9 @@
 #if(!$tour.type.startsWith('TEAM'))
           <div class="pairing-post-actions">
             <button id="result-sheets" class="ui mini floating icon button">result sheets <i class="fa fa-external-link"></i></button>
+#* disabled: ExplainHandler re-pairs the round in-place on the cached tournament (results lost on next persist)
             <a href="explain?id=${tour.id}&round=${round}" target="_blank" class="ui mini floating icon button">explain pairing <i class="fa fa-external-link"></i></a>
+*#
 #if($webhookConfigured)
             <button id="publish-pairings" class="ui mini yellow floating icon button">publish to website <i class="fa fa-cloud-upload"></i></button>
 #end
