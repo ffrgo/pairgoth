@@ -40,7 +40,7 @@ fun String.toCanonicalName(): String {
 
 // Pairable
 
-sealed class Pairable(val id: ID, val name: String, val rating: Int, val rank: Int, val final: Boolean, val mmsCorrection: Int = 0) {
+sealed class Pairable(val id: ID, val name: String, open val rating: Int, open val rank: Int, open val final: Boolean, val mmsCorrection: Int = 0) {
     // `rank` is the HONORARY grade: a stored label that the organiser may decouple from rating
     // via the link/unlink UI. Pairing must NEVER read it. Everything that decides who plays whom
     // — MMS groups (mmBase), handicap, seeding and sorting — reads `effectiveRank` instead, which

@@ -642,7 +642,7 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     ```json
     {
       "name": "Team Name",
-      "playerIds": [1, 2, 3],
+      "players": [1, 2, 3],
       "final": true,
       "mmsCorrection": 0
     }

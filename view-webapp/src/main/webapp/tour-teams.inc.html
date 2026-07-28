@@ -30,7 +30,7 @@
         <div>
           <div id="teams" class="multi-select" title="teams">
 #foreach($team in $teams)
-            <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank)#if($team.country) $team.country#end</span></div>
+            <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank) ($team.rating)#if($team.country) $team.country#end</span></div>
 #end
           </div>
           <div id="composition" class="hidden">

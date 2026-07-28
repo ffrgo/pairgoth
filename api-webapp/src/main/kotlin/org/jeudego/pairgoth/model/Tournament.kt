@@ -425,10 +425,14 @@ class TeamTournament(
 
     override fun pairedPlayers(round: Int) = super.pairedPlayers(round).flatMap { pairables[it]!!.asTeam()!!.playerIds }.toSet()
 
-    private fun List<Int>.average(provider: (Player)->Int) = ((sumOf {id -> provider(players[id]!!)} - epsilon) / size).roundToInt()
+    private fun List<Int>.average(provider: (Player)->Int) = if (isEmpty()) 0 else ((sumOf {id -> provider(players[id]!!)} - epsilon) / size).roundToInt()
 
-    inner class Team(id: ID, name: String, rating: Int, rank: Int, final: Boolean, mmsCorrection: Int = 0): Pairable(id, name, rating, rank, final, mmsCorrection) {
+    inner class Team(id: ID, name: String, mmsCorrection: Int = 0): Pairable(id, name, 0, 0, true, mmsCorrection) {
         val playerIds = mutableSetOf<ID>()
+        // live views over current members, so roster and player edits reach display and pairing
+        override val rating: Int get() = playerIds.toList().average(Player::rating)
+        override val rank: Int get() = playerIds.toList().average(Player::rank)
+        override val final: Boolean get() = teamPlayers.all { it.final }
         val teamPlayers: Set<Player> get() = playerIds.mapNotNull { players[it] }.toSet()
         override val club: String? get() = teamPlayers.map { it.club }.distinct().let { if (it.size == 1) it[0] else null }
         override val country: String? get() = teamPlayers.map { it.country }.distinct().let { if (it.size == 1) it[0] else null }
@@ -467,9 +471,6 @@ class TeamTournament(
         return Team(
             id = json.getInt("id") ?: default?.id ?: nextPlayerId,
             name = json.getString("name") ?: default?.name ?: badRequest("missing name"),
-            rating = json.getInt("rating") ?: default?.rating ?: teamPlayersIds.average(Player::rating),
-            rank = json.getInt("rank") ?: default?.rank ?: teamPlayersIds.average(Player::rank),
-            final = teamPlayersIds.all { players[it]!!.final },
             mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
         ).also {
                 it.playerIds.addAll(teamPlayersIds)
