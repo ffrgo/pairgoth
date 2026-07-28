@@ -278,10 +278,6 @@ onLoad(() => {
         type: form.val('pairing'),
         mmFloor: form.val('mmFloor'),
         mmBar: form.val('mmBar'),
-        main: {
-          firstSeed: form.val('firstSeed'),
-          secondSeed: form.val('secondSeed')
-        },
         handicap: {
           correction: -form.val('correction'),
           threshold: form.val('threshold')
@@ -296,6 +292,11 @@ onLoad(() => {
         periods: form.val('periods'),
         stones: form.val('stones')
       }
+    }
+    // the seed selects are Swiss-only fields; elsewhere let the server's per-type defaults rule
+    if (tour.pairing.type === 'SWISS') tour.pairing.main = {
+      firstSeed: form.val('firstSeed'),
+      secondSeed: form.val('secondSeed')
     }
     if (typeof(tour_id) !== 'undefined') {
       api.putJson(`tour/${tour_id}`, tour)

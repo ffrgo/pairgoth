@@ -49,6 +49,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Website re-sync no longer crashes when a player's round participation changed length: json array comparison was broken in essential-kson (crash on shorter, false equality on longer) — fixed upstream, dependency bumped 2.4 → 2.15 (Kotlin toolchain 2.1 → 2.3 to match).
 - Player search over a single source (or filtered by country) no longer pads the results up to the 20-hit cap with non-matching entries of that source (Lucene `BooleanQuery` `minimumNumberShouldMatch` fix in `PlayerIndex`).
 - The Advanced-parameters dialog no longer reloads the page on Update or Cancel, so pending edits in the main tournament form survive a trip through the dialog (they used to be silently discarded). Its updates now dispatch a dedicated `PairingParamsUpdated` event, labelled "Edit pairing parameters" in the undo list.
+- Default pairing parameters realigned on OpenGotha's per-system presets: a new Swiss tournament now seeds split-and-slip for all rounds (the creation form preselected split-and-random/split-and-fold, OpenGotha's raw pre-preset values); Mac Mahon seeds split-and-slip after round 1 (was split-and-fold) and gets the intended no-handicap threshold (1d) and secondary-criteria behaviour whether or not the request spells them out. Partial API payloads now fall back to the pairing-type defaults instead of type-blind ones. Existing tournaments keep their stored parameters.
 
 ## [0.26] - 2026-06-22
 

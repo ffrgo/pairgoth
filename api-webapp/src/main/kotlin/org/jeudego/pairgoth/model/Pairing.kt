@@ -33,7 +33,6 @@ data class BaseCritParams(
         const val MAX_BYE_WEIGHT = 100000000000.0 // 1e11
         const val MAX_RANDOM = 1000000000.0 // 1e9
         const val MAX_COLOR_BALANCE = 1000000.0 // 1e6
-        val default = BaseCritParams()
     }
 }
 
@@ -64,7 +63,6 @@ data class MainCritParams(
         const val MAX_SCORE_WEIGHT = 100000000000.0 // 1e11
         const val MAX_DRAW_UP_DOWN_WEIGHT = MAX_SCORE_WEIGHT / 1000.0;  // Draw-ups Draw-downs
         const val MAX_SEEDING_WEIGHT = MAX_SCORE_WEIGHT / 20000.0;
-        val default = MainCritParams()
     }
 }
 
@@ -75,9 +73,7 @@ data class SecondaryCritParams(
     val nbWinsThresholdActive: Boolean = true, // Do not apply secondary criteria when nbWins >= nbRounds / 2
     val defSecCrit: Double = MainCritParams.MAX_CATEGORIES_WEIGHT, // Should be MA_MAX_MINIMIZE_SCORE_DIFFERENCE for MM, MA_MAX_AVOID_MIXING_CATEGORIES for others
 ) {
-    companion object {
-        val default = SecondaryCritParams()
-    }
+    companion object {}
 }
 
 // geographical pairing params
@@ -115,13 +111,8 @@ data class HandicapParams(
             weight = 0.0,
             useMMS = false,
             rankThreshold = -30, // 30k
+            correction = 0,
             ceiling = 0)
-        val mmDefault = HandicapParams(
-            weight = 0.0,
-            useMMS = true,
-            rankThreshold = 0, // 1D
-            ceiling = 9)
-        fun default(type: PairingType) = if (type == MAC_MAHON) mmDefault else swissDefault
     }
 }
 
@@ -163,7 +154,8 @@ class Swiss(
         base = BaseCritParams(),
         main = MainCritParams(
             seedSystem1 = SPLIT_AND_SLIP,
-            seedSystem2 = SPLIT_AND_SLIP
+            seedSystem2 = SPLIT_AND_SLIP,
+            additionalPlacementCritSystem2 = Criterion.RATING
         ),
         secondary = SecondaryCritParams(
             barThresholdActive = true,
@@ -172,7 +164,7 @@ class Swiss(
             defSecCrit = MainCritParams.MAX_CATEGORIES_WEIGHT
         ),
         geo = GeographicalParams.disabled,
-        handicap = HandicapParams.default(SWISS)
+        handicap = HandicapParams.swissDefault
     ),
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
@@ -186,17 +178,20 @@ class Swiss(
 class MacMahon(
     pairingParams: PairingParams = PairingParams(
         base = BaseCritParams(),
-        main = MainCritParams(),
+        main = MainCritParams(
+            seedSystem2 = SPLIT_AND_SLIP // OpenGotha initForMM (the data class default keeps OG's raw pre-preset value)
+        ),
         secondary = SecondaryCritParams(
+            nbWinsThresholdActive = false, // not relevant in McMahon (OpenGotha initForMM)
             defSecCrit = MainCritParams.MAX_SCORE_WEIGHT
         ),
         geo = GeographicalParams(
             avoidSameGeo = MainCritParams.MAX_SCORE_WEIGHT
         ),
-        handicap = HandicapParams(
-            weight = MainCritParams.MAX_SCORE_WEIGHT, // TODO - contradictory with the comment above (not used anyway ?!)
+        handicap = HandicapParams( // OpenGotha initForMM
+            weight = 0.0,
             useMMS = true,
-            rankThreshold = -20,
+            rankThreshold = 0, // 1D
             ceiling = 9
         )
     ),
@@ -222,12 +217,12 @@ class RoundRobin(
 
 // Serialization
 
-fun BaseCritParams.Companion.fromJson(json: Json.Object, localDefault: BaseCritParams? = null) = BaseCritParams(
-    nx1 = json.getDouble("nx1") ?: localDefault?.nx1 ?: default.nx1,
-    dupWeight = json.getDouble("dupWeight") ?: localDefault?.dupWeight ?: default.dupWeight,
-    random = json.getDouble("random") ?: localDefault?.random ?: default.random,
-    deterministic = json.getBoolean("deterministic") ?: localDefault?.deterministic ?: default.deterministic,
-    colorBalanceWeight = json.getDouble("colorBalanceWeight") ?: localDefault?.colorBalanceWeight ?: default.colorBalanceWeight
+fun BaseCritParams.Companion.fromJson(json: Json.Object, default: BaseCritParams) = BaseCritParams(
+    nx1 = json.getDouble("nx1") ?: default.nx1,
+    dupWeight = json.getDouble("dupWeight") ?: default.dupWeight,
+    random = json.getDouble("random") ?: default.random,
+    deterministic = json.getBoolean("deterministic") ?: default.deterministic,
+    colorBalanceWeight = json.getDouble("colorBalanceWeight") ?: default.colorBalanceWeight
 )
 
 fun BaseCritParams.toJson() = Json.Object(
@@ -238,22 +233,22 @@ fun BaseCritParams.toJson() = Json.Object(
     "colorBalanceWeight" to colorBalanceWeight
 )
 
-fun MainCritParams.Companion.fromJson(json: Json.Object, localDefault: MainCritParams? = null) = MainCritParams(
-    categoriesWeight = json.getDouble("catWeight") ?: localDefault?.categoriesWeight ?: default.categoriesWeight,
-    scoreWeight = json.getDouble("scoreWeight") ?: localDefault?.scoreWeight ?: default.scoreWeight,
-    drawUpDownWeight = json.getDouble("upDownWeight") ?: localDefault?.drawUpDownWeight ?: default.drawUpDownWeight,
-    compensateDrawUpDown = json.getBoolean("upDownCompensate") ?: localDefault?.compensateDrawUpDown ?: default.compensateDrawUpDown,
-    drawUpDownLowerMode = json.getString("upDownLowerMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: localDefault?.drawUpDownLowerMode ?: default.drawUpDownLowerMode,
-    drawUpDownUpperMode = json.getString("upDownUpperMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: localDefault?.drawUpDownUpperMode ?: default.drawUpDownUpperMode,
-    seedingWeight = json.getDouble("maximizeSeeding") ?: localDefault?.seedingWeight ?: default.seedingWeight,
-    lastRoundForSeedSystem1 = json.getInt("firstSeedLastRound") ?: localDefault?.lastRoundForSeedSystem1 ?: default.lastRoundForSeedSystem1,
-    seedSystem1 = json.getString("firstSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: localDefault?.seedSystem1 ?: default.seedSystem1,
-    seedSystem2 = json.getString("secondSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: localDefault?.seedSystem2 ?: default.seedSystem2,
-    additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem1 ?: default.additionalPlacementCritSystem1,
-    additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: localDefault?.additionalPlacementCritSystem2 ?: default.additionalPlacementCritSystem2,
-    mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: localDefault?.mmsValueAbsent ?: default.mmsValueAbsent,
-    roundDownScore = json.getBoolean("roundDownScore") ?: localDefault?.roundDownScore ?: default.roundDownScore,
-    sosValueAbsentUseBase = json.getBoolean("sosValueAbsentUseBase") ?: localDefault?.sosValueAbsentUseBase ?: default.sosValueAbsentUseBase
+fun MainCritParams.Companion.fromJson(json: Json.Object, default: MainCritParams) = MainCritParams(
+    categoriesWeight = json.getDouble("catWeight") ?: default.categoriesWeight,
+    scoreWeight = json.getDouble("scoreWeight") ?: default.scoreWeight,
+    drawUpDownWeight = json.getDouble("upDownWeight") ?: default.drawUpDownWeight,
+    compensateDrawUpDown = json.getBoolean("upDownCompensate") ?: default.compensateDrawUpDown,
+    drawUpDownLowerMode = json.getString("upDownLowerMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: default.drawUpDownLowerMode,
+    drawUpDownUpperMode = json.getString("upDownUpperMode")?.let { MainCritParams.DrawUpDown.valueOf(it) } ?: default.drawUpDownUpperMode,
+    seedingWeight = json.getDouble("maximizeSeeding") ?: default.seedingWeight,
+    lastRoundForSeedSystem1 = json.getInt("firstSeedLastRound") ?: default.lastRoundForSeedSystem1,
+    seedSystem1 = json.getString("firstSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: default.seedSystem1,
+    seedSystem2 = json.getString("secondSeed")?.let { MainCritParams.SeedMethod.valueOf(it) } ?: default.seedSystem2,
+    additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem1,
+    additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem2,
+    mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: default.mmsValueAbsent,
+    roundDownScore = json.getBoolean("roundDownScore") ?: default.roundDownScore,
+    sosValueAbsentUseBase = json.getBoolean("sosValueAbsentUseBase") ?: default.sosValueAbsentUseBase
     )
 
 fun MainCritParams.toJson() = Json.Object(
@@ -274,11 +269,11 @@ fun MainCritParams.toJson() = Json.Object(
     "sosValueAbsentUseBase" to sosValueAbsentUseBase
 )
 
-fun SecondaryCritParams.Companion.fromJson(json: Json.Object, localDefault: SecondaryCritParams? = null) = SecondaryCritParams(
-    barThresholdActive = json.getBoolean("barThreshold") ?: localDefault?.barThresholdActive ?: default.barThresholdActive,
-    rankSecThreshold = json.getInt("rankThreshold") ?: localDefault?.rankSecThreshold ?: default.rankSecThreshold,
-    nbWinsThresholdActive = json.getBoolean("winsThreshold") ?: localDefault?.nbWinsThresholdActive ?: default.nbWinsThresholdActive,
-    defSecCrit = json.getDouble("secWeight") ?: localDefault?.defSecCrit ?: default.defSecCrit
+fun SecondaryCritParams.Companion.fromJson(json: Json.Object, default: SecondaryCritParams) = SecondaryCritParams(
+    barThresholdActive = json.getBoolean("barThreshold") ?: default.barThresholdActive,
+    rankSecThreshold = json.getInt("rankThreshold") ?: default.rankSecThreshold,
+    nbWinsThresholdActive = json.getBoolean("winsThreshold") ?: default.nbWinsThresholdActive,
+    defSecCrit = json.getDouble("secWeight") ?: default.defSecCrit
 )
 
 fun SecondaryCritParams.toJson() = Json.Object(
@@ -288,14 +283,14 @@ fun SecondaryCritParams.toJson() = Json.Object(
     "secWeight" to defSecCrit
 )
 
-fun GeographicalParams.Companion.fromJson(json: Json.Object, localDefault: GeographicalParams? = null) = GeographicalParams(
-    avoidSameGeo = json.getDouble("weight") ?: localDefault?.avoidSameGeo ?: disabled.avoidSameGeo,
-    preferMMSDiffRatherThanSameCountry = json.getInt("mmsDiffCountry") ?: localDefault?.preferMMSDiffRatherThanSameCountry ?: disabled.preferMMSDiffRatherThanSameCountry,
-    preferMMSDiffRatherThanSameClubsGroup = json.getInt("mmsDiffClubGroup") ?: localDefault?.preferMMSDiffRatherThanSameClub ?: disabled.preferMMSDiffRatherThanSameClubsGroup,
-    preferMMSDiffRatherThanSameClub = json.getInt("mmsDiffClub") ?: localDefault?.preferMMSDiffRatherThanSameClub ?: disabled.preferMMSDiffRatherThanSameClub,
-    mainClubAdjustment = json.getBoolean("mainClubAdjustment") ?: localDefault?.mainClubAdjustment ?: disabled.mainClubAdjustment,
-    mainClubDetectionThreshold = json.getDouble("mainClubDetectionThreshold") ?: localDefault?.mainClubDetectionThreshold ?: disabled.mainClubDetectionThreshold,
-    avoidSameFamily = json.getBoolean("avoidSameFamily") ?: localDefault?.avoidSameFamily ?: disabled.avoidSameFamily
+fun GeographicalParams.Companion.fromJson(json: Json.Object, default: GeographicalParams) = GeographicalParams(
+    avoidSameGeo = json.getDouble("weight") ?: default.avoidSameGeo,
+    preferMMSDiffRatherThanSameCountry = json.getInt("mmsDiffCountry") ?: default.preferMMSDiffRatherThanSameCountry,
+    preferMMSDiffRatherThanSameClubsGroup = json.getInt("mmsDiffClubGroup") ?: default.preferMMSDiffRatherThanSameClubsGroup,
+    preferMMSDiffRatherThanSameClub = json.getInt("mmsDiffClub") ?: default.preferMMSDiffRatherThanSameClub,
+    mainClubAdjustment = json.getBoolean("mainClubAdjustment") ?: default.mainClubAdjustment,
+    mainClubDetectionThreshold = json.getDouble("mainClubDetectionThreshold") ?: default.mainClubDetectionThreshold,
+    avoidSameFamily = json.getBoolean("avoidSameFamily") ?: default.avoidSameFamily
 )
 
 fun GeographicalParams.toJson() = Json.Object(
@@ -308,12 +303,12 @@ fun GeographicalParams.toJson() = Json.Object(
     "avoidSameFamily" to avoidSameFamily
 )
 
-fun HandicapParams.Companion.fromJson(json: Json.Object, type: PairingType, localDefault: HandicapParams? = null) = HandicapParams(
-    weight = json.getDouble("weight") ?: localDefault?.weight ?: default(type).weight,
-    useMMS = json.getBoolean("useMMS") ?: localDefault?.useMMS ?: default(type).useMMS,
-    rankThreshold = json.getInt("threshold") ?: localDefault?.rankThreshold ?: default(type).rankThreshold,
-    correction = json.getInt("correction") ?: localDefault?.correction ?: default(type).correction,
-    ceiling = json.getInt("ceiling") ?: localDefault?.ceiling ?: default(type).ceiling
+fun HandicapParams.Companion.fromJson(json: Json.Object, default: HandicapParams) = HandicapParams(
+    weight = json.getDouble("weight") ?: default.weight,
+    useMMS = json.getBoolean("useMMS") ?: default.useMMS,
+    rankThreshold = json.getInt("threshold") ?: default.rankThreshold,
+    correction = json.getInt("correction") ?: default.correction,
+    ceiling = json.getInt("ceiling") ?: default.ceiling
 )
 
 fun HandicapParams.toJson() = Json.Object(
@@ -332,11 +327,13 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?): Pairing {
         MAC_MAHON -> MacMahon()
         ROUND_ROBIN -> RoundRobin()
     }
-    val base = json.getObject("base")?.let { BaseCritParams.fromJson(it, default?.pairingParams?.base) } ?: default?.pairingParams?.base ?: defaultParams.pairingParams.base
-    val main = json.getObject("main")?.let { MainCritParams.fromJson(it, default?.pairingParams?.main) } ?: default?.pairingParams?.main ?: defaultParams.pairingParams.main
-    val secondary = json.getObject("secondary")?.let { SecondaryCritParams.fromJson(it, default?.pairingParams?.secondary) } ?: default?.pairingParams?.secondary ?: defaultParams.pairingParams.secondary
-    val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it, default?.pairingParams?.geo) } ?: default?.pairingParams?.geo ?: defaultParams.pairingParams.geo
-    val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it, type, default?.pairingParams?.handicap) } ?: default?.pairingParams?.handicap ?: defaultParams.pairingParams.handicap
+    // per-key fallback: the existing tournament's params, else the type-appropriate defaults
+    val inherited = default?.pairingParams ?: defaultParams.pairingParams
+    val base = json.getObject("base")?.let { BaseCritParams.fromJson(it, inherited.base) } ?: inherited.base
+    val main = json.getObject("main")?.let { MainCritParams.fromJson(it, inherited.main) } ?: inherited.main
+    val secondary = json.getObject("secondary")?.let { SecondaryCritParams.fromJson(it, inherited.secondary) } ?: inherited.secondary
+    val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it, inherited.geo) } ?: inherited.geo
+    val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it, inherited.handicap) } ?: inherited.handicap
     val pairingParams = PairingParams(base, main, secondary, geo, hd)
     val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: default?.placementParams ?: defaultParams.placementParams
     return when (type) {

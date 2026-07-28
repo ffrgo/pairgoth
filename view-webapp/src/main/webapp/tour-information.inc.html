@@ -130,17 +130,17 @@
           <span class="info"></span>
           <select name="firstSeed">
             <option value="SPLIT_AND_FOLD" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
-            <option value="SPLIT_AND_RANDOM" #if(!$tour || "$!tour.pairing.main.firstSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
-            <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
+            <option value="SPLIT_AND_RANDOM" #if($tour && "$!tour.pairing.main.firstSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
+            <option value="SPLIT_AND_SLIP" #if(!$tour || "$!tour.pairing.main.firstSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
           </select>
         </div>
         <div class="swiss pairing six wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS')hidden#end">
           <label>Next rounds seeding</label>
           <span class="info"></span>
           <select name="secondSeed">
-            <option value="SPLIT_AND_FOLD" #if(!$tour || "$!tour.pairing.main.secondSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
+            <option value="SPLIT_AND_FOLD" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_FOLD") selected #end>Split and fold</option>
             <option value="SPLIT_AND_RANDOM" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_RANDOM") selected #end>Split and random</option>
-            <option value="SPLIT_AND_SLIP" #if($tour && "$!tour.pairing.main.secondSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
+            <option value="SPLIT_AND_SLIP" #if(!$tour || "$!tour.pairing.main.secondSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
           </select>
         </div>
       </div>
