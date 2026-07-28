@@ -68,6 +68,33 @@ class TeamTest {
         Tournament.fromJson(tournament.toFullJson())
     }
 
+    // A tournament-form edit rebuilds the TeamTournament but used to transplant the old inner-class
+    // Team objects, still bound to the pre-edit instance: player edits made after the edit (e.g.
+    // benching a substitute) were invisible to Team.canPlay, so a 3-player TEAM2 stayed unpairable
+    // while the roster showed the skip. Teams must be re-parented onto the new instance.
+    @Test
+    fun `player edits after a tournament edit must be visible to teams`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa", 1800)
+        val p2 = addPlayer("Bbb", 1790)
+        val sub = addPlayer("Ccc", 1780)
+        val team = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Trio", "players":[$p1,$p2,$sub], "final":true }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        // 3 active players on a 2-board team: not pairable yet
+        assertEquals("[]", TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("pairables").toString())
+        // edit the tournament form (rounds 2 → 4): rebuilds the tournament instance
+        TestAPI.put("/api/tour/$tid", Json.Object("rounds" to 4)).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        // bench the substitute for round 1
+        TestAPI.put("/api/tour/$tid/part/$sub", Json.Object("skip" to Json.Array(1))).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        // the team must now be pairable: exactly 2 active players
+        assertEquals("[$team]", TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("pairables").toString())
+    }
+
     // Builds a TEAM2 with two full teams, pairs round 1 (one match over two boards), and lets the
     // board-0 white team win EVERY board (whatever stones it holds). Returns (tournamentId, teamGame).
     private fun sweptTeamMatch(): Pair<Int, Json.Object> {
