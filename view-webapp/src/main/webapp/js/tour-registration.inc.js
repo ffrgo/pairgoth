@@ -242,9 +242,7 @@ function initSearch() {
 
 function fillPlayer(player) {
   console.log(player);
-  // hack UK / GB
   let country = player.country.toLowerCase();
-  if ('uk' === country) country = 'gb';
   let form = $('#player-form')[0];
   form.val('name', player.name);
   form.val('firstname', player.firstname);
