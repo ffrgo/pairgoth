@@ -12,6 +12,9 @@ import javax.servlet.http.HttpServletResponse
 object ExplainHandler: PairgothApiHandler {
 
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
+        // disabled until made non-mutating: the weights are computed by re-pairing the round in place
+        // on the live cached tournament — the round's games (and results) are lost on the next persist
+        badRequest("explain is disabled")
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: badRequest("invalid round number")
         if (round > tournament.lastRound() + 1) badRequest("invalid round: previous round has not been played")
