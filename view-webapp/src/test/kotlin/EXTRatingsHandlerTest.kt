@@ -70,6 +70,25 @@ class EXTRatingsHandlerTest: TestBase() {
     }
 
     @Test
+    fun sameDateContentChangeRefreshes() {
+        val fixture = java.io.File("target/test-roster.json").apply { writeText(roster) }
+        BaseWebappManager.properties.setProperty("ratings.ext", fixture.toURI().toString())
+        try {
+            assertEquals(2, EXTRatingsHandler.fetchPlayers().size)
+            // same date, one more registrant: the snapshot must follow within the day
+            val extended = roster.replace(
+                "\"players\": [",
+                """"players": [
+                    {"name": "Uysal", "firstname": "Oktay", "country": "TR", "club": "Esk", "rank": "4k", "rating": 1678, "ext": "336"},"""
+            )
+            fixture.writeText(extended)
+            assertEquals(3, EXTRatingsHandler.fetchPlayers().size)
+        } finally {
+            BaseWebappManager.properties.remove("ratings.ext")
+        }
+    }
+
+    @Test
     fun activeIffConfigured() {
         BaseWebappManager.properties.remove("ratings.ext")
         assertFalse(EXTRatingsHandler.active)

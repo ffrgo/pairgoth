@@ -102,8 +102,9 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
         // Skip fetch when:
         //  - frozen and settled (no future EGD publication can be ≤ freeze), or
-        //  - cache mtime is within the cooldown window.
-        if ((frozen && freezeSettled) || cacheFresh) {
+        //  - cache mtime is within the cooldown window (registries are exempt:
+        //    a same-date rewrite refreshes the mtime, which would halve their cadence).
+        if ((frozen && freezeSettled) || freezable && cacheFresh) {
             val toLoad = effective()
             // toLoad == null implies frozen: cacheFresh alone guarantees latestCached != null
             if (toLoad == null) logger.warn("ratings.date=$freeze active but no cached ${origin.name} snapshot at or before that date; ${origin.name} ratings unavailable")
@@ -122,7 +123,9 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         val ratingsFilename = "${origin.name}-${ymd.format(lastUpdated)}.json"
         val newFile = RatingsManager.path.resolve(ratingsFilename).toFile()
         val isFreshFile = latestCached == null || latestCached.name != ratingsFilename
-        if (isFreshFile) {
+        // registries (non-freezable) change intraday: same-date content changes replace the snapshot
+        val sameDateChange = !isFreshFile && !freezable && newFile.readText().trim() != lastPlayers.toString()
+        if (isFreshFile || sameDateChange) {
             RatingsManager.logger.info("Writing new $origin snapshot $ratingsFilename")
             newFile.printWriter().use { out -> out.println(lastPlayers.toString()) }
         }
@@ -139,7 +142,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
                 activeRatingsFile = newFile
                 true
             }
-            toLoad.canonicalPath == newFile.canonicalPath && isFreshFile -> {
+            toLoad.canonicalPath == newFile.canonicalPath && (isFreshFile || sameDateChange) -> {
                 // optimization: avoid re-parsing what we just produced
                 players = lastPlayers
                 activeRatingsFile = newFile
