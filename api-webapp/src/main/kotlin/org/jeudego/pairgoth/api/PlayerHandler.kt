@@ -185,7 +185,7 @@ object PlayerHandler: PairgothApiHandler {
             (leavingRounds + joiningRounds).forEach { round ->
                 if (round <= tournament.lastRound()) {
                     val team = tournament.getPlayerTeam(player.id)
-                    if (team != null && tournament.pairedTeams().contains(team.id))
+                    if (team != null && tournament.pairedTeams(round).contains(team.id))
                         return "team #${team.id} active players cannot change for round $round"
                 }
             }
