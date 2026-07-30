@@ -105,9 +105,6 @@ class FileStore(pathStr: String): Store {
     /** Reconstructs a Tournament from a stored (full) tournament JSON, bumping the shared id counters. */
     private fun buildTournament(json: Json.Object): Tournament<*> {
         val tournament = Tournament.fromJson(json, canonicalize = false)
-        tournament.lastAction = json.getString("lastAction")
-        tournament.lastSync = json.getLong("lastSync")
-        tournament.lastPairing = json.getLong("lastPairing")
         var maxPlayerId = 0
         var maxGameId = 0
         val players = json["players"] as Json.Array? ?: Json.Array()

@@ -588,6 +588,10 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
     json.getArray("frozen")?.also {
         tournament.frozen = it
     }
+    // runtime stamps: full-json carries them (store path), a sparse rebuild inherits them
+    tournament.lastAction = json.getString("lastAction") ?: default?.lastAction
+    tournament.lastSync = json.getLong("lastSync") ?: default?.lastSync
+    tournament.lastPairing = json.getLong("lastPairing") ?: default?.lastPairing
     return tournament
 }
 
