@@ -171,7 +171,9 @@
         Mac Mahon groups
       </button>
 #end
-#if($webhookConfigured)
+## team tournaments register on paper: the website has nothing to sync for them,
+## and an empty roster would read as everyone unregistered — they keep the ratings refresh instead
+#if($webhookConfigured && $tour.type == 'INDIVIDUAL')
       <button id="sync-website" class="ui orange right labeled icon floating button" title="Sync players from EGC">
         <i class="fa fa-cloud-download"></i>
         Sync from EGC

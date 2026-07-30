@@ -65,4 +65,25 @@ class BulkMissingTest : TestBase() {
         report = TestAPI.post("/api/tour/$tourId/part?reason=ratings", Json.Array(player("101", "Alpha"))).asObject()
         assertEquals(0, report.getArray("missing")!!.size)
     }
+
+    // Team tournaments register on paper — the website cannot register teams, so its roster
+    // (typically empty) is not authoritative: a sync must never unregister anyone. An operator
+    // once pressed Sync on the Nations Cup and every player got all rounds skipped.
+    @Test
+    fun `a sync must not unregister players of a team tournament`() {
+        val teamTournament = Json.MutableObject(tournament).also {
+            it["type"] = "TEAM2"; it["shortName"] = "bulk-missing-team-test"
+        }
+        val tourId = TestAPI.post("/api/tour", teamTournament).asObject().getInt("id")
+            ?: throw Error("tournament creation failed")
+        TestAPI.post("/api/tour/$tourId/part",
+            Json.Array(player("201", "Gamma"), player("202", "Delta"))).asObject()
+
+        // the Nations Cup scenario: sync against an empty website roster
+        val report = TestAPI.post("/api/tour/$tourId/part", Json.Array()).asObject()
+        assertEquals(0, report.getArray("missing")!!.size)
+        TestAPI.get("/api/tour/$tourId/part").asArray().map { it as Json.Object }.forEach {
+            assertNull(it.getArray("skip"), "${it.getString("name")} must keep all rounds")
+        }
+    }
 }

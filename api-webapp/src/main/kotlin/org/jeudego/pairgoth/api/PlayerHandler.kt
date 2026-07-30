@@ -118,7 +118,9 @@ object PlayerHandler: PairgothApiHandler {
         // stay untouched; the journal entry carries the change when there is one.
         val missing = Json.MutableArray()
         var unregistered = 0
-        if (event == PlayersImported) preExisting.filter { it.id !in touched }.forEach { player ->
+        // team tournaments register on paper (the website cannot register teams), so the website
+        // roster is not authoritative there: a sync must never unregister anyone
+        if (event == PlayersImported && tournament !is TeamTournament) preExisting.filter { it.id !in touched }.forEach { player ->
             val remaining = (1..tournament.rounds).filter { round ->
                 round !in player.skip &&
                     (round > tournament.lastRound() || player.id !in tournament.pairedPlayers(round)) &&
