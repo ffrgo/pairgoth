@@ -30,7 +30,9 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
     if (!neededCriteria.contains(Criterion.NBW)) neededCriteria.add(Criterion.NBW)
     if (!neededCriteria.contains(Criterion.RATING)) neededCriteria.add(Criterion.RATING)
-    if (type == Tournament.Type.INDIVIDUAL && pairing.type == PairingType.MAC_MAHON && !neededCriteria.contains(Criterion.MMS)) neededCriteria.add(Criterion.MMS)
+    // MacMahon ⇒ MMS present on every row, teams included: the standings view and the EGF
+    // export insert an MMS column on their own (e.g. when SCOREX comes first)
+    if (pairing.type == PairingType.MAC_MAHON && !neededCriteria.contains(Criterion.MMS)) neededCriteria.add(Criterion.MMS)
     val criteria = neededCriteria.map { crit ->
         crit.name to when (crit) {
             Criterion.NONE -> StandingsHandler.nullMap

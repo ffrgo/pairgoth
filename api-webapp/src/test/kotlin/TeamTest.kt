@@ -222,4 +222,30 @@ class TeamTest {
         assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
             "a per-board colour override must not change the match result")
     }
+
+    // Nations Cup, EGC 2026: putting SCOREX first in the placement criteria of a *team* MacMahon
+    // white-paged the whole tournament page — the standings view inserts an MMS column whenever
+    // SCOREX comes first, but standings rows only carried an MMS value for INDIVIDUAL tournaments.
+    @Test
+    fun `team MacMahon standings carry MMS`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        TestAPI.put("/api/tour/$tid", Json.Object(
+            "pairing" to Json.Object("placement" to Json.Array("SCOREX", "DC", "SOSM", "SOSOSM"))))
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val teams = listOf("Ducks" to listOf(addPlayer("Aaa", 1900), addPlayer("Bbb", 1700)),
+                           "Drakes" to listOf(addPlayer("Ccc", 1850), addPlayer("Ddd", 1750)))
+        teams.forEach { (name, players) ->
+            TestAPI.post("/api/tour/$tid/team",
+                Json.parse("""{ "name":"$name", "players":${players}, "final":true }""")?.asObject() ?: fail("no null here"))
+        }
+        TestAPI.post("/api/tour/$tid/pair/1", Json.Array("all"))
+        val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray()
+        assertEquals(2, standings.size, "one standings row per team")
+        standings.forEach { row ->
+            assertTrue((row as Json.Object).containsKey("MMS"), "team standings rows must carry MMS: $row")
+        }
+    }
 }
