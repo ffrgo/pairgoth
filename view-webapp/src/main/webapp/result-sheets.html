@@ -30,7 +30,13 @@
   </script>
   #stop
 #end
-#set($games = $utils.removeBye($roundPairing.games))
+## Team-of-individuals tournaments print one sheet per board — the boards of a match share
+## their table number — matching the /part player map loaded above.
+#if($tour.type.startsWith('TEAM'))
+  #set($games = $utils.removeBye($roundPairing.individualGames))
+#else
+  #set($games = $utils.removeBye($roundPairing.games))
+#end
 #if("$!params.tables" != "")
   #set($games = $utils.filterTables($games, $params.tables))
 #end
