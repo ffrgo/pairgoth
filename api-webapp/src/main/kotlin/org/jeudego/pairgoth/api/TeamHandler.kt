@@ -10,6 +10,16 @@ import javax.servlet.http.HttpServletResponse
 
 object TeamHandler: PairgothApiHandler {
 
+    // a player belongs to at most one team; the UI only implies it, stale views don't
+    private fun checkPlayersFree(tournament: TeamTournament, team: TeamTournament.Team, self: Int? = null) {
+        team.playerIds.forEach { id ->
+            val owner = tournament.getPlayerTeam(id)
+            if (owner != null && owner.id != self) {
+                badRequest("player ${tournament.players[id]?.fullName() ?: "#$id"} is already in team \"${owner.name}\"")
+            }
+        }
+    }
+
     override fun get(request: HttpServletRequest, response: HttpServletResponse): Json? {
         val tournament = getTournament(request)
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
@@ -24,6 +34,7 @@ object TeamHandler: PairgothApiHandler {
         if (tournament !is TeamTournament) badRequest("tournament is not a team tournament")
         val payload = getObjectPayload(request)
         val team = tournament.teamFromJson(payload)
+        checkPlayersFree(tournament, team)
         tournament.teams[team.id] = team
         tournament.dispatchEvent(TeamAdded, request, team.toJson())
         return Json.Object("success" to true, "id" to team.id)
@@ -36,6 +47,7 @@ object TeamHandler: PairgothApiHandler {
         val team = tournament.teams[id] ?: badRequest("invalid team id")
         val payload = getObjectPayload(request)
         val updated = tournament.teamFromJson(payload, team)
+        checkPlayersFree(tournament, updated, team.id)
         for (round in 1..tournament.lastRound()) {
             if (tournament.pairedTeams(round).contains(team.id) && !updated.canPlay(round)) {
                 badRequest("team is playing round #$round, number of pairable players cannot change for this round")

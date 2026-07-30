@@ -35,8 +35,14 @@ class TeamTest {
         assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID],"rating":1750,"rank":-3,"country":"FR","names":["Burma Nestor","Poirot Hercule"],"ranks":[-5,-1]}""", resp.toString(), "expecting team description")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
-        // nothing stops us in reusing players in different teams, at least for now...
+        // a player belongs to at most one team: reusing them must be refused
         resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aTeamPlayerID, $anotherTeamPlayerID], "final":true }""")?.asObject() ?: fail("no null here")).asObject()
+        assertTrue(resp.getBoolean("success") == false, "expecting failure")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", Json.Object("name" to "Maigret", "firstname" to "Jules", "rating" to 1500, "rank" to -6, "country" to "FR", "club" to "75Op", "final" to true)).asObject()
+        val aThirdPlayerID = resp.getInt("id") ?: fail("id cannot be null")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", Json.Object("name" to "Holmes", "firstname" to "Sherlock", "rating" to 1700, "rank" to -4, "country" to "GB", "club" to "Lond", "final" to true)).asObject()
+        val aFourthPlayerID = resp.getInt("id") ?: fail("id cannot be null")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aThirdPlayerID, $aFourthPlayerID], "final":true }""")?.asObject() ?: fail("no null here")).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val anotherTeamID = resp.getInt("id") ?: fail("no null here")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
@@ -66,6 +72,38 @@ class TeamTest {
         // for the operator (FileStore persists toFullJson() and reparses it via Tournament.fromJson())
         val tournament = MemoryStore.getTournament(tid) ?: fail("tournament vanished")
         Tournament.fromJson(tournament.toFullJson())
+    }
+
+    // Operator report (EGC 2026 Nations Cup): a create-team response lost on venue wifi → the operator
+    // resubmitted the same selection 10s later → two identical teams sharing all seven players, both
+    // pairable. The server now enforces "a player belongs to at most one team" on team POST and PUT.
+    @Test
+    fun `a player must not land in two teams`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to 1800, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa")
+        val p2 = addPlayer("Bbb")
+        val p3 = addPlayer("Ccc")
+        val p4 = addPlayer("Ddd")
+        TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2] }""")?.asObject() ?: fail("no null here"))
+        // the exact prod scenario: identical resubmission
+        val dup = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2] }""")?.asObject() ?: fail("no null here")).asObject()
+        assertTrue(dup.getBoolean("success") == false, "duplicate team must be refused")
+        assertTrue(dup.getString("error")!!.contains("already in team"), "expecting the guard's message")
+        val teamB = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Other", "players":[$p3,$p4] }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        // a PUT must not steal another team's member...
+        assertTrue(TestAPI.put("/api/tour/$tid/team/$teamB", Json.parse("""{ "players":[$p3,$p1] }"""))
+            .asObject().getBoolean("success") == false, "member theft must be refused")
+        // ...but reshuffling its own members stays legal (join/leave/rename path)
+        assertTrue(TestAPI.put("/api/tour/$tid/team/$teamB", Json.parse("""{ "players":[$p4] }"""))
+            .asObject().getBoolean("success") == true)
     }
 
     // A tournament-form edit rebuilds the TeamTournament but used to transplant the old inner-class
