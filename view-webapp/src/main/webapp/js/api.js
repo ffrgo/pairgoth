@@ -63,15 +63,22 @@ function dismissOnNextClick(elem) {
 }
 
 function error(response) {
+  // fetch rejections (network failure) reach here as TypeError, not Response;
+  // throwing out of the helpers' catch would leave their promise rejected
+  if (!(response instanceof Response)) {
+    showError(response && response.message || 'network error');
+    return;
+  }
   const contentType = response.headers.get("content-type");
   let promise =
     (contentType && contentType.indexOf("application/json") !== -1)
     ? response.json().then(json => json.error || "unknown error")
-    : Promise.resolve(response.statusText);
+    // no reason phrase over h2: fall back to the status code
+    : Promise.resolve(response.statusText || `error ${response.status}`);
   promise.then(message => {
-    message = message.replaceAll(/([a-z])([A-Z])/g,"$1 $2").toLowerCase();
+    message = String(message).replaceAll(/([a-z])([A-Z])/g,"$1 $2").toLowerCase();
     showError(message);
-  });
+  }).catch(() => showError("unknown error"));
 }
 
 let api = {
