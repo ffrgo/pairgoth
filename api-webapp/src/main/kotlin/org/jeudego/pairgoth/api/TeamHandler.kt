@@ -48,6 +48,14 @@ object TeamHandler: PairgothApiHandler {
         val payload = getObjectPayload(request)
         val updated = tournament.teamFromJson(payload, team)
         checkPlayersFree(tournament, updated, team.id)
+        // late arrivals sit out the rounds the team already played: pairing stays untouched
+        // and the round check below still sees the same active players for those rounds
+        (updated.playerIds - team.playerIds).forEach { id ->
+            val newcomer = tournament.players[id]!!
+            for (round in 1..tournament.lastRound()) {
+                if (tournament.pairedTeams(round).contains(team.id)) newcomer.skip.add(round)
+            }
+        }
         for (round in 1..tournament.lastRound()) {
             if (tournament.pairedTeams(round).contains(team.id) && !updated.canPlay(round)) {
                 badRequest("team is playing round #$round, number of pairable players cannot change for this round")

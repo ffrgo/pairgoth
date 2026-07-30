@@ -179,6 +179,37 @@ class TeamTest {
         assertEquals("[$team]", pairables(), "finalizing the member must make the team pairable")
     }
 
+    // A late arrival must be addable to an already paired team: they are auto-skipped for the
+    // rounds the team already played (pairing untouched), instead of the PUT failing with
+    // "team is playing round #N".
+    @Test
+    fun `a late arrival can join an already paired team`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, p1: Int, p2: Int) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":[$p1,$p2], "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        val alpha = addPlayer("Alpha", 1900)
+        val beta = addPlayer("Beta", 1800)
+        val alphas = addTeam("Alphas", alpha, beta)
+        addTeam("Gammas", addPlayer("Gamma", 1700), addPlayer("Delta", 1600))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val gameBefore = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games").toString()
+        val late = addPlayer("Epsilon", 2000)
+        val resp = TestAPI.put("/api/tour/$tid/team/$alphas",
+            Json.parse("""{ "players":[$alpha,$beta,$late] }""")).asObject()
+        assertTrue(resp.getBoolean("success") == true, "a late arrival must be accepted")
+        assertEquals("[1]", TestAPI.get("/api/tour/$tid/part/$late").asObject().getArray("skip").toString(),
+            "the late arrival must sit out the already paired round")
+        assertEquals(gameBefore, TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games").toString(),
+            "the round 1 pairing must be untouched")
+        // members already aboard must not get skipped
+        assertTrue(TestAPI.get("/api/tour/$tid/part/$alpha").asObject().getArray("skip") == null)
+    }
+
     // Builds a TEAM2 with two full teams, pairs round 1 (one match over two boards), and lets the
     // board-0 white team win EVERY board (whatever stones it holds). Returns (tournamentId, teamGame).
     private fun sweptTeamMatch(): Pair<Int, Json.Object> {

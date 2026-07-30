@@ -37,6 +37,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- A late arrival can now join an already paired team: the new member is automatically marked as sitting out the rounds the team has already been paired in (the pairing stays untouched), instead of the edit being refused with "team is playing round #N".
 - Team creation and edition now refuse players already belonging to another team: a create-team response lost in transit and resubmitted used to silently duplicate the team, leaving its players pairable twice (the team buttons also stay disabled while a request is in flight).
 - Streamed API responses containing characters that need JSON escaping (double quotes, backslashes, control characters) were corrupted — or crashed the request — by a from/to vs offset/length mismatch in the JSON writer adapter.
 - Same-club avoidance no longer treats club-less players as clubmates: an empty club or a placeholder ("xxxx", "NoCb") never matches, and such players can't be detected as the host club either.
