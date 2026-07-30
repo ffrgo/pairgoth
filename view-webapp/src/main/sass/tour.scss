@@ -579,6 +579,14 @@
         color: #999;
         font-style: italic;
       }
+      // team tint: boards alternate colours, so the columns zigzag between the two
+      // teams — the border says which team a player belongs to (EGC event palette)
+      &.team-a {
+        border-left: 4px solid hsl(185, 55%, 55%);
+      }
+      &.team-b {
+        border-left: 4px solid hsl(24, 100%, 68%);
+      }
     }
     #results-table {
       tr.filtered {

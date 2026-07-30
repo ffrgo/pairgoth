@@ -42,6 +42,17 @@
 #foreach($game in $individualGames)
   #set($white = $resultsMap[$game.w])
   #set($black = $resultsMap[$game.b])
+## Boards alternate colours, so the columns zigzag between the two teams: tint each player cell
+## by team (within a match, the lower team id is 'team-a') to make the braid readable.
+  #set($wtint = '')
+  #set($btint = '')
+  #if($tour.type.startsWith('TEAM'))
+    #set($wteam = $tmap[$game.w])
+    #set($bteam = $tmap[$game.b])
+    #if($wteam && $bteam)
+      #if($wteam < $bteam)#set($wtint = ' team-a')#set($btint = ' team-b')#else#set($wtint = ' team-b')#set($btint = ' team-a')#end
+    #end
+  #end
   #if($black && $white)
         <tr id="result-$game.id" data-id="$game.id">
 ## SPECIFIC EGC2026 CHANGES - tables > 1000 keep sorting on top when the column header is clicked
@@ -49,11 +60,11 @@
   #if($game.t > 1000)#set($tableSort = $game.t - 1000000)#end
           <td data-sort="$tableSort">${game.t}.</td>
 #if($blackFirst)
-          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
-          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
+          <td class="black player$btint #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
+          <td class="white player$wtint #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
 #else
-          <td class="white player #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
-          <td class="black player #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
+          <td class="white player$wtint #if($game.r == 'w' || $game.r == '#') winner #elseif($game.r == 'b' || $game.r == '0') looser #end" data-id="$white.id" data-sort="$white.name#if($white.firstname) $white.firstname#end"><span>#if($white)$white.name#if($white.firstname) $white.firstname#end #rank($white.rank $!white.pro)#{else}BIP#end</span></td>
+          <td class="black player$btint #if($game.r == 'b' || $game.r == '#') winner #elseif($game.r == 'w' || $game.r == '0') looser #end" data-id="$black.id" data-sort="$black.name#if($black.firstname) $black.firstname#end"><span>#if($black)$black.name#if($black.firstname) $black.firstname#end #rank($black.rank $!black.pro)#{else}BIP#end</span></td>
 #end
           <td class="handicap centered">$!game.h</td>
           <td class="result centered" data-sort="$game.r" data-result="$game.r">#if($blackFirst)$dispRstInv[$game.r]#{else}$dispRst[$game.r]#end</td>
