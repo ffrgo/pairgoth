@@ -128,6 +128,9 @@ class FileStore(pathStr: String): Store {
                     }
                 }
             )
+            // individual board games draw from the same id sequence as team games —
+            // skipping them here would reissue their ids at the next pairing
+            tournament.individualGames.values.flatten().forEach { maxGameId = max(maxGameId, it.id) }
         }
         val games = json["games"] as Json.Array? ?: Json.Array()
         (1..games.size).forEach { round ->

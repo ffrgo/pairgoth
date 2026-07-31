@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.store.MemoryStore
+import org.jeudego.pairgoth.store._nextGameId
 import org.jeudego.pairgoth.test.BasicTests.Companion.aPlayer
 import org.jeudego.pairgoth.test.BasicTests.Companion.aRengoTournament
 import org.jeudego.pairgoth.test.BasicTests.Companion.aTeamTournament
@@ -290,6 +291,45 @@ class TeamTest {
             "the board result must flip so its winner is unchanged")
         assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
             "a per-board colour override must not change the match result")
+    }
+
+    // Nations Cup, EGC 2026: the game id counter used to be restored from *team* games only on a
+    // cold load (boards ignored), so a container restart before pairing round 2 reissued round-1
+    // board ids. Entering a result on such a board then resolved to round 1's match and 500ed
+    // ("Team game not found"). The result lookup is now round-scoped, and the FileStore restore
+    // scans board ids too.
+    @Test
+    fun `a result on a board with a recycled id must reach its own round's match`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", Json.MutableObject(aTeamTournament).set("type", "TEAM3"))
+            .asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, players: List<Int>) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":$players, "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        addTeam("Alphas", listOf(addPlayer("Aaa", 1900), addPlayer("Bbb", 1800), addPlayer("Ccc", 1700)))
+        addTeam("Gammas", listOf(addPlayer("Ddd", 1600), addPlayer("Eee", 1500), addPlayer("Fff", 1400)))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val round1 = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        val round1GameId = round1.getArray("games")!!.getJson(0)!!.asObject().getInt("id")!!
+        val round1BoardIds = round1.getArray("individualGames")!!.map { (it as Json.Object).getInt("id")!! }.toSet()
+        round1BoardIds.forEach { TestAPI.put("/api/tour/$tid/res/1", Json.parse("""{"id":$it,"result":"w"}""")) }
+        fun matchResult(round: Int, id: Int) = TestAPI.get("/api/tour/$tid/pair/$round").asObject()
+            .getArray("games")!!.map { it as Json.Object }.first { it.getInt("id") == id }.getString("r")
+        val round1Result = matchResult(1, round1GameId)
+        // the pre-fix restart restore: counter rebuilt from team game ids only, below the board ids
+        _nextGameId.set(round1GameId + 1)
+        TestAPI.post("/api/tour/$tid/pair/2", Json.parse("""["all"]"""))
+        val round2 = TestAPI.get("/api/tour/$tid/pair/2").asObject()
+        val round2GameId = round2.getArray("games")!!.getJson(0)!!.asObject().getInt("id")!!
+        val collider = round2.getArray("individualGames")!!.map { (it as Json.Object).getInt("id")!! }
+            .firstOrNull { round1BoardIds.contains(it) } ?: fail("premise broken: no board id was recycled")
+        val resp = TestAPI.put("/api/tour/$tid/res/2", Json.parse("""{"id":$collider,"result":"w"}""")).asObject()
+        assertTrue(resp.getBoolean("success") == true, "the result must be accepted")
+        assertTrue(matchResult(2, round2GameId) != "?", "the board result must propagate to round 2's match")
+        assertEquals(round1Result, matchResult(1, round1GameId), "round 1's match must be untouched")
     }
 
     // Nations Cup, EGC 2026: putting SCOREX first in the placement criteria of a *team* MacMahon

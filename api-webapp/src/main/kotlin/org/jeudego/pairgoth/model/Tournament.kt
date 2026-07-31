@@ -478,11 +478,11 @@ class TeamTournament(
     }
 
     fun propagateIndividualResult(round: Int, game: Game) {
-        // the forward map is always populated; the bimap inverse is not maintained by pairIndividualGames
-        val teamGameID = individualGames.entries.find { (_, boards) -> boards.any { it.id == game.id } }?.key
+        // resolve within this round's team games only: files written before the counter
+        // restore accounted for boards may hold colliding board ids across rounds
+        val teamGame = games(round).values.find { tg -> individualGames[tg.id]?.any { it.id == game.id } == true }
             ?: error("No team game found for individual game ${game.id}")
-        val teamGame = games(round)[teamGameID] ?: error("Team game not found: $teamGameID")
-        teamGame.result = teamMatchResult(teamGame, individualGames[teamGameID] ?: emptySet())
+        teamGame.result = teamMatchResult(teamGame, individualGames[teamGame.id] ?: emptySet())
     }
 
     fun propagateIndividualResults(round: Int) {
