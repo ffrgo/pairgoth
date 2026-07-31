@@ -29,7 +29,9 @@ enum class Event(val slug: String) {
     ;
 
     companion object {
-        private val nextMessageId = AtomicLong(0)
+        // seeded with the boot time so id ranges never overlap across restarts: a cursor from a
+        // previous boot must fall outside the new history (jeasse replayHasGap), never inside it
+        private val nextMessageId = AtomicLong(System.currentTimeMillis())
         private val sse: SSEServlet by lazy { SSEServlet.getInstance() }
         private fun <T> buildEvent(event: Event, data: T) = MessageEvent.Builder()
             .setId("${nextMessageId.incrementAndGet()}".padStart(10, '0'))

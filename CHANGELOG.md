@@ -28,6 +28,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Bulk roster import reports players removed on the source side: registered players a full-roster import leaves untouched come back in a `missing` journal section (shown as "removed on website (kept here)" after a sync) — reported only, never deleted.
 - `ratings.rank_authoritative`: on bulk roster imports, make the imported rank the level authority — a rating outside the rank's band is snapped to the rank's nominal value, so imported players always land with rank and rating linked (default off: the rating stays authoritative and discrepancies show as unlinked honorary grades).
 - External registry player source (`ratings.ext = <url>`): a tournament website's roster, served as JSON, becomes searchable in the Add Player popup alongside the rating databases (inactive when the property is unset). It is a participant registry, not a ratings authority, so the `ratings.date` freeze and the ratings refresh both leave it alone; `ratings.<source>.enable`/`.show`/`.label` configure it like any source (off and hidden by default). The roster is polled hourly and same-day registrations show up at the next poll.
+- Server-restart detection (collaborative mode): the event stream greets each subscriber with a boot id, so every open tournament page notices a webapp restart and reloads itself — or warns first when a reload would lose on-screen work — picking up redeployed code and fresh sessions without manual hard reloads. Event ids are seeded with the boot time, so a replay cursor from a previous boot can no longer be mistaken for a valid position in the new one.
 
 ### Changed
 
@@ -38,6 +39,8 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- An unexpected server exception during an API call now comes back as the standard JSON error instead of the container's HTML error page — which the browser used to render as an *empty* red error box (HTTP/2 responses carry no reason phrase to fall back on).
+- Static scripts and stylesheets are cache-busted by content hash instead of release version: redeploying the same version (venue hotfixes) used to leave browsers running stale cached scripts until a manual hard reload.
 - Syncing from the website can no longer unregister the players of a team tournament: team registrations happen on paper (the website cannot register teams), so its roster — typically empty — is not authoritative there. The Sync button is replaced by Refresh-ratings on team tournaments, and the server ignores the missing-players section for them regardless of the client.
 - A late arrival can now join an already paired team: the new member is automatically marked as sitting out the rounds the team has already been paired in (the pairing stays untouched), instead of the edit being refused with "team is playing round #N".
 - Team creation and edition now refuse players already belonging to another team: a create-team response lost in transit and resubmitted used to silently duplicate the team, leaving its players pairable twice (the team buttons also stay disabled while a request is in flight).

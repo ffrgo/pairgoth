@@ -547,7 +547,7 @@ function busy(affected) {
     case 'standings':   return !$('#params-submit').hasClass('hidden') || $('#publish-modal').hasClass('shown');
     case 'registration':
       return $('#player').hasClass('shown') && $('#player').hasClass('edit') &&
-             affected != null && String($('#player-form')[0].val('id')) === String(affected);
+             (affected === '*' || affected != null && String($('#player-form')[0].val('id')) === String(affected));
     default:            return false; // results: patched, nothing fragile on screen
   }
 }
@@ -574,6 +574,17 @@ function warnReloadOrReadonly() {
     warnTimer = null;
     if (!readOnly && !$('#sse-warn-modal').hasClass('shown')) modal('sse-warn-modal');
   }, 300);
+}
+
+// A resync signal — server restart (`hello` boot-id change) or unrecoverable event gap: missed
+// events are lost, everything on screen is suspect. All tabs go stale; reload, or warn first when
+// a reload would destroy on-screen work ('*': any open edit counts, not just a matching player).
+function resync(reason) {
+  console.warn(`[sse] ${reason} — resyncing`);
+  markStaleFrom(TAB_ORDER[0]);
+  if (readOnly) return; // frozen tab stays put; the stale marks cover later navigation
+  if (busy('*')) warnReloadOrReadonly();
+  else document.location.reload();
 }
 
 // What an affecting echo does to the on-screen tab when no finer patch applies: reload, or — if a
@@ -621,9 +632,13 @@ onLoad(() => {
   // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events
   // (served directly same-origin in standalone; proxied via /api/tour/* in client mode)
   let source = new EventSource('/api/tour/events');
-  source.addEventListener('history-gap', e => {
-    console.warn('[sse] history gap — reloading to resync');
-    document.location.reload();
+  source.addEventListener('history-gap', e => resync('history gap'));
+  // `hello` carries the server's boot id: a change across auto-reconnects means the server
+  // restarted while this tab held no replay cursor (it only ever saw keep-alive comments)
+  let serverBoot = null;
+  source.addEventListener('hello', e => {
+    if (serverBoot !== null && serverBoot !== e.data) resync('server restart');
+    serverBoot = e.data;
   });
   Object.keys(EVENT_SOURCE_TAB).forEach(name => source.addEventListener(name, e => {
     let payload = JSON.parse(e.data);

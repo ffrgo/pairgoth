@@ -4,6 +4,7 @@ import info.macias.sse.EventBroadcast
 import info.macias.sse.events.MessageEvent
 import info.macias.sse.servlet3.ServletEventTarget
 import org.slf4j.LoggerFactory
+import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.servlet.http.HttpServlet
@@ -16,6 +17,14 @@ class SSEServlet: HttpServlet() {
         private val logger = LoggerFactory.getLogger("sse")
         private var zeInstance: SSEServlet? = null
         internal fun getInstance(): SSEServlet = zeInstance ?: throw Error("SSE servlet not ready")
+        // welcome event carrying this boot's identity: volatile (not retained) and id-less (leaves the
+        // client's replay cursor untouched), it lets even cursor-less subscribers — tabs that only ever
+        // saw keep-alive comments — detect a server restart across reconnects and resync
+        private val helloEvent = MessageEvent.Builder()
+            .setEvent("hello")
+            .setData(UUID.randomUUID().toString())
+            .setVolatile()
+            .build()
     }
     init {
         if (zeInstance != null) throw Error("Multiple instances of SSE servlet found!")
@@ -38,7 +47,7 @@ class SSEServlet: HttpServlet() {
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse?) {
         logger.trace("<< new channel")
-        broadcast.addSubscriber(ServletEventTarget(req), req.getHeader("Last-Event-Id"))
+        broadcast.addSubscriber(ServletEventTarget(req), helloEvent, req.getHeader("Last-Event-Id"))
     }
 
     internal fun broadcast(message: MessageEvent) = broadcast.broadcast(message)
