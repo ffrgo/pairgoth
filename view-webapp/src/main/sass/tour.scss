@@ -637,6 +637,9 @@
     &.hide-country .col-country, &.hide-club .col-club {
       display: none;
     }
+    &.hide-inactive tr.inactive {
+      display: none;
+    }
   }
   #standings-container {
     max-width: 95vw;

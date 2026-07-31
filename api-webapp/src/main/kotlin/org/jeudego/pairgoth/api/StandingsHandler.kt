@@ -30,6 +30,8 @@ object StandingsHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
         val dropUnplayed = request.getParameter("drop_unplayed")?.toBoolean() ?: false
+        // include_preliminary is for internal use (registration fetches everyone's MM base via standings/0);
+        // published standings never contain preliminary players
         val includePreliminary = !dropUnplayed && (request.getParameter("include_preliminary")?.toBoolean() ?: false)
 
         val individualStandings = tournament is TeamTournament &&

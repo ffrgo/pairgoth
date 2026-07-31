@@ -4,14 +4,25 @@ function applyStandingsColumns() {
   let tab = $('#standings-tab')[0];
   tab.classList.toggle('hide-country', !standingsColumns.country);
   tab.classList.toggle('hide-club', !standingsColumns.club);
+  tab.classList.toggle('hide-inactive', !standingsColumns.inactive);
 }
 
-// publish what the screen shows: clone the table, drop the hidden columns
+// inactive = every game cell shows opponent 0 (never paired, or bye-only) — the
+// server's drop_unplayed criterion, read off the rendered rows
+function tagInactiveRows() {
+  $('#standings-tab tbody tr').forEach(row => {
+    let played = [...row.querySelectorAll('.game-result')].some(cell => parseInt(cell.textContent) !== 0);
+    if (!played) row.classList.add('inactive');
+  });
+}
+
+// publish what the screen shows: clone the table, drop the hidden columns and rows
 function visibleTableHtml(table) {
   if (!table) return undefined;
   let clone = table.cloneNode(true);
   if (!standingsColumns.country) clone.querySelectorAll('.col-country').forEach(cell => cell.remove());
   if (!standingsColumns.club) clone.querySelectorAll('.col-club').forEach(cell => cell.remove());
+  if (!standingsColumns.inactive) clone.querySelectorAll('tr.inactive').forEach(row => row.remove());
   return clone.outerHTML;
 }
 
@@ -21,12 +32,9 @@ function publish(format, extension, encoding) {
   let hdrs = headers();
   hdrs['Accept'] = `${format};charset=${encoding}`
   let params = new URLSearchParams();
-  if ($('#publish-skip-unplayed')[0]?.checked) {
-    // drops never-paired + bye-only players; server also forces preliminary out in this case
+  // publish follows the screen: inactive players hidden ⇒ dropped from exports too
+  if (!standingsColumns.inactive) {
     params.set('drop_unplayed', 'true');
-  } else if (!$('#publish-skip-preliminary')[0]?.checked) {
-    // preliminary are excluded by default server-side; only opt them back in
-    params.set('include_preliminary', 'true');
   }
   let qs = params.toString();
   fetch(`api/tour/${tour_id}/standings/${activeRound}${qs ? '?' + qs : ''}`, {
@@ -71,13 +79,16 @@ function freeze() {
 
 onLoad(() => {
   new Tablesort($('#standings-table')[0]);
-  standingsColumns = Object.assign({country: true, club: true}, store('standingsColumns'));
+  standingsColumns = Object.assign({country: true, club: true, inactive: true}, store('standingsColumns'));
   $('#show-country')[0].checked = standingsColumns.country;
   $('#show-club')[0].checked = standingsColumns.club;
+  $('#show-inactive')[0].checked = standingsColumns.inactive;
+  tagInactiveRows();
   applyStandingsColumns();
   $('#standings-columns input').on('change', e => {
     standingsColumns.country = $('#show-country')[0].checked;
     standingsColumns.club = $('#show-club')[0].checked;
+    standingsColumns.inactive = $('#show-inactive')[0].checked;
     store('standingsColumns', standingsColumns);
     applyStandingsColumns();
   });
@@ -123,12 +134,6 @@ onLoad(() => {
   });
   $('#publish').on('click', e => {
     modal('publish-modal');
-  });
-  $('#publish-skip-unplayed').on('change', e => {
-    let prelim = $('#publish-skip-preliminary')[0];
-    if (!prelim) return;
-    if (e.target.checked) { prelim.checked = true; prelim.disabled = true; }
-    else prelim.disabled = false;
   });
 /*
   $('#publish-modal').on('click', e => {

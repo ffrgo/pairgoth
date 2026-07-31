@@ -179,7 +179,7 @@ fun Tournament<*>.populateStandings(sortedEntries: List<Json.Object>, round: Int
     }
 }
 
-fun TeamTournament.getSortedTeamMembers(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
+fun TeamTournament.getSortedTeamMembers(round: Int): List<Json.Object> {
 
     val teamGames = historyBefore(round + 1)
     val individualHistory = teamGames.map { roundTeamGames ->
@@ -197,7 +197,7 @@ fun TeamTournament.getSortedTeamMembers(round: Int, includePreliminary: Boolean 
             else -> null
         }
     }
-    val jsonPlayers = players.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
+    val jsonPlayers = players.values.filter { it.final }.map { it.toDetailedJson() }
     jsonPlayers.forEach { player ->
         for (crit in criteria) {
             player[crit.first] = crit.second?.get(player.getID()) ?: 0.0

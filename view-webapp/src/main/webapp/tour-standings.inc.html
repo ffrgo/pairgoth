@@ -43,6 +43,7 @@
     Display:
     <label><input type="checkbox" id="show-country"/> Country</label>
     <label><input type="checkbox" id="show-club"/> Club</label>
+    <label><input type="checkbox" id="show-inactive"/> Inactive players</label>
   </div>
 #if($tour.type.startsWith('TEAM'))
   <div class="strong">Team Standings</div>
@@ -221,12 +222,6 @@
       <div class="warning">Warning: publishing partial results at round <span>$round</span> / <span>$tour.rounds</span>!</div>
 #end
       <form class="ui edit form">
-        <div class="field">
-          <label><input type="checkbox" id="publish-skip-unplayed" checked/> Exclude players who never played a game</label>
-        </div>
-        <div class="field">
-          <label><input type="checkbox" id="publish-skip-preliminary" checked disabled/> Exclude unconfirmed preliminary players</label>
-        </div>
         <div class="field">
           <label>Choose format</label>
           <div class="inline fields">

@@ -745,7 +745,8 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     - `text/csv` - CSV format
 
     Optional query parameters:
-    - `include_preliminary=true` - Include preliminary standings
+    - `drop_unplayed=true` - Exclude players who never played a game (never paired, or bye-only)
+    - `include_preliminary=true` - Include unconfirmed preliminary players (internal use; ignored when `drop_unplayed` is set)
     - `individual_standings=true` - For team tournaments with individual scoring
 
 + `GET /api/tour/#tid/stand/#rn` Get standings after round #rn

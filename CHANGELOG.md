@@ -31,6 +31,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Changed
 
+- Standings: an "Inactive players" display toggle beside the country/club ones hides players who never played a real game (never paired, or byes only) — on screen, in print, and in every published format alike. The Publish dialog checkboxes are gone: exports follow the on-screen state, and published standings never include unconfirmed preliminary players.
 - Loaded tournaments are cached in memory across requests; hand-edits to the `.tour` files are still picked up.
 - A failed webhook health check at startup is now a warning instead of a fatal error, so a co-located webhook peer (e.g. a sibling container) that isn't up yet no longer takes pairgoth down. A missing `webhook.secret` is still fatal.
 - Rank-to-rating conversion now anchors ranks at the EGD band centre (1d = 2100) instead of the weak edge (2050), so a rank-derived rating tolerates ±49 points of drift without flipping rank.
