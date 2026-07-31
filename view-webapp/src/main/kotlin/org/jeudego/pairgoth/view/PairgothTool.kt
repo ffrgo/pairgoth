@@ -5,10 +5,13 @@ import org.jeudego.pairgoth.ratings.RatingsManager
 import org.jeudego.pairgoth.util.displayRank
 import org.jeudego.pairgoth.util.ratingToRank
 import org.jeudego.pairgoth.web.WebappManager
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.security.MessageDigest
 import java.util.Locale
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.walk
 
@@ -124,6 +127,19 @@ class PairgothTool {
 
     companion object {
         const val EXAMPLES_DIRECTORY = "examples"
+        private val assetHashes = ConcurrentHashMap<String, Pair<Long, String>>()
+    }
+
+    // Cache-busting for static assets: ?v= is the file's content hash, so a redeploy
+    // invalidates exactly the files that changed (the release version stays stable across redeploys).
+    fun hashed(path: String): String {
+        val file = WebappManager.context.getRealPath(path)?.let { File(it) }?.takeIf { it.isFile }
+            ?: return "$path?v=${WebappManager.properties.getProperty("version") ?: "?"}"
+        val cached = assetHashes[path]?.takeIf { it.first == file.lastModified() }
+        val hash = cached?.second ?: MessageDigest.getInstance("SHA-1").digest(file.readBytes())
+            .joinToString("") { "%02x".format(it) }.substring(0, 12)
+            .also { assetHashes[path] = Pair(file.lastModified(), it) }
+        return "$path?v=$hash"
     }
 
     fun getRatingsDates() = RatingsManager.getRatingsDates()

@@ -146,13 +146,13 @@
   <script type="text/javascript" src="/lib/tablesort-5.4.0/sorts/tablesort.number.min.js"></script>
   <link rel="stylesheet" href="/lib/tablesort-5.4.0/tablesort.css"/>
   <script type="text/javascript" src="/lib/imaskjs-7.1.3/imask.min.js"></script>
-  <script type="text/javascript" src="/js/api.js?v=$version"></script>
-  <script type="text/javascript" src="/js/main.js?v=$version"></script>
-  <script type="text/javascript" src="/js/domhelper.js?v=$version"></script>
+  <script type="text/javascript" src="$utils.hashed('/js/api.js')"></script>
+  <script type="text/javascript" src="$utils.hashed('/js/main.js')"></script>
+  <script type="text/javascript" src="$utils.hashed('/js/domhelper.js')"></script>
   <link rel="stylesheet" href="/lib/fork-awesome-1.2.0/fork-awesome.min.css"/>
-  <link rel="stylesheet" href="/css/main.css?v=$version"/>
+  <link rel="stylesheet" href="$utils.hashed('/css/main.css')"/>
 #if($css)
-    <link rel="stylesheet" href="${css}?v=$version"/>
+    <link rel="stylesheet" href="$utils.hashed($css)"/>
 #end
   <script type="text/javascript">
     const lang = '${request.lang}';
