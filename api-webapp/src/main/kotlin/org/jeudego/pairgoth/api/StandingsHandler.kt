@@ -53,6 +53,17 @@ object StandingsHandler: PairgothApiHandler {
                 .flatMap { listOf(it.white, it.black) }
                 .toSet()
             sortedEntries = sortedEntries.filter { it.getID() in played }
+            // close the place gaps the drop leaves (ties keep sharing); on copies, because
+            // the frozen branch serves the stored snapshot objects
+            var prevOld = 0
+            var prevNew = 0
+            sortedEntries = sortedEntries.mapIndexed { i, p ->
+                val old = p.getInt("place") ?: 0
+                val new = if (old == prevOld) prevNew else i + 1
+                prevOld = old
+                prevNew = new
+                Json.MutableObject(p).set("place", new)
+            }
         }
 
         val acceptHeader = request.getHeader("Accept") as String?

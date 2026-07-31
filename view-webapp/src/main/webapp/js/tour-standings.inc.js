@@ -5,6 +5,7 @@ function applyStandingsColumns() {
   tab.classList.toggle('hide-country', !standingsColumns.country);
   tab.classList.toggle('hide-club', !standingsColumns.club);
   tab.classList.toggle('hide-inactive', !standingsColumns.inactive);
+  renumberPlaces();
 }
 
 // inactive = every game cell shows opponent 0 (never paired, or bye-only) — the
@@ -13,6 +14,22 @@ function tagInactiveRows() {
   $('#standings-tab tbody tr').forEach(row => {
     let played = [...row.querySelectorAll('.game-result')].some(cell => parseInt(cell.textContent) !== 0);
     if (!played) row.classList.add('inactive');
+  });
+}
+
+// re-rank visible rows: new place = 1 + number of strictly better visible players, so ties
+// keep sharing; originals stashed in data-place (all rows visible ⇒ identity, i.e. restore)
+function renumberPlaces() {
+  ['#standings-table', '#individual-standings-table'].forEach(sel => {
+    let table = $(sel)[0];
+    if (!table) return;
+    let cells = [...table.querySelectorAll('tbody tr')].map(row => row.cells[1]);
+    cells.forEach(cell => { if (!cell.dataset.place) cell.dataset.place = cell.textContent; });
+    let visible = cells.filter(cell => standingsColumns.inactive || !cell.parentNode.classList.contains('inactive'));
+    let places = visible.map(cell => +cell.dataset.place).sort((a, b) => a - b);
+    let newPlace = new Map();
+    places.forEach((place, i) => { if (!newPlace.has(place)) newPlace.set(place, i + 1); });
+    visible.forEach(cell => cell.textContent = newPlace.get(+cell.dataset.place));
   });
 }
 
