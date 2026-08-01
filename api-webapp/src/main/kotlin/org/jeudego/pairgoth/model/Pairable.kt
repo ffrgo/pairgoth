@@ -94,6 +94,12 @@ fun Pairable.displayRank() = when (val p = (this as? Player)?.pro ?: 0) {
 // Effective pairing rank display (rating-derived), plain k/d — never a pro title.
 fun Pairable.displayEffectiveRank() = displayRank(effectiveRank)
 
+// EGC-specific: the EGC feed rides an age-category prefix ("U12 Ankara GC") on the club
+// field so it shows everywhere club is displayed; strip it wherever club acts as an
+// identity or goes to rating bodies.
+private val categoryPrefixRegex = Regex("^U\\d{2}(\\s+|$)")
+fun stripCategory(club: String?): String? = club?.replace(categoryPrefixRegex, "")
+
 private val rankRegex = Regex("(\\d+)([kdp])", RegexOption.IGNORE_CASE)
 
 // Returns null on invalid input. For `p` (pro) inputs, returns null too — pro requires

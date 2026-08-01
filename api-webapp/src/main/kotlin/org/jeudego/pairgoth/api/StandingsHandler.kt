@@ -11,6 +11,7 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.adjustedTime
 import org.jeudego.pairgoth.model.displayRank
 import org.jeudego.pairgoth.model.getID
+import org.jeudego.pairgoth.model.stripCategory
 import java.io.PrintWriter
 import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
@@ -181,7 +182,8 @@ ${
         } ${
             player.getString("country")?.uppercase() ?: ""
         } ${
-            (player.getString("club") ?: "").padStart(4).take(4)
+            // EGC-specific: never export the age-category club prefix to EGD
+            (stripCategory(player.getString("club")) ?: "").padStart(4).take(4)
         } ${
             criteria.joinToString(" ") { numFormat.format(player.getDouble(it.name)!!).let { if (it.contains('.')) it else "$it  " }.padStart(7, ' ') }
         }  ${
@@ -273,7 +275,8 @@ ${
             player.getString("ffg") ?: "       "
         } ${
             if (player.getString("country") == "FR")
-                (player.getString("club") ?: "").padEnd(4).take(4)
+                // EGC-specific: never export the age-category club prefix to FFG
+                (stripCategory(player.getString("club")) ?: "").padEnd(4).take(4)
             else
                 (player.getString("country") ?: "").padEnd(4).take(4)
         } ${

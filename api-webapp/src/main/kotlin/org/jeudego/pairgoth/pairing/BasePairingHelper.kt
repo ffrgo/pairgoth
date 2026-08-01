@@ -68,8 +68,9 @@ abstract class BasePairingHelper(
     // Club comparison key: first four characters, case insensitive (OpenGotha compatible).
     // Blank or placeholder values ("xxxx", "NoCb") mean "no club": key is null, and club-less
     // players must never be considered clubmates of each other.
+    // EGC-specific: the age-category prefix is display-only, not part of club identity.
     protected val Pairable.clubKey: String? get() =
-        club?.take(4)?.uppercase()?.takeUnless { it.isBlank() || it == "XXXX" || it == "NOCB" }
+        stripCategory(club)?.take(4)?.uppercase()?.takeUnless { it.isBlank() || it == "XXXX" || it == "NOCB" }
 
     // number of players in the biggest club and the biggest country
     // this can be used to adjust geocost if there is a majority of players from the same country or club
