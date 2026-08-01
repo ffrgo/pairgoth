@@ -47,6 +47,22 @@ function navigatePairing(dir) {
     });
 }
 
+// Stamp "this round's pairing is now public" (print/publish doors; a result entered stamps
+// server-side). Metadata PUT with no client-visible state, so it deliberately bypasses mutate():
+// no effect, no staleness — the first stamp of a round makes one history row, repeats are no-ops.
+function stampPlaying() {
+  if (readOnly || $('#paired .listitem').length === 0) return;
+  api.putJson(`tour/${tour_id}`, { playing: activeRound });
+}
+
+// The round's pairing is public — players may already be playing it: confirm before destroying
+// it. Fresh GET at click time (another operator may have printed or entered a result meanwhile).
+async function confirmPairingDestruction() {
+  let tour = await api.getJson(`tour/${tour_id}`);
+  if (tour !== 'error' && tour.playing >= activeRound) return confirm($('#confirm-players-playing').text());
+  return true;
+}
+
 function renumberTables() {
   let payload = {}
   let tablesExclusionControl = $('#exclude-tables');
@@ -219,15 +235,17 @@ onLoad(()=>{
     }
     pair(parts);
   });
-  $('#pairing-prev').on('click', e => {
-    navigatePairing('prev');
+  $('#pairing-prev').on('click', async e => {
+    if (await confirmPairingDestruction()) navigatePairing('prev');
   });
-  $('#pairing-next').on('click', e => {
-    navigatePairing('next');
+  $('#pairing-next').on('click', async e => {
+    if (await confirmPairingDestruction()) navigatePairing('next');
   });
-  $('#unpair').on('click', e => {
+  $('#unpair').on('click', async e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     if (games.length == 0) {
+      // global unpair only — a partial (selected) unpair is surgical, no confirm
+      if (!(await confirmPairingDestruction())) return;
       $('#paired .listitem').addClass('selected');
       games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     }
@@ -257,6 +275,11 @@ onLoad(()=>{
     }
     close_modal();
     window.open(url, '_blank');
+    stampPlaying();
+  });
+  // the generic header print, while on this tab, means pairings go out on paper
+  $('#print').on('click', e => {
+    if (currentStep() === 'pairing') stampPlaying();
   });
   $('#pairing-form [name]').on('input', e => {
     $('#update-pairing').removeClass('disabled');
@@ -337,7 +360,10 @@ onLoad(()=>{
       .then(data => {
         if (data === 'error') return;
         if (!data.status) showError(data.message || 'Publish failed');
-        else showSuccess(`Pairings for round ${activeRound} published to website`);
+        else {
+          showSuccess(`Pairings for round ${activeRound} published to website`);
+          stampPlaying();
+        }
       });
   });
 });

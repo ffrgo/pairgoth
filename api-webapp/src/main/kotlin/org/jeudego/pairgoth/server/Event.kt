@@ -25,7 +25,8 @@ enum class Event(val slug: String) {
     ResultsCleared("clear-results"),
     TablesRenumbered("renumber"),
     StandingsUpdated("set-criteria"),
-    PairingParamsUpdated("pairing-params")
+    PairingParamsUpdated("pairing-params"),
+    PairingsPublished("publish")
     ;
 
     companion object {

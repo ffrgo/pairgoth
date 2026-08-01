@@ -19,6 +19,11 @@ interface PairgothApiHandler: ApiHandler {
         // the history snapshot (category), and lastAction is the human label, for the undo view
         if (event != Event.TournamentAdded && event != Event.TournamentDeleted) {
             if (event == Event.GamesAdded) lastPairing = System.currentTimeMillis()
+            // a result entered means players are playing the round, even if the pairing was
+            // never printed nor published (small tournaments show pairings on screen)
+            if (event == Event.ResultUpdated) (data as? Json.Object)?.getInt("round")?.let {
+                playing = maxOf(playing, it)
+            }
             lastAction = actionLabel(event, data)
             getStore(request).replaceTournament(this, event.slug)
         }
@@ -47,6 +52,7 @@ interface PairgothApiHandler: ApiHandler {
             Event.ResultsCleared -> "Clear results$ofRound"
             Event.TablesRenumbered -> "Renumber tables$ofRound"
             Event.TournamentUpdated -> "Edit tournament settings"
+            Event.PairingsPublished -> "Publish pairings$ofRound"
             Event.PairingParamsUpdated -> "Edit pairing parameters"
             else -> event.slug.replace('-', ' ')
         }

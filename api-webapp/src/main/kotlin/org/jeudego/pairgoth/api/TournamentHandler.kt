@@ -42,6 +42,7 @@ object TournamentHandler: PairgothApiHandler {
                                     json["frozen"] = tour.frozen != null
                                     val lastPairing = tour.lastPairing
                                     json["syncNeeded"] = lastPairing != null && lastPairing > (tour.lastSync ?: 0)
+                                    json["playing"] = tour.playing
                                 }
                             }
                         }
@@ -81,6 +82,18 @@ object TournamentHandler: PairgothApiHandler {
         // CB TODO - some checks are needed here (cannot lower rounds number if games have been played in removed rounds, for instance)
         val tournament = getTournament(request)
         val payload = getObjectPayload(request).toMutableJsonObject()
+        // a sparse {playing: N} stamps "round N's pairing was made public" (print/publish doors,
+        // client-side); monotonic and idempotent — only the first stamp of a round dispatches an
+        // event (one history row, restart-proof), re-prints are no-ops
+        if (payload.keys == setOf("playing")) {
+            val round = payload.getInt("playing") ?: badRequest("invalid 'playing'")
+            if (round < 1 || round > tournament.rounds) badRequest("invalid 'playing' round number")
+            if (round > tournament.playing) {
+                tournament.playing = round
+                tournament.dispatchEvent(PairingsPublished, request, Json.Object("round" to round))
+            }
+            return Json.Object("success" to true)
+        }
         // a criteria change from the standings view arrives as a sparse {pairing:{placement:...}}
         // payload; flag it so the event is sourced at the standings tab rather than information
         val placementOnly = payload.keys == setOf("pairing") &&

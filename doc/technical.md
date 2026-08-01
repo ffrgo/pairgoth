@@ -556,6 +556,8 @@ When authentication is enabled, all requests require an `Authorization` header.
 
     *input* json object for updated tournament (only id and updated fields required)
 
+    The sparse payload `{ "playing": #rn }` stamps round #rn's pairing as made public (players may be playing). The stamp is monotonic and idempotent; the client's print and publish actions send it, and a first entered result sets it implicitly. Destructive pairing actions ask for confirmation on a stamped round.
+
     *output* `{ "success": true }`
 
 + `DELETE /api/tour/#tid` Delete a tournament
