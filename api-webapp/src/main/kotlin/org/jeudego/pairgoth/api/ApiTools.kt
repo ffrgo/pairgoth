@@ -45,11 +45,11 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.STS -> StandingsHandler.nullMap
             Criterion.CPS -> StandingsHandler.nullMap
 
-            Criterion.SOSW -> history.sos
-            Criterion.SOSWM1 -> history.sosm1
-            Criterion.SOSWM2 -> history.sosm2
-            Criterion.SODOSW -> history.sodos
-            Criterion.SOSOSW -> history.sosos
+            Criterion.SOSW -> history.winsSos
+            Criterion.SOSWM1 -> history.winsSosm1
+            Criterion.SOSWM2 -> history.winsSosm2
+            Criterion.SODOSW -> history.winsSodos
+            Criterion.SOSOSW -> history.winsSosos
             Criterion.CUSSW -> if (round == 0) StandingsHandler.nullMap else history.cumScore
             Criterion.SOSM -> history.sos
             Criterion.SOSMM1 -> history.sosm1

@@ -1,11 +1,13 @@
 package org.jeudego.pairgoth.test
 
+import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.Game.Result.BLACK
 import org.jeudego.pairgoth.model.Game.Result.WHITE
 import org.jeudego.pairgoth.pairing.HistoryHelper
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 
 /**
  * SOSW/SOSOSW/SODOSW are wins-based and handicap-free (Swiss semantics), so a MacMahon
@@ -83,5 +85,49 @@ class WinsSosTest: TestBase() {
         }
         assertEquals(0.0, h.winsSos[3])
         assertEquals(null, h.winsSodos[3])
+    }
+
+    // The standings path (ApiTools.getSortedPairables) has its own criterion table, separate
+    // from BasePairingHelper.evalCriterion — this is the path the standings tab and the
+    // exports go through, so it must serve the wins-based family too.
+    @Test
+    fun `200 standings serve wins-based SOSW and SOSOSW in a handicapped MacMahon`() {
+        val tour = Json.Object(
+            "type" to "INDIVIDUAL", "name" to "HFree", "shortName" to "hfree",
+            "startDate" to "2026-08-03", "endDate" to "2026-08-05",
+            "country" to "TR", "location" to "Ankara", "online" to false,
+            "timeSystem" to Json.Object("type" to "FISCHER", "mainTime" to 600, "increment" to 10),
+            "rounds" to 2,
+            "pairing" to Json.Object(
+                "type" to "MAC_MAHON",
+                "handicap" to Json.Object("correction" to 1),
+                "placement" to Json.Array("NBW", "SOSW", "SOSOSW")
+            )
+        )
+        val tourId = TestAPI.post("/api/tour", tour).asObject().getInt("id")!!
+        for (p in listOf(
+            Json.Object("name" to "Strong", "firstname" to "S", "rating" to 1950, "rank" to -1, "country" to "TR", "club" to "Ank", "final" to true),
+            Json.Object("name" to "Weak", "firstname" to "W", "rating" to 1550, "rank" to -5, "country" to "TR", "club" to "Ank", "final" to true),
+        )) TestAPI.post("/api/tour/$tourId/part", p).asObject().also { assertTrue(it.getBoolean("success")!!) }
+
+        val games = mutableListOf<Json.Object>()
+        for (round in 1..2) {
+            val game = TestAPI.post("/api/tour/$tourId/pair/$round", Json.Array("all")).asArray().getObject(0)!!
+            TestAPI.put("/api/tour/$tourId/res/$round", Json.parse("""{"id":${game.getInt("id")},"result":"w"}""")).asObject()
+            games.add(game)
+        }
+        assertTrue(games.any { it.getInt("h")!! > 0 }, "fixture must contain a handicap game")
+
+        // white won every game: compute wins-based SOS from the games alone
+        val wins = games.groupingBy { it.getInt("w")!! }.eachCount().mapValues { it.value.toDouble() }
+        val standings = TestAPI.get("/api/tour/$tourId/standings/2").asArray().map { it as Json.Object }
+        for (row in standings) {
+            val id = row.getInt("id")!!
+            val opponents = games.map { if (it.getInt("w") == id) it.getInt("b")!! else it.getInt("w")!! }
+            assertEquals(opponents.sumOf { wins[it] ?: 0.0 }, row.getDouble("SOSW"), "SOSW must sum opponents' wins")
+            assertEquals(opponents.sumOf { opp ->
+                games.map { if (it.getInt("w") == opp) it.getInt("b")!! else it.getInt("w")!! }.sumOf { wins[it] ?: 0.0 }
+            }, row.getDouble("SOSOSW"), "SOSOSW must sum opponents' SOSW")
+        }
     }
 }
