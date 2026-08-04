@@ -200,6 +200,49 @@ open class HistoryHelper(
     }
 
 
+    // wins-based flavors backing the SOSW/SOSOSW/SODOSW criteria: Swiss semantics whatever the
+    // tournament type — opponents' NBW, no handicap adjustment, byes and missed rounds count 0.
+    // In a no-handicap Swiss they coincide with the score-based maps; in MacMahon they give
+    // handicap-free tie-breaks (NBW-ranked "swiss with handicap" played as MM).
+    val winsSos: Map<ID, Double> by lazy {
+        (history.flatten().map { game ->
+            Pair(game.black, if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0)
+        } + history.flatten().map { game ->
+            Pair(game.white, if (game.black == ByePlayer.id) 0.0 else wins[game.black] ?: 0.0)
+        }).groupingBy {
+            it.first
+        }.fold(0.0) { acc, next ->
+            acc + next.second
+        }
+    }
+
+    val winsSosos: Map<ID, Double> by lazy {
+        (history.flatten().map { game ->
+            Pair(game.black, if (game.white == ByePlayer.id) 0.0 else winsSos[game.white] ?: 0.0)
+        } + history.flatten().map { game ->
+            Pair(game.white, if (game.black == ByePlayer.id) 0.0 else winsSos[game.black] ?: 0.0)
+        }).groupingBy {
+            it.first
+        }.fold(0.0) { acc, next ->
+            acc + next.second
+        }
+    }
+
+    val winsSodos: Map<ID, Double> by lazy {
+        (history.flatten().filter { game ->
+            game.white != ByePlayer.id && game.black != ByePlayer.id
+        }.flatMap { game ->
+            listOf(
+                Pair(game.black, if (game.result == BLACK) wins[game.white] ?: 0.0 else 0.0),
+                Pair(game.white, if (game.result == WHITE) wins[game.black] ?: 0.0 else 0.0)
+            )
+        }).groupingBy {
+            it.first
+        }.fold(0.0) { acc, next ->
+            acc + next.second
+        }
+    }
+
     // sosos
     val sosos by lazy {
         val currentRound = history.size

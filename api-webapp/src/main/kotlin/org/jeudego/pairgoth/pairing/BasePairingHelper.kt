@@ -125,6 +125,9 @@ abstract class BasePairingHelper(
     val Pairable.sosm2: Double get() = history.sosm2[id] ?: 0.0
     val Pairable.sosos: Double get() = history.sosos[id] ?: 0.0
     val Pairable.sodos: Double get() = history.sodos[id] ?: 0.0
+    val Pairable.winsSos: Double get() = history.winsSos[id] ?: 0.0
+    val Pairable.winsSosos: Double get() = history.winsSosos[id] ?: 0.0
+    val Pairable.winsSodos: Double get() = history.winsSodos[id] ?: 0.0
     val Pairable.cums: Double get() = history.cumScore[id] ?: 0.0
     fun Pairable.missedRounds(): Int = (1 until round).map { round ->
         if (history.playersPerRound.getOrNull(round - 1)
@@ -139,11 +142,11 @@ abstract class BasePairingHelper(
         Criterion.RANK -> pairable.effectiveRank.toDouble()
         Criterion.RATING -> pairable.rating.toDouble()
         Criterion.NBW -> pairable.nbW
-        Criterion.SOSW -> pairable.sos
+        Criterion.SOSW -> pairable.winsSos
         Criterion.SOSWM1 -> pairable.sosm1
         Criterion.SOSWM2 -> pairable.sosm2
-        Criterion.SOSOSW -> pairable.sosos
-        Criterion.SODOSW -> pairable.sodos
+        Criterion.SOSOSW -> pairable.winsSosos
+        Criterion.SODOSW -> pairable.winsSodos
         Criterion.CUSSW -> pairable.cums
         // group-relative standings tie-breaks, neutral for pairing
         Criterion.DC, Criterion.SDC -> 0.0
