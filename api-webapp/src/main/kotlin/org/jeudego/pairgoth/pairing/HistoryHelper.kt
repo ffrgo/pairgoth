@@ -204,17 +204,30 @@ open class HistoryHelper(
     // tournament type — opponents' NBW, no handicap adjustment, byes and missed rounds count 0.
     // In a no-handicap Swiss they coincide with the score-based maps; in MacMahon they give
     // handicap-free tie-breaks (NBW-ranked "swiss with handicap" played as MM).
-    val winsSos: Map<ID, Double> by lazy {
-        (history.flatten().map { game ->
-            Pair(game.black, if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0)
-        } + history.flatten().map { game ->
+    private fun oppWinsPairs() = history.flatten().flatMap { game ->
+        listOf(
+            Pair(game.black, if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0),
             Pair(game.white, if (game.black == ByePlayer.id) 0.0 else wins[game.black] ?: 0.0)
-        }).groupingBy {
+        )
+    }
+
+    val winsSos: Map<ID, Double> by lazy {
+        oppWinsPairs().groupingBy {
             it.first
         }.fold(0.0) { acc, next ->
             acc + next.second
         }
     }
+
+    // minus the n greatest opponent contributions
+    private fun winsSosMinus(n: Int) = oppWinsPairs().groupBy {
+        it.first
+    }.mapValues { (_, pairs) ->
+        pairs.map { it.second }.sortedDescending().drop(n).sum()
+    }
+
+    val winsSosm1: Map<ID, Double> by lazy { winsSosMinus(1) }
+    val winsSosm2: Map<ID, Double> by lazy { winsSosMinus(2) }
 
     val winsSosos: Map<ID, Double> by lazy {
         (history.flatten().map { game ->

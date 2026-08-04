@@ -12,7 +12,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 ### Added
 
 - Pairing a fresh round with an external website configured now asks for confirmation when no roster sync happened since the previous pairing (stale presences guard).
-- The wins-based tie-breaks (SOSW, SOSOSW, SODOSW) now really sum opponents' wins, without handicap adjustment, in every tournament type — in a Mac-Mahon tournament they used to silently evaluate as their MMS-based cousins (SOSM, SOSOSM, SODOSM). Ranking on NBW + SOSW + SOSOSW gives a handicap-blind "swiss" placement inside a handicapped Mac-Mahon.
+- The wins-based tie-breaks (SOSW, SOSWM1, SOSWM2, SOSOSW, SODOSW) now really sum opponents' wins, without handicap adjustment, in every tournament type — in a Mac-Mahon tournament they used to silently evaluate as their MMS-based cousins (SOSM & co). Ranking on NBW + SOSW + SOSOSW gives a handicap-blind "swiss" placement inside a handicapped Mac-Mahon.
 
 - Standings: direct confrontation placement criteria (DC, SDC), OpenGotha-compatible; the standings tab now offers four placement-criterion slots (a slot left on NONE is ignored).
 - Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).

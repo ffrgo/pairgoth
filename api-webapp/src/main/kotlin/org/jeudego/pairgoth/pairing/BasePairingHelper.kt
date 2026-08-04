@@ -126,6 +126,8 @@ abstract class BasePairingHelper(
     val Pairable.sosos: Double get() = history.sosos[id] ?: 0.0
     val Pairable.sodos: Double get() = history.sodos[id] ?: 0.0
     val Pairable.winsSos: Double get() = history.winsSos[id] ?: 0.0
+    val Pairable.winsSosm1: Double get() = history.winsSosm1[id] ?: 0.0
+    val Pairable.winsSosm2: Double get() = history.winsSosm2[id] ?: 0.0
     val Pairable.winsSosos: Double get() = history.winsSosos[id] ?: 0.0
     val Pairable.winsSodos: Double get() = history.winsSodos[id] ?: 0.0
     val Pairable.cums: Double get() = history.cumScore[id] ?: 0.0
@@ -143,8 +145,8 @@ abstract class BasePairingHelper(
         Criterion.RATING -> pairable.rating.toDouble()
         Criterion.NBW -> pairable.nbW
         Criterion.SOSW -> pairable.winsSos
-        Criterion.SOSWM1 -> pairable.sosm1
-        Criterion.SOSWM2 -> pairable.sosm2
+        Criterion.SOSWM1 -> pairable.winsSosm1
+        Criterion.SOSWM2 -> pairable.winsSosm2
         Criterion.SOSOSW -> pairable.winsSosos
         Criterion.SODOSW -> pairable.winsSodos
         Criterion.CUSSW -> pairable.cums

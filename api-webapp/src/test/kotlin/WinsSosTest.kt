@@ -49,6 +49,14 @@ class WinsSosTest: TestBase() {
     }
 
     @Test
+    fun `105 winsSosm1 and winsSosm2 drop the greatest opponent contributions`() {
+        val h = helper()
+        // opponent-wins lists: 1:[1,2] 2:[1,0] 3:[0,1] 4:[2,1]
+        assertEquals(mapOf(1 to 1.0, 2 to 0.0, 3 to 0.0, 4 to 1.0), h.winsSosm1)
+        assertEquals(mapOf(1 to 0.0, 2 to 0.0, 3 to 0.0, 4 to 0.0), h.winsSosm2)
+    }
+
+    @Test
     fun `102 winsSodos sums defeated opponents wins only`() {
         val h = helper()
         // 1 beat 2 -> 1; 2 beat 4 -> 0; 3 beat 4,1 -> 0+1; 4 beat nobody
