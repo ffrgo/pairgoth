@@ -4,6 +4,7 @@ import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.pairing.DirectConfrontation
 import org.junit.jupiter.api.Test
+import kotlin.math.floor
 import kotlin.test.assertEquals
 
 class DirectConfrontationTest: TestBase() {
@@ -91,16 +92,97 @@ class DirectConfrontationTest: TestBase() {
         )
     }
 
+    @Test
+    fun `050 egfdc counts wins among the tied players`() {
+        val games = listOf(
+            game(white = 1, black = 2, result = Game.Result.WHITE),   // 1 > 2
+            game(white = 3, black = 1, result = Game.Result.BLACK),   // 1 > 3
+            game(white = 2, black = 3, result = Game.Result.WHITE)    // 2 > 3
+        )
+        assertEquals(
+            mapOf(1 to 2.0, 2 to 1.0, 3 to 0.0),
+            DirectConfrontation.egfdc(listOf(1, 2, 3), games)
+        )
+    }
+
+    @Test
+    fun `051 egfdc zeroes the group on unequal numbers of games`() {
+        // 1 and 2 met, 3 met nobody: the EGF override applies
+        val games = listOf(game(white = 1, black = 2, result = Game.Result.WHITE))
+        assertEquals(
+            mapOf(1 to 0.0, 2 to 0.0, 3 to 0.0),
+            DirectConfrontation.egfdc(listOf(1, 2, 3), games)
+        )
+    }
+
+    @Test
+    fun `052 egfdc applies on an incomplete but balanced matrix`() {
+        // each played exactly one game inside the group: SDC would give up, the EGF does not
+        val games = listOf(
+            game(white = 1, black = 2, result = Game.Result.WHITE),
+            game(white = 3, black = 4, result = Game.Result.BLACK)
+        )
+        assertEquals(
+            mapOf(1 to 1.0, 2 to 0.0, 3 to 0.0, 4 to 1.0),
+            DirectConfrontation.egfdc(listOf(1, 2, 3, 4), games)
+        )
+    }
+
+    @Test
+    fun `053 egfdc counts handicap games and rounds jigos down`() {
+        val games = listOf(
+            game(white = 1, black = 2, result = Game.Result.WHITE, handicap = 3), // 1 > 2
+            game(white = 1, black = 2, result = Game.Result.JIGO)                 // ½ each
+        )
+        // 1: 1½ -> 1, 2: ½ -> 0
+        assertEquals(mapOf(1 to 1.0, 2 to 0.0), DirectConfrontation.egfdc(listOf(1, 2), games))
+    }
+
+    @Test
+    fun `054 egfdc keeps cycles meaningful where dc discards them`() {
+        // round robin: 1>2, 1>3, 2>3, 2>4, 3>4, 4>1 -- a single cycle through all four
+        val games = listOf(
+            game(white = 1, black = 2, result = Game.Result.WHITE),
+            game(white = 1, black = 3, result = Game.Result.WHITE),
+            game(white = 2, black = 3, result = Game.Result.WHITE),
+            game(white = 2, black = 4, result = Game.Result.WHITE),
+            game(white = 3, black = 4, result = Game.Result.WHITE),
+            game(white = 4, black = 1, result = Game.Result.WHITE)
+        )
+        val group = listOf(1, 2, 3, 4)
+        // 1 and 2 win twice, 3 and 4 once; the iterative application then splits both pairs
+        // (1 beat 2, 3 beat 4), and the displayed value stays the win count
+        val egfdc = DirectConfrontation.egfdc(group, games)
+        assertEquals(listOf(1, 2, 3, 4), group.sortedByDescending { egfdc[it]!! })
+        assertEquals(listOf(2.0, 2.0, 1.0, 1.0), group.map { floor(egfdc[it]!!) })
+        // DC, in contrast, throws every win away: the whole group is one strongly connected
+        // component, and only the criteria placed after DC order it
+        val dc = DirectConfrontation.dc(group, DirectConfrontation.netWins(games, group.toSet()), key(4.0, 3.0, 2.0, 1.0))
+        assertEquals(mapOf(1 to 3.0, 2 to 2.0, 3 to 1.0, 4 to 0.0), dc)
+    }
+
     private var nextGameId = 1
     private fun game(white: Int, black: Int, result: Game.Result, handicap: Int = 0) =
         Game(id = nextGameId++, table = nextGameId, white = white, black = black, handicap = handicap, result = result)
 
     @Test
     fun `040 end-to-end - DC orders head-to-head winners within tied groups`() {
+        assertEquals(listOf("A", "B", "C", "D"), roundRobinStandings("DC"))
+    }
+
+    @Test
+    fun `055 end-to-end - EGFDC orders head-to-head winners within tied groups`() {
+        // each tied pair played exactly one game inside its group: the EGF override lets the
+        // criterion apply, and the head-to-head win beats the rating tiebreak
+        assertEquals(listOf("A", "B", "C", "D"), roundRobinStandings("EGFDC"))
+    }
+
+    // a 4-player round robin, ranked on the given direct confrontation criterion
+    private fun roundRobinStandings(criterion: String): List<String> {
         val tourId = TestAPI.post("/api/tour", Json.Object(
             "type" to "INDIVIDUAL",
-            "name" to "DC Swiss",
-            "shortName" to "dc-swiss",
+            "name" to "$criterion Swiss",
+            "shortName" to "${criterion.lowercase()}-swiss",
             "startDate" to "2026-07-01",
             "endDate" to "2026-07-03",
             "country" to "FR",
@@ -111,11 +193,11 @@ class DirectConfrontationTest: TestBase() {
             "pairing" to Json.Object("type" to "SWISS")
         )).asObject().getInt("id")!!
         TestAPI.put("/api/tour/$tourId", Json.Object(
-            "pairing" to Json.Object("placement" to Json.Array("NBW", "DC", "SOSW", "SOSOSW"))
+            "pairing" to Json.Object("placement" to Json.Array("NBW", criterion, "SOSW", "SOSOSW"))
         ))
 
-        // the intended DC losers (B over A, D over C) get the HIGHER ratings, so the final
-        // order proves DC acted: without it the rating tiebreak would invert both pairs
+        // the intended losers (B over A, D over C) get the HIGHER ratings, so the final
+        // order proves the criterion acted: without it the rating tiebreak would invert both pairs
         val ids = listOf("A" to 1800, "B" to 1900, "C" to 1600, "D" to 1700).associate { (name, rating) ->
             name to TestAPI.post("/api/tour/$tourId/part", Json.Object(
                 "name" to name, "firstname" to "p", "rating" to rating,
@@ -140,10 +222,9 @@ class DirectConfrontationTest: TestBase() {
             }
         }
 
-        val standings = TestAPI.get("/api/tour/$tourId/standings/3").asArray().map {
+        // A above B (NBW 2, A beat B), C above D (NBW 1, C beat D), despite lower ratings
+        return TestAPI.get("/api/tour/$tourId/standings/3").asArray().map {
             (it as Json.Object).getString("name")!!
         }
-        // A above B (NBW 2, A beat B), C above D (NBW 1, C beat D), despite lower ratings
-        assertEquals(listOf("A", "B", "C", "D"), standings)
     }
 }

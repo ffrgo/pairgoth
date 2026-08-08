@@ -263,19 +263,21 @@ Tiebreak criteria for standings, in order of priority.
 | CATEGORY | Player category |
 | RANK | Player rank |
 | RATING | Player rating |
+| EGFDC | Direct comparison, EGF rules (see below) |
 | DC | Direct confrontation (see below) |
 | SDC | Simplified direct confrontation (see below) |
 | EXT | Exploits attempted |
 | EXR | Exploits successful |
 
-#### Direct confrontation (DC and SDC)
+#### Direct confrontation (EGFDC, DC and SDC)
 
-Both criteria order players that are tied on every criterion placed before them, using only the games those tied players played against each other. Only even games with a plain win/loss result count; when two players met several times their results are summed, so a 1-1 split cancels out.
+The three criteria all order players that are tied on every criterion placed before them, using only the games those tied players played against each other. They differ in what they make of those games — **EGFDC** implements the European Go Federation's definition, DC and SDC reproduce OpenGotha's.
 
-- **DC** ranks the tied group by "who beat whom". Victory cycles (A beats B, B beats C, C beats A) are neutralized: wins inside a cycle are ignored, and every member of the cycle inherits the cycle's collective wins and losses against the rest of the group, so beating one member of a cycle counts as beating them all. The group is then filled from the bottom: among the players left with no remaining victory, the ones ranked lowest by the criteria placed *after* DC go last. The DC number itself is only meaningful within the group (higher is better).
-- **SDC** applies only when every pair of tied players has a decided result between them; each player then scores the number of tied opponents they beat. Otherwise everyone in the group scores 0.
+- **EGFDC** is the number of wins over the intra-group games, a jigo counting a half point and the total being rounded down (the EGF rounds down accumulated values in a Swiss or a Mac-Mahon, tie-breaks included). Handicap games count. The criterion only applies if the tied players all played the *same number* of games against each other, as the EGF prescribes for Swiss and Mac-Mahon tournaments; otherwise the whole group scores 0. If it leaves players tied, it is applied again among them alone, refining its first verdict rather than replacing it.
+- **DC** ranks the tied group by "who beat whom", counting only even games with a plain win/loss result (when two players met several times their results are summed, so a 1-1 split cancels out). Victory cycles (A beats B, B beats C, C beats A) are neutralized: wins inside a cycle are ignored, and every member of the cycle inherits the cycle's collective wins and losses against the rest of the group, so beating one member of a cycle counts as beating them all. The group is then filled from the bottom: among the players left with no remaining victory, the ones ranked lowest by the criteria placed *after* DC go last. The DC number itself is only meaningful within the group (higher is better).
+- **SDC** uses the same games as DC, and applies only when every pair of tied players has a decided result between them; each player then scores the number of tied opponents they beat. Otherwise everyone in the group scores 0.
 
-Only one of DC/SDC should appear in the placement criteria.
+Only one of the three should appear in the placement criteria. EGFDC being specific to pairgoth, an OpenGotha export naming it will not be understood on the OpenGotha side.
 
 The standings tab offers four placement-criterion slots; a slot left on NONE is ignored.
 

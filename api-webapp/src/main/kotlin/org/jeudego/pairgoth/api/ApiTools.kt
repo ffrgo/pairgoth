@@ -66,6 +66,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             // group-relative, patched below once every other criterion value is known
             Criterion.SDC -> StandingsHandler.nullMap
             Criterion.DC -> StandingsHandler.nullMap
+            Criterion.EGFDC -> StandingsHandler.nullMap
         }
     }
     val jsonPairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
@@ -76,24 +77,27 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }
 
-    // direct confrontation: on each group tied on the criteria before DC/SDC,
-    // rank by games between group members (ties broken by the criteria after)
+    // direct confrontation: on each group tied on the criteria before the criterion,
+    // rank by games between group members (DC also uses the criteria after)
     val placementCriteria = pairing.placementParams.criteria
-    val dirIndex = placementCriteria.indexOfFirst { it == Criterion.DC || it == Criterion.SDC }
+    val directCriteria = setOf(Criterion.DC, Criterion.SDC, Criterion.EGFDC)
+    val dirIndex = placementCriteria.indexOfFirst { it in directCriteria }
     if (dirIndex >= 0) {
         val before = placementCriteria.subList(0, dirIndex).map { it.name }
         val after = placementCriteria.drop(dirIndex + 1)
-            .filter { it != Criterion.DC && it != Criterion.SDC }.map { it.name }
+            .filter { it !in directCriteria }.map { it.name }
         val games = historyBefore(round + 1).flatten()
         val byId = jsonPairables.associateBy { it.getID()!! }
         jsonPairables.groupBy { p -> before.map { p.getDouble(it) ?: 0.0 } }.values.forEach { group ->
             val members = group.map { it.getID()!! }
-            val wins = DirectConfrontation.netWins(games, members.toSet())
+            val wins by lazy { DirectConfrontation.netWins(games, members.toSet()) }
             val afterKey = { id: ID -> after.map { byId[id]!!.getDouble(it) ?: 0.0 } }
             if (placementCriteria.contains(Criterion.DC))
                 DirectConfrontation.dc(members, wins, afterKey).forEach { (id, dc) -> byId[id]!![Criterion.DC.name] = dc }
             if (placementCriteria.contains(Criterion.SDC))
                 DirectConfrontation.sdc(members, wins).forEach { (id, sdc) -> byId[id]!![Criterion.SDC.name] = sdc }
+            if (placementCriteria.contains(Criterion.EGFDC))
+                DirectConfrontation.egfdc(members, games).forEach { (id, dc) -> byId[id]!![Criterion.EGFDC.name] = dc }
         }
     }
 

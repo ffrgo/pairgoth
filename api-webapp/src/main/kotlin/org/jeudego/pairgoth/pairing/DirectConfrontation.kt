@@ -2,14 +2,17 @@ package org.jeudego.pairgoth.pairing
 
 import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.ID
+import kotlin.math.floor
 
 /**
- * Direct confrontation placement criteria (DC / SDC), following OpenGotha's semantics
- * (Tournament.defineDirForExAequoGroup + mw.go.confrontation.Confrontation).
+ * Direct confrontation placement criteria: DC and SDC follow OpenGotha's semantics
+ * (Tournament.defineDirForExAequoGroup + mw.go.confrontation.Confrontation), EGFDC follows
+ * the EGF tournament system rules.
  *
- * Both operate on a group of players tied on all placement criteria before the DC/SDC
- * criterion, looking only at games played between group members. Values are group-relative:
- * they only order players within the group (a higher criterion already separates groups).
+ * All operate on a group of players tied on all placement criteria before the direct
+ * confrontation criterion, looking only at games played between group members. Values are
+ * group-relative: they only order players within the group (a higher criterion already
+ * separates groups).
  */
 object DirectConfrontation {
 
@@ -93,6 +96,57 @@ object DirectConfrontation {
             remaining.removeAll(batch.toSet())
         }
         return rank.mapValues { (_, r) -> (maxRank - r).toDouble() }
+    }
+
+    /**
+     * EGF Direct Comparison: a player's number of wins over the games played between the tied
+     * players only — a win 1, a jigo ½, and the total rounded down, as the EGF prescribes for
+     * accumulated values in a Swiss or a Mac-Mahon. Unlike DC/SDC, handicap games count.
+     *
+     * Pairgoth knows no tournament system other than Swiss and Mac-Mahon, so the EGF override
+     * always applies: the whole group scores 0 unless its members all played the same number of
+     * games against each other. Players still tied are then compared again among themselves,
+     * "not overwriting but fine-tuning" — those extra applications are folded into the value as
+     * a vanishing tail, below the standings' one-decimal display.
+     */
+    fun egfdc(group: List<ID>, games: Collection<Game>): Map<ID, Double> {
+        if (group.size <= 1) return group.associateWith { 0.0 }
+        val keys = group.associateWith { mutableListOf<Double>() }
+        refine(group, games, keys)
+        val epsilon = 1.0 / (100 * group.size)
+        return keys.mapValues { (_, key) ->
+            key.first() + key.drop(1).foldRight(0.0) { value, tail -> (value + tail) * epsilon }
+        }
+    }
+
+    private fun refine(subset: List<ID>, games: Collection<Game>, keys: Map<ID, MutableList<Double>>) {
+        val scores = comparison(subset, games)
+        subset.forEach { keys[it]!!.add(scores[it]!!) }
+        subset.groupBy { scores[it] }.values.forEach { tied ->
+            if (tied.size > 1 && tied.size < subset.size) refine(tied, games, keys)
+        }
+    }
+
+    // one application of the EGF definition to a set of mutually tied players
+    private fun comparison(subset: List<ID>, games: Collection<Game>): Map<ID, Double> {
+        val members = subset.toSet()
+        val played = games.filter {
+            it.black in members && it.white in members && it.result != Game.Result.UNKNOWN
+        }
+        val counts = subset.map { p -> played.count { it.black == p || it.white == p } }
+        if (counts.distinct().size > 1) return subset.associateWith { 0.0 }
+        val score = subset.associateWith { 0.0 }.toMutableMap()
+        fun credit(player: ID, points: Double) { score[player] = score[player]!! + points }
+        played.forEach { game ->
+            when (game.result) {
+                Game.Result.BLACK -> credit(game.black, 1.0)
+                Game.Result.WHITE -> credit(game.white, 1.0)
+                Game.Result.JIGO -> { credit(game.black, 0.5); credit(game.white, 0.5) }
+                Game.Result.BOTHWIN -> { credit(game.black, 1.0); credit(game.white, 1.0) }
+                else -> {} // BOTHLOOSE, CANCELLED: no point for either
+            }
+        }
+        return score.mapValues { floor(it.value) }
     }
 
     private fun compareKeys(left: List<Double>, right: List<Double>): Int {

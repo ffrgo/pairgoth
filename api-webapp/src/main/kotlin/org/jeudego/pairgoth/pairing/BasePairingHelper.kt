@@ -151,7 +151,7 @@ abstract class BasePairingHelper(
         Criterion.SODOSW -> pairable.winsSodos
         Criterion.CUSSW -> pairable.cums
         // group-relative standings tie-breaks, neutral for pairing
-        Criterion.DC, Criterion.SDC -> 0.0
+        Criterion.DC, Criterion.SDC, Criterion.EGFDC -> 0.0
         else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
     }
 

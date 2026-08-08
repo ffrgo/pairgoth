@@ -15,6 +15,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - The wins-based tie-breaks (SOSW, SOSWM1, SOSWM2, SOSOSW, SODOSW) now really sum opponents' wins, without handicap adjustment, in every tournament type — in a Mac-Mahon tournament they used to silently evaluate as their MMS-based cousins (SOSM & co). Ranking on NBW + SOSW + SOSOSW gives a handicap-blind "swiss" placement inside a handicapped Mac-Mahon.
 
 - Standings: direct confrontation placement criteria (DC, SDC), OpenGotha-compatible; the standings tab now offers four placement-criterion slots (a slot left on NONE is ignored).
+- Standings: EGFDC placement criterion, the European Go Federation's Direct Comparison — wins among the tied players only, zero for the whole group unless they all played the same number of games against each other, applied again on whoever is still tied.
 - Bulk roster import: `POST /api/tour/{id}/part` with a json array upserts a whole roster in one idempotent request; the in-app Sync-website / Refresh-ratings / Mac-Mahon-reset actions use it too (one history entry per roster operation).
 - Version check at startup, suppressible with `version.check = false`.
 - Documentation split per audience: reference (model), pairing (new), technical (new: configuration, API and webhook specifications, deployment profiles), hands-on tutorial.

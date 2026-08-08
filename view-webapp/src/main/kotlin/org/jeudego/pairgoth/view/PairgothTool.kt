@@ -64,7 +64,8 @@ class PairgothTool {
         // TODO "EXT" to "Attempted achievements", // Exploits tentes
         // TODO "EXR" to "Succeeded achievements", // Exploits reussis
 
-        // For the two criteria below see the user documentation
+        // For the three criteria below see the user documentation
+        "EGFDC" to "Direct comparison (EGF rules)",
         "DC" to "Direct confrontation",
         "SDC" to "Simplified direct confrontation",
     )
