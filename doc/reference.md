@@ -280,7 +280,7 @@ The three criteria all order players that are tied on every criterion placed bef
 - **DC** ranks the tied group by "who beat whom", counting only even games with a plain win/loss result (when two players met several times their results are summed, so a 1-1 split cancels out). Victory cycles (A beats B, B beats C, C beats A) are neutralized: wins inside a cycle are ignored, and every member of the cycle inherits the cycle's collective wins and losses against the rest of the group, so beating one member of a cycle counts as beating them all. The group is then filled from the bottom: among the players left with no remaining victory, the ones ranked lowest by the criteria placed *after* DC go last. The DC number itself is only meaningful within the group (higher is better).
 - **SDC** uses the same games as DC, and applies only when every pair of tied players has a decided result between them; each player then scores the number of tied opponents they beat. Otherwise everyone in the group scores 0.
 
-Only one of the three should appear in the placement criteria. EGFDC being specific to pairgoth, an OpenGotha export naming it will not be understood on the OpenGotha side.
+Only one of the three may appear in the placement criteria — as only one of SOS, SOS-1 and SOS-2 may, the EGF being explicit on that point. Pairgoth refuses such a list when the criteria are set (an existing tournament carrying one still opens). EGFDC being specific to pairgoth, an OpenGotha export naming it will not be understood on the OpenGotha side.
 
 The standings tab offers four placement-criterion slots; a slot left on NONE is ignored.
 

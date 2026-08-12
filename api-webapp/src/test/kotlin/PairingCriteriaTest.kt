@@ -52,6 +52,39 @@ class PairingCriteriaTest : TestBase() {
         assertEquals(cleared.placementParams.criteria, cleared.pairingPlacement.criteria)
     }
 
+    // "Only one of SOS-2, SOS-1, or SOS may be used" (EGF), and one direct comparison is enough
+    @Test
+    fun `incoherent criteria are refused, both lists`() {
+        MemoryStore.reset()
+        fun create(placement: Json.Array, pairingPlacement: Json.Array? = null): Json.Object {
+            val pairing = Json.MutableObject("type" to "MAC_MAHON", "placement" to placement)
+            pairingPlacement?.let { pairing["pairingPlacement"] = it }
+            return TestAPI.post("/api/tour", Json.Object(
+                "type" to "INDIVIDUAL", "name" to "Bad", "shortName" to "bad",
+                "startDate" to "2026-08-12", "endDate" to "2026-08-12",
+                "country" to "FR", "location" to "Paris", "online" to false,
+                "timeSystem" to Json.Object("type" to "FISCHER", "mainTime" to 600, "increment" to 10),
+                "rounds" to 2, "pairing" to pairing)).asObject()
+        }
+        create(Json.Array("MMS", "SOSM", "SOSMM1")).also {
+            assertEquals(false, it.getBoolean("success"), "two SOS flavours must be refused")
+            assertTrue(it.getString("error")!!.contains("only one of SOS"), "expecting the EGF rule's message")
+        }
+        create(Json.Array("MMS", "EGFDC", "DC")).also {
+            assertEquals(false, it.getBoolean("success"), "two direct confrontations must be refused")
+        }
+        create(Json.Array("MMS", "SOSM", "SOSM")).also {
+            assertEquals(false, it.getBoolean("success"), "a repeated criterion must be refused")
+        }
+        // the pairing list is checked too
+        create(Json.Array("MMS", "SOSM"), Json.Array("MMS", "SOSM", "SOSMM2")).also {
+            assertEquals(false, it.getBoolean("success"))
+            assertTrue(it.getString("error")!!.contains("pairing criteria"))
+        }
+        // and a sound list still goes through
+        assertEquals(true, create(Json.Array("MMS", "EGFDC", "SOSM", "NONE")).getBoolean("success"))
+    }
+
     @Test
     fun `the dedicated order drives the draw, the standings keep their own`() {
         MemoryStore.reset()

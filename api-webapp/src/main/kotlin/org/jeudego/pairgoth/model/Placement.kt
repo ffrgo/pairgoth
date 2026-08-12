@@ -67,14 +67,29 @@ fun previousOrderValue(pairable: Pairable) = pairable.previousOrder?.let { -it.t
 class PlacementParams(vararg crit: Criterion) {
     companion object {}
 
-    val criteria = crit.toList().also {
-        check()
-    }
+    val criteria = crit.toList()
+}
 
-    private fun check() {
-        // throws an exception if criteria are incoherent
-        // TODO - if (not coherent) throw Error("...")
+/**
+ * Why a list of criteria cannot work, null if it can. "Only one of SOS-2, SOS-1, or SOS may be
+ * used" (EGF tournament system rules) — and the three direct-confrontation flavours are three
+ * answers to the same question, so only one of them may be used either.
+ *
+ * Checked when criteria are *set* (creation and settings update), never when a tournament is
+ * loaded: an existing file with an odd list must keep opening.
+ */
+fun PlacementParams.validate(): String? {
+    val used = criteria.filter { it != Criterion.NONE }
+    used.groupingBy { it }.eachCount().entries.firstOrNull { it.value > 1 }?.let {
+        return "${it.key.name} is used twice"
     }
+    val sosFamily = setOf(
+        Criterion.SOSW, Criterion.SOSWM1, Criterion.SOSWM2,
+        Criterion.SOSM, Criterion.SOSMM1, Criterion.SOSMM2)
+    if (used.count { it in sosFamily } > 1) return "only one of SOS, SOS-1 or SOS-2 may be used"
+    val directFamily = setOf(Criterion.DC, Criterion.SDC, Criterion.EGFDC)
+    if (used.count { it in directFamily } > 1) return "only one direct confrontation criterion may be used"
+    return null
 }
 
 fun PlacementParams.Companion.fromJson(json: Json.Array) = PlacementParams(*json.map {
