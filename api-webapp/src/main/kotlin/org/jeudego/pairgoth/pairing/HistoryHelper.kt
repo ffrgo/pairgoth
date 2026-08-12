@@ -30,10 +30,6 @@ open class HistoryHelper(
         else -> 0.0
     }
 
-    private val Game.blackScore get() = scoreOf(black)
-
-    private val Game.whiteScore get() = scoreOf(white)
-
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
@@ -220,19 +216,19 @@ open class HistoryHelper(
     }
 
 
-    // cumulative score
+    // cumulative score: the sum, over every round, of the score standing at the end of that round
     val cumScore by lazy {
-        history.map { games ->
-            (games.groupingBy { it.black }.fold(0.0) { acc, next ->
-                acc + next.blackScore
-            }) +
-            (games.groupingBy { it.white }.fold(0.0) { acc, next ->
-                acc + next.whiteScore
-            })
-        }.reduce { acc, map ->
-            (acc.keys + map.keys).associateWith { id -> acc.getOrDefault(id, 0.0) + acc.getOrDefault(id, 0.0) + map.getOrDefault(id, 0.0) }
-                .toMap()
+        val running = mutableMapOf<ID, Double>()
+        val cumulative = mutableMapOf<ID, Double>()
+        history.forEach { games ->
+            games.forEach { game ->
+                listOf(game.black, game.white).filter { it != ByePlayer.id }.forEach { id ->
+                    running[id] = running.getOrDefault(id, 0.0) + game.scoreOf(id)
+                }
+            }
+            running.forEach { (id, total) -> cumulative[id] = cumulative.getOrDefault(id, 0.0) + total }
         }
+        cumulative
     }
 
     // drawn up down: map ID -> Pair(sum of drawn up, sum of drawn down)

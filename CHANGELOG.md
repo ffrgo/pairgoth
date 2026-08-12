@@ -42,6 +42,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- The cumulative score (CUSS) counted every round but the last twice as much as it should: the running total was added to itself at each step (after three rounds a first-round win weighed 4 instead of 3).
 - SOS-1 and SOS-2 (SOSWM1/SOSMM1, SOSWM2/SOSMM2) now ignore the round of *smallest* value, as the EGF tournament system rules define them and as OpenGotha computes them — they used to drop the largest one, i.e. the strongest opponent, turning the tie-break upside down. A round without an opponent (bye or missed round) is a candidate for the drop like any other, instead of being added back after the fact.
 - A drawn team match (equal board sums) is now recorded as a draw — half a point for each team, as the EGF tournament system rules prescribe — instead of staying "unknown", which read as a match still being played and scored nothing for either team. A match is only called a draw once every board is in.
 - A jigo (½-½) is worth half a point to each player, as the EGF tournament system rules prescribe. It used to be worth nothing anywhere but in the EGFDC tie-break: entering ½-½ silently scored a double loss in NBW, MMS, SOS and SODOS, and an OpenGotha tournament containing a jigo imported with different standings than it had.
