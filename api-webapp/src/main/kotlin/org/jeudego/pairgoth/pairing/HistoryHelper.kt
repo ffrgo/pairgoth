@@ -14,10 +14,14 @@ open class HistoryHelper(
     lateinit var scoresFactory: ScoreMapFactory
     lateinit var scoresXFactory: ScoreMapFactory
     lateinit var missedRoundsSosFactory: ScoreMapFactory
+    // the EGF "Number of Wins Score": wins, plus what the tournament gives for a non-played round,
+    // rounded down. Solvers install the real one; a bare helper falls back on the raw win count.
+    var nbwScoresFactory: ScoreMapFactory = { wins }
 
     val scores by lazy { scoresFactory() }
     val scoresX by lazy { scoresXFactory() }
     val missedRoundsSos by lazy { missedRoundsSosFactory() }
+    val nbwScores by lazy { nbwScoresFactory() }
 
     // EGF game value: a win 1, a jigo ½, a loss 0 (a bye is stored as a win for the real player).
     // Every accumulated score below is built from this single definition.
@@ -136,17 +140,16 @@ open class HistoryHelper(
 
 
     // wins-based flavors backing the SOSW/SOSOSW/SODOSW criteria: Swiss semantics whatever the
-    // tournament type — opponents' NBW, no handicap adjustment, byes and missed rounds count 0.
-    // In a no-handicap Swiss they coincide with the score-based maps; in MacMahon they give
-    // handicap-free tie-breaks (NBW-ranked "swiss with handicap" played as MM).
-    // Per-round contributions, as sosContributions but wins-based: a bye or a missed round is
-    // worth 0 whatever the tournament type. Players who never played get no entry at all.
+    // tournament type — opponents' Number of Wins Score, no handicap adjustment, byes and missed
+    // rounds worth 0. In a no-handicap Swiss they coincide with the score-based maps; in MacMahon
+    // they give handicap-free tie-breaks (NBW-ranked "swiss with handicap" played as MM).
+    // Per-round contributions, as sosContributions; players who never played get no entry at all.
     private val winsSosContributions: Map<ID, List<Double>> by lazy {
         val perRound = history.map { games ->
             games.flatMap { game ->
                 listOf(
-                    game.black to if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0,
-                    game.white to if (game.black == ByePlayer.id) 0.0 else wins[game.black] ?: 0.0
+                    game.black to if (game.white == ByePlayer.id) 0.0 else nbwScores[game.white] ?: 0.0,
+                    game.white to if (game.black == ByePlayer.id) 0.0 else nbwScores[game.black] ?: 0.0
                 )
             }.toMap()
         }
@@ -184,8 +187,8 @@ open class HistoryHelper(
             game.white != ByePlayer.id && game.black != ByePlayer.id
         }.flatMap { game ->
             listOf(
-                Pair(game.black, game.scoreOf(game.black) * (wins[game.white] ?: 0.0)),
-                Pair(game.white, game.scoreOf(game.white) * (wins[game.black] ?: 0.0))
+                Pair(game.black, game.scoreOf(game.black) * (nbwScores[game.white] ?: 0.0)),
+                Pair(game.white, game.scoreOf(game.white) * (nbwScores[game.black] ?: 0.0))
             )
         }).groupingBy {
             it.first

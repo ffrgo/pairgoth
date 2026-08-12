@@ -52,6 +52,7 @@ data class MainCritParams(
     val additionalPlacementCritSystem1: Criterion = Criterion.RATING,
     val additionalPlacementCritSystem2: Criterion = Criterion.NONE,
     val mmsValueAbsent: Double = 0.5,
+    val nbwValueAbsent: Double = 0.0, // the EGF gives ½ to a player who does not play a round, if the tournament rules agree
     val roundDownScore: Boolean = true,
     val sosValueAbsentUseBase: Boolean = true
 ) {
@@ -247,6 +248,7 @@ fun MainCritParams.Companion.fromJson(json: Json.Object, default: MainCritParams
     additionalPlacementCritSystem1 = json.getString("firstSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem1,
     additionalPlacementCritSystem2 = json.getString("secondSeedAddCrit")?.let { Criterion.valueOf(it) } ?: default.additionalPlacementCritSystem2,
     mmsValueAbsent = json.getDouble("mmsValueAbsent") ?: default.mmsValueAbsent,
+    nbwValueAbsent = json.getDouble("nbwValueAbsent") ?: default.nbwValueAbsent,
     roundDownScore = json.getBoolean("roundDownScore") ?: default.roundDownScore,
     sosValueAbsentUseBase = json.getBoolean("sosValueAbsentUseBase") ?: default.sosValueAbsentUseBase
     )
@@ -265,6 +267,7 @@ fun MainCritParams.toJson() = Json.Object(
     "firstSeedAddCrit" to additionalPlacementCritSystem1,
     "secondSeedAddCrit" to additionalPlacementCritSystem2,
     "mmsValueAbsent" to mmsValueAbsent,
+    "nbwValueAbsent" to nbwValueAbsent,
     "roundDownScore" to roundDownScore,
     "sosValueAbsentUseBase" to sosValueAbsentUseBase
 )

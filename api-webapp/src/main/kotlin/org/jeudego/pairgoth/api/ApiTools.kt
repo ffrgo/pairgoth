@@ -39,7 +39,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.CATEGORY -> StandingsHandler.nullMap
             Criterion.RANK -> pairables.mapValues { it.value.rank }
             Criterion.RATING -> pairables.mapValues { it.value.rating }
-            Criterion.NBW -> history.wins
+            Criterion.NBW -> history.nbwScores
             Criterion.MMS -> history.mms
             Criterion.SCOREX -> history.scoresX
             Criterion.STS -> StandingsHandler.nullMap

@@ -58,6 +58,7 @@ In a **Swiss** tournament, players start at score 0 and the main cost is the sco
 | seedSystem1 | First seeding method |
 | seedSystem2 | Second seeding method |
 | mmsValueAbsent | MMS for absent players |
+| nbwValueAbsent | Number of wins for absent players (the EGF gives ½, if the tournament rules say so) |
 | roundDownScore | Floor vs round scores |
 
 ## Seed Methods

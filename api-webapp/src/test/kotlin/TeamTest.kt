@@ -263,6 +263,8 @@ class TeamTest {
             Json.parse("""{"id":${board.getInt("id")},"result":"${if (board.getString("r") == "w") "b" else "w"}"}"""))
         assertEquals("=", teamGame(tid, tg.getInt("id")).getString("r"), "one board each is a draw")
 
+        // scores are rounded down by default (EGF), so read them unrounded to see the half point
+        TestAPI.put("/api/tour/$tid", Json.parse("""{"pairing":{"main":{"roundDownScore":false}}}"""))
         val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray().map { it as Json.Object }
         assertEquals(2, standings.size)
         standings.forEach { assertEquals(0.5, it.getDouble("NBW"), "each team scores half a point") }

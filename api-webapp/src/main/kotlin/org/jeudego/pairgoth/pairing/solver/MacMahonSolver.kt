@@ -21,13 +21,13 @@ class MacMahonSolver(round: Int,
     override fun mainScoreMapFactory() =
         allPairablesMap.mapValues { (id, pairable) ->
             roundScore(pairable.mmBase +
-                    pairable.nbW +
+                    (history.wins[id] ?: 0.0) +
                     pairable.missedRounds() * pairing.main.mmsValueAbsent)
         }
 
     override fun scoreXMapFactory() =
         allPairablesMap.mapValues { (id, pairable) ->
-            roundScore(pairable.mmBase + pairable.nbW)
+            roundScore(pairable.mmBase + (history.wins[id] ?: 0.0))
         }
 
     override fun missedRoundSosMapFactory() =

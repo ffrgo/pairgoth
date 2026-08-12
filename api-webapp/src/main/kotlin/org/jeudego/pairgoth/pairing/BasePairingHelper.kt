@@ -119,7 +119,7 @@ abstract class BasePairingHelper(
 
     val Pairable.score: Double get() = history.scores[id] ?: 0.0
     val Pairable.scoreX: Double get() = history.scoresX[id] ?: 0.0
-    val Pairable.nbW: Double get() = history.wins[id] ?: 0.0
+    val Pairable.nbW: Double get() = history.nbwScores[id] ?: 0.0
     val Pairable.sos: Double get() = history.sos[id] ?: 0.0
     val Pairable.sosm1: Double get() = history.sosm1[id] ?: 0.0
     val Pairable.sosm2: Double get() = history.sosm2[id] ?: 0.0

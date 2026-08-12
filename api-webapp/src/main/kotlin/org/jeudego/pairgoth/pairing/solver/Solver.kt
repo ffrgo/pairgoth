@@ -47,7 +47,18 @@ sealed class Solver(
         history.scoresFactory = this::mainScoreMapFactory
         history.scoresXFactory = this::scoreXMapFactory
         history.missedRoundsSosFactory = this::missedRoundSosMapFactory
+        history.nbwScoresFactory = this::nbwScoreMapFactory
     }
+
+    /**
+     * The EGF "Number of Wins Score": games won (a jigo counting half), plus whatever the
+     * tournament gives for a non-played round, the total rounded down. It is the main score of a
+     * Swiss, the NBW placement criterion, and what the wins-based SOS family sums.
+     */
+    open fun nbwScoreMapFactory(): Map<ID, Double> =
+        allPairablesMap.mapValues { (id, pairable) ->
+            roundScore((history.wins[id] ?: 0.0) + pairable.missedRounds() * pairing.main.nbwValueAbsent)
+        }
 
     /**
      * Main score map factory (NBW for Swiss, MMS for MacMahon, ...).
