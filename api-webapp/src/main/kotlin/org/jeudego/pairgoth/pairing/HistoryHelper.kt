@@ -99,90 +99,29 @@ open class HistoryHelper(
     // define mms to be a synonym of scores
     val mms by lazy { scores }
 
-    val sos by lazy {
-        // SOS for played games against a real opponent or BIP
-        val historySos = (history.flatten().map { game ->
-            Pair(
-                game.black,
-                if (game.white == 0) missedRoundsSos[game.black] ?: 0.0
-                else scores[game.white]?.let { it - game.handicap } ?: 0.0
-            )
-        } + history.flatten().map { game ->
-            Pair(
-                game.white,
-                if (game.black == 0) missedRoundsSos[game.white] ?: 0.0
-                else scores[game.black]?.let { it + game.handicap } ?: 0.0
-            )
-        }).groupingBy {
-            it.first
-        }.fold(0.0) { acc, next ->
-            acc + next.second
+    // Per-round SOS contributions: the opponent's score (handicap-adjusted, OpenGotha-style) for
+    // a played game, the player's own pseudo-score for a bye or a missed round (the Mac-Mahon
+    // starting score, or 0 in a swiss). One entry per round, so SOS-1 and SOS-2 discard *rounds*.
+    private val sosContributions: Map<ID, List<Double>> by lazy {
+        val perRound = history.map { games ->
+            games.flatMap { game ->
+                listOf(
+                    game.black to if (game.white == ByePlayer.id) null else scores[game.white]?.let { it - game.handicap } ?: 0.0,
+                    game.white to if (game.black == ByePlayer.id) null else scores[game.black]?.let { it + game.handicap } ?: 0.0
+                )
+            }.toMap()
         }
-        // plus SOS for missed rounds
         missedRoundsSos.mapValues { (id, pseudoSos) ->
-            (historySos[id] ?: 0.0) + playersPerRound.sumOf {
-                if (it.contains(id)) 0.0 else pseudoSos
-            }
+            perRound.map { round -> round[id] ?: pseudoSos }
         }
     }
 
-    // sos-1
-    val sosm1 by lazy {
-        // SOS for played games against a real opponent or BIP
-        (history.flatten().map { game ->
-            Pair(
-                game.black,
-                if (game.white == 0) missedRoundsSos[game.black] ?: 0.0
-                else scores[game.white]?.let { it - game.handicap } ?: 0.0
-            )
-        } + history.flatten().map { game ->
-            Pair(
-                game.white,
-                if (game.black == 0) missedRoundsSos[game.white] ?: 0.0
-                else scores[game.black]?.let { it + game.handicap } ?: 0.0
-            )
-        }).groupBy {
-            it.first
-        }.mapValues { (id, pairs) ->
-          val oppScores = pairs.map { it.second }.sortedDescending()
-            // minus greatest SOS
-          oppScores.sum() - (oppScores.firstOrNull() ?: 0.0) +
-              // plus SOS for missed rounds
-              playersPerRound.sumOf { players ->
-                  if (players.contains(id)) 0.0
-                  else missedRoundsSos[id] ?: 0.0
-              }
-        }
-    }
+    val sos by lazy { sosContributions.mapValues { (_, rounds) -> rounds.sum() } }
 
-    // sos-2
-    val sosm2 by lazy {
-        // SOS for played games against a real opponent or BIP
-        (history.flatten().map { game ->
-            Pair(
-                game.black,
-                if (game.white == 0) missedRoundsSos[game.black] ?: 0.0
-                else scores[game.white]?.let { it - game.handicap } ?: 0.0
-            )
-        } + history.flatten().map { game ->
-            Pair(
-                game.white,
-                if (game.black == 0) missedRoundsSos[game.white] ?: 0.0
-                else scores[game.black]?.let { it + game.handicap } ?: 0.0
-            )
-        }).groupBy {
-            it.first
-        }.mapValues { (id, pairs) ->
-            val oppScores = pairs.map { it.second }.sortedDescending()
-            // minus two greatest SOS
-            oppScores.sum() - oppScores.getOrElse(0) { 0.0 } - oppScores.getOrElse(1) { 0.0 } +
-                // plus SOS for missed rounds
-                playersPerRound.sumOf { players ->
-                    if (players.contains(id)) 0.0
-                    else missedRoundsSos[id] ?: 0.0
-                }
-        }
-    }
+    // sos-1 and sos-2: SOS ignoring the 1 (resp. 2) rounds of smallest value
+    val sosm1 by lazy { sosContributions.mapValues { (_, rounds) -> rounds.sorted().drop(1).sum() } }
+
+    val sosm2 by lazy { sosContributions.mapValues { (_, rounds) -> rounds.sorted().drop(2).sum() } }
 
     // sodos — the opponent's score weighted by the game value, so a jigo brings half of it
     val sodos by lazy {
@@ -204,26 +143,29 @@ open class HistoryHelper(
     // tournament type — opponents' NBW, no handicap adjustment, byes and missed rounds count 0.
     // In a no-handicap Swiss they coincide with the score-based maps; in MacMahon they give
     // handicap-free tie-breaks (NBW-ranked "swiss with handicap" played as MM).
-    private fun oppWinsPairs() = history.flatten().flatMap { game ->
-        listOf(
-            Pair(game.black, if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0),
-            Pair(game.white, if (game.black == ByePlayer.id) 0.0 else wins[game.black] ?: 0.0)
-        )
-    }
-
-    val winsSos: Map<ID, Double> by lazy {
-        oppWinsPairs().groupingBy {
-            it.first
-        }.fold(0.0) { acc, next ->
-            acc + next.second
+    // Per-round contributions, as sosContributions but wins-based: a bye or a missed round is
+    // worth 0 whatever the tournament type. Players who never played get no entry at all.
+    private val winsSosContributions: Map<ID, List<Double>> by lazy {
+        val perRound = history.map { games ->
+            games.flatMap { game ->
+                listOf(
+                    game.black to if (game.white == ByePlayer.id) 0.0 else wins[game.white] ?: 0.0,
+                    game.white to if (game.black == ByePlayer.id) 0.0 else wins[game.black] ?: 0.0
+                )
+            }.toMap()
+        }
+        playersPerRound.flatten().toSet().associateWith { id ->
+            perRound.map { round -> round[id] ?: 0.0 }
         }
     }
 
-    // minus the n greatest opponent contributions
-    private fun winsSosMinus(n: Int) = oppWinsPairs().groupBy {
-        it.first
-    }.mapValues { (_, pairs) ->
-        pairs.map { it.second }.sortedDescending().drop(n).sum()
+    val winsSos: Map<ID, Double> by lazy {
+        winsSosContributions.mapValues { (_, rounds) -> rounds.sum() }
+    }
+
+    // minus the n rounds of smallest value
+    private fun winsSosMinus(n: Int) = winsSosContributions.mapValues { (_, rounds) ->
+        rounds.sorted().drop(n).sum()
     }
 
     val winsSosm1: Map<ID, Double> by lazy { winsSosMinus(1) }

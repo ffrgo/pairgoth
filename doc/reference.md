@@ -250,8 +250,8 @@ Tiebreak criteria for standings, in order of priority.
 | Criterion | Description |
 |-----------|-------------|
 | SOSW / SOSM | Sum of opponent scores |
-| SOSWM1 / SOSMM1 | SOS minus worst |
-| SOSWM2 / SOSMM2 | SOS minus two worst |
+| SOSWM1 / SOSMM1 | SOS ignoring the round of smallest value |
+| SOSWM2 / SOSMM2 | SOS ignoring the two rounds of smallest value |
 | SODOSW / SODOSM | Sum of defeated opponent scores |
 | SOSOSW / SOSOSM | Sum of opponent SOS |
 | CUSSW / CUSSM | Cumulative score sum |
