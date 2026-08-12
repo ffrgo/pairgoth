@@ -11,6 +11,8 @@ import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
+import org.jeudego.pairgoth.model.lotteryValue
+import org.jeudego.pairgoth.model.previousOrderValue
 import org.jeudego.pairgoth.model.historyBefore
 import org.jeudego.pairgoth.pairing.DirectConfrontation
 import org.jeudego.pairgoth.pairing.HistoryHelper
@@ -63,6 +65,9 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
 
             Criterion.EXT -> StandingsHandler.nullMap
             Criterion.EXR -> StandingsHandler.nullMap
+
+            Criterion.PREV -> pairables.mapValues { previousOrderValue(it.value) }
+            Criterion.LOTTERY -> pairables.mapValues { lotteryValue(it.key) }
 
             // group-relative, patched below once every other criterion value is known
             Criterion.SDC -> StandingsHandler.nullMap

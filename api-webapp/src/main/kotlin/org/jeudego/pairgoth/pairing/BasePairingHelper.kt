@@ -150,6 +150,8 @@ abstract class BasePairingHelper(
         Criterion.SOSOSW -> pairable.winsSosos
         Criterion.SODOSW -> pairable.winsSodos
         Criterion.CUSSW -> pairable.cums
+        Criterion.PREV -> previousOrderValue(pairable)
+        Criterion.LOTTERY -> lotteryValue(pairable.id)
         // group-relative standings tie-breaks, neutral for pairing.
         // BDW joins them: the solver's history holds team games, never their boards.
         Criterion.DC, Criterion.SDC, Criterion.EGFDC, Criterion.BDW -> 0.0

@@ -444,7 +444,9 @@ class TeamTournament(
             "id" to id,
             "name" to name,
             "players" to playerIds.toList().toJsonArray()
-        )
+        ).also { json ->
+            previousOrder?.let { json["previousOrder"] = it }
+        }
 
         override fun toDetailedJson() = toMutableJson().also { json ->
             json["rating"] = rating
@@ -478,6 +480,7 @@ class TeamTournament(
             mmsCorrection = json.getInt("mmsCorrection") ?: default?.mmsCorrection ?: 0
         ).also {
                 it.playerIds.addAll(teamPlayersIds)
+                it.previousOrder = json.getInt("previousOrder") ?: default?.previousOrder
         }
     }
 

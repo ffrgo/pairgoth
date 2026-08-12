@@ -38,7 +38,31 @@ enum class Criterion {
     SDC, // Simplified direct confrontation
     DC, // Direct confrontation
     EGFDC, // Direct comparison, as defined by the EGF tournament system rules
+
+    PREV, // Previous order: the players' relative order at an earlier time
+    LOTTERY, // Drawing of lots, the EGF's last resort tie-break
 }
+
+/**
+ * EGF "Lottery": one lot for each of the tied players, drawn in order. The standings are
+ * recomputed at every request, so the draw is a stable hash of the player id (splitmix64
+ * finalizer) rather than a live draw — same players, same lots, for the whole tournament.
+ * Values spread over [0, 100) by thousandths.
+ */
+fun lotteryValue(id: ID): Double {
+    var h = id.toLong() * -7046029254386353131L
+    h = (h xor (h ushr 30)) * -4658895280553007687L
+    h = (h xor (h ushr 27)) * -7723592293110705685L
+    h = h xor (h ushr 31)
+    return Math.floorMod(h, 100000L).toDouble() / 1000.0
+}
+
+/**
+ * EGF "Previous Order": the players' relative order at a specified earlier time (a qualification,
+ * a previous tournament), 1 being the best. A criterion is better when greater, hence the negated
+ * order; players with no recorded order rank behind every player that has one.
+ */
+fun previousOrderValue(pairable: Pairable) = pairable.previousOrder?.let { -it.toDouble() } ?: -1000000.0
 
 class PlacementParams(vararg crit: Criterion) {
     companion object {}

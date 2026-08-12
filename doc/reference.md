@@ -265,6 +265,8 @@ Tiebreak criteria for standings, in order of priority.
 | RANK | Player rank |
 | RATING | Player rating |
 | EGFDC | Direct comparison, EGF rules (see below) |
+| PREV | Previous order: the players' relative order at an earlier time (a qualification, a previous tournament), 1 being the best. Set through the API (`previousOrder` on a player or a team), there is no UI for it; players with no recorded order rank behind those that have one. |
+| LOTTERY | Drawing of lots, the EGF's last-resort tie-break. The lot is drawn once and for all from the player id, so the standings never reshuffle between two computations. |
 | DC | Direct confrontation (see below) |
 | SDC | Simplified direct confrontation (see below) |
 | EXT | Exploits attempted |

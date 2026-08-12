@@ -69,6 +69,9 @@ class PairgothTool {
         "EGFDC" to "Direct comparison (EGF rules)",
         "DC" to "Direct confrontation",
         "SDC" to "Simplified direct confrontation",
+
+        "PREV" to "Previous order",
+        "LOTTERY" to "Drawing of lots",
     )
 
     fun getResultsStats(games: Collection<Json.Object>): Json.Object {

@@ -67,6 +67,10 @@ sealed class Pairable(val id: ID, val name: String, open val rating: Int, open v
     }
     open val skip = mutableSetOf<Int>() // skipped rounds
 
+    // EGF "Previous Order" tie-break: relative order at an earlier time (qualification, previous
+    // tournament), 1 = best. Fed by the API or an import; no pairgoth UI. null = unknown.
+    var previousOrder: Int? = null
+
     fun equals(other: Pairable): Boolean {
         return id == other.id
     }
@@ -175,6 +179,7 @@ class Player(
         if (pro != 0) json["pro"] = pro
         if (licensed != null) json["licensed"] = licensed
         if (locked) json["locked"] = true
+        previousOrder?.let { json["previousOrder"] = it }
         externalIds.forEach { (dbid, id) ->
             json[dbid.key] = id
         }
@@ -209,6 +214,7 @@ fun Player.Companion.fromJson(json: Json.Object, default: Player? = null, canoni
 ).also { player ->
     player.licensed = json.getBoolean("licensed") ?: default?.licensed
     player.locked = json.getBoolean("locked") ?: default?.locked ?: false
+    player.previousOrder = json.getInt("previousOrder") ?: default?.previousOrder
     (json.getArray("skip") ?: default?.skip)?.let {
         if (it.isNotEmpty()) player.skip.addAll(it.map { id -> (id as Number).toInt() })
     }
