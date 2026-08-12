@@ -95,3 +95,39 @@ In a **Swiss** tournament, players start at score 0 and the main cost is the sco
 | correction | Handicap reduction |
 | ceiling | Max handicap stones |
 
+
+## EGF tournament system rules
+
+Pairgoth implements the [EGF tournament system rules](https://www.eurogofed.org/egf/toursysrules.htm).
+What they prescribe and pairgoth applies, without asking anything of the organizer:
+
+- **Game values** — a win 1, a jigo ½, a loss 0; a bye is a default win, and a team match is won,
+  lost or drawn on the sum of its board results.
+- **Accumulated scores are rounded down** (*round down NBW/MMS score*, on by default), tie-breaks
+  included: they read the same rounded scores.
+- **Non-played rounds** — worth `mmsValueAbsent` in the McMahon score and `nbwValueAbsent` in the
+  number of wins (the EGF gives ½ *if the tournament rules say so*, hence the settings). For SOS
+  they bring the player's own starting McMahon score in a McMahon, and 0 in a swiss.
+- **Equal players share a place number**, one greater than the number of better placed players.
+- **Pairing the same players twice** is the most expensive thing the pairing can do; when it cannot
+  be avoided, the two players get **inverse colours**. Otherwise colour balance drives the choice.
+- **Above the top bar**, pairing is not biased by geography (*secondary criteria threshold*).
+
+What the rules leave to the organizer, with their recommendation:
+
+- **Tie-breaks.** The EGF recommends, in this order: number of board wins (team tournaments),
+  direct comparison (EGFDC — "generally it should be the first or even the only tiebreaker" for
+  the final results), then one of SOS-2, SOS-1 or SOS, then rating, previous order, lottery. Only
+  one SOS flavour may be used, and SOSOS, SODOS and CUSS are explicitly *not* recommended — they
+  are still available, being long-standing national habits. Criteria may differ between the final
+  results and the draw (*Player ordering for pairing*), which the EGF encourages: SOS is sound for
+  making pairings and doubtful for the standings.
+- **Handicap.** The EGF default is *no handicap*; when handicap is used, its default is the rank
+  difference minus two, for 15 kyu and below. Pairgoth ships OpenGotha's habits instead — no
+  handicap in a swiss, and in a McMahon a rank difference minus one below 1 dan (*Hd correction*
+  and *No hd threshold*, on the information tab).
+- **Rating** as a tie-break is the rating "just before the tournament's start": freeze it with the
+  `ratings.date` setting, otherwise a ratings refresh moves it mid-tournament.
+
+Not implemented: knockout, league and match systems (only swiss and McMahon are), and McMahon
+supergroups — which the rules do not use by default either.
