@@ -42,6 +42,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- A jigo (½-½) is worth half a point to each player, as the EGF tournament system rules prescribe. It used to be worth nothing anywhere but in the EGFDC tie-break: entering ½-½ silently scored a double loss in NBW, MMS, SOS and SODOS, and an OpenGotha tournament containing a jigo imported with different standings than it had.
 - An unexpected server exception during an API call now comes back as the standard JSON error instead of the container's HTML error page — which the browser used to render as an *empty* red error box (HTTP/2 responses carry no reason phrase to fall back on).
 - Static scripts and stylesheets are cache-busted by content hash instead of release version: redeploying the same version (venue hotfixes) used to leave browsers running stale cached scripts until a manual hard reload.
 - Syncing from the website can no longer unregister the players of a team tournament: team registrations happen on paper (the website cannot register teams), so its roster — typically empty — is not authoritative there. The Sync button is replaced by Refresh-ratings on team tournaments, and the server ignores the missing-players section for them regardless of the client.

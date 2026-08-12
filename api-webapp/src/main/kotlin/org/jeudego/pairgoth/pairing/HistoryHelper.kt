@@ -19,15 +19,20 @@ open class HistoryHelper(
     val scoresX by lazy { scoresXFactory() }
     val missedRoundsSos by lazy { missedRoundsSosFactory() }
 
-    private val Game.blackScore get() = when (result) {
-        BLACK, BOTHWIN -> 1.0
+    // EGF game value: a win 1, a jigo ½, a loss 0 (a bye is stored as a win for the real player).
+    // Every accumulated score below is built from this single definition.
+    protected fun Game.scoreOf(id: ID) = when {
+        id != black && id != white -> 0.0
+        result == BOTHWIN -> 1.0
+        result == JIGO -> 0.5
+        result == BLACK -> if (id == black) 1.0 else 0.0
+        result == WHITE -> if (id == white) 1.0 else 0.0
         else -> 0.0
     }
 
-    private val Game.whiteScore get() = when (result) {
-        WHITE, BOTHWIN -> 1.0
-        else -> 0.0
-    }
+    private val Game.blackScore get() = scoreOf(black)
+
+    private val Game.whiteScore get() = scoreOf(white)
 
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
@@ -83,14 +88,9 @@ open class HistoryHelper(
     val wins: Map<ID, Double> by lazy {
         mutableMapOf<ID, Double>().apply {
             history.flatten().forEach { game ->
-                when (game.result) {
-                    Game.Result.BLACK -> put(game.black, getOrDefault(game.black, 0.0) + 1.0)
-                    Game.Result.WHITE -> put(game.white, getOrDefault(game.white, 0.0) + 1.0)
-                    Game.Result.BOTHWIN -> {
-                        put(game.black, getOrDefault(game.black, 0.0) + 1.0)
-                        put(game.white, getOrDefault(game.white, 0.0) + 1.0)
-                    }
-                    else -> {}
+                listOf(game.black, game.white).forEach { id ->
+                    val score = game.scoreOf(id)
+                    if (score != 0.0) put(id, getOrDefault(id, 0.0) + score)
                 }
             }
         }
@@ -184,16 +184,16 @@ open class HistoryHelper(
         }
     }
 
-    // sodos
+    // sodos — the opponent's score weighted by the game value, so a jigo brings half of it
     val sodos by lazy {
         (history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.black, if (game.result == Game.Result.BLACK) scores[game.white]?.let { it - game.handicap } ?: 0.0 else 0.0)
+            Pair(game.black, game.scoreOf(game.black) * (scores[game.white]?.let { it - game.handicap } ?: 0.0))
         } + history.flatten().filter { game ->
             game.white != 0 // Remove games against byePlayer
         }.map { game ->
-            Pair(game.white, if (game.result == Game.Result.WHITE) scores[game.black]?.let { it + game.handicap } ?: 0.0 else 0.0)
+            Pair(game.white, game.scoreOf(game.white) * (scores[game.black]?.let { it + game.handicap } ?: 0.0))
         }).groupingBy { it.first }.fold(0.0) { acc, next ->
             acc + next.second
         }
@@ -246,8 +246,8 @@ open class HistoryHelper(
             game.white != ByePlayer.id && game.black != ByePlayer.id
         }.flatMap { game ->
             listOf(
-                Pair(game.black, if (game.result == BLACK) wins[game.white] ?: 0.0 else 0.0),
-                Pair(game.white, if (game.result == WHITE) wins[game.black] ?: 0.0 else 0.0)
+                Pair(game.black, game.scoreOf(game.black) * (wins[game.white] ?: 0.0)),
+                Pair(game.white, game.scoreOf(game.white) * (wins[game.black] ?: 0.0))
             )
         }).groupingBy {
             it.first
