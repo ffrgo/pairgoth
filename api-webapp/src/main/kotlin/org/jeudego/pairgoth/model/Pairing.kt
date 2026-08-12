@@ -132,6 +132,15 @@ sealed class Pairing(
     val pairingParams: PairingParams,
     val placementParams: PlacementParams) {
     companion object {}
+
+    /**
+     * Criteria ordering the players *for making pairings*, when they must differ from the ones
+     * ordering the final results — "Different tiebreakers might be used for different purposes.
+     * Pairing programs should allow such." (EGF tournament system rules; SOS & co are reasonable
+     * for pairing and doubtful for the final standings). null = the standings criteria are used.
+     */
+    var pairingPlacementParams: PlacementParams? = null
+    val pairingPlacement: PlacementParams get() = pairingPlacementParams ?: placementParams
     internal abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
     internal fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         val solver = solver(tournament, round, pairables).also { solver ->
@@ -173,7 +182,7 @@ class Swiss(
 ): Pairing(SWISS, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        SwissSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round))
+        SwissSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, pairingPlacement, tournament.usedTables(round))
 }
 
 class MacMahon(
@@ -204,7 +213,7 @@ class MacMahon(
 ): Pairing(MAC_MAHON, pairingParams, placementParams) {
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
-        MacMahonSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, placementParams, tournament.usedTables(round), mmFloor, mmBar)
+        MacMahonSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, pairingPlacement, tournament.usedTables(round), mmFloor, mmBar)
 }
 
 class RoundRobin(
@@ -345,6 +354,12 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?, teams: Bool
             .also { it.add(1, Criterion.BDW) }.take(4).toTypedArray())
         else defaultParams.placementParams
     val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: default?.placementParams ?: defaultPlacement
+    // an all-NONE list means "same criteria as the standings", and clears any previous setting
+    val pairingPlacement =
+        if (json.containsKey("pairingPlacement"))
+            json.getArray("pairingPlacement")?.let { PlacementParams.fromJson(it) }
+                ?.takeIf { params -> params.criteria.any { it != Criterion.NONE } }
+        else default?.pairingPlacementParams
     return when (type) {
         SWISS -> Swiss(pairingParams, placementParams)
         MAC_MAHON -> MacMahon(pairingParams, placementParams).also { mm ->
@@ -352,6 +367,8 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?, teams: Bool
             mm.mmBar = json.getInt("mmBar") ?: (default as? MacMahon)?.mmBar ?: 0
         }
         ROUND_ROBIN -> RoundRobin(pairingParams, placementParams)
+    }.also { pairing ->
+        pairing.pairingPlacementParams = pairingPlacement
     }
 }
 
@@ -364,6 +381,7 @@ fun Pairing.toJson(): Json.Object = Json.MutableObject(
     "handicap" to pairingParams.handicap.toJson(),
     "placement" to placementParams.toJson()
 ).also { ret ->
+    pairingPlacementParams?.let { ret["pairingPlacement"] = it.toJson() }
     if (this is MacMahon) {
         ret["mmFloor"] = mmFloor
         ret["mmBar"] = mmBar

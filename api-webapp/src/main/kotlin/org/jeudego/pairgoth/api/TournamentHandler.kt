@@ -103,7 +103,7 @@ object TournamentHandler: PairgothApiHandler {
         // the information tab stand (the client patches the dialog in place instead of reloading)
         val paramsOnly = !placementOnly && payload.keys == setOf("pairing") &&
             payload.getObject("pairing")?.keys?.all {
-                it in setOf("base", "main", "secondary", "geo", "handicap")
+                it in setOf("base", "main", "secondary", "geo", "handicap", "pairingPlacement")
             } == true
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")

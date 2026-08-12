@@ -284,6 +284,8 @@ Only one of the three should appear in the placement criteria. EGFDC being speci
 
 The standings tab offers four placement-criterion slots; a slot left on NONE is ignored.
 
+The criteria ordering the players **when pairing a round** may differ from the ones ordering the final results — the EGF explicitly asks pairing programs to allow it, SOS and its variants being reasonable for making pairings and doubtful for the final standings. Advanced parameters › *Player ordering for pairing* holds that second list (`pairingPlacement` in the API); left all-NONE, the standings criteria order the draw too.
+
 ### External Databases
 
 Player IDs can be linked to external rating databases:

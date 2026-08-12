@@ -357,7 +357,9 @@ onLoad(() => {
         handicap: {
           useMMS: form.val('useMMS'),
           ceiling: form.val('ceiling')
-        }
+        },
+        // all NONE means "order the draw like the standings"
+        pairingPlacement: [1, 2, 3, 4].map(i => form.val(`pairingCrit-${i}`))
       }
     }
     let rst = await mutate({ url: `tour/${tour_id}`, body: tour, source: 'information' });
@@ -395,6 +397,8 @@ onLoad(() => {
     set('mainClubDetectionThreshold', Math.round((geo.mainClubDetectionThreshold || 0.4) * 100));
     check('useMMS', handicap.useMMS);
     set('ceiling', handicap.ceiling);
+    let pairingPlacement = pairing.pairingPlacement || [];
+    for (let i = 1; i <= 4; ++i) set(`pairingCrit-${i}`, pairingPlacement[i - 1] || 'NONE');
     syncMainClubDetails();
   }
 
