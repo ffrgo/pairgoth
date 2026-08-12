@@ -565,7 +565,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
                 gobanSize = json.getInt("gobanSize") ?: default?.gobanSize ?: 19,
                 timeSystem = json.getObject("timeSystem")?.let { TimeSystem.fromJson(it) } ?: default?.timeSystem ?: badRequest("missing timeSystem"),
                 rounds = json.getInt("rounds") ?: default?.rounds ?: badRequest("missing rounds"),
-                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing) } ?: default?.pairing ?: badRequest("missing pairing"),
+                pairing = json.getObject("pairing")?.let { Pairing.fromJson(it, default?.pairing, teams = true) } ?: default?.pairing ?: badRequest("missing pairing"),
                 tablesExclusion = json.getArray("tablesExclusion")?.map { item -> item as String }?.toMutableList() ?: default?.tablesExclusion ?: mutableListOf(),
                 individualGames = json.getObject("individualGames")?.entries?.flatMap {
                     (key, value) -> (value as Json.Array).map { game -> Game.fromJson(game as Json.Object) }.map { key.toID() to it }

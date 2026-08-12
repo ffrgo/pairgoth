@@ -244,6 +244,7 @@ Tiebreak criteria for standings, in order of priority.
 | STS | Strasbourg score |
 | CPS | Cup score |
 | SCOREX | Congress score |
+| BDW | Number of board wins, i.e. the sum of a team's board results over all rounds (team tournaments only; a jigo counts half). The EGF recommends it as the first tie-break of a team tournament, and new team tournaments start with it. |
 
 #### Opponent-based (W = wins, M = MMS)
 

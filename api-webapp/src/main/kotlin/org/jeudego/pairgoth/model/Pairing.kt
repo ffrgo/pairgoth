@@ -322,7 +322,7 @@ fun HandicapParams.toJson() = Json.Object(
     "ceiling" to ceiling
 )
 
-fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?): Pairing {
+fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?, teams: Boolean = false): Pairing {
     // get default values for each type
     val type = json.getString("type")?.let { PairingType.valueOf(it) } ?: default?.type ?: badRequest("missing pairing type")
     val defaultParams = when (type) {
@@ -338,7 +338,13 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?): Pairing {
     val geo = json.getObject("geo")?.let { GeographicalParams.fromJson(it, inherited.geo) } ?: inherited.geo
     val hd = json.getObject("handicap")?.let { HandicapParams.fromJson(it, inherited.handicap) } ?: inherited.handicap
     val pairingParams = PairingParams(base, main, secondary, geo, hd)
-    val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: default?.placementParams ?: defaultParams.placementParams
+    // EGF: in a team tournament the number of board wins is highly meaningful and should be the
+    // first tie-break — so it is what new team tournaments start with (four slots, as the UI shows)
+    val defaultPlacement =
+        if (teams) PlacementParams(*defaultParams.placementParams.criteria.toMutableList()
+            .also { it.add(1, Criterion.BDW) }.take(4).toTypedArray())
+        else defaultParams.placementParams
+    val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: default?.placementParams ?: defaultPlacement
     return when (type) {
         SWISS -> Swiss(pairingParams, placementParams)
         MAC_MAHON -> MacMahon(pairingParams, placementParams).also { mm ->

@@ -42,6 +42,7 @@ class PairgothTool {
         "NBW" to "Number of wins", // Number win
         "MMS" to "Mac Mahon score", // Macmahon score
         "SCOREX" to "Score X", // Score X
+        "BDW" to "Board wins (team tournaments)", // Sum of a team's board results
         // TODO "STS" to "Strasbourg score", // Strasbourg score
         // TODO "CPS" to "Cup score", // Cup score
 
