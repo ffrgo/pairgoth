@@ -40,7 +40,7 @@ In a **Swiss** tournament, players start at score 0 and the main cost is the sco
 | dupWeight | Duplicate game avoidance weight |
 | random | Randomization factor |
 | deterministic | Deterministic pairing |
-| colorBalanceWeight | Color balance importance |
+| colorBalanceWeight | Color balance importance (a rematch overrides it: two players meeting again get inverse colours) |
 | byeWeight | Bye assignment weight |
 
 ## Main Parameters

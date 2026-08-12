@@ -36,6 +36,8 @@ open class HistoryHelper(
 
     // Generic helper functions
     open fun playedTogether(p1: Pairable, p2: Pairable) = paired.contains(Pair(p1.id, p2.id))
+    /** Who held white the last time those two met, null if they never did. */
+    open fun lastMeetingWhite(p1: Pairable, p2: Pairable): ID? = lastMeetingWhite[Pair(p1.id, p2.id)]
     open fun colorBalance(p: Pairable) = colorBalance[p.id]
     open fun nbPlayedWithBye(p: Pairable) = nbPlayedWithBye[p.id]
 
@@ -45,6 +47,19 @@ open class HistoryHelper(
         } + history.flatten().map { game ->
             Pair(game.white, game.black)
         }).toSet()
+    }
+
+    // Colours of the last meeting of two players, both directions: pair -> who held white.
+    // Rounds are walked in order, so a later meeting overwrites an earlier one.
+    private val lastMeetingWhite: Map<Pair<ID, ID>, ID> by lazy {
+        mutableMapOf<Pair<ID, ID>, ID>().apply {
+            history.flatten().filter { game ->
+                game.white != ByePlayer.id && game.black != ByePlayer.id
+            }.forEach { game ->
+                put(Pair(game.white, game.black), game.white)
+                put(Pair(game.black, game.white), game.white)
+            }
+        }
     }
 
     // Returns the number of games played as white minus the number of games played as black
