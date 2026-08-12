@@ -42,6 +42,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- A drawn team match (equal board sums) is now recorded as a draw — half a point for each team, as the EGF tournament system rules prescribe — instead of staying "unknown", which read as a match still being played and scored nothing for either team. A match is only called a draw once every board is in.
 - A jigo (½-½) is worth half a point to each player, as the EGF tournament system rules prescribe. It used to be worth nothing anywhere but in the EGFDC tie-break: entering ½-½ silently scored a double loss in NBW, MMS, SOS and SODOS, and an OpenGotha tournament containing a jigo imported with different standings than it had.
 - An unexpected server exception during an API call now comes back as the standard JSON error instead of the container's HTML error page — which the browser used to render as an *empty* red error box (HTTP/2 responses carry no reason phrase to fall back on).
 - Static scripts and stylesheets are cache-busted by content hash instead of release version: redeploying the same version (venue hotfixes) used to leave browsers running stale cached scripts until a manual hard reload.

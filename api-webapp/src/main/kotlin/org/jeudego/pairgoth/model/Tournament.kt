@@ -511,6 +511,9 @@ class TeamTournament(
         return when {
             score > 0 -> Game.Result.WHITE
             score < 0 -> Game.Result.BLACK
+            // Equal sums are a draw — half a point for each team (EGF tournament system rules) —
+            // but only once every board is in: before that the match is still pending, not tied.
+            boards.isNotEmpty() && boards.all { it.result != Game.Result.UNKNOWN } -> Game.Result.JIGO
             else -> Game.Result.UNKNOWN
         }
     }

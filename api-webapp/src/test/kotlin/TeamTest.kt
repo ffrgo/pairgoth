@@ -252,6 +252,44 @@ class TeamTest {
             "the white team swept both boards — the match must be a white win, not a draw")
     }
 
+    // Equal board sums are a draw: half a point for each team (EGF tournament system rules). The
+    // match used to stay "unknown", indistinguishable from a match still being played.
+    @Test
+    fun `a team match with equal board sums is a draw`() {
+        val (tid, tg) = sweptTeamMatch()
+        val board = boards(tid).first()
+        // flip one of the two boards: 1-1
+        TestAPI.put("/api/tour/$tid/res/1",
+            Json.parse("""{"id":${board.getInt("id")},"result":"${if (board.getString("r") == "w") "b" else "w"}"}"""))
+        assertEquals("=", teamGame(tid, tg.getInt("id")).getString("r"), "one board each is a draw")
+
+        val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray().map { it as Json.Object }
+        assertEquals(2, standings.size)
+        standings.forEach { assertEquals(0.5, it.getDouble("NBW"), "each team scores half a point") }
+    }
+
+    // ... but only once every board is in: a half-entered match is pending, not tied.
+    @Test
+    fun `a half entered team match stays pending`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, p1: Int, p2: Int) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":[$p1,$p2], "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        addTeam("Alphas", addPlayer("Alpha", 1900), addPlayer("Beta", 1800))
+        addTeam("Gammas", addPlayer("Gamma", 1700), addPlayer("Delta", 1600))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val tg = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games")!!.getObject(0)!!
+        assertEquals("?", teamGame(tid, tg.getInt("id")).getString("r"), "no board entered yet")
+        val board = boards(tid).first()
+        TestAPI.put("/api/tour/$tid/res/1", Json.parse("""{"id":${board.getInt("id")},"result":"w"}"""))
+        assertTrue(teamGame(tid, tg.getInt("id")).getString("r") != "=",
+            "one board in, one to go: the match is not a draw yet")
+    }
+
     // A table move keeps the same two teams: results must survive, boards must follow to the new table.
     @Test
     fun `editing a team game's table keeps its results`() {
