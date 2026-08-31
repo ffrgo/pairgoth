@@ -23,6 +23,9 @@ independent planes: pairgoth **pushing** to the event (the *webhook*), and the e
   [External (SSO) authentication](#external-sso-authentication); ignore it otherwise.
 - Details by plane: the push side is the [Webhook specification](#pairgoth-webhook-specification); the
   drive side is the [API specification](#pairgoth-api-specification) (incl. bulk roster import).
+- If the club site runs **WordPress**, the local-publish row needs no development at all: the
+  `wordpress-plugin/` directory of the pairgoth sources holds a ready-made consumer of the publishing
+  endpoints (see its README).
 
 ## Configuration
 
@@ -805,6 +808,9 @@ Pairgoth's role:
 
 Configuration is described in [Webhook](#webhook) under the Configuration section. When `webhook.url` is set, pairgoth
 performs `GET <webhook.url>/health` at startup; a failed check is logged as a warning, not fatal.
+
+For a WordPress club site, the publishing half of this specification is already implemented in
+`wordpress-plugin/` (pairings, results and standings; the registration endpoints below are left out).
 
 All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate
 it on every `{code}`-scoped endpoint and return `401` on mismatch. `/health` is instance-scoped and **may** be served
