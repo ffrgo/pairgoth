@@ -72,7 +72,8 @@ function error(response) {
   const contentType = response.headers.get("content-type");
   let promise =
     (contentType && contentType.indexOf("application/json") !== -1)
-    ? response.json().then(json => json.error || "unknown error")
+    // both keys: pairgoth answers with `error`, the webhook spec (and TokenHandler) with `message`
+    ? response.json().then(json => json.error || json.message || "unknown error")
     // no reason phrase over h2: fall back to the status code
     : Promise.resolve(response.statusText || `error ${response.status}`);
   promise.then(message => {
