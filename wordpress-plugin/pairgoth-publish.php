@@ -210,7 +210,9 @@ function pgp_render($post_id, $view = null, $round = null, $nav = true) {
             __('Published %s', 'pairgoth-publish'),
             wp_date(get_option('date_format') . ' ' . get_option('time_format'), $stamp))) . '</p>';
     }
-    return $out . $html;
+    // The id is the nav links' scroll target, so a round change lands on the tables
+    // even when the block sits at the bottom of a long page.
+    return '<div class="pairgoth-publish" id="pairgoth">' . $out . $html . '</div>';
 }
 
 /** View tabs + round links, as plain links carrying pgv/pgr on the current URL. */
@@ -221,13 +223,13 @@ function pgp_nav($available, $view, $round) {
     foreach ($available as $v => $rounds) {
         $target = add_query_arg(['pgv' => $v, 'pgr' => $v === $view ? $round : end($rounds)], $here);
         $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
-            $v === $view ? 'current' : '', esc_url($target), esc_html($labels[$v]));
+            $v === $view ? 'current' : '', esc_url($target . '#pairgoth'), esc_html($labels[$v]));
     }
     $out .= '</ul><ul class="pairgoth-rounds">';
     foreach ($available[$view] as $r) {
         $target = add_query_arg(['pgv' => $view, 'pgr' => $r], $here);
         $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
-            $r === $round ? 'current' : '', esc_url($target),
+            $r === $round ? 'current' : '', esc_url($target . '#pairgoth'),
             esc_html(sprintf(/* translators: %d: round number */ __('R%d', 'pairgoth-publish'), $r)));
     }
     return $out . '</ul></nav>';

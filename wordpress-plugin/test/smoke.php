@@ -161,6 +161,8 @@ check('nothing was created for a rejected push', count($POSTS) === 1);
 $html = pgp_render($post->ID, null, null);
 check('defaults to the first view, latest round', strpos($html, '<p>corrected</p>') !== false);
 check('nav offers both views', strpos($html, 'Standings') !== false && strpos($html, 'Pairings') !== false);
+check('rendered block carries the scroll anchor', strpos($html, 'id="pairgoth"') !== false);
+check('nav links target the anchor', strpos($html, '#pairgoth') !== false);
 check('explicit round honoured', strpos(pgp_render($post->ID, 'pairings', 1), '<p>pairings r1</p>') !== false);
 check('unknown round falls back to the latest', strpos(pgp_render($post->ID, 'pairings', 99), '<p>corrected</p>') !== false);
 check('unknown view falls back to an available one', strpos(pgp_render($post->ID, 'nope', null), '<p>corrected</p>') !== false);
