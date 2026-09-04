@@ -54,6 +54,7 @@ French rules	Französische Regeln
 Given name	Vorname
 Goban	Gobrett
 Handicap	Vorgabe
+Hd	Vorgabe
 Hd correction	Vorgabe
 No hd threshold	Ohne Vorgabe
 How to use	Verwendung
@@ -106,7 +107,9 @@ Rengo with 3 players team	Rengo mit 3 Spielern pro Team
 Renumber	Neu durchnummerieren
 Required field	Pflichtfeld
 Reset	Zurücksetzen
+Result	Ergebnis
 Results	Ergebnisse
+Tbl	Tisch
 Results for round	Ergebnisse für Runde
 Round-robin	Jeder-gegen-jeden
 Rounds	Runden

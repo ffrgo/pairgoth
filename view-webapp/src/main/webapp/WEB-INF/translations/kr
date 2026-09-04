@@ -55,6 +55,7 @@ French rules	프랑스식
 Given name	이름
 Goban	바둑판
 Handicap	핸디캡
+Hd	핸디
 Hd correction	핸디캡 보정
 No hd threshold	핸디캡 임계값 없음
 How to use	 
@@ -107,7 +108,9 @@ Rengo with 3 players team	3인 팀
 Renumber	번호 다시 매기기
 Required field	필수 항목
 Reset	재설정
+Result	결과
 Results	결과
+Tbl	테이블
 Results for round	라운드 결과
 Round-robin	라운드 로빈
 Rounds	라운드

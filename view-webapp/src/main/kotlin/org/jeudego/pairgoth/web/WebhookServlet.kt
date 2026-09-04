@@ -1,5 +1,7 @@
 package org.jeudego.pairgoth.web
 
+import org.jeudego.pairgoth.util.Translator
+import org.jeudego.pairgoth.view.TranslationTool
 import org.slf4j.LoggerFactory
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -89,6 +91,11 @@ class WebhookServlet : HttpServlet() {
     private fun render(request: HttpServletRequest, response: HttpServletResponse, view: String, tourId: String, round: String): String? {
         val target = "/publish/$view?id=$tourId&round=$round"
         return try {
+            // The include skips the LanguageFilter (/api/* URI), so set the translator here:
+            // the payload follows the operator's UI language (lang param), like the scraped standings do.
+            val lang = request.getParameter("lang")?.takeIf { Translator.providedLanguages.contains(it) }
+                ?: LanguageFilter.parseLanguageHeader(request).first
+            TranslationTool.translator.set(Translator.getTranslator(lang))
             val capture = CapturingResponse(response)
             request.getRequestDispatcher(target).include(request, capture)
             capture.body()

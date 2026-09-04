@@ -107,7 +107,7 @@ onLoad(()=>{
       showError('Tournament short name is required for publishing');
       return;
     }
-    api.postJson(`webhook/publish/results/${code}/${activeRound}?id=${tour_id}`, {})
+    api.postJson(`webhook/publish/results/${code}/${activeRound}?id=${tour_id}&lang=${document.documentElement.lang}`, {})
       .then(data => {
         if (data === 'error') return;
         if (!data.status) showError(data.message || 'Publish failed');
