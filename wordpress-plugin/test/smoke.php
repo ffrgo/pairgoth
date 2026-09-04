@@ -176,6 +176,12 @@ check('code can be re-keyed by hand', get_post_meta($post->ID, PGP_CODE_META, tr
 
 pgp_route_publish(new WP_REST_Request(['code' => 'other-club', 'round' => '1'], '<p>x</p>'), 'pairings');
 $other = pgp_find_tournament('other-club');
+check('single view and single round → no nav at all',
+    strpos(pgp_render($other->ID, null, null), 'pairgoth-nav') === false);
+pgp_route_publish(new WP_REST_Request(['code' => 'other-club', 'round' => '2'], '<p>y</p>'), 'pairings');
+$solo = pgp_render($other->ID, null, null);
+check('single view, two rounds → round links but no view tabs',
+    strpos($solo, 'pairgoth-rounds') !== false && strpos($solo, 'pairgoth-views') === false);
 $_POST = ['pgp_code' => '20260712-club-v2', 'pgp_code_nonce' => 'nonce_pgp_code_' . $other->ID];
 fire('save_post_' . PGP_CPT, $other->ID);
 check('a code already in use is refused', get_post_meta($other->ID, PGP_CODE_META, true) === 'other-club');

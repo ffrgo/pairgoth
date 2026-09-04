@@ -9,6 +9,7 @@
  * Author:            Pairgoth
  * License:           GPLv2 or later
  * Text Domain:       pairgoth-publish
+ * Domain Path:       /languages
  */
 
 /*
@@ -39,6 +40,7 @@ function pgp_views() {
 /* ------------------------------------------------------------------ custom post type */
 
 add_action('init', function () {
+    load_plugin_textdomain('pairgoth-publish', false, dirname(plugin_basename(__FILE__)) . '/languages');
     register_post_type(PGP_CPT, [
         'labels' => [
             'name'          => __('Tournaments', 'pairgoth-publish'),
@@ -215,24 +217,34 @@ function pgp_render($post_id, $view = null, $round = null, $nav = true) {
     return '<div class="pairgoth-publish" id="pairgoth">' . $out . $html . '</div>';
 }
 
-/** View tabs + round links, as plain links carrying pgv/pgr on the current URL. */
+/**
+ * View tabs + round links, as plain links carrying pgv/pgr on the current URL.
+ * A list with a single entry would be a link to the page itself: not rendered.
+ */
 function pgp_nav($available, $view, $round) {
     $labels = pgp_views();
     $here = remove_query_arg(['pgv', 'pgr']);
-    $out = '<nav class="pairgoth-nav"><ul class="pairgoth-views">';
-    foreach ($available as $v => $rounds) {
-        $target = add_query_arg(['pgv' => $v, 'pgr' => $v === $view ? $round : end($rounds)], $here);
-        $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
-            $v === $view ? 'current' : '', esc_url($target . '#pairgoth'), esc_html($labels[$v]));
+    $out = '';
+    if (count($available) > 1) {
+        $out .= '<ul class="pairgoth-views">';
+        foreach ($available as $v => $rounds) {
+            $target = add_query_arg(['pgv' => $v, 'pgr' => $v === $view ? $round : end($rounds)], $here);
+            $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
+                $v === $view ? 'current' : '', esc_url($target . '#pairgoth'), esc_html($labels[$v]));
+        }
+        $out .= '</ul>';
     }
-    $out .= '</ul><ul class="pairgoth-rounds">';
-    foreach ($available[$view] as $r) {
-        $target = add_query_arg(['pgv' => $view, 'pgr' => $r], $here);
-        $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
-            $r === $round ? 'current' : '', esc_url($target . '#pairgoth'),
-            esc_html(sprintf(/* translators: %d: round number */ __('R%d', 'pairgoth-publish'), $r)));
+    if (count($available[$view]) > 1) {
+        $out .= '<ul class="pairgoth-rounds">';
+        foreach ($available[$view] as $r) {
+            $target = add_query_arg(['pgv' => $view, 'pgr' => $r], $here);
+            $out .= sprintf('<li class="%s"><a href="%s">%s</a></li>',
+                $r === $round ? 'current' : '', esc_url($target . '#pairgoth'),
+                esc_html(sprintf(/* translators: %d: round number */ __('R%d', 'pairgoth-publish'), $r)));
+        }
+        $out .= '</ul>';
     }
-    return $out . '</ul></nav>';
+    return $out === '' ? '' : '<nav class="pairgoth-nav">' . $out . '</nav>';
 }
 
 /** [pairgoth code="20260712-club" view="standings" round="3" nav="yes"] */
@@ -261,14 +273,21 @@ add_filter('the_content', function ($content) {
 }, 20);
 
 add_action('wp_enqueue_scripts', function () {
-    if (!is_singular(PGP_CPT)) return;
+    $post = get_post();
+    if (!is_singular(PGP_CPT) && !($post && has_shortcode($post->post_content, 'pairgoth'))) return;
     // Navigation only: the published tables carry their own styles.
     wp_register_style('pairgoth-publish', false, [], PGP_VERSION);
     wp_enqueue_style('pairgoth-publish');
     wp_add_inline_style('pairgoth-publish', '
-.pairgoth-nav ul { display: flex; flex-wrap: wrap; gap: .5em; list-style: none; margin: 0 0 .5em; padding: 0; }
-.pairgoth-nav li.current > a { font-weight: bold; text-decoration: none; }
-.pairgoth-stamp { font-size: .85em; opacity: .7; }');
+.pairgoth-nav ul { display: flex; flex-wrap: wrap; list-style: none; margin: 0; padding: 0; }
+.pairgoth-nav a { text-decoration: none; }
+.pairgoth-views { gap: .25em; border-bottom: 1px solid rgba(128,128,128,.4); }
+.pairgoth-views li { margin-bottom: -1px; }
+.pairgoth-views a { display: inline-block; padding: .25em .9em; border: 1px solid transparent; border-radius: .4em .4em 0 0; }
+.pairgoth-views li.current a { font-weight: bold; border-color: rgba(128,128,128,.4); border-bottom-color: #fff; background: #fff; border-bottom-color: Canvas; background: Canvas; }
+.pairgoth-rounds { gap: .6em; margin-top: .5em; }
+.pairgoth-rounds li.current a { font-weight: bold; text-decoration: underline; }
+.pairgoth-stamp { font-size: .85em; font-style: italic; opacity: .7; }');
 });
 
 /* ------------------------------------------------------------------ admin */
