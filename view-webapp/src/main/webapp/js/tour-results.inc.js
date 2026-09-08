@@ -100,7 +100,8 @@ onLoad(()=>{
       clearResults();
     }
   });
-  $('#publish-results').on('click', e => {
+  $('#publish-results').on('click', async e => {
+    if (!(await freshOrConfirm())) return;
     let form = $('#tournament-infos')[0];
     let code = form.val('shortName');
     if (!code) {

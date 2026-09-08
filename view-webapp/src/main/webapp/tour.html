@@ -93,8 +93,9 @@
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
   // Collaborative SSE mode: every mutating click is POST-only and the SSE echo drives all effects.
-  // It needs one stream per tab → requires HTTP/2 multiplexing (HTTP/1.1's ~6-conn/origin limit
-  // breaks multi-tab); dev always qualifies. Otherwise we run direct (local effect on response).
+  // Collaboration is always on; `collaborative` picks the TRANSPORT: SSE needs one held stream
+  // per tab → requires HTTP/2 multiplexing (HTTP/1.1's ~6-conn/origin limit breaks multi-tab);
+  // dev always qualifies. Otherwise main.js runs the polling loop over the same event feed.
   const env = '$env';
   // A webhook (EGC) is configured: the registration tab gates a presence add on a confirmed push.
   const webhook = $webhookConfigured;
@@ -268,6 +269,7 @@
     </div>
   </div>
 </div>
+<div id="confirm-unverified" class="hidden">Could not verify data freshness — this page may be outdated. Continue anyway?</div>
 <!-- collaborative SSE: shown when a remote change hits the on-screen tab while it has unsaved work -->
 <div id="sse-warn-modal" class="popup no-dimmer-close">
   <div class="popup-body">

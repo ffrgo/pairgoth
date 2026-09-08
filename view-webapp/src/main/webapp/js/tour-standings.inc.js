@@ -169,7 +169,8 @@ onLoad(() => {
   $('.publish-html').on('click', e => {
     publishHtml();
   });
-  $('.publish-website').on('click', e => {
+  $('.publish-website').on('click', async e => {
+    if (!(await freshOrConfirm())) return;
     let form = $('#tournament-infos')[0];
     let code = form.val('shortName');
     if (!code) {

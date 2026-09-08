@@ -9,11 +9,14 @@ const apiVersion = '1.0';
 //     .catch(err => { ... });
 
 const base = '/api/';
+// One key per page load: lets a polling tab recognize (and drop) the echo of its own mutations.
+// Deliberately per-tab, not per-browser: two tabs of the same operator must hear each other.
+const tabKey = Math.random().toString(36).slice(2, 14);
 let  headers = function(withJson) {
     let ret = {
         'Accept-Version': apiVersion,
         'Accept': 'application/json',
-        'X-Browser-Key': store('browserKey')
+        'X-Pairgoth-Tab': tabKey
     };
     if (typeof(withJson) === 'undefined') withJson = true;
     if (withJson) {

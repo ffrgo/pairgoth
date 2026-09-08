@@ -306,10 +306,7 @@ onLoad(()=>{
     window.open(url, '_blank');
     stampPlaying();
   });
-  // the generic header print, while on this tab, means pairings go out on paper
-  $('#print').on('click', e => {
-    if (currentStep() === 'pairing') stampPlaying();
-  });
+  // (the generic header print button stamps `playing` itself — see the layout's #print handler)
   $('#pairing-form [name]').on('input', e => {
     $('#update-pairing').removeClass('disabled');
   });
@@ -378,7 +375,8 @@ onLoad(()=>{
   }
 
   // Publish pairings to website (server-side render, no DOM scrape)
-  $('#publish-pairings').on('click', e => {
+  $('#publish-pairings').on('click', async e => {
+    if (!(await freshOrConfirm())) return;
     let form = $('#tournament-infos')[0];
     let code = form.val('shortName');
     if (!code) {
