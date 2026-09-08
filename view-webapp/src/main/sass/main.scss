@@ -686,6 +686,9 @@
     .ui.striped.table > tbody > tr:nth-child(2n of :not(.filtered)),
     .ui.striped.table > tr:nth-child(2n of :not(.filtered)) {
       background-color: #eeeeee;
+      /* print the zebra even when the browser's "background graphics" option is off */
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
     }
 
     #title {
