@@ -675,6 +675,17 @@
 
     .roundbox {
       border: none;
+      background: none;
+    }
+
+    /* white ground, a single light zebra: the screen's rgba stripe over the roundbox gray
+       printed as three different grays */
+    .ui.striped.table > thead > tr > th {
+      background: none;
+    }
+    .ui.striped.table > tbody > tr:nth-child(2n of :not(.filtered)),
+    .ui.striped.table > tr:nth-child(2n of :not(.filtered)) {
+      background-color: #eeeeee;
     }
 
     #title {

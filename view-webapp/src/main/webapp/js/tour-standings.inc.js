@@ -192,7 +192,7 @@ onLoad(() => {
       .then(data => {
         if (data === 'error') return;
         if (!data.status) showError(data.message || 'Publish failed');
-        else showSuccess(`Standings for round ${activeRound} published to website`);
+        else showSuccess(`Standings after round ${activeRound} published to website`);
       });
   });
   $('#freeze').on('click', e => {
