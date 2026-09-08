@@ -4,7 +4,6 @@ import info.macias.sse.EventBroadcast
 import info.macias.sse.events.MessageEvent
 import info.macias.sse.servlet3.ServletEventTarget
 import org.slf4j.LoggerFactory
-import java.util.UUID
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import javax.servlet.http.HttpServlet
@@ -22,7 +21,7 @@ class SSEServlet: HttpServlet() {
         // saw keep-alive comments — detect a server restart across reconnects and resync
         private val helloEvent = MessageEvent.Builder()
             .setEvent("hello")
-            .setData(UUID.randomUUID().toString())
+            .setData(Event.bootId)
             .setVolatile()
             .build()
     }
@@ -46,6 +45,13 @@ class SSEServlet: HttpServlet() {
     }
 
     override fun doGet(req: HttpServletRequest, resp: HttpServletResponse?) {
+        // polling transport (HTTP/1.1 clients): same feed as JSON instead of a held SSE connection
+        val since = req.getParameter("since")
+        if (since != null && resp != null) {
+            resp.contentType = "application/json; charset=UTF-8"
+            resp.writer.write(Event.eventsSince(since.toLongOrNull()).toString())
+            return
+        }
         logger.trace("<< new channel")
         broadcast.addSubscriber(ServletEventTarget(req), helloEvent, req.getHeader("Last-Event-Id"))
     }

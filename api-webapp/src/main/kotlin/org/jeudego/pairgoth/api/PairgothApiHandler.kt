@@ -14,7 +14,9 @@ interface PairgothApiHandler: ApiHandler {
     }
 
     fun Tournament<*>.dispatchEvent(event: Event, request: HttpServletRequest, data: Json? = null) {
-        Event.dispatch(event, Json.Object("tournament" to id, "data" to data))
+        // `tab` identifies the originating browser tab: a polling client drops its own echoes
+        Event.dispatch(event, Json.Object("tournament" to id,
+            "tab" to request.getHeader("X-Pairgoth-Tab"), "data" to data))
         // when storage is not in memory, the tournament has to be persisted; the event's slug names
         // the history snapshot (category), and lastAction is the human label, for the undo view
         if (event != Event.TournamentAdded && event != Event.TournamentDeleted) {
