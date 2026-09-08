@@ -111,6 +111,10 @@
     <async-supported>true</async-supported>
   </servlet>
   <servlet>
+    <servlet-name>client-log</servlet-name>
+    <servlet-class>org.jeudego.pairgoth.web.ClientLogServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>ratings-lookup</servlet-name>
     <servlet-class>org.jeudego.pairgoth.web.RatingsLookupServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -154,6 +158,10 @@
   <servlet-mapping>
     <servlet-name>webhook</servlet-name>
     <url-pattern>/api/webhook/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>client-log</servlet-name>
+    <url-pattern>/api/jslog</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>ratings-lookup</servlet-name>
