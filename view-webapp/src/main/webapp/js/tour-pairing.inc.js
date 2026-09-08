@@ -55,12 +55,19 @@ function stampPlaying() {
   api.putJson(`tour/${tour_id}`, { playing: activeRound });
 }
 
-// The round's pairing is public — players may already be playing it: confirm before destroying
-// it. Fresh GET at click time (another operator may have printed or entered a result meanwhile).
+// The round's pairing is public — players may already be playing it: warn before destroying it.
+// Fresh GET at click time (another operator may have printed or entered a result meanwhile).
+// Modal instead of a native confirm so it can carry a per-session opt-out; used by the
+// optimal-pairing navigation — the global unpair has its own unconditional confirm.
+let playingWarnResolve = null;
 async function confirmPairingDestruction() {
+  try { if (sessionStorage.getItem('skipPlayingWarn')) return true; } catch (e) {}
   let tour = await api.getJson(`tour/${tour_id}`);
-  if (tour !== 'error' && tour.playing >= activeRound) return confirm($('#confirm-players-playing').text());
-  return true;
+  if (tour === 'error' || tour.playing < activeRound) return true;
+  return new Promise(resolve => {
+    playingWarnResolve = resolve;
+    modal('confirm-playing-modal');
+  });
 }
 
 function renumberTables() {
@@ -228,6 +235,12 @@ onLoad(()=>{
       let tour = await api.getJson(`tour/${tour_id}`);
       if (tour !== 'error' && tour.syncNeeded && !confirm($('#confirm-unsynced-pairing').text())) return;
     }
+    // Launching a round on incomplete previous-round results means pairing on wrong scores: confirm.
+    if (activeRound > 1 && $('#paired .listitem').length === 0) {
+      let previous = await api.getJson(`tour/${tour_id}/pair/${activeRound - 1}`);
+      let missing = previous === 'error' ? 0 : previous.games.filter(g => g.r === '?').length;
+      if (missing > 0 && !confirm(`${$('#confirm-missing-results').text().trim()} (${missing})`)) return;
+    }
     let parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     if (parts.length === 0) {
       $('#pairables .listitem').addClass('selected');
@@ -244,12 +257,28 @@ onLoad(()=>{
   $('#unpair').on('click', async e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     if (games.length == 0) {
-      // global unpair only — a partial (selected) unpair is surgical, no confirm
-      if (!(await confirmPairingDestruction())) return;
-      $('#paired .listitem').addClass('selected');
+      // Global unpair: ALWAYS confirm, playing stamp or not — a silently empty selection
+      // (seen once in the field) must never escalate to destroying the round unasked.
+      let all = $('#paired .listitem');
+      let message = `${$('#confirm-unpair-all').text().trim()} (${all.length})`;
+      let tour = await api.getJson(`tour/${tour_id}`);
+      if (tour !== 'error' && tour.playing >= activeRound) message += '\n' + $('#confirm-players-playing').text().trim();
+      if (!confirm(message)) return;
+      all.addClass('selected');
       games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     }
     unpair(games);
+  });
+  $('#playing-warn-proceed').on('click', e => {
+    if ($('#playing-warn-skip')[0].checked) {
+      try { sessionStorage.setItem('skipPlayingWarn', '1'); } catch (err) {}
+    }
+    close_modal();
+    if (playingWarnResolve) playingWarnResolve(true);
+  });
+  $('#playing-warn-cancel').on('click', e => {
+    close_modal();
+    if (playingWarnResolve) playingWarnResolve(false);
   });
   $('#renumber-tables').on('click', e => {
     renumberTables();

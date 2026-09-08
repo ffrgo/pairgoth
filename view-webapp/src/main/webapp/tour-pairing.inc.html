@@ -251,5 +251,19 @@
 <div id="previous_games_prefix" class="hidden">Games of </div>
 <div id="confirm-unsynced-pairing" class="hidden">No website sync since the last pairing — presences may be stale. Pair anyway?</div>
 <div id="confirm-players-playing" class="hidden">This pairing has been made public — players may already be playing. Proceed anyway?</div>
+<div id="confirm-unpair-all" class="hidden">Unpair ALL the games of this round?</div>
+<div id="confirm-missing-results" class="hidden">Some results of the previous round are still missing — the pairing would use wrong scores. Pair anyway?</div>
+<div id="confirm-playing-modal" class="popup no-dimmer-close">
+  <div class="popup-body">
+    <div class="popup-content">
+      <p>This pairing has been made public — players may already be playing. Proceed anyway?</p>
+      <label><input type="checkbox" id="playing-warn-skip"/> Don't ask again for this session</label>
+    </div>
+    <div class="popup-footer">
+      <button type="button" id="playing-warn-cancel" class="ui gray floating button">Cancel</button>
+      <button type="button" id="playing-warn-proceed" class="ui blue floating button">Proceed</button>
+    </div>
+  </div>
+</div>
 <div id="invalid-tables-selection" class="hidden">Invalid table numbers</div>
 <div id="previous_games_postfix" class="hidden"></div>

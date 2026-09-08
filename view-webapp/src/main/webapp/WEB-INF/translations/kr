@@ -274,3 +274,9 @@ rather than pairing players of the same club.	점 차이를 선호
 use MMS rather than rank for handicap	핸디캡에는 랭킹 대신 MMS 사용
 Handicap ceiling:	핸디캡 상한:
 round down NBW/MMS score	라운드 내림 라운드 NBW/MMS
+This pairing has been made public — players may already be playing. Proceed anyway?	이 대진은 이미 공개되었습니다 — 선수들이 이미 대국 중일 수 있습니다. 계속할까요?
+No website sync since the last pairing — presences may be stale. Pair anyway?	마지막 대진 이후 웹사이트 동기화가 없습니다 — 참석 정보가 오래되었을 수 있습니다. 그래도 대진할까요?
+Unpair ALL the games of this round?	이 라운드의 모든 대국 매칭을 취소할까요?
+Some results of the previous round are still missing — the pairing would use wrong scores. Pair anyway?	이전 라운드의 결과가 아직 입력되지 않았습니다 — 잘못된 점수로 대진하게 됩니다. 그래도 대진할까요?
+Don't ask again for this session	이 세션에서 다시 묻지 않음
+Proceed	계속
