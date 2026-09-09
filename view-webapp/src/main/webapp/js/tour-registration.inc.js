@@ -431,7 +431,7 @@ function navigateResults(ev) {
 let tableSort;
 
 onLoad(() => {
-  // collaborative echoes: bit2/3 patch the row in place; identity/add → reload; delete → drop the row
+  // remote echoes: bit2/3 patch the row in place; identity/add → reload; delete → drop the row
   sseEffect('PlayerUpdated', player => patchPlayerRow(player));
   sseEffect('PlayerAdded', () => false);
   sseEffect('PlayerDeleted', data => { removePlayerRow(data.id); return true; });
