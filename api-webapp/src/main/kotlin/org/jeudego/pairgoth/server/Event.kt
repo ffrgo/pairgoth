@@ -41,48 +41,16 @@ enum class Event(val slug: String) {
         // every response — a change tells them their cursor belongs to a dead history
         val bootId: String = UUID.randomUUID().toString()
 
-        // bounded event log for the polling transport (the SSE replay history lives inside jeasse):
-        // one writer (dispatch), read by SSEServlet's JSON branch
-        private const val LOG_SIZE = 500
-        private val log = ArrayDeque<Json.Object>()
-
-        private fun buildEvent(id: Long, event: Event, data: Json) = MessageEvent.Builder()
-            .setId("$id".padStart(10, '0'))
-            .setEvent(event.name)
-            .setData(data.toString())
-            .build()
+        /** The current newest id, padded like jeasse keys it: the starting cursor handed to a
+         *  polling client when the retained history is still empty (see eventsSince's contract). */
+        internal fun currentCursor() = "${nextMessageId.get()}".padStart(10, '0')
 
         internal fun dispatch(event: Event, data: Json) {
-            val id = nextMessageId.incrementAndGet()
-            synchronized(log) {
-                log.addLast(Json.Object("id" to id, "name" to event.name, "data" to data))
-                while (log.size > LOG_SIZE) log.removeFirst()
-            }
-            sse.broadcast(buildEvent(id, event, data))
-        }
-
-        /** Polling view of the log: events with id > since. `gap` when pruning ate part of the
-         *  asked range; a null/absent `since` just returns the current cursor to start from. */
-        internal fun eventsSince(since: Long?): Json.Object {
-            val events = Json.MutableArray()
-            var gap = false
-            var cursor = since ?: 0L
-            synchronized(log) {
-                if (since == null) {
-                    cursor = log.lastOrNull()?.getLong("id") ?: nextMessageId.get()
-                } else {
-                    val first = log.firstOrNull()?.getLong("id")
-                    if (first != null && since < first - 1) gap = true
-                    for (entry in log) {
-                        val id = entry.getLong("id")!!
-                        if (id > since) {
-                            events.add(entry)
-                            cursor = id
-                        }
-                    }
-                }
-            }
-            return Json.Object("boot" to bootId, "gap" to gap, "cursor" to cursor, "events" to events)
+            sse.broadcast(MessageEvent.Builder()
+                .setId("${nextMessageId.incrementAndGet()}".padStart(10, '0'))
+                .setEvent(event.name)
+                .setData(data.toString())
+                .build())
         }
     }
 }

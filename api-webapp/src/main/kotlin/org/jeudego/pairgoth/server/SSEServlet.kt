@@ -1,5 +1,6 @@
 package org.jeudego.pairgoth.server
 
+import com.republicate.kson.Json
 import info.macias.sse.EventBroadcast
 import info.macias.sse.events.MessageEvent
 import info.macias.sse.servlet3.ServletEventTarget
@@ -29,7 +30,9 @@ class SSEServlet: HttpServlet() {
         if (zeInstance != null) throw Error("Multiple instances of SSE servlet found!")
         zeInstance = this
     }
-    private val broadcast = EventBroadcast()
+    // deeper history than jeasse's replay default: the polling transport needs the retained
+    // window to cover a full 20s interval under burst
+    private val broadcast = EventBroadcast().apply { setHistorySize(200) }
     private val keepAlive = Executors.newSingleThreadScheduledExecutor { r -> Thread(r, "sse-keepalive").apply { isDaemon = true } }
 
     override fun init() {
@@ -48,8 +51,15 @@ class SSEServlet: HttpServlet() {
         // polling transport (HTTP/1.1 clients): same feed as JSON instead of a held SSE connection
         val since = req.getParameter("since")
         if (since != null && resp != null) {
+            val missed = broadcast.eventsSince(since)
+            val events = Json.MutableArray()
+            missed.events.forEach { message ->
+                events.add(Json.Object("id" to message.id, "name" to message.event,
+                    "data" to Json.parse(message.data)))
+            }
             resp.contentType = "application/json; charset=UTF-8"
-            resp.writer.write(Event.eventsSince(since.toLongOrNull()).toString())
+            resp.writer.write(Json.Object("boot" to Event.bootId, "gap" to missed.gap,
+                "cursor" to missed.cursor.ifEmpty { Event.currentCursor() }, "events" to events).toString())
             return
         }
         logger.trace("<< new channel")
