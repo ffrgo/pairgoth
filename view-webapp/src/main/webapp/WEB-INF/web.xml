@@ -65,12 +65,6 @@
     <servlet-class>org.jeudego.pairgoth.web.ViewServlet</servlet-class>
   </servlet>
   <servlet>
-    <servlet-name>sse</servlet-name>
-    <servlet-class>org.jeudego.pairgoth.web.SSEServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-    <async-supported>true</async-supported>
-  </servlet>
-  <servlet>
     <servlet-name>api</servlet-name>
     <servlet-class>org.jeudego.pairgoth.web.ApiServlet</servlet-class>
     <load-on-startup>1</load-on-startup>
@@ -125,10 +119,6 @@
   <servlet-mapping>
     <servlet-name>view</servlet-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>sse</servlet-name>
-    <url-pattern>/events/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>api</servlet-name>
