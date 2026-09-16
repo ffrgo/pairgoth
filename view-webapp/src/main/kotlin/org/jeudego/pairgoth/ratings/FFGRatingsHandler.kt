@@ -10,7 +10,8 @@ import java.time.format.DateTimeFormatter
 
 object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
     val ratingsDateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy")
-    override val defaultURL = URL("https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt")
+    // V4 = V3 + the EGD PIN as last column ("--------" when the FFG doesn't know it)
+    override val defaultURL = URL("https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V4.txt")
     override fun parsePayload(payload: String): Pair<LocalDate, Json.Array>? {
         val firstLine = payload.lineSequence().firstOrNull()
         if (firstLine == null || !firstLine.contains("#Echelle au ")) {
@@ -32,6 +33,7 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
                     }.toTypedArray()
                     Json.MutableObject(*pairs).also {
                         it["origin"] = "FFG"
+                        match.groups["egf"]?.value?.takeIf { pin -> pin.all(Char::isDigit) }?.let { pin -> it["egf"] = pin }
                         // FFG echelle does not carry pro grades; mirror the affichePersonne.php
                         // hardcoded list (FFG dev repo) for French pros, keyed by license.
                         val pro = frenchPros[it.getString("ffg")] ?: 0
@@ -52,7 +54,7 @@ object FFGRatingsHandler: RatingsHandler(RatingsManager.Ratings.FFG) {
     override fun defaultCharset() = StandardCharsets.ISO_8859_1
 
     var linePattern =
-        Regex("(?<name>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s(?<firstname>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s+(?<rating>-?[0-9]+)\\s(?<license>[-eCLX])\\s(?<ffg>(?:\\d|[A-Z]){7}|-------)\\s(?<club>xxxx|XXXX|\\d{2}[a-zA-Z0-9]{2})\\s(?<country>[A-Z]{2})")
+        Regex("(?<name>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s(?<firstname>$atom+(?:\\((?:$atom|[0-9])+\\))?)\\s+(?<rating>-?[0-9]+)\\s(?<license>[-eCLX])\\s(?<ffg>(?:\\d|[A-Z]){7}|-------)\\s(?<club>xxxx|XXXX|\\d{2}[a-zA-Z0-9]{2})\\s(?<country>[A-Z]{2})(?:\\s(?<egf>\\d{8}|-{8}))?")
     val groups = arrayOf("name", "firstname", "rating", "license", "ffg", "club", "country")
 
     // French pros licensed in France; mirrors ffg.jeudego.org/php/affichePersonne.php $joueurs_pro.

@@ -1,10 +1,8 @@
 package org.jeudego.pairgoth.ratings
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.util.getResourceAsStream
 import org.jeudego.pairgoth.web.WebappManager
 import org.slf4j.LoggerFactory
-import java.io.BufferedReader
 import java.lang.Exception
 import java.nio.file.Path
 import java.time.format.DateTimeFormatter
@@ -42,12 +40,6 @@ object RatingsManager: Runnable {
     val timer = Timer()
     lateinit var players: Json.MutableArray
     val updateLock: ReadWriteLock = ReentrantReadWriteLock()
-    val egf2ffg by lazy {
-        BufferedReader(getResourceAsStream("/egf2ffg.csv").reader()).readLines().associate {
-            it.split(',').zipWithNext().first()
-        }
-    }
-
     const val PERIOD = 3600000L
 
     override fun run() {
@@ -77,21 +69,18 @@ object RatingsManager: Runnable {
                     players = newPlayers
                     index.build(players)
 
-                    // propagate French players license status from ffg to egf
-                    val licenseStatus = players.map { it -> it as Json.MutableObject }.filter {
-                        it["origin"] == "FFG"
+                    // propagate French players license status from ffg to egf, keyed by the
+                    // PIN the FFG echelle carries (V4)
+                    val licenseByPin = players.map { it -> it as Json.MutableObject }.filter {
+                        it["origin"] == "FFG" && it.containsKey("egf")
                     }.associate { player ->
-                        Pair(player.getString("ffg")!!, player.getString("license") ?: "-")
+                        Pair(player.getString("egf")!!, player.getString("license") ?: "-")
                     }
                     players.map { it -> it as Json.MutableObject }.filter {
                         it["origin"] == "EGF" && it["country"] == "FR"
                     }.forEach { player ->
                         player.getString("egf")?.let { egf ->
-                            egf2ffg[egf]?.let { ffg ->
-                                licenseStatus[ffg]?.let {
-                                    player["license"] = it
-                                }
-                            }
+                            licenseByPin[egf]?.let { player["license"] = it }
                         }
                     }
                 } finally {

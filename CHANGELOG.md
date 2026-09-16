@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- FFG players carry their EGD PIN: the FFG echelle now publishes it (`ech_ffg_V4.txt`), so a player picked from the FFG ladder exports to the EGD with a PIN, and Refresh ratings fills the PIN in for already-registered players. The licence status shown on French EGF entries follows the same live link (the bundled 2024 correspondence snapshot is gone).
 - WordPress plugin (`wordpress-plugin/`): a club site can receive and display published pairings, results and standings with no development — install it, set a shared secret, and paste into `pairgoth.properties` the two lines its settings page shows. Publishing only: the roster and presence endpoints are left to bigger event sites.
 - Pairing a fresh round with an external website configured now asks for confirmation when no roster sync happened since the previous pairing (stale presences guard).
 - The wins-based tie-breaks (SOSW, SOSWM1, SOSWM2, SOSOSW, SODOSW) now really sum opponents' wins, without handicap adjustment, in every tournament type — in a Mac-Mahon tournament they used to silently evaluate as their MMS-based cousins (SOSM & co). Ranking on NBW + SOSW + SOSOSW gives a handicap-blind "swiss" placement inside a handicapped Mac-Mahon.

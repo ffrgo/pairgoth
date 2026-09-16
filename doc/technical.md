@@ -268,7 +268,7 @@ ratings.<source> = <url>
 
 URL override for the rating source. Schemes: `http://`, `https://`, `file://`. If not set, the built-in default URL for that source is used:
 
-- FFG: https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V3.txt
+- FFG: https://ffg.jeudego.org/echelle/echtxt/ech_ffg_V4.txt (V3 columns plus the EGD PIN when the FFG knows it; a V3 mirror still parses, without PINs)
 - EGF: https://pairgoth.jeudego.org/egd/allworld_lp.zip (pairgoth-hosted mirror, zipped)
 - AGA: TBD
 
