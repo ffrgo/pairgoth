@@ -230,22 +230,21 @@ private fun launchServer() {
     }
     val secure = webappUrl.protocol == "https"
     val h2c = serverProps.getProperty("webapp.h2c")?.toBoolean() ?: false
+    // unset = every interface, so other computers on the LAN can reach a standalone instance
+    val bindInterface = serverProps.getProperty(if (mode == "server") "api.interface" else "webapp.interface")
 
     // create server
-    val server =
-        if (secure || h2c) Server()
-        else Server(webappUrl.port)
+    val server = Server()
 
     server.apply {
         // register webapps
         handler = ContextHandlerCollection(*webAppContexts.toTypedArray())
-        if (secure) {
-            val connector = buildSecureConnector(server, webappUrl.port)
-            addConnector(connector)
-        } else if (h2c) {
-            val connector = buildH2cConnector(server, webappUrl.port)
-            addConnector(connector)
-        }
+        val connector =
+            if (secure) buildSecureConnector(server, webappUrl.port)
+            else if (h2c) buildH2cConnector(server, webappUrl.port)
+            else ServerConnector(server).apply { port = webappUrl.port }
+        connector.host = bindInterface
+        addConnector(connector)
         // launch server
         start()
         checkVersion()

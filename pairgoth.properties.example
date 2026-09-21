@@ -24,7 +24,8 @@
 
 # Webapp (UI) connector
 # webapp.protocol = http
-# webapp.host = localhost                     # interface to bind (alias: webapp.interface)
+# webapp.host = localhost                     # host part of the URLs pairgoth builds
+# webapp.interface = localhost                # interface to bind (default: all, i.e. reachable from the LAN)
 # webapp.port = 8080
 # webapp.context = /
 # webapp.external.url = http://localhost:8080 # external URL (OAuth redirects, client config)
@@ -32,6 +33,7 @@
 # API connector (standalone: port 8080, context /api/tour)
 # api.protocol = http
 # api.host = localhost
+# api.interface = localhost                   # server mode: interface to bind (default: all)
 # api.port = 8085
 # api.context = /api
 # api.external.url = http://localhost:8085/api

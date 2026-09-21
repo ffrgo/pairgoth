@@ -54,6 +54,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- The documented bind setting (`webapp.interface`, `api.interface` in server mode) is now honoured — it used to be ignored, the server always listened on every interface. Unset still means every interface (other computers on the local network can reach the instance); `localhost` keeps it private.
 - Server errors carrying a `message` rather than an `error` field now show their reason in the error box instead of "unknown error" — an expired session used to report "unknown error" where it meant "unauthorized", and so did anything the tournament website refused.
 - The cumulative score (CUSS) counted every round but the last twice as much as it should: the running total was added to itself at each step (after three rounds a first-round win weighed 4 instead of 3).
 - SOS-1 and SOS-2 (SOSWM1/SOSMM1, SOSWM2/SOSMM2) now ignore the round of *smallest* value, as the EGF tournament system rules define them and as OpenGotha computes them — they used to drop the largest one, i.e. the strongest opponent, turning the tie-break upside down. A round without an opponent (bye or missed round) is a candidate for the drop like any other, instead of being added back after the fact.

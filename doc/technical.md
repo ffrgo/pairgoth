@@ -188,7 +188,8 @@ webapp.context = /
 webapp.external.url = http://localhost:8080
 ```
 
-- `webapp.host` (or `webapp.interface`) - Hostname/interface to bind to
+- `webapp.host` - Host part of the URLs pairgoth builds (not the bind address)
+- `webapp.interface` - Interface to bind to; unset = all interfaces, so other computers on the local network can reach the instance (several operators sharing one standalone). Set `localhost` to keep it private to this computer.
 - `webapp.external.url` - External URL for OAuth redirects and client configuration
 
 ### API connector
@@ -204,6 +205,8 @@ api.external.url = http://localhost:8085/api
 ```
 
 Note: In standalone mode, API port defaults to 8080 and context to `/api/tour`.
+
+In server mode, `api.interface` is the bind interface (same semantics as `webapp.interface`).
 
 ### SSL/TLS configuration
 
