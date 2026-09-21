@@ -293,6 +293,12 @@
     }
   }
 
+  /* local flags, so the menu works offline (jdecked/twemoji 17.0.3) */
+  i.flag.gb::before, i.flag.uk::before { background-image: url(../lib/flags/gb.svg); }
+  i.flag.fr::before { background-image: url(../lib/flags/fr.svg); }
+  i.flag.de::before { background-image: url(../lib/flags/de.svg); }
+  i.flag.kr::before { background-image: url(../lib/flags/kr.svg); }
+
   /* UI fixes */
 
   .ui.form, .ui.segment, .ui.form .field > label { font-size: 1em; }
