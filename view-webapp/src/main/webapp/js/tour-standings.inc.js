@@ -84,16 +84,6 @@ function publishHtml() {
   close_modal();
 }
 
-function freeze() {
-  api.put(`tour/${tour_id}/standings/${activeRound}`, {}
-  ).then(resp => {
-    if (resp.ok) {
-      document.location.reload();
-    }
-    else throw "freeze error"
-  }).catch(err => showError(err));
-}
-
 onLoad(() => {
   new Tablesort($('#standings-table')[0]);
   standingsColumns = Object.assign({country: true, club: true, inactive: true}, store('standingsColumns'));
@@ -195,10 +185,5 @@ onLoad(() => {
         if (!data.status) showError(data.message || 'Publish failed');
         else showSuccess(`Standings after round ${activeRound} published to website`);
       });
-  });
-  $('#freeze').on('click', e => {
-    if (confirm("Once frozen, names, levels and even pairings can be changed, but the scores and the standings will stay the same. Freeze the standings?")) {
-      freeze()
-    }
   });
 });

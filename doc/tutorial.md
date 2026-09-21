@@ -78,8 +78,6 @@ Several operators can enter results simultaneously from different computers: cha
 
 The **Standings** tab ranks players using the placement criteria (MMS, SOS, SOSOS… — click a criterion header to change it; see the [reference](reference) for definitions). Results of every round are shown per player.
 
-Once the tournament is over, **freeze** the standings if you want later corrections (names, ranks) to leave the official results untouched.
-
 ## Exporting Data
 
 The **Publish** button on the standings tab offers:

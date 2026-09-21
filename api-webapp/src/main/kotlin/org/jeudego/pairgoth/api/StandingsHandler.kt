@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.WebappManager
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
@@ -54,8 +53,7 @@ object StandingsHandler: PairgothApiHandler {
                 .flatMap { listOf(it.white, it.black) }
                 .toSet()
             sortedEntries = sortedEntries.filter { it.getID() in played }
-            // close the place gaps the drop leaves (ties keep sharing); on copies, because
-            // the frozen branch serves the stored snapshot objects
+            // close the place gaps the drop leaves (ties keep sharing)
             var prevOld = 0
             var prevNew = 0
             sortedEntries = sortedEntries.mapIndexed { i, p ->
@@ -322,14 +320,6 @@ ${
                 tournament.pairing.placementParams.criteria.joinToString(";") { line.getString(it.name) ?: "" }
             }")
         }
-    }
-
-    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
-        val tournament = getTournament(request)
-        val sortedPairables = tournament.getSortedPairables(tournament.rounds)
-        tournament.frozen = sortedPairables.toJsonArray()
-        tournament.dispatchEvent(Event.TournamentUpdated, request, tournament.toJson())
-        return Json.Object("status" to "ok")
     }
 
     private val numFormat = DecimalFormat("###0.#")

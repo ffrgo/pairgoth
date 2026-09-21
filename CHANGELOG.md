@@ -48,6 +48,10 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - A failed webhook health check at startup is now a warning instead of a fatal error, so a co-located webhook peer (e.g. a sibling container) that isn't up yet no longer takes pairgoth down. A missing `webhook.secret` is still fatal.
 - Rank-to-rating conversion now anchors ranks at the EGD band centre (1d = 2100) instead of the weak edge (2050), so a rank-derived rating tolerates ±49 points of drift without flipping rank.
 
+### Removed
+
+- Standings freeze: final standings are always computed from the current results. Snapshots frozen by earlier versions are ignored (and dropped at the tournament's next save).
+
 ### Fixed
 
 - Server errors carrying a `message` rather than an `error` field now show their reason in the error box instead of "unknown error" — an expired session used to report "unknown error" where it meant "unauthorized", and so did anything the tournament website refused.

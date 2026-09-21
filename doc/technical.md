@@ -762,10 +762,6 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
 
     Criteria names include: `nbw`, `mms`, `sts`, `cps`, `sosw`, `sosm`, `sososw`, `sososm`, `sodosw`, `sodosm`, `cussw`, `cussm`, `dc`, `sdc`, `ext`, `exr`, etc.
 
-+ `PUT /api/tour/#tid/standings` Freeze/lock standings
-
-    *output* `{ "success": true }`
-
 ### Pairing explanation
 
 + `GET /api/tour/#tid/explain/#rn` Get detailed pairing criteria weights for round #rn
