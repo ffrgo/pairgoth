@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Webhook: the site's `/health` answer may list its `capabilities` (`players`, `presences`, `pairings`, `standings`); pairgoth only shows the matching website buttons — a publish-only site no longer offers a "Sync from website" that can't work. Absent field = every capability, as before.
 - FFG players carry their EGD PIN: the FFG echelle now publishes it (`ech_ffg_V4.txt`), so a player picked from the FFG ladder exports to the EGD with a PIN, and Refresh ratings fills the PIN in for already-registered players. The licence status shown on French EGF entries follows the same live link (the bundled 2024 correspondence snapshot is gone).
 - WordPress plugin (`wordpress-plugin/`): a club site can receive and display published pairings, results and standings with no development — install it, set a shared secret, and paste into `pairgoth.properties` the two lines its settings page shows. Publishing only: the roster and presence endpoints are left to bigger event sites.
 - Pairing a fresh round with an external website configured now asks for confirmation when no roster sync happened since the previous pairing (stale presences guard).

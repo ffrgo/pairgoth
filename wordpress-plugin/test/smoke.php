@@ -41,6 +41,7 @@ function sanitize_title($s) { return strtolower($s); }
 function sanitize_key($s) { return strtolower(preg_replace('/[^a-z0-9_\-]/i', '', $s)); }
 function wp_slash($s) { return addslashes($s); }
 function wp_unslash($s) { return stripslashes($s); }
+function get_bloginfo($k) { return 'Test Club'; }
 function get_option($k, $d = '') { return $GLOBALS['OPTIONS'][$k] ?? $d; }
 function wp_date($f, $t) { return date($f, $t); }
 function get_permalink($p) { return 'https://club.example/tournaments/x'; }
@@ -121,6 +122,8 @@ function fire($hook, ...$args) {
 // --- authentication
 $anonymous = new WP_REST_Request([], '', ['x-pairgoth-secret' => 'guess']);
 $res = pgp_check_secret($anonymous);
+$health = pgp_route_health()->get_data();
+check('health declares the publishing capabilities only', $health['status'] === true && $health['capabilities'] === ['pairings', 'standings']);
 check('no secret configured → 503, not a silent accept', $res instanceof WP_Error && $res->data['status'] === 503);
 $OPTIONS[PGP_SECRET_OPT] = 'right-secret';
 $res = pgp_check_secret($anonymous);

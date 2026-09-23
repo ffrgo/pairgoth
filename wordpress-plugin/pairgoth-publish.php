@@ -29,7 +29,7 @@ const PGP_NS         = 'pairgoth/v1';
 const PGP_CPT        = 'pairgoth_tournament';
 const PGP_SECRET_OPT = 'pairgoth_publish_secret';
 const PGP_CODE_META  = '_pairgoth_code';
-const PGP_VERSION    = '0.1.0';
+const PGP_VERSION    = '0.2.0';
 
 /** Views pairgoth can push. 'pairings' also carries results (same endpoint, richer table). */
 function pgp_views() {
@@ -140,7 +140,11 @@ add_action('rest_api_init', function () {
 });
 
 function pgp_route_health() {
-    return new WP_REST_Response(['status' => true, 'name' => get_bloginfo('name'), 'version' => PGP_VERSION], 200);
+    // publishing half only: pairgoth then hides its Sync / presence actions for this site
+    return new WP_REST_Response([
+        'status' => true, 'name' => get_bloginfo('name'), 'version' => PGP_VERSION,
+        'capabilities' => ['pairings', 'standings'],
+    ], 200);
 }
 
 function pgp_check_secret(WP_REST_Request $request) {

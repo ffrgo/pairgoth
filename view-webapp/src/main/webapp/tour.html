@@ -97,8 +97,9 @@
   // (HTTP/1.1's ~6-conn/origin limit breaks multi-tab); dev always qualifies. Otherwise main.js
   // runs the polling loop over the same event feed, with direct-mode mutations.
   const env = '$env';
-  // A webhook (EGC) is configured: the registration tab gates a presence add on a confirmed push.
-  const webhook = $webhookConfigured;
+  // Website integrations the webhook consumer implements (see Webhook.kt): the registration tab
+  // gates a presence add on a confirmed push, the pairing tab confirms an unsynced round.
+  const webhook = { players: $webhook.players, presences: $webhook.presences };
   // display.pairing.blackFirst: live result patches must match the server-rendered orientation
   const blackFirst = $blackFirst;
   const sseTransport = env === 'dev' ||

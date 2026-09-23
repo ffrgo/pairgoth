@@ -413,8 +413,12 @@ Behavior:
   startup. **A failed health check is only logged as a warning** (not fatal):
   the tournament site is normally already running, but a co-located peer (e.g.
   a sibling docker container) may simply not be up yet — pairgoth keeps
-  serving, and pushes/pulls retry at runtime. A missing `webhook.secret` while
+  serving, probes again from the next tournament page (at most once a minute),
+  and pushes/pulls retry at runtime. A missing `webhook.secret` while
   `webhook.url` is set is still a fatal misconfiguration.
+- The health answer may list the site's `capabilities`: only the matching
+  buttons are shown (a publish-only site gets no *Sync from website*). A site
+  that doesn't answer, or answers without the field, gets every button.
 
 ### Display
 
@@ -833,9 +837,11 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
 
 + `GET /health` — health check used at pairgoth startup.
 
-    *output* `{ "status": true, "name"?: string, "version"?: string }`
+    *output* `{ "status": true, "name"?: string, "version"?: string, "capabilities"?: string[] }`
 
     The `name` is shown in pairgoth's startup log line (`webhook at <url> healthy: <name>`) — useful for the operator to confirm the right backend.
+
+    `capabilities` lists the endpoints below the site implements, by their first path segment: `players`, `presences`, `pairings` (which also carries results), `standings`. Pairgoth only offers the corresponding actions (Sync from website, presence write-back, Publish pairings/results, Publish standings). **Absent means all four** — sites predating the field keep working unchanged; a publish-only site should declare `["pairings", "standings"]` rather than let its operators discover a missing route from an error box.
 
 ### /players/{code}
 

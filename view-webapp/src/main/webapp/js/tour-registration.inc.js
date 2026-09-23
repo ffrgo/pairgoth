@@ -878,7 +878,7 @@ onLoad(() => {
     // Add (red→green) of a website-sourced player on an EGC deployment: gate the local change on a
     // confirmed push — the website may refuse a round the player isn't registered for. The label only
     // flips via the effect/echo, so aborting is just not committing (nothing to revert).
-    if (present && webhook && ext) {
+    if (present && webhook.presences && ext) {
       let pushed = await pushPresence(ext, round, true);
       if (pushed !== 'ok' && pushed !== 'noop') {
         showError(`The website refused this presence change: ${pushed.message}. Not applied.`);

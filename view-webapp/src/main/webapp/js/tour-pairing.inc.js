@@ -231,7 +231,7 @@ onLoad(()=>{
     // EGC deployments: launching a round without a website sync since the previous pairing likely
     // means stale presences — confirm. Fresh GET (another operator may have synced meanwhile);
     // only for a still-empty round: a partially paired round means adjusting, not launching.
-    if (webhook && $('#paired .listitem').length === 0) {
+    if (webhook.players && $('#paired .listitem').length === 0) {
       let tour = await api.getJson(`tour/${tour_id}`);
       if (tour !== 'error' && tour.syncNeeded && !confirm($('#confirm-unsynced-pairing').text())) return;
     }
