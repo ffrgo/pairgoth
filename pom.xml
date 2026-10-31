@@ -172,6 +172,10 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${maven.surefire.plugin.version}</version>
+          <configuration>
+            <!-- test fixtures are UTF-8; without this, tests fail on platforms whose default charset differs (Windows) -->
+            <argLine>-Dfile.encoding=UTF-8</argLine>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
