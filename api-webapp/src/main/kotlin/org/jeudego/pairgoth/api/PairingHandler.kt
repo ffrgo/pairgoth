@@ -107,17 +107,21 @@ object PairingHandler: PairgothApiHandler {
                 else
                     game.black != payload.getInt("b") || game.white != payload.getInt("w") || game.handicap != payload.getInt("h")
             if (hasResult && changesPairing) badRequest("Game already has a result")
+            // resolve both players before touching the game: an unknown id used to be stored in the game
+            // (dangling id) and then crash recomputeDUDD with a 500
+            val black = tournament.pairables[payload.getID("b") ?: badRequest("missing black player id")] ?: badRequest("invalid black player id")
+            val white = tournament.pairables[payload.getID("w") ?: badRequest("missing white player id")] ?: badRequest("invalid white player id")
             val previousWhite = game.white
             val previousBlack = game.black
-            game.black = payload.getID("b") ?: badRequest("missing black player id")
-            game.white = payload.getID("w") ?: badRequest("missing white player id")
+            game.black = black.id
+            game.white = white.id
 
             tournament.recomputeDUDD(round, game.id)
             val previousTable = game.table;
             // temporary
             //payload.getInt("dudd")?.let { game.drawnUpDown = it }
-            val black = tournament.pairables[game.black] ?: badRequest("invalid black player id")
-            val white = tournament.pairables[game.white] ?: badRequest("invalid white player id")
+            // CAUTION: the checks below run after the game was modified, and a refused edit keeps the
+            // modification. Re-pairing a round game by game (PairingTests forcePairing) relies on it.
             if (!black.final) badRequest("black registration status is not final")
             if (!white.final) badRequest("white registration status is not final")
             if (black.skip.contains(round)) badRequest("black is not playing this round")
