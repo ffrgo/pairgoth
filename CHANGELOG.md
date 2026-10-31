@@ -9,6 +9,13 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [Unreleased]
 
+### Fixed
+
+- API responses containing a string that needs JSON escaping (quotes, backslashes, newlines — e.g. a tournament or player name with a `"`) failed with a server error.
+- Manual game edit: an unknown player id was stored in the game before being refused, then crashed with a server error, leaving a dangling id.
+- Pairing a round beyond the next one before any round was paired gave a server error instead of a 400.
+- The test suite now passes on platforms whose default charset is not UTF-8 (Windows).
+
 ## [0.26] - 2026-06-22
 
 ### Added
