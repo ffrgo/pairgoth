@@ -89,7 +89,7 @@ sealed class Tournament <P: Pairable>(
     protected val games = mutableListOf<MutableMap<ID, Game>>()
 
     fun games(round: Int) = games.getOrNull(round - 1) ?:
-        if (round > games.size + 1) throw Error("invalid round")
+        if (round > games.size + 1) badRequest("invalid round")
         else mutableMapOf<ID, Game>().also { games.add(it) }
 
     open fun individualGames(round: Int): Map<ID, Game> = games(round)
