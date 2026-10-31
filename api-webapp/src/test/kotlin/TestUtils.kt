@@ -13,6 +13,8 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 import javax.servlet.ReadListener
 import javax.servlet.ServletInputStream
+import javax.servlet.ServletOutputStream
+import javax.servlet.WriteListener
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -91,10 +93,14 @@ object TestAPI {
 
         // mock response
         val buffer = StringWriter()
+        val bytes = ByteArrayOutputStream()
         val errCode = argumentCaptor<Int>()
         val errMessage = argumentCaptor<String>()
+        lastHeaders.clear()
         val resp = mock<HttpServletResponse> {
             on { writer } doAnswer { PrintWriter(buffer) }
+            on { outputStream } doAnswer { DelegatingServletOutputStream(bytes) }
+            on { setHeader(any(), any()) } doAnswer { lastHeaders[it.getArgument(0)] = it.getArgument(1) }
             on { sendError(errCode.capture(), errMessage.capture()) } doAnswer { throw Error("${errCode.lastValue} ${errMessage.lastValue}") }
         }
 
@@ -105,14 +111,19 @@ object TestAPI {
             "DELETE" -> apiServlet.doDelete(req, resp)
         }
 
-        return buffer.toString()
+        // exports (EGF, FFG, CSV) are written to the output stream rather than to the writer
+        return buffer.toString() + bytes.toString(StandardCharsets.UTF_8)
     }
+
+    /** Headers set by the last request (e.g. Content-Disposition of an export). */
+    val lastHeaders = mutableMapOf<String, String>()
 
     fun get(uri: String): Json = Json.parse(testRequest<Void>("GET", uri)) ?: throw Error("no payload")
     fun getXml(uri: String): String = testRequest<Void>("GET", uri, "application/xml")
     fun getJson(uri: String): String = testRequest<Void>("GET", uri, "application/pairgoth")
     fun getCSV(uri: String): String = testRequest<Void>("GET", uri, "text/csv")
     fun getFFG(uri: String): String = testRequest<Void>("GET", uri, "application/ffg")
+    fun getEGF(uri: String): String = testRequest<Void>("GET", uri, "application/egf")
     fun <T> post(uri: String, payload: T) = Json.parse(testRequest("POST", uri, payload = payload)) ?: throw Error("no payload")
     fun <T> put(uri: String, payload: T) = Json.parse(testRequest("PUT", uri, payload = payload)) ?: throw Error("no payload")
     fun <T> delete(uri: String, payload: T) = Json.parse(testRequest("DELETE", uri, payload = payload)) ?: throw Error("no payload")
@@ -125,6 +136,12 @@ fun getTestResources(path: String) = getTestFile(path).listFiles()
 fun getTestFile(path: String) = File("${System.getProperty("user.dir")}/src/test/resources/$path")
 
 fun getOutputFile(path: String) = File("${System.getProperty("test.build.dir")}/$path")
+
+class DelegatingServletOutputStream(val targetStream: OutputStream) : ServletOutputStream() {
+    override fun write(b: Int) = targetStream.write(b)
+    override fun isReady() = true
+    override fun setWriteListener(writeListener: WriteListener?) {}
+}
 
 class DelegatingServletInputStream(val sourceStream: InputStream) : ServletInputStream() {
 
