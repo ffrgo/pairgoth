@@ -60,28 +60,28 @@ class LanguageFilter : Filter {
         }
     }
 
-    /**
-     * Returns Pair(language, locale)
-     */
-    private fun parseLanguageHeader(request: HttpServletRequest): Pair<String, String> {
-        langHeaderParser.findAll(request.getHeader("Accept-Language") ?: "").filter {
-            providedLanguages.contains(it.groupValues[1])
-        }.sortedByDescending {
-            it.groupValues[3].toDoubleOrNull() ?: 1.0
-        }.firstOrNull()?.let { match ->
-            val lang = match.groupValues[1].let { if (it == "*") defaultLanguage else it }
-            val variant = match.groupValues.getOrNull(2)?.lowercase(Locale.ROOT)
-            // by convention, the variant is only kept if different from the language (fr-FR => fr)
-            val locale = variant?.let { if (lang == variant) lang else "$lang-${variant.uppercase(Locale.ROOT)}" } ?: lang
-            return Pair(lang, locale)
-        }
-        return Pair(defaultLanguage, defaultLanguage)
-    }
-
     override fun destroy() {}
 
     companion object {
         private val langPattern = Regex("/([a-z]{2})(/.+)")
         private val langHeaderParser = Regex("(?:\\b(\\*|[a-z]{2})(?:(?:_|-)(\\w+))?)(?:;q=([0-9.]+))?")
+
+        /**
+         * Returns Pair(language, locale)
+         */
+        fun parseLanguageHeader(request: HttpServletRequest): Pair<String, String> {
+            langHeaderParser.findAll(request.getHeader("Accept-Language") ?: "").filter {
+                providedLanguages.contains(it.groupValues[1])
+            }.sortedByDescending {
+                it.groupValues[3].toDoubleOrNull() ?: 1.0
+            }.firstOrNull()?.let { match ->
+                val lang = match.groupValues[1].let { if (it == "*") defaultLanguage else it }
+                val variant = match.groupValues.getOrNull(2)?.lowercase(Locale.ROOT)
+                // by convention, the variant is only kept if different from the language (fr-FR => fr)
+                val locale = variant?.let { if (lang == variant) lang else "$lang-${variant.uppercase(Locale.ROOT)}" } ?: lang
+                return Pair(lang, locale)
+            }
+            return Pair(defaultLanguage, defaultLanguage)
+        }
     }
 }
