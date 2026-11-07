@@ -2,6 +2,26 @@
 
 const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
+// Client-side errors notified to the server.
+let clientErrorsSent = 0;
+function reportClientError(kind, message, stack) {
+  if (clientErrorsSent >= 5) return;
+  ++clientErrorsSent;
+  try {
+    fetch('/api/jslog', {
+      method: 'POST',
+      keepalive: true,
+      headers: { 'Content-Type': 'text/plain' },
+      body: `${kind}: ${message}\n${location.pathname}${location.search}\n${stack || ''}`.slice(0, 3500)
+    }).catch(() => {});
+  } catch (e) {}
+}
+window.addEventListener('error', e => reportClientError('error', e.message, e.error && e.error.stack));
+window.addEventListener('unhandledrejection', e => {
+  let reason = e.reason;
+  reportClientError('rejection', reason && reason.message || String(reason), reason && reason.stack);
+});
+
 /* Per-user preferences — disabled. Display.pairing.blackFirst is now a server-side
    pairgoth.properties config; the per-user gear icon / settings modal are commented
    out in the layout. Kept here for potential reuse.
