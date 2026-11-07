@@ -49,6 +49,11 @@
         <i class="fa fa-cog"></i>
       </div>
 *#
+#if($tour && !$tour.error)
+      <div id="undo" title="Undo recent actions" data-tour="$params.id">
+        <i class="fa fa-undo"></i>
+      </div>
+#end
       <div id="print" title="Print">
         <i class="fa fa-print"></i>
       </div>
@@ -98,6 +103,19 @@
     <a class="lang" data-lang="$lang.key" href="#"><i class="$lang.value flag"></i>&nbsp;$lang.key</a>
   #end
 #end
+  </div>
+  <div id="undo-modal" class="popup">
+    <div class="popup-body">
+      <div class="popup-header">Undo</div>
+      <div class="popup-content">
+        <div id="undo-hint">Select the range of past actions to undo</div>
+        <div id="undo-list" class="multi-select"></div>
+      </div>
+      <div class="popup-footer">
+        <button class="ui blue button disabled" id="undo-confirm">Undo selected</button>
+        <button class="ui button gray close">Cancel</button>
+      </div>
+    </div>
   </div>
 #*  Per-user settings modal — empty for now
   <div id="settings-modal" class="popup">

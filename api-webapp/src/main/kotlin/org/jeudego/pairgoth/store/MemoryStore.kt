@@ -26,7 +26,7 @@ object MemoryStore: Store {
 
     override fun getTournament(id: ID) = tournaments[id]
 
-    override fun replaceTournament(tournament: Tournament<*>) {
+    override fun replaceTournament(tournament: Tournament<*>, actionSlug: String?) {
         if (!tournaments.containsKey(tournament.id)) throw Error("tournament id #${tournament.id} not known")
         tournaments[tournament.id] = tournament
     }

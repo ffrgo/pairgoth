@@ -62,6 +62,9 @@ sealed class Tournament <P: Pairable>(
     // frozen standings
     var frozen: Json.Array? = null
 
+    // label of the last user action
+    var lastAction: String? = null
+
     // pairing
     open fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         // Minimal check on round number.
@@ -620,6 +623,9 @@ fun Tournament<*>.toFullJson(): Json.Object {
     }
     if (frozen != null) {
         json["frozen"] = frozen
+    }
+    if (lastAction != null) {
+        json["lastAction"] = lastAction
     }
     return json
 }

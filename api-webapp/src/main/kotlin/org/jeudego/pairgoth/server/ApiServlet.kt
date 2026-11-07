@@ -1,11 +1,10 @@
 package org.jeudego.pairgoth.server
 
-import com.github.benmanes.caffeine.cache.Cache
-import com.github.benmanes.caffeine.cache.Caffeine
 import com.republicate.kson.Json
 import org.apache.commons.io.input.BOMInputStream
 import org.jeudego.pairgoth.api.ApiHandler
 import org.jeudego.pairgoth.api.ExplainHandler
+import org.jeudego.pairgoth.api.HistoryHandler
 import org.jeudego.pairgoth.api.PairingHandler
 import org.jeudego.pairgoth.api.PlayerHandler
 import org.jeudego.pairgoth.api.ResultsHandler
@@ -13,20 +12,17 @@ import org.jeudego.pairgoth.api.StandingsHandler
 import org.jeudego.pairgoth.api.TeamHandler
 import org.jeudego.pairgoth.api.TokenHandler
 import org.jeudego.pairgoth.api.TournamentHandler
-import org.jeudego.pairgoth.util.AESCryptograph
 import org.jeudego.pairgoth.util.Colorizer.blue
 import org.jeudego.pairgoth.util.Colorizer.green
 import org.jeudego.pairgoth.util.Colorizer.red
 import org.jeudego.pairgoth.util.XmlUtils
 import org.jeudego.pairgoth.util.parse
 import org.jeudego.pairgoth.util.toString
-import org.jeudego.pairgoth.web.sharedSecret
 import org.slf4j.LoggerFactory
 import org.w3c.dom.Element
 import java.io.IOException
 import java.io.InputStreamReader
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 import javax.servlet.http.HttpServlet
@@ -106,6 +102,7 @@ class ApiServlet: HttpServlet() {
                         "res" -> ResultsHandler
                         "standings" -> StandingsHandler
                         "team" -> TeamHandler
+                        "history" -> HistoryHandler
                         else -> ApiHandler.badRequest("unknown sub-entity: $subEntity")
                     }
                 // "player" -> PlayerHandler

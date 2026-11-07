@@ -898,3 +898,25 @@
   }
 
 }
+
+#undo {
+  cursor: pointer;
+}
+#undo-modal {
+  #undo-hint {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 0.5em;
+  }
+  #undo-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    .listitem {
+      display: flex;
+      justify-content: space-between;
+      gap: 1em;
+      .when { color: #888; font-size: 0.85em; white-space: nowrap; }
+      &.empty { justify-content: center; color: #888; font-style: italic; cursor: default; }
+    }
+  }
+}

@@ -3,22 +3,22 @@ package org.jeudego.pairgoth.server
 import info.macias.sse.events.MessageEvent
 import java.util.concurrent.atomic.AtomicLong
 
-enum class Event {
-    TournamentAdded,
-    TournamentUpdated,
-    TournamentDeleted,
-    PlayerAdded,
-    PlayerUpdated,
-    PlayerDeleted,
-    TeamAdded,
-    TeamUpdated,
-    TeamDeleted,
-    GamesAdded,
-    GamesDeleted,
-    GameUpdated,
-    ResultUpdated,
-    ResultsCleared,
-    TablesRenumbered
+enum class Event(val slug: String) {
+    TournamentAdded("add-tourney"),
+    TournamentUpdated("edit-tourney"),
+    TournamentDeleted("del-tourney"),
+    PlayerAdded("add-player"),
+    PlayerUpdated("edit-player"),
+    PlayerDeleted("del-player"),
+    TeamAdded("add-team"),
+    TeamUpdated("edit-team"),
+    TeamDeleted("del-team"),
+    GamesAdded("pair"),
+    GamesDeleted("unpair"),
+    GameUpdated("edit-game"),
+    ResultUpdated("enter-result"),
+    ResultsCleared("clear-results"),
+    TablesRenumbered("renumber")
     ;
 
     companion object {
