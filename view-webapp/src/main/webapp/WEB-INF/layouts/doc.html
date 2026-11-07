@@ -20,6 +20,11 @@
       </div>
     </div>
   </div>
+  <div id="doc-nav">
+#foreach($p in ['tutorial', 'reference', 'pairing', 'technical'])
+    <a href="$p" #if($p == $docPage)class="active"#end>$strings.capitalize($p)</a>
+#end
+  </div>
   <div id="center">
     <div id="inner">
       <div class="markdown-body">

@@ -40,6 +40,7 @@ class MarkdownServlet : VelocityViewServlet() {
         super.fillContext(context, request)
         val uri = request.requestURI
         val page = uri.removePrefix("/doc/").ifEmpty { null }
+        context.put("docPage", page ?: "")
 
         if (page == null || page.contains("..") || page.contains("/")) {
             context.put("docContent", "")

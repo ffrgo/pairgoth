@@ -2,6 +2,21 @@ body.doc {
   overflow: auto;
   counter-reset: h2;
 
+  #doc-nav {
+    display: flex;
+    justify-content: center;
+    gap: 1.5em;
+    padding: 0.4em 0;
+    border-bottom: 1px solid #ddd;
+    a {
+      color: #888;
+      &.active {
+        color: black;
+        font-weight: bold;
+      }
+    }
+  }
+
   #center {
     overflow: auto;
     padding: 2em;
