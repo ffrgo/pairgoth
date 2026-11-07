@@ -25,6 +25,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Removed Explain feature and button for now: it could loose results and pairings
 - Fix behavior of rank and rating for ratings refresh, bulk uploads and honorary ratings
 - Fix same-club avoidance rule: blank/placeholder clubs (xxxx, NoCb) never match
 - results were not displayed correctly with blackFirst option set to true
