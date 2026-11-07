@@ -31,30 +31,34 @@
   #stop
 #end
 #set($games = $utils.removeBye($roundPairing.games))
+#if("$!params.tables" != "")
+  #set($games = $utils.filterTables($games, $params.tables))
+#end
 #set($pages = ($games.size() + 3) / 4)
 #set($items = $pages * 4)
-#foreach($i in [1..$items])
-  #set($j = ($i - 1) / 4 + (($i - 1) % 4) * $pages)
-  #if($j < $games.size())
-    #set($game = $games[$j])
-    #set($white = $pmap[$game.w])
-    #set($black = $pmap[$game.b])
-  #else
-    #set($game = { 't': 'xxx', 'h': 'xxx' })
-    #set($white = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
-    #set($black = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
-  #end
-  #if($foreach.index % 4 == 0)
+#if($items > 0)
+  #foreach($i in [1..$items])
+    #set($j = ($i - 1) / 4 + (($i - 1) % 4) * $pages)
+    #if($j < $games.size())
+      #set($game = $games[$j])
+      #set($white = $pmap[$game.w])
+      #set($black = $pmap[$game.b])
+    #else
+      #set($game = { 't': 'xxx', 'h': 'xxx' })
+      #set($white = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
+      #set($black = { 'name': 'xxx', 'firstname': 'xxx', 'rank': -99, 'country': 'XX', 'club': 'xxx' })
+    #end
+    #if($foreach.index % 4 == 0)
   <div class="page">
-  #end
+    #end
 
     <div class="page-item">
       <div class="title">$tour.name</div>
       <div class="subtitle"></div>
       <div class="details">
         <div>Table $game.t</div>
-  #set($komi = $tour.komi)
-  #if($game.h) #set($komi = $komi - $math.floor($komi)) #end
+    #set($komi = $tour.komi)
+    #if($game.h) #set($komi = $komi - $math.floor($komi)) #end
         <div>Handicap $game.h &nbsp;&dash;&nbsp; Komi $komi</div>
         <div>Round $round</div>
       </div>
@@ -62,7 +66,7 @@
         Surround winner's name or ½-½
       </div>
       <div class="players">
-#if($blackFirst)
+    #if($blackFirst)
         <div class="black player">
           <div class="color">Black</div>
           <div class="name">$black.name $!black.firstname #rank($black.rank $!black.pro)<br/>#if($black.country)($black.country.toUpperCase()#if($black.club), $black.club#end)#end</div>
@@ -72,7 +76,7 @@
           <div class="color">White</div>
           <div class="name">$white.name $!white.firstname #rank($white.rank $!white.pro)<br/>#if($white.country)($white.country.toUpperCase()#if($white.club), $white.club#end)#end</div>
         </div>
-#else
+    #else
         <div class="white player">
           <div class="color">White</div>
           <div class="name">$white.name $!white.firstname #rank($white.rank $!white.pro)<br/>#if($white.country)($white.country.toUpperCase()#if($white.club), $white.club#end)#end</div>
@@ -82,7 +86,7 @@
           <div class="color">Black</div>
           <div class="name">$black.name $!black.firstname #rank($black.rank $!black.pro)<br/>#if($black.country)($black.country.toUpperCase()#if($black.club), $black.club#end)#end</div>
         </div>
-#end
+    #end
       </div>
       <div class="signatures">
         <div class="signature">Signature:</div>
@@ -91,8 +95,9 @@
       </div>
     </div>
 
-  #if($foreach.index % 4 == 3)
+    #if($foreach.index % 4 == 3)
   </div>
+    #end
   #end
 #end
 </div>

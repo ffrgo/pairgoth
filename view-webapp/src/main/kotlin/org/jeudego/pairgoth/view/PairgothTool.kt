@@ -97,6 +97,18 @@ class PairgothTool {
             it.getInt("b")!! != 0 && it.getInt("w")!! != 0
         }
 
+    // same syntax as the tables exclusion field, see Tournament.excludedTables()
+    fun filterTables(games: Collection<Json.Object>, tables: String): Collection<Json.Object> {
+        val parser = Regex("(\\d+)(?:-(\\d+))?")
+        val selected = mutableSetOf<Int>()
+        parser.findAll(tables).forEach { match ->
+            val left = match.groupValues[1].toInt()
+            val right = match.groupValues[2].let { if (it.isEmpty()) left else it.toInt() }
+            for (t in left..right) selected.add(t)
+        }
+        return games.filter { selected.contains(it.getInt("t")) }
+    }
+
     @OptIn(ExperimentalPathApi::class)
     fun getExampleTournaments(): List<String> {
         val classLoader: ClassLoader = PairgothTool::class.java.classLoader

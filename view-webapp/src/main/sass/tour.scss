@@ -536,6 +536,18 @@
     margin-top: 0.2em;
   }
 
+  /* result sheets dialog: keep radio, label and input on one line */
+  #result-sheets-form .field > label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4em;
+    white-space: nowrap;
+    input[type="text"] {
+      flex: 1;
+      width: auto;
+    }
+  }
+
   /* results section */
 
   #results-filter {
