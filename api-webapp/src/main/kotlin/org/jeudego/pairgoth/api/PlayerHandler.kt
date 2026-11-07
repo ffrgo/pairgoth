@@ -77,8 +77,13 @@ object PlayerHandler: PairgothApiHandler {
             }
         }
         // one event / one history snapshot — and none at all when nothing actually changed
+        val event = when (request.getParameter("reason")) {
+            "mms" -> MMGroupsUpdated
+            "ratings" -> RatingsRefreshed
+            else -> PlayersImported
+        }
         if (added.isNotEmpty() || updated.isNotEmpty())
-            tournament.dispatchEvent(PlayersImported, request, Json.Object("added" to added.size, "updated" to updated.size))
+            tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
         return Json.Object("success" to true,
             "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed)
     }

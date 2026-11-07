@@ -282,7 +282,8 @@ function addPlayers() {
 }
 
 function bulkUpdate(players) {
-  api.postJson(`tour/${tour_id}/part`, players)
+  // single bulk upsert (one event server-side) instead of a per-player PUT loop with reason=mms
+  api.postJson(`tour/${tour_id}/part?reason=mms`, players)
     .then(rst => { if (rst !== 'error') window.location.reload(); });
 }
 
@@ -1031,7 +1032,7 @@ onLoad(() => {
 
     let failed = 0, lastError = null;
     if (payloads.length) {
-      let report = await api.postJson(`tour/${tour_id}/part`, payloads);
+      let report = await api.postJson(`tour/${tour_id}/part?reason=ratings`, payloads);
       if (report === 'error') { failed = payloads.length; lastError = 'bulk update failed'; }
       else { failed = (report.failed || []).length; lastError = report.failed?.[0]?.reason || null; }
     }
