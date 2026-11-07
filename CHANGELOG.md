@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Allow distinct placement criteria for the pairings and the standings
 - Board wins criterion, first tie-breaker by default for team tournaments
 - Printing, publishing or entering results make a round public: ask confirmation for subsequent destructive actions
 - Print result sheets for a custom tables selection

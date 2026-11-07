@@ -13,6 +13,7 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.model.toJson
+import org.jeudego.pairgoth.model.validate
 import org.jeudego.pairgoth.server.ApiServlet
 import org.jeudego.pairgoth.server.Event.*
 import org.jeudego.pairgoth.store.AclFileStore
@@ -68,7 +69,7 @@ object TournamentHandler: PairgothApiHandler {
         val tournament = when (val payload = request.getAttribute(PAYLOAD_KEY)) {
             // Tournament POST is a restore-from-payload (full player array inline). Don't
             // canonicalise names — pairing depends on stable detRandom seed (see Pairable.kt).
-            is Json.Object -> Tournament.fromJson(getObjectPayload(request), canonicalize = false)
+            is Json.Object -> Tournament.fromJson(getObjectPayload(request), canonicalize = false).also { validatePlacement(it) }
             is Element -> if (MacMahon39.isFormat(payload)) MacMahon39.import(payload) else OpenGotha.import(payload)
             else -> badRequest("missing or invalid payload")
         }
@@ -101,7 +102,7 @@ object TournamentHandler: PairgothApiHandler {
         // payload; if it's the case, use a specific event to avoid forcing a refresh of the information tab
         val paramsOnly = !placementOnly && payload.keys == setOf("pairing") &&
             payload.getObject("pairing")?.keys?.all {
-                it in setOf("base", "main", "secondary", "geo", "handicap")
+                it in setOf("base", "main", "secondary", "geo", "handicap", "pairingPlacement")
             } == true
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
@@ -156,7 +157,7 @@ object TournamentHandler: PairgothApiHandler {
             // prepare updated tournament version (no name canonicalisation — players are
             // copied across from the existing tournament right after this, so the flag here
             // is mostly moot, but keep it false for symmetry with the restore path)
-            val updated = Tournament.fromJson(payload, tournament, canonicalize = false)
+            val updated = Tournament.fromJson(payload, tournament, canonicalize = false).also { validatePlacement(it) }
             // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
             updated.players.putAll(tournament.players)
             if (tournament is TeamTournament && updated is TeamTournament) {
@@ -176,6 +177,12 @@ object TournamentHandler: PairgothApiHandler {
             }, request, updated.toJson())
         }
         return Json.Object("success" to true)
+    }
+
+    // refuse incoherent criteria
+    private fun validatePlacement(tournament: Tournament<*>) {
+        tournament.pairing.placementParams.validate()?.let { badRequest("standings criteria: $it") }
+        tournament.pairing.pairingPlacementParams?.validate()?.let { badRequest("pairing criteria: $it") }
     }
 
     internal fun validateTablesExclusion(exclusion: String) {

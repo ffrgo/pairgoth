@@ -188,5 +188,37 @@
         </label>
       </div>
     </div>
+    <div class="title"><i class="dropdown icon"></i>Player ordering for pairing</div>
+    <div class="content">
+      <div class="field">
+        <label>Criteria ordering the players when pairing a round. Left empty, the standings
+          criteria are used — set them here to order the draw differently from the final results
+          (SOS &amp; co are sound for pairing, doubtful for the standings).</label>
+      </div>
+#set($pairingPlacements = [])
+#if($tour.pairing.pairingPlacement)
+  #foreach($placement in $tour.pairing.pairingPlacement)
+    #set($junk = $pairingPlacements.add($placement))
+  #end
+#end
+#foreach($i in [1..4])
+  #if($pairingPlacements.size() < 4)
+    #set($junk = $pairingPlacements.add('NONE'))
+  #end
+#end
+      <div class="inline fields">
+#foreach($placement in $pairingPlacements)
+  #set($num = $foreach.index + 1)
+        <div class="criterium field">
+          <label>Crit #$num</label>
+          <select name="pairingCrit-$num" class="short-value">
+  #foreach($crit in $$utils.criteria.entrySet())
+            <option value="$crit.key" data-tooltip="$crit.value" #if($placement == $crit.key)selected#end>$crit.key - $crit.value</option>
+  #end
+          </select>
+        </div>
+#end
+      </div>
+    </div>
   </div>
 </form>
