@@ -12,7 +12,7 @@
         <tool key="inflector" class="org.atteo.evo.inflector.English"/>
         -->
     </toolbox>
-Exception
+
     <toolbox scope="session">
         <!--
         <tool key="oauth" class="org.jeudego.egc2024.tool.OAuthTool"/>
