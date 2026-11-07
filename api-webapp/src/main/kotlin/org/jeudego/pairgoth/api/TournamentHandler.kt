@@ -147,7 +147,10 @@ object TournamentHandler: PairgothApiHandler {
             // copy players, games, criteria (this copy should be provided by the Tournament class - CB TODO)
             updated.players.putAll(tournament.players)
             if (tournament is TeamTournament && updated is TeamTournament) {
-                updated.teams.putAll(tournament.teams)
+                // Team is an inner class, so re-create Team instances, do not copy them
+                tournament.teams.values.forEach { team ->
+                    updated.teams[team.id] = updated.teamFromJson(team.toJson(), team)
+                }
             }
             for (round in 1..tournament.lastRound()) updated.games(round).apply {
                 clear()

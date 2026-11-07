@@ -68,6 +68,79 @@ class TeamTest {
         Tournament.fromJson(tournament.toFullJson())
     }
 
+    // A tournament-form edit rebuilds the TeamTournament but used to transplant the old inner-class
+    // Team objects, still bound to the pre-edit instance: player edits made after the edit (e.g.
+    // benching a substitute) were invisible to Team.canPlay, so a 3-player TEAM2 stayed unpairable
+    // while the roster showed the skip. Teams must be re-parented onto the new instance.
+    @Test
+    fun `player edits after a tournament edit must be visible to teams`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa", 1800)
+        val p2 = addPlayer("Bbb", 1790)
+        val sub = addPlayer("Ccc", 1780)
+        val team = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Trio", "players":[$p1,$p2,$sub], "final":true }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        // 3 active players on a 2-board team: not pairable yet
+        assertEquals("[]", TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("pairables").toString())
+        // edit the tournament form (rounds 2 → 4): rebuilds the tournament instance
+        TestAPI.put("/api/tour/$tid", Json.Object("rounds" to 4)).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        // bench the substitute for round 1
+        TestAPI.put("/api/tour/$tid/part/$sub", Json.Object("skip" to Json.Array(1))).asObject().also { assertTrue(it.getBoolean("success")!!) }
+        // the team must now be pairable: exactly 2 active players
+        assertEquals("[$team]", TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("pairables").toString())
+    }
+
+    // Team rating/rank are live means over the current members: a member's rating update or a
+    // roster change must be reflected immediately (they feed pairing via effectiveRank), instead
+    // of staying frozen at the value computed when the team was created.
+    @Test
+    fun `team rating follows member ratings and roster changes`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa", 1900)
+        val p2 = addPlayer("Bbb", 1700)
+        val team = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2], "final":true }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        fun teamRating() = TestAPI.get("/api/tour/$tid/team/$team").asObject().getInt("rating")
+        assertEquals(1800, teamRating(), "team rating must be the members' mean")
+        // a ratings refresh reaches the team
+        TestAPI.put("/api/tour/$tid/part/$p1", Json.Object("rating" to 2100))
+        assertEquals(1900, teamRating(), "a member's rating update must reach the team mean")
+        // a roster change reaches the team
+        val p3 = addPlayer("Ccc", 2100)
+        TestAPI.put("/api/tour/$tid/team/$team", Json.parse("""{ "players":[$p1,$p3] }"""))
+        assertEquals(2100, teamRating(), "a roster change must reach the team mean")
+    }
+
+    // Team final is live too: a team built around a preliminary registration becomes pairable
+    // the moment that member is finalized (it used to stay frozen non-final until a team PUT).
+    @Test
+    fun `team final follows member finalization`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, final: Boolean) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to 1800, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to final)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa", true)
+        val p2 = addPlayer("Bbb", false)
+        val team = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2] }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        fun pairables() = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("pairables").toString()
+        assertEquals("[]", pairables(), "a team with a preliminary member must not be pairable")
+        TestAPI.put("/api/tour/$tid/part/$p2", Json.Object("final" to true))
+        assertEquals("[$team]", pairables(), "finalizing the member must make the team pairable")
+    }
+
     // Builds a TEAM2 with two full teams, pairs round 1 (one match over two boards), and lets the
     // board-0 white team win EVERY board (whatever stones it holds). Returns (tournamentId, teamGame).
     private fun sweptTeamMatch(): Pair<Int, Json.Object> {
@@ -148,5 +221,31 @@ class TeamTest {
             "the board result must flip so its winner is unchanged")
         assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
             "a per-board colour override must not change the match result")
+    }
+
+    // Nations Cup, EGC 2026: putting SCOREX first in the placement criteria of a *team* MacMahon
+    // white-paged the whole tournament page — the standings view inserts an MMS column whenever
+    // SCOREX comes first, but standings rows only carried an MMS value for INDIVIDUAL tournaments.
+    @Test
+    fun `team MacMahon standings carry MMS`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        TestAPI.put("/api/tour/$tid", Json.Object(
+            "pairing" to Json.Object("placement" to Json.Array("SCOREX", "DC", "SOSM", "SOSOSM"))))
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val teams = listOf("Ducks" to listOf(addPlayer("Aaa", 1900), addPlayer("Bbb", 1700)),
+                           "Drakes" to listOf(addPlayer("Ccc", 1850), addPlayer("Ddd", 1750)))
+        teams.forEach { (name, players) ->
+            TestAPI.post("/api/tour/$tid/team",
+                Json.parse("""{ "name":"$name", "players":${players}, "final":true }""")?.asObject() ?: fail("no null here"))
+        }
+        TestAPI.post("/api/tour/$tid/pair/1", Json.Array("all"))
+        val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray()
+        assertEquals(2, standings.size, "one standings row per team")
+        standings.forEach { row ->
+            assertTrue((row as Json.Object).containsKey("MMS"), "team standings rows must carry MMS: $row")
+        }
     }
 }
