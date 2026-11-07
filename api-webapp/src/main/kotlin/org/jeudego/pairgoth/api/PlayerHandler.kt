@@ -12,6 +12,11 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.server.ApiException
 import org.jeudego.pairgoth.server.Event.*
+import org.jeudego.pairgoth.server.WebappManager
+import org.jeudego.pairgoth.util.proToRating
+import org.jeudego.pairgoth.util.rankToRating
+import org.jeudego.pairgoth.util.ratingToPro
+import org.jeudego.pairgoth.util.ratingToRank
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -56,9 +61,10 @@ object PlayerHandler: PairgothApiHandler {
         // from the rounds still open to them (see the `missing` journal below).
         val preExisting = tournament.players.values.toList()
         val touched = mutableSetOf<ID>()
+        val rankAuthoritative = WebappManager.properties.getProperty("ratings.rank_authoritative")?.toBoolean() ?: false
         roster.forEach { entry ->
             if (entry !is Json.Object) { failed.add(Json.Object("reason" to "not a json object")); return@forEach }
-            val p = entry
+            val p = if (rankAuthoritative) enforceRankAuthority(entry) else entry
             val label = listOfNotNull(p.getString("name"), p.getString("firstname"))
                 .joinToString(" ").ifBlank { "#${p.getInt("id") ?: "?"}" }
             try {
@@ -71,7 +77,11 @@ object PlayerHandler: PairgothApiHandler {
                     tournament.players[player.id] = player
                     added.add(label)
                 } else {
-                    val merged = Player.fromJson(p, existing)
+                    // Level lock: rating/rank/pro of a locked player survive every bulk import
+                    val source = if (existing.locked && p.getBoolean("locked") != false)
+                        Json.MutableObject(p).also { it.remove("rating"); it.remove("rank"); it.remove("pro") }
+                    else p
+                    val merged = Player.fromJson(source, existing)
                     participationConflict(tournament, existing, merged)?.let { badRequest(it) }
                     val before = existing.toJson(); val after = merged.toJson()
                     if (before == after) unchanged.add(label)
@@ -119,6 +129,23 @@ object PlayerHandler: PairgothApiHandler {
             "added" to added, "updated" to updated, "unchanged" to unchanged, "failed" to failed,
             "missing" to missing)
     }
+
+    /**
+     * `ratings.rank_authoritative`: the imported rank is the level truth. When an entry carries
+     * both rank and rating and they disagree (rating out of the rank's band), the rating is
+     * snapped to the rank's nominal value ; imported players always land chained in the UI.
+     * In-band ratings keep their finer-grained value; partial entries missing either field
+     * pass through untouched (locked players are stripped later and stay immune regardless).
+     */
+    private fun enforceRankAuthority(p: Json.Object): Json.Object {
+        val rank = p.getInt("rank") ?: return p
+        val rating = p.getInt("rating") ?: return p
+        val pro = p.getInt("pro") ?: 0
+        val linked = if (pro > 0) ratingToPro(rating) == pro else ratingToRank(rating) == rank
+        return if (linked) p
+        else Json.MutableObject(p).also { it["rating"] = if (pro > 0) proToRating(pro) else rankToRating(rank) }
+    }
+
 
     /** Computes a human-readable label of a difference */
     private fun diffLabel(before: Json.Object, after: Json.Object): String {

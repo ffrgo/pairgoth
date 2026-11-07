@@ -733,6 +733,7 @@ onLoad(() => {
     // Relinking reconciles from rank to rating.
     if (chained) syncRatingFromRank();
     updateLinkHints();
+    $('#register').removeClass('disabled');
   });
   $('#player input[name="rating"]').on('input', e=>{
     updateLinkHints();
@@ -931,7 +932,7 @@ onLoad(() => {
           if (wp.rounds[i] === '0') skip.push(i + 1);
         }
       }
-      return {
+      let payload = {
         name: wp.lastname, firstname: wp.firstname,
         country: (wp.country || '').toLowerCase(),
         club: wp.club || '',
@@ -940,6 +941,10 @@ onLoad(() => {
         ext: wp.id != null ? String(wp.id) : null,
         final: true, skip
       };
+      // Level lock: the website flags its rating-exception players; only pass the flag through
+      // when the wire carries it, an absent flag must never silently unlock.
+      if (wp.locked != null) payload.locked = !!wp.locked;
+      return payload;
     }
 
     let report = await api.postJson(`tour/${tour_id}/part`, data.players.map(buildPayload));
@@ -973,10 +978,9 @@ onLoad(() => {
   });
 
   // Refresh ratings — pulls latest rating/rank/pro for already-registered players from EGD/FFG.
-  // Source priority when a player has multiple external IDs: EGF > FFG > AGA. Rank is updated
-  // only when the player's current (rating, rank) are chained; rating and pro are always
-  // updated. The summary toast lists rank-skipped players so the organiser can spot manual
-  // overrides that would otherwise be silently kept.
+  // Source priority when a player has multiple external IDs: EGF > FFG > AGA. An honorary rank
+  // (rank decoupled from rating, in the edit form's "unchained" state) is kept: only the rating
+  // is refreshed. The report lists those separately so the organizer can spot them.
   $('#refresh-ratings').on('click', async e => {
     e.preventDefault();
     let players = await api.getJson(`tour/${tour_id}/part`);
@@ -986,6 +990,11 @@ onLoad(() => {
       showError('No registered player has an external ID (EGF/FFG/AGA) to refresh from.');
       return;
     }
+    // Locked players (rating exceptions, flagged by the external website) are skipped up front; the server
+    // would preserve them anyway, but skipping keeps the change-log and the journal truthful.
+    let lockedSkipped = registered.filter(p => p.locked)
+      .map(p => `${p.name} ${p.firstname || ''}`.trim()).sort((a, b) => a.localeCompare(b));
+    registered = registered.filter(p => !p.locked);
     if (!confirm(`Refresh ratings for ${registered.length} registered player(s) from EGD/FFG?`)) return;
 
     // Bulk lookup
@@ -1004,7 +1013,7 @@ onLoad(() => {
     // Overwrite everything from the official source (rating, level, pro). The FFG licence
     // snapshot is refreshed for FR tournaments only (and only where the source carries it).
     let isFR = (tour_country || '').toLowerCase() === 'fr';
-    let changes = [], notFound = [], payloads = [];
+    let changes = [], honoraryChanges = [], notFound = [], payloads = [];
     for (let p of registered) {
       // Pick the first source with a hit, in priority order.
       let hit = null;
@@ -1019,20 +1028,25 @@ onLoad(() => {
         continue;
       }
       let newRating = parseInt(hit.rating);
-      let newPro = hit.pro ? parseInt(hit.pro) : 0;
-      let newRank = ratingToRankInt(newRating);
       let oldRating = parseInt(p.rating), oldRank = parseInt(p.rank), oldPro = p.pro ? parseInt(p.pro) : 0;
+      // Honorary rank = rank decoupled from rating (unchained): the organizer's grade wins,
+      // only the rating is refreshed; the payload omits rank/pro so the merge keeps them.
+      let honorary = oldRank !== ratingToRankInt(oldRating);
+      let newPro = honorary ? oldPro : (hit.pro ? parseInt(hit.pro) : 0);
+      let newRank = honorary ? oldRank : ratingToRankInt(newRating);
       let oldLicensed = (typeof p.licensed === 'boolean') ? p.licensed : null;
       let newLicensed = (isFR && hit.license != null) ? (hit.license === 'L') : oldLicensed;
       let levelChanged = newRating !== oldRating || newRank !== oldRank || newPro !== oldPro;
       if (!levelChanged && newLicensed === oldLicensed) continue;
-      let payload = { id: p.id, rating: newRating, rank: newRank, pro: newPro };
+      let payload = honorary ? { id: p.id, rating: newRating }
+                             : { id: p.id, rating: newRating, rank: newRank, pro: newPro };
       if (isFR && hit.license != null) payload.licensed = newLicensed;
       payloads.push(payload);
       // changelog computed client-side
       if (levelChanged) {
         let name = `${p.name} ${p.firstname || ''}`.trim();
-        changes.push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
+        (honorary ? honoraryChanges : changes)
+          .push(`${name} (${displayRank(oldRank, oldPro)}, ${oldRating}) => (${displayRank(newRank, newPro)}, ${newRating})`);
       }
     }
 
@@ -1045,9 +1059,12 @@ onLoad(() => {
     let updated = payloads.length - failed;
 
     changes.sort((a, b) => a.localeCompare(b));
+    honoraryChanges.sort((a, b) => a.localeCompare(b));
     notFound.sort((a, b) => a.localeCompare(b));
     let sections = [];
     if (changes.length) sections.push({ label: `${changes.length} updated`, items: changes });
+    if (honoraryChanges.length) sections.push({ label: `${honoraryChanges.length} rating updated, honorary rank kept`, items: honoraryChanges });
+    if (lockedSkipped.length) sections.push({ label: `${lockedSkipped.length} locked (level preserved)`, items: lockedSkipped });
     if (notFound.length) sections.push({ label: `${notFound.length} not found in ratings DB`, items: notFound });
     if (failed) sections.push({ label: `${failed} failed`, items: lastError ? [lastError] : [] });
     if (updated > 0) {
