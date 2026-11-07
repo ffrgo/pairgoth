@@ -68,10 +68,6 @@ object OpenGotha {
 
         // some checks
 
-        if (genParams.genNBW2ValueAbsent.toDouble() != 0.0) {
-            throw Error("Pairgoth only support 0 for 'NBW for Absent player'")
-        }
-
         if (genParams.genNBW2ValueBye.toDouble() != 2.0) {
             throw Error("Pairgoth only support 1 for 'NBW for Bye player'")
         }
@@ -102,6 +98,7 @@ object OpenGotha {
                 additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
                 additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE")),
                 mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0,
+                nbwValueAbsent = genParams.genNBW2ValueAbsent.toDouble() / 2.0,
                 roundDownScore = genParams.genRoundDownNBWMMS.toBoolean()
             ),
             secondary = SecondaryCritParams(
@@ -370,7 +367,9 @@ object OpenGotha {
                 ).uppercase(Locale.ROOT)
             }" genMMS2ValueAbsent="${
             (tournament.pairing.pairingParams.main.mmsValueAbsent * 2).roundToInt()
-            }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="0" genNBW2ValueBye="2" genRoundDownNBWMMS="${
+            }" genMMS2ValueBye="2" genMMZero="30K" genNBW2ValueAbsent="${
+                (tournament.pairing.pairingParams.main.nbwValueAbsent * 2).roundToInt()
+            }" genNBW2ValueBye="2" genRoundDownNBWMMS="${
                 tournament.pairing.pairingParams.main.roundDownScore
             }" komi="${
                 tournament.komi

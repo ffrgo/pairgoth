@@ -325,6 +325,7 @@ onLoad(() => {
         },
         main: {
           mmsValueAbsent: form.val('mmsValueAbsent'),
+          nbwValueAbsent: form.val('nbwValueAbsent'),
           roundDownScore: form.val('roundDownScore'),
           sosValueAbsentUseBase: form.val('sosValueAbsentUseBase'),
           firstSeedLastRound: form.val('firstSeedLastRound'),
@@ -369,6 +370,7 @@ onLoad(() => {
     check('colorBalance', base.colorBalanceWeight);
     check('roundDownScore', main.roundDownScore);
     set('mmsValueAbsent', main.mmsValueAbsent);
+    set('nbwValueAbsent', main.nbwValueAbsent);
     set('sosValueAbsentUseBase', main.sosValueAbsentUseBase);
     set('firstSeedLastRound', main.firstSeedLastRound);
     check('firstSeedAddRating', main.firstSeedAddCrit === 'RATING');

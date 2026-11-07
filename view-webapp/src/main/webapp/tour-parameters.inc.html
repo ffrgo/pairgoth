@@ -18,17 +18,25 @@
     </div>
     <div class="title"><i class="dropdown icon"></i>Main parameters</div>
     <div class="content">
-#if($tour.pairing.type == 'MAC_MAHON')
       <div class="inline fields">
         <div class="field">
           <label><input type="checkbox" name="roundDownScore" value="true" #if($tour.pairing.main.roundDownScore) checked #end>&nbsp;round down NBW/MMS score</label>
         </div>
       </div>
-#end
       <div class="ui fluid styled accordion">
-#if($tour.pairing.type == 'MAC_MAHON')
-        <div class="title"><i class="dropdown icon"></i>Special Mac Mahon handling for players absent from a round</div>
+        <div class="title"><i class="dropdown icon"></i>Handling of players absent from a round</div>
         <div class="content">
+          <div class="field">
+            <label>
+              Number of wins for non-played rounds:
+              <select name="nbwValueAbsent">
+                <option value="0" #if($tour.pairing.main.nbwValueAbsent == 0) selected #end>0</option>
+                <option value="0.5" #if($tour.pairing.main.nbwValueAbsent == 0.5) selected #end>½</option>
+                <option value="1" #if($tour.pairing.main.nbwValueAbsent == 1) selected #end>1</option>
+              </select>
+            </label>
+          </div>
+#if($tour.pairing.type == 'MAC_MAHON')
           <div class="field">
             <label>
               MMS score for non-played rounds:
@@ -49,8 +57,8 @@
               of player
             </label>
           </div>
-        </div>
 #end
+        </div>
         <div class="title"><i class="dropdown icon"></i>Seeding methods inside groups of same score</div>
         <div class="content">
           <div class="field">

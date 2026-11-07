@@ -15,10 +15,8 @@ class SwissSolver(round: Int,
 ):
     Solver(round, totalRounds, history, pairables, allPairablesMap, pairingParams, placementParams, usedTables) {
 
-    override fun mainScoreMapFactory() =
-        allPairablesMap.mapValues { (id, pairable) ->
-            history.wins[id] ?: 0.0
-        }
+    // in a Swiss the main score IS the Number of Wins Score
+    override fun mainScoreMapFactory() = history.nbwScores
 
     override fun scoreXMapFactory() = mainScoreMapFactory()
 

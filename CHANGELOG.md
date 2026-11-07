@@ -26,6 +26,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Fix jigo scoring, SOS-n and cumulative score
 - SOSW family criteria were broken
 - Team tournaments now stable
 - Removed Explain feature and button for now: it could loose results and pairings
