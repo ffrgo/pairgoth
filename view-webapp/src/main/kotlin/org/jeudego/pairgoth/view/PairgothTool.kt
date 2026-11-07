@@ -78,8 +78,8 @@ class PairgothTool {
         return Json.Object("total" to total, "known" to known)
     }
 
-    fun getMmsMap(pairables: Collection<Json.Object>) =
-        pairables.groupBy { pairable -> pairable.getDouble("MMS")?.toLong() }
+    fun getMmsMap(pairables: Collection<Json.Object>, superKey: Number) =
+        pairables.groupBy { pairable -> pairable.getDouble("MMS")?.toLong()?.coerceAtMost(superKey.toLong()) }
         .mapValues { entry ->
             entry.value.sortedByDescending { pairable ->
                 pairable.getInt("rating")
