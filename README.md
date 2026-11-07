@@ -27,15 +27,15 @@ Please refer to [Pairgoth](https://pairgoth.jeudego.org) landing page.
 ├── application ............................... Executable final packaging
 ├── webserver ................................. Web container
 ├── docker .................................... Docker packaging
-│   ├── pairgoth.properties.example ........... Docker property file to instanciate
-│   └── run.sh ................................ Docker launch script
+│   ├── compose.yml ........................... Docker compose service
+│   └── run.sh ................................ Docker launch script
 ├── pairgoth-common............................ Shared utility code library
 └── api-webapp ................................ Engine web application
     └── src
         ├── main
-        │   ├── kotlin ........................ Engine kotlin sources (the real meat is here!)
-        │   └── webapp ........................ Engine API webapp root
-        │       └── WEB-INF ................... Engine API webapp configuration
+        │   ├── kotlin ........................ Engine kotlin sources (the real meat is here!)
+        │   └── webapp ........................ Engine API webapp root
+        │       └── WEB-INF ................... Engine API webapp configuration
         └── test
             └── kotlin ........................ Engine webapp API unit tests
 └── view-webapp ............................... View web application
@@ -71,9 +71,9 @@ Under windows, please use the WSL.
 
 You need docker installed, and the current user being in the `docker` group.
 
-Copy and adapt `docker/pairgoth.properties.example` towards `docker/pairgoth.properties`.
+Copy and adapt `pairgoth.properties.example` towards `docker/pairgoth.properties`, if needed.
 
-Just running `./run.sh` in the `docker` directory should build and run the engine.
+Build with `mvn package`, then run `./run.sh` in the `docker` directory: it picks up the freshly built engine and runs it in a container.
 
 ## Debugging
 
