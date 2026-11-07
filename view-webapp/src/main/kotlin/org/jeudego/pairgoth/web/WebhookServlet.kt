@@ -28,6 +28,10 @@ class WebhookServlet : HttpServlet() {
         val sub = subPath(request) ?: return notConfigured(response)
         when {
             sub.startsWith("/publish/") -> handlePublish(request, response, sub.removePrefix("/publish/"))
+            // POST /presences/{code}/{round} : mirror a referee's presence change back to the consumer
+            // (the website owns presences; this keeps it current so a later resync won't revert it).
+            presencesRoute.matches(sub) -> forward("POST", sub, "application/json; charset=UTF-8",
+                request.inputStream.readBytes(), response)
             else -> notFound(response, "POST", sub)
         }
     }
@@ -171,6 +175,7 @@ class WebhookServlet : HttpServlet() {
         private const val TIMEOUT_MS = 30_000
 
         private val playersRoute = Regex("^/players/[^/]+$")
+        private val presencesRoute = Regex("^/presences/[^/]+/[^/]+$")
 
         private val webhookUrl: String by lazy {
             WebappManager.properties.getProperty("webhook.url")?.trim().orEmpty()

@@ -309,6 +309,36 @@ function setRowParticipation(id, skip) {
   });
 }
 
+// The website (EGC) is the source of truth for per-round presence. Mirror a referee's per-round
+// participation flip back to it. Only website-sourced players (with an ext id) are pushed ; plain
+// events have none, so this is a no-op for them.
+// Returns:
+//   'noop'   — no ext/code: not website-sourced, nothing to push (caller proceeds locally).
+//   'ok'     — the website accepted the change.
+//   { message } — the website rejected it or was unreachable; `message` is its reason.
+// An *add* (red -> green) is gated on 'ok' (the website owns registration choices and may refuse a
+// round the player isn't registered for); a *removal* commits regardless and only soft-warns.
+async function pushPresence(ext, round, present) {
+  let code = $('#tournament-infos')[0].val('shortName');
+  if (!ext || !code) return 'noop';
+  // Mirror the website's own id type: it ships a numeric id from /players/{code}, so send a number back.
+  let id = /^\d+$/.test(String(ext)) ? Number(ext) : ext;
+  try {
+    let resp = await api.post(`webhook/presences/${code}/${round}`, [{ id: id, present: present }]);
+    let json = await resp.json().catch(() => null);
+    if (!resp.ok || (json && json.status === false)) {
+      return { message: (json && json.message) || `HTTP ${resp.status}` };
+    }
+    // 200 + status:true can still carry a per-id refusal in `rejected` (e.g. not
+    // registered for this round). We push one id, so ours appearing there = refused.
+    if (json && Array.isArray(json.rejected) && json.rejected.map(String).includes(String(id)))
+      return { message: `player not registered for this round` };
+    return 'ok';
+  } catch (ignored) {
+    return { message: 'website unreachable' };
+  }
+}
+
 function removePlayerRow(id) {
   let tr = $(`#players tr[data-id="${id}"]`);
   if (tr.length === 0) return;
@@ -740,19 +770,37 @@ onLoad(() => {
   $('.player-fields').on('change input', e => {
     $('#register').removeClass('disabled');
   });
-  $('.participation label').on('click', e => {
+  $('.participation label').on('click', async e => {
+    e.preventDefault();
     let part = e.target;
-    let id = part.closest('tr').data('id');
+    let tr = part.closest('tr');
+    let id = tr.data('id');
+    let ext = tr.data('ext');
     let round = parseInt(part.text());
     let skip = new Set(part.closest('.participation').find('label.red').map(it => parseInt(it.innerText)));
     if (skip.has(round)) skip.delete(round);
     else skip.add(round);
     let skipArr = Array.from(skip);
-    mutate({
+    let present = !skip.has(round);
+    let commit = () => mutate({
       url: `tour/${tour_id}/part/${id}`, body: { id: id, skip: skipArr },
       source: 'registration', effect: () => setRowParticipation(id, skipArr)
     });
-    e.preventDefault();
+    if (present && webhook && ext) {
+      let pushed = await pushPresence(ext, round, true);
+      if (pushed !== 'ok' && pushed !== 'noop') {
+        showError(`The website refused this presence change: ${pushed.message}. Not applied.`);
+        return false;
+      }
+      await commit();
+      return false;
+    }
+    let rst = await commit();
+    if (rst !== 'error' && rst !== 'readonly') {
+      let pushed = await pushPresence(ext, round, present);
+      if (pushed !== 'ok' && pushed !== 'noop')
+        showError(`Presence updated locally but not pushed to the website: ${pushed.message}. Update it there by hand.`);
+    }
     return false;
   });
   $('#rating').on('input', e => {

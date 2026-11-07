@@ -88,8 +88,9 @@
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
   const env = '$env';
-  // Collaborative SSE mode needs HTTP/2
-  const collaborative = env === 'dev' || performance.getEntriesByType('navigation')[0]?.nextHopProtocol === 'h2';
+  const webhook = $webhookConfigured;
+  const collaborative = env === 'dev' ||
+    performance.getEntriesByType('navigation')[0]?.nextHopProtocol === 'h2';
   // #[[
   const safeRegex = /^[-a-zA-Z0-9_.]+$/;
 
