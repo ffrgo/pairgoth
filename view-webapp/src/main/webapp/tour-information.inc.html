@@ -5,7 +5,7 @@
         <div class="eight wide field">
           <label>Name</label>
           <span class="info"></span>
-          <input type="text" name="name" spellcheck="false" required placeholder="Tournament name" #if($tour) value="$tour.name" #end/>
+          <input type="text" name="name" spellcheck="false" required placeholder="Tournament name" #if($tour) value="$tour.name" #elseif($prefill) value="$esc.html($prefill.name)" #end/>
         </div>
         <div class="right eight wide field">
           <label>Dates</label>

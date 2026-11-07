@@ -53,6 +53,11 @@ class AuthFilter: Filter {
             return
         }
 
+        if (auth == "external") {
+            ExternalAuth.handle(req, resp, chain)
+            return
+        }
+
         if (auth == "none" || whitelisted(uri) || forwarded || session?.getAttribute(SESSION_KEY_USER) != null) {
             chain.doFilter(req, resp)
         } else {

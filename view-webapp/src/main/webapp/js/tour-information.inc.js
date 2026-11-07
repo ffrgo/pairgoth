@@ -303,10 +303,13 @@ onLoad(() => {
           }
         });
     } else {
+      if (typeof newTournamentId !== 'undefined' && newTournamentId) tour.id = newTournamentId;
       api.postJson('tour', tour)
         .then(tour => {
           if (tour !== 'error') {
-            window.location.href += `?id=${tour.id}`;
+            let search = `id=${tour.id}`;
+            if (`?${search}` === window.location.search) window.location.reload();
+            else window.location.search = search;
           }
         });
     }

@@ -46,6 +46,10 @@ class WebappManager : BaseWebappManager("View Webapp", "view") {
         context.setAttribute("auth", auth)
         when (auth) {
             "none", "sesame" -> {}
+            "external" -> {
+                getMandatoryProperty("auth.external.login_url")
+                getMandatoryProperty("auth.external.secret")
+            }
             "oauth" -> {
                 properties.getProperty("oauth.providers")?.let {
                     val providers = it.split(Regex("\\s*,\\s*"))

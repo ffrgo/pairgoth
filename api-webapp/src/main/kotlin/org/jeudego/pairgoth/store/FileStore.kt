@@ -63,6 +63,10 @@ class FileStore(pathStr: String): Store {
         entries.firstOrNull()
     }
 
+    // does a tournament file exist in this store?
+    internal fun exists(id: ID): Boolean = fileFor(id) != null
+    internal fun fileMTime(id: ID): Long = fileFor(id)?.toFile()?.lastModified() ?: 0L
+
 
     override fun getTournaments(): Map<ID, Map<String, String>> {
         return path.useDirectoryEntries("*.tour") { entries ->
