@@ -126,7 +126,7 @@ object OpenGotha {
             crit = placmtParams.placementCriteria.placementCriterion.filter {
                 it.name != "NULL"
             }.map {
-                Criterion.valueOf(it.name)
+                Criterion.valueOf(it.name.uppercase())
             }.toTypedArray()
         )
 
