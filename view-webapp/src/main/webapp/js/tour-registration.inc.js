@@ -1013,7 +1013,7 @@ onLoad(() => {
     // Overwrite everything from the official source (rating, level, pro). The FFG licence
     // snapshot is refreshed for FR tournaments only (and only where the source carries it).
     let isFR = (tour_country || '').toLowerCase() === 'fr';
-    let changes = [], honoraryChanges = [], notFound = [], payloads = [];
+    let changes = [], honoraryChanges = [], pinsFilled = [], notFound = [], payloads = [];
     for (let p of registered) {
       // Pick the first source with a hit, in priority order.
       let hit = null;
@@ -1037,10 +1037,13 @@ onLoad(() => {
       let oldLicensed = (typeof p.licensed === 'boolean') ? p.licensed : null;
       let newLicensed = (isFR && hit.license != null) ? (hit.license === 'L') : oldLicensed;
       let levelChanged = newRating !== oldRating || newRank !== oldRank || newPro !== oldPro;
-      if (!levelChanged && newLicensed === oldLicensed) continue;
+      // an FFG hit may carry the EGD PIN the player was registered without (needed by the EGF export)
+      let newPin = (!p.egf && hit.egf) ? hit.egf : null;
+      if (!levelChanged && newLicensed === oldLicensed && !newPin) continue;
       let payload = honorary ? { id: p.id, rating: newRating }
                              : { id: p.id, rating: newRating, rank: newRank, pro: newPro };
       if (isFR && hit.license != null) payload.licensed = newLicensed;
+      if (newPin) { payload.egf = newPin; pinsFilled.push(`${p.name} ${p.firstname || ''}`.trim() + ` (${newPin})`); }
       payloads.push(payload);
       // changelog computed client-side
       if (levelChanged) {
@@ -1064,6 +1067,7 @@ onLoad(() => {
     let sections = [];
     if (changes.length) sections.push({ label: `${changes.length} updated`, items: changes });
     if (honoraryChanges.length) sections.push({ label: `${honoraryChanges.length} rating updated, honorary rank kept`, items: honoraryChanges });
+    if (pinsFilled.length) { pinsFilled.sort((a, b) => a.localeCompare(b)); sections.push({ label: `${pinsFilled.length} EGF PIN filled in from FFG`, items: pinsFilled }); }
     if (lockedSkipped.length) sections.push({ label: `${lockedSkipped.length} locked (level preserved)`, items: lockedSkipped });
     if (notFound.length) sections.push({ label: `${notFound.length} not found in ratings DB`, items: notFound });
     if (failed) sections.push({ label: `${failed} failed`, items: lastError ? [lastError] : [] });
