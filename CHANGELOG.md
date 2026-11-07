@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Standings tab: country/club and inactive players display options
 - Bulk players import & re-import
 - External authentication: per-operator externally managed ACL of an instance's tournaments (typically for EGC)
 - Multi-operators collaboration using Server-Sent Events streams

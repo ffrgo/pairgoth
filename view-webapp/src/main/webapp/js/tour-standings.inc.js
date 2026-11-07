@@ -1,15 +1,54 @@
+let standingsColumns;
+
+function applyStandingsColumns() {
+  let tab = $('#standings-tab')[0];
+  tab.classList.toggle('hide-country', !standingsColumns.country);
+  tab.classList.toggle('hide-club', !standingsColumns.club);
+  tab.classList.toggle('hide-inactive', !standingsColumns.inactive);
+  renumberPlaces();
+}
+
+// inactive = only "0" games
+function tagInactiveRows() {
+  $('#standings-tab tbody tr').forEach(row => {
+    let played = [...row.querySelectorAll('.game-result')].some(cell => parseInt(cell.textContent) !== 0);
+    if (!played) row.classList.add('inactive');
+  });
+}
+
+// re-ranking of visible rows
+function renumberPlaces() {
+  ['#standings-table', '#individual-standings-table'].forEach(sel => {
+    let table = $(sel)[0];
+    if (!table) return;
+    let cells = [...table.querySelectorAll('tbody tr')].map(row => row.cells[1]);
+    cells.forEach(cell => { if (!cell.dataset.place) cell.dataset.place = cell.textContent; });
+    let visible = cells.filter(cell => standingsColumns.inactive || !cell.parentNode.classList.contains('inactive'));
+    let places = visible.map(cell => +cell.dataset.place).sort((a, b) => a - b);
+    let newPlace = new Map();
+    places.forEach((place, i) => { if (!newPlace.has(place)) newPlace.set(place, i + 1); });
+    visible.forEach(cell => cell.textContent = newPlace.get(+cell.dataset.place));
+  });
+}
+
+// publish what the screen shows: clone the table, drop the hidden columns and rows
+function visibleTableHtml(table) {
+  if (!table) return undefined;
+  let clone = table.cloneNode(true);
+  if (!standingsColumns.country) clone.querySelectorAll('.col-country').forEach(cell => cell.remove());
+  if (!standingsColumns.club) clone.querySelectorAll('.col-club').forEach(cell => cell.remove());
+  if (!standingsColumns.inactive) clone.querySelectorAll('tr.inactive').forEach(row => row.remove());
+  return clone.outerHTML;
+}
+
 function publish(format, extension, encoding) {
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
   let hdrs = headers();
   hdrs['Accept'] = `${format};charset=${encoding}`
   let params = new URLSearchParams();
-  if ($('#publish-skip-unplayed')[0]?.checked) {
-    // drops never-paired + bye-only players; server also forces preliminary out in this case
+  if (!standingsColumns.inactive) {
     params.set('drop_unplayed', 'true');
-  } else if (!$('#publish-skip-preliminary')[0]?.checked) {
-    // preliminary are excluded by default server-side; only opt them back in
-    params.set('include_preliminary', 'true');
   }
   let qs = params.toString();
   fetch(`api/tour/${tour_id}/standings/${activeRound}${qs ? '?' + qs : ''}`, {
@@ -34,7 +73,7 @@ function filenameFromContentDisposition(header) {
 }
 
 function publishHtml() {
-  let html = $('#standings-table')[0].outerHTML;
+  let html = visibleTableHtml($('#standings-table')[0]);
   let form = $('#tournament-infos')[0];
   let shortName = form.val('shortName');
   let blob = new Blob(['\uFEFF', html], {type: 'text/html;charset=utf-8'});
@@ -54,6 +93,19 @@ function freeze() {
 
 onLoad(() => {
   new Tablesort($('#standings-table')[0]);
+  standingsColumns = Object.assign({country: true, club: true, inactive: true}, store('standingsColumns'));
+  $('#show-country')[0].checked = standingsColumns.country;
+  $('#show-club')[0].checked = standingsColumns.club;
+  $('#show-inactive')[0].checked = standingsColumns.inactive;
+  tagInactiveRows();
+  applyStandingsColumns();
+  $('#standings-columns input').on('change', e => {
+    standingsColumns.country = $('#show-country')[0].checked;
+    standingsColumns.club = $('#show-club')[0].checked;
+    standingsColumns.inactive = $('#show-inactive')[0].checked;
+    store('standingsColumns', standingsColumns);
+    applyStandingsColumns();
+  });
   $('.criterium').on('click', e => {
     let alreadyOpen = e.target.closest('select');
     if (alreadyOpen) return;
@@ -97,12 +149,6 @@ onLoad(() => {
   $('#publish').on('click', e => {
     modal('publish-modal');
   });
-  $('#publish-skip-unplayed').on('change', e => {
-    let prelim = $('#publish-skip-preliminary')[0];
-    if (!prelim) return;
-    if (e.target.checked) { prelim.checked = true; prelim.disabled = true; }
-    else prelim.disabled = false;
-  });
 /*
   $('#publish-modal').on('click', e => {
     close_modal();
@@ -127,13 +173,13 @@ onLoad(() => {
       showError('Tournament short name is required for publishing');
       return;
     }
-    let teamHtml = $('#standings-table')[0]?.outerHTML;
+    let teamHtml = visibleTableHtml($('#standings-table')[0]);
     if (!teamHtml) {
       showError('No standings to publish');
       return;
     }
     // TEAM* tournaments expose a second table (#individual-standings-table); ship both, wrapped to distinguish.
-    let individualHtml = $('#individual-standings-table')[0]?.outerHTML;
+    let individualHtml = visibleTableHtml($('#individual-standings-table')[0]);
     let payload = individualHtml
       ? `<div class="standings-section team-standings">${teamHtml}</div>` +
         `<div class="standings-section individual-standings">${individualHtml}</div>`

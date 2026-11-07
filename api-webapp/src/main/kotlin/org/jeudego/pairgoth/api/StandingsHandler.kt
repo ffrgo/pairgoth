@@ -30,6 +30,8 @@ object StandingsHandler: PairgothApiHandler {
         val tournament = getTournament(request)
         val round = getSubSelector(request)?.toIntOrNull() ?: tournament.rounds
         val dropUnplayed = request.getParameter("drop_unplayed")?.toBoolean() ?: false
+        // include_preliminary is for internal use (registration fetches everyone's MM base via standings/0);
+        // published standings never contain preliminary players
         val includePreliminary = !dropUnplayed && (request.getParameter("include_preliminary")?.toBoolean() ?: false)
 
         val individualStandings = tournament is TeamTournament &&
@@ -51,6 +53,15 @@ object StandingsHandler: PairgothApiHandler {
                 .flatMap { listOf(it.white, it.black) }
                 .toSet()
             sortedEntries = sortedEntries.filter { it.getID() in played }
+            var prevOld = 0
+            var prevNew = 0
+            sortedEntries = sortedEntries.mapIndexed { i, p ->
+                val old = p.getInt("place") ?: 0
+                val new = if (old == prevOld) prevNew else i + 1
+                prevOld = old
+                prevNew = new
+                Json.MutableObject(p).set("place", new)
+            }
         }
 
         val acceptHeader = request.getHeader("Accept") as String?
