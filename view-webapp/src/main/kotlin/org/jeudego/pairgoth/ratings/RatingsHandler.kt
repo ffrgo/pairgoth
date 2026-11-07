@@ -30,6 +30,8 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
         .build()
     abstract val defaultURL: URL
     open val active = true
+    // whether the `ratings.date` global freeze applies (false for participant registries)
+    open val freezable = true
     lateinit var players: Json.Array
     lateinit var activeRatingsFile: File
     private var updated = false
@@ -89,7 +91,7 @@ abstract class RatingsHandler(val origin: RatingsManager.Ratings) {
 
     @Synchronized
     fun updateIfNeeded(): Boolean {
-        val freeze = parseFreezeDate()
+        val freeze = if (freezable) parseFreezeDate() else null
         val frozen = freeze != null && !LocalDate.now().isBefore(freeze)
         val latestCached = getLatestRatingsFile()
         val freezeSettled = frozen && latestCached != null
