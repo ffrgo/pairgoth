@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.fromJson
 import org.jeudego.pairgoth.model.toFullJson
 import org.jeudego.pairgoth.store.MemoryStore
+import org.jeudego.pairgoth.store._nextGameId
 import org.jeudego.pairgoth.test.BasicTests.Companion.aPlayer
 import org.jeudego.pairgoth.test.BasicTests.Companion.aRengoTournament
 import org.jeudego.pairgoth.test.BasicTests.Companion.aTeamTournament
@@ -35,8 +36,14 @@ class TeamTest {
         assertEquals("""{"id":$aTeamID,"name":"The Buffallos","players":[$aTeamPlayerID,$anotherTeamPlayerID],"rating":1750,"rank":-3,"country":"FR","names":["Burma Nestor","Poirot Hercule"],"ranks":[-5,-1]}""", resp.toString(), "expecting team description")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
         assertEquals("[$aTeamID]", arr.toString(), "expecting a singleton array")
-        // nothing stops us in reusing players in different teams, at least for now...
+        // a player belongs to at most one team: reusing them must be refused
         resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aTeamPlayerID, $anotherTeamPlayerID], "final":true }""")?.asObject() ?: fail("no null here")).asObject()
+        assertTrue(resp.getBoolean("success") == false, "expecting failure")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", Json.Object("name" to "Maigret", "firstname" to "Jules", "rating" to 1500, "rank" to -6, "country" to "FR", "club" to "75Op", "final" to true)).asObject()
+        val aThirdPlayerID = resp.getInt("id") ?: fail("id cannot be null")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/part", Json.Object("name" to "Holmes", "firstname" to "Sherlock", "rating" to 1700, "rank" to -4, "country" to "GB", "club" to "Lond", "final" to true)).asObject()
+        val aFourthPlayerID = resp.getInt("id") ?: fail("id cannot be null")
+        resp = TestAPI.post("/api/tour/$aTeamTournamentID/team", Json.parse("""{ "name":"The Billies", "players":[$aThirdPlayerID, $aFourthPlayerID], "final":true }""")?.asObject() ?: fail("no null here")).asObject()
         assertTrue(resp.getBoolean("success") == true, "expecting success")
         val anotherTeamID = resp.getInt("id") ?: fail("no null here")
         arr = TestAPI.get("/api/tour/$aTeamTournamentID/pair/1").asObject().getArray("pairables")
@@ -66,6 +73,38 @@ class TeamTest {
         // for the operator (FileStore persists toFullJson() and reparses it via Tournament.fromJson())
         val tournament = MemoryStore.getTournament(tid) ?: fail("tournament vanished")
         Tournament.fromJson(tournament.toFullJson())
+    }
+
+    // Operator report (EGC 2026 Nations Cup): a create-team response lost on venue wifi → the operator
+    // resubmitted the same selection 10s later → two identical teams sharing all seven players, both
+    // pairable. The server now enforces "a player belongs to at most one team" on team POST and PUT.
+    @Test
+    fun `a player must not land in two teams`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to 1800, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        val p1 = addPlayer("Aaa")
+        val p2 = addPlayer("Bbb")
+        val p3 = addPlayer("Ccc")
+        val p4 = addPlayer("Ddd")
+        TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2] }""")?.asObject() ?: fail("no null here"))
+        // the exact prod scenario: identical resubmission
+        val dup = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Duo", "players":[$p1,$p2] }""")?.asObject() ?: fail("no null here")).asObject()
+        assertTrue(dup.getBoolean("success") == false, "duplicate team must be refused")
+        assertTrue(dup.getString("error")!!.contains("already in team"), "expecting the guard's message")
+        val teamB = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"Other", "players":[$p3,$p4] }""")?.asObject() ?: fail("no null here"))
+            .asObject().getInt("id") ?: fail("no team id")
+        // a PUT must not steal another team's member...
+        assertTrue(TestAPI.put("/api/tour/$tid/team/$teamB", Json.parse("""{ "players":[$p3,$p1] }"""))
+            .asObject().getBoolean("success") == false, "member theft must be refused")
+        // ...but reshuffling its own members stays legal (join/leave/rename path)
+        assertTrue(TestAPI.put("/api/tour/$tid/team/$teamB", Json.parse("""{ "players":[$p4] }"""))
+            .asObject().getBoolean("success") == true)
     }
 
     // A tournament-form edit rebuilds the TeamTournament but used to transplant the old inner-class
@@ -139,6 +178,37 @@ class TeamTest {
         assertEquals("[]", pairables(), "a team with a preliminary member must not be pairable")
         TestAPI.put("/api/tour/$tid/part/$p2", Json.Object("final" to true))
         assertEquals("[$team]", pairables(), "finalizing the member must make the team pairable")
+    }
+
+    // A late arrival must be addable to an already paired team: they are auto-skipped for the
+    // rounds the team already played (pairing untouched), instead of the PUT failing with
+    // "team is playing round #N".
+    @Test
+    fun `a late arrival can join an already paired team`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, p1: Int, p2: Int) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":[$p1,$p2], "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        val alpha = addPlayer("Alpha", 1900)
+        val beta = addPlayer("Beta", 1800)
+        val alphas = addTeam("Alphas", alpha, beta)
+        addTeam("Gammas", addPlayer("Gamma", 1700), addPlayer("Delta", 1600))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val gameBefore = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games").toString()
+        val late = addPlayer("Epsilon", 2000)
+        val resp = TestAPI.put("/api/tour/$tid/team/$alphas",
+            Json.parse("""{ "players":[$alpha,$beta,$late] }""")).asObject()
+        assertTrue(resp.getBoolean("success") == true, "a late arrival must be accepted")
+        assertEquals("[1]", TestAPI.get("/api/tour/$tid/part/$late").asObject().getArray("skip").toString(),
+            "the late arrival must sit out the already paired round")
+        assertEquals(gameBefore, TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games").toString(),
+            "the round 1 pairing must be untouched")
+        // members already aboard must not get skipped
+        assertTrue(TestAPI.get("/api/tour/$tid/part/$alpha").asObject().getArray("skip") == null)
     }
 
     // Builds a TEAM2 with two full teams, pairs round 1 (one match over two boards), and lets the
@@ -221,6 +291,45 @@ class TeamTest {
             "the board result must flip so its winner is unchanged")
         assertEquals("w", teamGame(tid, tg.getInt("id")).getString("r"),
             "a per-board colour override must not change the match result")
+    }
+
+    // Nations Cup, EGC 2026: the game id counter used to be restored from *team* games only on a
+    // cold load (boards ignored), so a container restart before pairing round 2 reissued round-1
+    // board ids. Entering a result on such a board then resolved to round 1's match and 500ed
+    // ("Team game not found"). The result lookup is now round-scoped, and the FileStore restore
+    // scans board ids too.
+    @Test
+    fun `a result on a board with a recycled id must reach its own round's match`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", Json.MutableObject(aTeamTournament).set("type", "TEAM3"))
+            .asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, players: List<Int>) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":$players, "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        addTeam("Alphas", listOf(addPlayer("Aaa", 1900), addPlayer("Bbb", 1800), addPlayer("Ccc", 1700)))
+        addTeam("Gammas", listOf(addPlayer("Ddd", 1600), addPlayer("Eee", 1500), addPlayer("Fff", 1400)))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val round1 = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        val round1GameId = round1.getArray("games")!!.getJson(0)!!.asObject().getInt("id")!!
+        val round1BoardIds = round1.getArray("individualGames")!!.map { (it as Json.Object).getInt("id")!! }.toSet()
+        round1BoardIds.forEach { TestAPI.put("/api/tour/$tid/res/1", Json.parse("""{"id":$it,"result":"w"}""")) }
+        fun matchResult(round: Int, id: Int) = TestAPI.get("/api/tour/$tid/pair/$round").asObject()
+            .getArray("games")!!.map { it as Json.Object }.first { it.getInt("id") == id }.getString("r")
+        val round1Result = matchResult(1, round1GameId)
+        // the pre-fix restart restore: counter rebuilt from team game ids only, below the board ids
+        _nextGameId.set(round1GameId + 1)
+        TestAPI.post("/api/tour/$tid/pair/2", Json.parse("""["all"]"""))
+        val round2 = TestAPI.get("/api/tour/$tid/pair/2").asObject()
+        val round2GameId = round2.getArray("games")!!.getJson(0)!!.asObject().getInt("id")!!
+        val collider = round2.getArray("individualGames")!!.map { (it as Json.Object).getInt("id")!! }
+            .firstOrNull { round1BoardIds.contains(it) } ?: fail("premise broken: no board id was recycled")
+        val resp = TestAPI.put("/api/tour/$tid/res/2", Json.parse("""{"id":$collider,"result":"w"}""")).asObject()
+        assertTrue(resp.getBoolean("success") == true, "the result must be accepted")
+        assertTrue(matchResult(2, round2GameId) != "?", "the board result must propagate to round 2's match")
+        assertEquals(round1Result, matchResult(1, round1GameId), "round 1's match must be untouched")
     }
 
     // Nations Cup, EGC 2026: putting SCOREX first in the placement criteria of a *team* MacMahon

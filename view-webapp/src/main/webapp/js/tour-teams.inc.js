@@ -1,15 +1,19 @@
 function teamUp(players) {
+  $('#teamup').addClass('disabled');
   api.postJson(`tour/${tour_id}/team`, {
     "name": $('#team-name')[0].value,
     "players": players
   }).then(rst => {
     if (rst !== 'error') {
       document.location.reload();
+    } else {
+      $('#teamup').removeClass('disabled');
     }
   });
 }
 
 function split(teams) {
+  $('#split').addClass('disabled');
   let promises = teams.map(team => api.deleteJson(`tour/${tour_id}/team/${team}`));
   Promise.all(promises)
     .then(rsts => {
@@ -21,17 +25,19 @@ function split(teams) {
         if (!rst.success) console.error(rst.error)
       }
       if (any) document.location.reload();
+      else $('#split').removeClass('disabled');
     });
 }
 
 function join(players, team) {
-  console.log(team)
-  console.log(teams.get(team))
+  $('#join').addClass('disabled');
   api.putJson(`tour/${tour_id}/team/${team}`, {
     "players": teams.get(team).players.concat(players)
   }).then(rst => {
     if (rst !== 'error') {
       document.location.reload();
+    } else {
+      $('#join').removeClass('disabled');
     }
   });
 }

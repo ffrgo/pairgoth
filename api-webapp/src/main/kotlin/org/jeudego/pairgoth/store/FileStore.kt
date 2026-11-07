@@ -124,6 +124,7 @@ class FileStore(pathStr: String): Store {
                     }
                 }
             )
+            tournament.individualGames.values.flatten().forEach { maxGameId = max(maxGameId, it.id) }
         }
         val games = json["games"] as Json.Array? ?: Json.Array()
         (1..games.size).forEach { round ->
