@@ -65,10 +65,16 @@ abstract class BasePairingHelper(
         }.toMap()
     }
 
+    // Club comparison key: first four characters, case-insensitive (OpenGotha compatible).
+    // Do not consider blank or placeholder values ("xxxx", "NoCb").
+    protected val Pairable.clubKey: String? get() =
+        club?.take(4)?.uppercase()?.takeUnless { it.isBlank() || it == "XXXX" || it == "NOCB" }
+
     // number of players in the biggest club and the biggest country
     // this can be used to adjust geocost if there is a majority of players from the same country or club
+    // (club-less players are not a club: they are excluded from the counts)
     private val clubCounts by lazy {
-        pairables.groupingBy { it.club?.take(4)?.uppercase() }.eachCount()
+        pairables.mapNotNull { it.clubKey }.groupingBy { it }.eachCount()
     }
     protected val biggestClubSize by lazy {
         clubCounts.values.maxOrNull() ?: 0
@@ -94,7 +100,7 @@ abstract class BasePairingHelper(
     // Check if a player belongs to the local club
     protected fun Pairable.isFromLocalClub(): Boolean {
         val local = localClub ?: return false
-        return club?.take(4)?.uppercase() == local
+        return clubKey == local
     }
 
     // already paired players map
