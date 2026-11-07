@@ -93,6 +93,7 @@ class CountriesTool {
             "er" to "Eritrea",
             "es" to "Spain",
             "et" to "Ethiopia",
+            "eu" to "Europe",
             "fi" to "Finland",
             "fj" to "Fiji",
             "fr" to "France",

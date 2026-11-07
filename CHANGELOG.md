@@ -23,6 +23,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Add EU iso for Europe, as EGD does
 - Fix UK/GB iso country bug
 - Late participants registration: participation defaults to false for already paired rounds
 - Default shared secret was broken in standalone mode
