@@ -172,7 +172,7 @@
       </button>
 #end
 ## team tournaments are typically register on paper: do not propose syncing
-#if($webhookConfigured && $tour.type == 'INDIVIDUAL')
+#if($webhook.players && $tour.type == 'INDIVIDUAL')
       <button id="sync-website" class="ui orange right labeled icon floating button" title="Sync players from EGC">
         <i class="fa fa-cloud-download"></i>
         Sync from EGC

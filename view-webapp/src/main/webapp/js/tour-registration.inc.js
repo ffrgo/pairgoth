@@ -860,7 +860,7 @@ onLoad(() => {
       url: `tour/${tour_id}/part/${id}`, body: { id: id, skip: skipArr },
       source: 'registration', effect: () => setRowParticipation(id, skipArr)
     });
-    if (present && webhook && ext) {
+    if (present && webhook.presences && ext) {
       let pushed = await pushPresence(ext, round, true);
       if (pushed !== 'ok' && pushed !== 'noop') {
         showError(`The website refused this presence change: ${pushed.message}. Not applied.`);

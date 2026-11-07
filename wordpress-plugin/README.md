@@ -8,7 +8,7 @@ pairgoth is the client, the website is the server — so the tournament laptop c
 NAT or firewall.
 
 ```
-+ /health                     GET    health check, called once at pairgoth startup
++ /health                     GET    health check at pairgoth startup; declares capabilities = pairings, standings
 + /pairings/{code}/{round}    POST   pairings, and results for the same round
 + /standings/{code}/{round}   POST   standings as of a round
 ```

@@ -84,6 +84,7 @@
   const tour_endDate = '$!tour.endDate';
   const tour_country = '$!tour.country';
   let activeRound = ${round};
+  // rounds that already have games — a newly added player defaults to skipping them
   const pairedRounds = [#foreach($r in [1..$tour.rounds])#if($tour.stats[$r - 1].games > 0)$r,#end#end];
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
   const teamSize = $tour.teamSize;
@@ -91,7 +92,8 @@
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
   const env = '$env'; // dev or prod
-  const webhook = $webhookConfigured;
+  // Website integrations the webhook consumer does implement.
+  const webhook = { players: $webhook.players, presences: $webhook.presences };
   const blackFirst = $blackFirst;
   // Collaborative mode: true when using SSE, false will resort to polling
   const sseTransport = env === 'dev' ||
@@ -122,7 +124,8 @@
     $('.step').removeClass('active');
     $(`.step[data-step="${step}"], #${step}-tab`).addClass('active');
     window.location.hash = `#${step}`;
-    // a tab marked stale by an SSE event is refreshed on entry
+    // a tab marked stale by an SSE event (another operator's change, or our own) is refreshed on
+    // entry; the '.stale' class is the state (reset by the reload)
     if ($(`.step[data-step="${step}"]`)[0]?.hasClass('stale')) {
       window.location.reload();
     }

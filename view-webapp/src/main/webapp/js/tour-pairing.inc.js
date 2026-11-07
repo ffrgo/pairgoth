@@ -224,7 +224,7 @@ onLoad(()=>{
   $('#pair').on('click', async e => {
     // EGC deployments: launching a round without a website sync since the previous pairing likely
     // means stale presences, so ask for confirmation.
-    if (webhook && $('#paired .listitem').length === 0) {
+    if (webhook.players && $('#paired .listitem').length === 0) {
       let tour = await api.getJson(`tour/${tour_id}`);
       if (tour !== 'error' && tour.syncNeeded && !confirm($('#confirm-unsynced-pairing').text())) return;
     }

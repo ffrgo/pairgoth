@@ -55,6 +55,9 @@ class ViewServlet : VelocityViewServlet() {
         // deployment profile ('dev' or 'prod')
         context.put("env", WebappManager.properties.getProperty("env") ?: "dev")
 
+        // which website integrations to offer: what the webhook consumer declares it implements
+        context.put("webhook", Webhook.capabilities())
+
         /*
         val menu = menuEntries!![uri]
         var title: String? = null
