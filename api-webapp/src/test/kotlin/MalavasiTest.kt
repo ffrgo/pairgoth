@@ -1,7 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
-import org.jeudego.pairgoth.test.PairingTests.Companion.compare_weights
+import org.jeudego.pairgoth.test.OpenGothaWeights.compare_weights
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
 import kotlin.test.assertEquals
