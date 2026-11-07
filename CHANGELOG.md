@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Corpus tests: replay real opengotha tournament files round by round
 - French system pairing (Swiss with a sliding Mac Mahon-like bonus: r−1 starting-level groups at round 1, one fewer each round, plain Swiss for the last two rounds) — every player may still win, strong players meet early, games stay close in level.
 - Webhook: the external site's `/health` answer may list its capabilities (`players`, `presences`, `pairings`, `standings`)
 - WordPress plugin to publish pairings, results and standings on a club site
