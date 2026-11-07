@@ -278,7 +278,8 @@ onLoad(()=>{
   $('#update-pairable').on('click', e => {
     updatePairable();
   });
-  window.on('unload', e => {
+  // Persist scoll positions on 'pagehide' ('unload' event less reliable)
+  window.on('pagehide', e => {
     store('pairablesScroll', $('#pairables')[0].scrollTop);
     store('unpairablesScroll', $('#unpairables')[0].scrollTop);
     store('pairedScroll', $('#paired')[0].scrollTop);

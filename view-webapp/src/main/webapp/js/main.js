@@ -471,6 +471,140 @@ onLoad(() => {
   });
 });
 
+// --- Collaborative SSE client ---
+
+// Workflow order: a change originating at tab i invalidates every tab j >= i.
+// Each mutating event maps to its source tab.
+const TAB_ORDER = ['information', 'registration', 'teams', 'pairing', 'results', 'standings'];
+const EVENT_SOURCE_TAB = {
+  TournamentUpdated: 'information',
+  PlayerAdded: 'registration', PlayerUpdated: 'registration', PlayerDeleted: 'registration',
+  TeamAdded: 'teams', TeamUpdated: 'teams', TeamDeleted: 'teams',
+  GamesAdded: 'pairing', GamesDeleted: 'pairing', GameUpdated: 'pairing', TablesRenumbered: 'pairing',
+  ResultUpdated: 'results', ResultsCleared: 'results',
+  StandingsUpdated: 'standings'
+};
+// Staleness is held as the '.stale' class on the menu item
+function currentStep() {
+  return (window.location.hash || '').substring(1) || $('.step.active')[0]?.attr('data-step');
+}
+
+function markStaleFrom(sourceStep) {
+  let from = TAB_ORDER.indexOf(sourceStep);
+  if (from < 0) return;
+  let current = currentStep();
+  for (let i = from; i < TAB_ORDER.length; ++i) {
+    let step = TAB_ORDER[i];
+    if (step === current) continue;
+    $(`.step[data-step="${step}"]`).addClass('stale');
+  }
+}
+
+// Single entry point for every tournament-mutating action
+//   collaborative : POST only — the server's SSE echo drives the data effect for everyone, the actor included
+//   direct        : POST, then apply the local effect on the response + mark downstream tabs stale
+// `effect` is the tournament state change closure (patch a cell, add a row...), not including local-only changes
+//          (like: close the dialog, clear the form, success tick...)
+// `source` defaults to the current tab (overridable for rare cases like pairable's participation changes)
+async function mutate({ method = 'put', url, body = {}, source, effect }) {
+  if (readOnly) return 'readonly';              // tab frozen on outdated data — no overwrite path
+  let rst = await (api[`${method}Json`]).call(api, url, body);
+  if (rst === 'error') return rst;              // api.js already surfaced the error
+  if (!collaborative) {
+    if (effect) effect(rst);                    // local state effect on the response
+    markStaleFrom(source || currentStep());     // this op's own cross-tab staleness
+  }
+  return rst;                                   // for actor-local follow-up (both modes)
+}
+
+// --- Collaborative current-tab handling ---
+// An edit at tab S affects every tab j >= S. Non-active tabs are just marked as stale and will be reloaded.
+// If the active tab has been modified by someone else, user gets a warn dialog (Reload / Read-only).
+function busy(affected) {
+  switch (currentStep()) {
+    case 'information': return $('#tournament-infos').hasClass('edit');
+    case 'teams':       return $('#teams .selected.listitem, #teamables .selected.listitem').length > 0;
+    case 'pairing':     return $('#pairing-lists .selected.listitem').length > 0;
+    case 'standings':   return !$('#params-submit').hasClass('hidden') || $('#publish-modal').hasClass('shown');
+    case 'registration':
+      return $('#player').hasClass('shown') && $('#player').hasClass('edit') &&
+             affected != null && String($('#player-form')[0].val('id')) === String(affected);
+    default:            return false; // results: patched, nothing fragile on screen
+  }
+}
+
+// Read-only freezes the displayed tab on its (now outdated) data with no overwrite path.
+let readOnly = false;
+function enterReadOnly() {
+  readOnly = true;
+  $('body').addClass('read-only');
+  $(`.step[data-step="${currentStep()}"]`).addClass('stale');
+}
+
+// Protection against our own actions triggering a flash of the warning modal.
+let warnTimer = null;
+function warnReloadOrReadonly() {
+  if (readOnly || warnTimer || $('#sse-warn-modal').hasClass('shown')) return;
+  warnTimer = setTimeout(() => {
+    warnTimer = null;
+    if (!readOnly && !$('#sse-warn-modal').hasClass('shown')) modal('sse-warn-modal');
+  }, 300);
+}
+
+// Reload or warn if current tab is affected by a change.
+function onCurrentTabAffected(affected) {
+  if (readOnly) return;
+  if (busy(affected)) warnReloadOrReadonly();
+  else window.location.reload();
+}
+
+// In-place patch handlers registered per event by the tabs
+// returns true if it fully handled, false to fall through to the coarse reload/warn.
+const sseEffects = {};
+function sseEffect(name, fn) { sseEffects[name] = fn; }
+
+// Collaborative-mode dispatch for one event: every affected tab (j >= source) off-screen goes stale,
+// if it's the current tab then allow finer resolution on players updates (allow concurrent registrations).
+function handleCollaborativeEvent(name, source, data) {
+  markStaleFrom(source);                                                   // off-screen downstream tabs
+  if (TAB_ORDER.indexOf(currentStep()) < TAB_ORDER.indexOf(source)) return; // on-screen tab is upstream → unaffected
+  // an in-place patch is only meaningful on the tab the change originated from (downstream tabs derive
+  // from it and must reload/warn)
+  let patched = currentStep() === source && sseEffects[name] && sseEffects[name](data);
+  if (!patched) onCurrentTabAffected(name === 'PlayerUpdated' ? data?.id : undefined);
+}
+
+onLoad(() => {
+  $('#sse-warn-reload').on('click', () => window.location.reload());
+  $('#sse-warn-readonly').on('click', () => { close_modal(); enterReadOnly(); });
+  $('#sse-readonly-reload').on('click', () => window.location.reload());
+  // leaving a frozen tab releases its read-only freeze (the tab stays stale → reloads on return)
+  $('.step').on('click', () => { if (readOnly) { readOnly = false; $('body').removeClass('read-only'); } });
+});
+
+onLoad(() => {
+  if (typeof tour_id === 'undefined') return;
+  // Collaborative mode only opens an SSE stream — it needs one per tab, hence HTTP/2 (or dev). In
+  // direct mode we open none (HTTP/1.1's ~6-conn/origin limit would break multi-tab): mutate()'s local
+  // effect + stale-marking cover the single operator; cross-browser real-time is the accepted degradation.
+  if (!collaborative) return;
+  // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events
+  let source = new EventSource('/api/tour/events');
+  source.addEventListener('history-gap', e => {
+    console.warn('[sse] history gap — reloading to resync');
+    document.location.reload();
+  });
+  Object.keys(EVENT_SOURCE_TAB).forEach(name => source.addEventListener(name, e => {
+    let payload = JSON.parse(e.data);
+    if (payload && payload.tournament !== tour_id) return;
+    handleCollaborativeEvent(name, EVENT_SOURCE_TAB[name], payload.data);
+  }));
+  source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
+  // SSE cleanup
+  window.on('pagehide', () => source.close());
+  window.on('pageshow', e => { if (e.persisted) document.location.reload(); });
+});
+
 // Element.clearChildren method
 if( typeof Element.prototype.clearChildren === 'undefined' ) {
   Object.defineProperty(Element.prototype, 'clearChildren', {

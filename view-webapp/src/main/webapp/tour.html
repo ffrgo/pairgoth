@@ -81,12 +81,13 @@
   const tour_country = '$!tour.country';
   let activeRound = ${round};
   let correction = #if($tour.pairing.type == 'MAC_MAHON')${tour.pairing.handicap.correction}#{else}0#end;
-  let standingsUpToDate = true;
-  let pairablesUpToDate = true;
   const teamSize = $tour.teamSize;
 #end
 #set($datepickerLocale = $translate.datepickerLocale($request.lang, $request.loc))
   const datepickerLocale = '$datepickerLocale';
+  const env = '$env';
+  // Collaborative SSE mode needs HTTP/2
+  const collaborative = env === 'dev' || performance.getEntriesByType('navigation')[0]?.nextHopProtocol === 'h2';
   // #[[
   const safeRegex = /^[-a-zA-Z0-9_.]+$/;
 
@@ -113,9 +114,8 @@
     $('.step').removeClass('active');
     $(`.step[data-step="${step}"], #${step}-tab`).addClass('active');
     window.location.hash = `#${step}`;
-    if (step === 'standings' && !standingsUpToDate) {
-      window.location.reload();
-    } else if (step === 'pairing' && !pairablesUpToDate) {
+    // a tab marked stale by an SSE event is refreshed on entry
+    if ($(`.step[data-step="${step}"]`)[0]?.hasClass('stale')) {
       window.location.reload();
     }
   }
@@ -252,5 +252,21 @@
       </button>
     </div>
   </div>
+</div>
+<div id="sse-warn-modal" class="popup no-dimmer-close">
+  <div class="popup-body">
+    <div class="popup-content">
+      <p>Another operator just changed data shown on this tab, but you have unsaved work here.
+        Reload to get the latest version (your unsaved changes here will be lost), or keep this tab read-only.</p>
+    </div>
+    <div class="popup-footer">
+      <button type="button" id="sse-warn-readonly" class="ui gray floating button">Keep read-only</button>
+      <button type="button" id="sse-warn-reload" class="ui blue floating button">Reload</button>
+    </div>
+  </div>
+</div>
+<div id="sse-readonly-banner">
+  <span>This tab is read-only — it shows outdated data.</span>
+  <button type="button" id="sse-readonly-reload" class="ui mini blue button">Reload</button>
 </div>
 #end

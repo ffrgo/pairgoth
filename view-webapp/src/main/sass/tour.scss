@@ -539,7 +539,31 @@
     .step {
       padding-top: 0.5em;
       padding-bottom: 0.5em;
+      // '.stale' = this tab's data changed elsewhere; no need for a visual feedback,
+      // the tab will be refreshed on display
     }
+  }
+
+  /* collaborative SSE: read-only freeze of the on-screen tab */
+  body.read-only .tab-content.active {
+    opacity: 0.6;
+    button, input, select, textarea, .listitem {
+      pointer-events: none;
+    }
+  }
+  #sse-readonly-banner {
+    display: none;
+  }
+  body.read-only #sse-readonly-banner {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    justify-content: center;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.4em 1em;
+    background: #ffe9b0;
   }
 
   @media(max-width: 1600px) {

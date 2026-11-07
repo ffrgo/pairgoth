@@ -52,6 +52,9 @@ class ViewServlet : VelocityViewServlet() {
         val blackFirst = WebappManager.properties.getProperty("display.pairing.blackFirst")?.toBoolean() ?: false
         context.put("blackFirst", blackFirst)
 
+        // deployment profile ('dev' or 'prod')
+        context.put("env", WebappManager.properties.getProperty("env") ?: "dev")
+
         /*
         val menu = menuEntries!![uri]
         var title: String? = null

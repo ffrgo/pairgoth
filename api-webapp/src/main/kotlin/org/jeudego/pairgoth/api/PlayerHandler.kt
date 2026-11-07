@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.api
 
 import com.republicate.kson.Json
 import com.republicate.kson.toJsonArray
+import com.republicate.kson.toMutableJsonObject
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.TeamTournament
@@ -67,8 +68,15 @@ object PlayerHandler: PairgothApiHandler {
                 }
             }
         }
+        // changes mask for the collaborative SSE client: bit1 identity, bit2 reg-status (final),
+        // bit3 participation (skip). Observers patch on 2/3-only changes, reload on identity.
+        fun identity(p: Player) = p.toJson().toMutableJsonObject().also { it.remove("final"); it.remove("skip") }
+        var changes = 0
+        if (identity(player) != identity(updated)) changes = changes or 1
+        if (player.final != updated.final) changes = changes or 2
+        if (player.skip != updated.skip) changes = changes or 4
         tournament.players[id] = updated
-        tournament.dispatchEvent(PlayerUpdated, request, player.toJson())
+        tournament.dispatchEvent(PlayerUpdated, request, updated.toJson().toMutableJsonObject().also { it["changes"] = changes })
         return Json.Object("success" to true)
     }
 

@@ -18,7 +18,8 @@ enum class Event(val slug: String) {
     GameUpdated("edit-game"),
     ResultUpdated("enter-result"),
     ResultsCleared("clear-results"),
-    TablesRenumbered("renumber")
+    TablesRenumbered("renumber"),
+    StandingsUpdated("set-criteria")
     ;
 
     companion object {
