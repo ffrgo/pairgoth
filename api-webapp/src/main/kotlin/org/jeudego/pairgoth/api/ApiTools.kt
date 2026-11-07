@@ -34,6 +34,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.NBW -> history.nbwScores
             Criterion.MMS -> history.mms
             Criterion.SCOREX -> history.scoresX
+            Criterion.BDW -> (this as? TeamTournament)?.boardWins(round) ?: StandingsHandler.nullMap
             Criterion.STS -> StandingsHandler.nullMap
             Criterion.CPS -> StandingsHandler.nullMap
 
@@ -113,6 +114,19 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     }
 
     return sortedPairables
+}
+
+/**
+ * Number of Board Wins: the sum of a team's game results over all rounds (EGF tournament system
+ * rules), a jigo counting half. Zero for non-individual team tournament.
+ */
+fun TeamTournament.boardWins(round: Int): Map<ID, Double> {
+    if (!type.individual) return StandingsHandler.nullMap
+    val boards = historyBefore(round + 1).map { teamGames ->
+        teamGames.flatMap { individualGames[it.id]?.toList() ?: listOf() }
+    }
+    val playerWins = HistoryHelper(boards).wins
+    return teams.mapValues { (_, team) -> team.playerIds.sumOf { playerWins[it] ?: 0.0 } }
 }
 
 fun Tournament<*>.populateStandings(sortedEntries: List<Json.Object>, round: Int = rounds, individualStandings: Boolean) {

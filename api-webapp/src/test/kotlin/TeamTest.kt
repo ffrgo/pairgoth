@@ -270,6 +270,23 @@ class TeamTest {
         standings.forEach { assertEquals(0.5, it.getDouble("NBW"), "each team scores half a point") }
     }
 
+    // "Number of Board Wins = Sum of a team's game results in all rounds. It can be applied only in
+    // a team tournament. There it is highly meaningful and should be the first tiebreaker." (EGF)
+    @Test
+    fun `board wins are the first tie-break of a team tournament`() {
+        val (tid, tg) = sweptTeamMatch()
+        val placement = TestAPI.get("/api/tour/$tid").asObject().getObject("pairing")!!.getArray("placement")!!
+        assertEquals("MMS", placement[0], "the main score comes first")
+        assertEquals("BDW", placement[1], "board wins are the first tie-break")
+
+        val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray().map { it as Json.Object }
+        val winner = standings.first { it.getInt("id") == tg.getInt("w") }
+        val loser = standings.first { it.getInt("id") == tg.getInt("b") }
+        assertEquals(2.0, winner.getDouble("BDW"), "the sweeping team won both boards")
+        assertEquals(0.0, loser.getDouble("BDW"))
+        assertEquals(1, winner.getInt("place"), "and is placed first")
+    }
+
     // ... but only once every board is in: a half-entered match is pending, not tied.
     @Test
     fun `a half entered team match stays pending`() {

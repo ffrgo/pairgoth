@@ -12,7 +12,8 @@ enum class Criterion {
     MMS, // Macmahon score
     STS, // Strasbourg score
     CPS, // Cup score
-    SCOREX, // CB TODO - I'm adding this one for the congress, didn't find its name in OG after a quick check, needs a deeper investigation
+    SCOREX, // Score-X
+    BDW, // Number of board wins (team tournaments), OpenGotha's TPL_CRIT_BOARDWINS
 
     SOSW, // Sum of opponents NBW
     SOSWM1, //-1
