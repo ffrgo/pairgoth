@@ -1,0 +1,84 @@
+# French translation of the Pairgoth Publish plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: pairgoth-publish 0.1.0\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+
+msgid "Pairings & results"
+msgstr "Appariements & résultats"
+
+msgid "Standings"
+msgstr "Classement"
+
+msgid "Tournaments"
+msgstr "Tournois"
+
+msgid "Tournament"
+msgstr "Tournoi"
+
+msgid "Search tournaments"
+msgstr "Rechercher des tournois"
+
+msgid "No tournament published yet"
+msgstr "Aucun tournoi publié pour l’instant"
+
+msgid "Pairgoth Publish has no shared secret set"
+msgstr "Pairgoth Publish n’a pas de secret partagé configuré"
+
+msgid "invalid X-Pairgoth-Secret"
+msgstr "en-tête X-Pairgoth-Secret invalide"
+
+msgid "Nothing published yet."
+msgstr "Rien n’a encore été publié."
+
+#. translators: %s: date and time of the last publication
+msgid "Published %s"
+msgstr "Publié le %s"
+
+#. translators: %d: round number
+msgid "R%d"
+msgstr "R%d"
+
+msgid "Unknown tournament."
+msgstr "Tournoi inconnu."
+
+msgid "Pairgoth code"
+msgstr "Code pairgoth"
+
+msgid "Last publication"
+msgstr "Dernière publication"
+
+msgid "The tournament short name pairgoth publishes under. Change it only to follow a rename made in pairgoth."
+msgstr "Le nom court sous lequel pairgoth publie ce tournoi. Ne le changer que pour suivre un renommage fait dans pairgoth."
+
+msgid "Code refused: only letters, digits, dot, dash and underscore."
+msgstr "Code refusé : uniquement lettres, chiffres, point, tiret et tiret bas."
+
+#. translators: %s: the other tournament's title
+msgid "Code refused: already used by “%s”."
+msgstr "Code refusé : déjà utilisé par « %s »."
+
+msgid "Put these two lines in the pairgoth.properties file of the tournament laptop:"
+msgstr "Mettre ces deux lignes dans le fichier pairgoth.properties de l’ordinateur du tournoi :"
+
+msgid "Shared secret"
+msgstr "Secret partagé"
+
+msgid "Any long random string. Anyone holding it can publish HTML on this site, so keep it to the tournament laptop and serve this site over HTTPS."
+msgstr "N’importe quelle longue chaîne aléatoire. Quiconque la détient peut publier du HTML sur ce site : la réserver à l’ordinateur du tournoi et servir le site en HTTPS."
+
+msgid "a freshly generated one, if you need it."
+msgstr "une fraîchement générée, si besoin."
+
+msgid "Displaying a tournament"
+msgstr "Afficher un tournoi"
+
+msgid "Each tournament gets its own page as soon as pairgoth publishes to it. To embed one in an existing page instead:"
+msgstr "Chaque tournoi a sa propre page dès que pairgoth y publie. Pour l’intégrer plutôt dans une page existante :"
+
+msgid "optional attributes: view=\"pairings|standings\", round=\"3\", nav=\"no\"."
+msgstr "attributs optionnels : view=\"pairings|standings\", round=\"3\", nav=\"no\"."
