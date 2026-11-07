@@ -101,7 +101,10 @@ sealed class Tournament <P: Pairable>(
         if (this is TeamTournament) return false
         val enumeration = repairEnumerations[round] ?: return false
         val batchGames = games(round).values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
-        return batchGames.isNotEmpty() && batchGames.none { it.result != Game.Result.UNKNOWN }
+        // a bye game carries a structural result, not a played one — it never blocks navigation
+        return batchGames.isNotEmpty() && batchGames.none {
+            it.white != ByePlayer.id && it.black != ByePlayer.id && it.result != Game.Result.UNKNOWN
+        }
     }
 
     /** Index of the currently active optimal pairing (0 = the committed one). */

@@ -31,6 +31,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- "Find another optimal pairing" was silently unavailable in any round with a bye
 - Fix jigo scoring, SOS-n and cumulative score
 - SOSW family criteria were broken
 - Team tournaments now stable
