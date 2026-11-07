@@ -1,6 +1,8 @@
 package org.jeudego.pairgoth.server
 
+import com.republicate.kson.Json
 import info.macias.sse.events.MessageEvent
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicLong
 
 enum class Event(val slug: String) {
@@ -31,13 +33,21 @@ enum class Event(val slug: String) {
         // seed event ids with the boot time so id ranges never overlap across restarts
         private val nextMessageId = AtomicLong(System.currentTimeMillis())
         private val sse: SSEServlet by lazy { SSEServlet.getInstance() }
-        private fun <T> buildEvent(event: Event, data: T) = MessageEvent.Builder()
-            .setId("${nextMessageId.incrementAndGet()}".padStart(10, '0'))
-            .setEvent(event.name)
-            .setData(data.toString())
-            .build()
-        internal fun <T> dispatch(event: Event, data: T) {
-            sse.broadcast(buildEvent(event, data))
+
+        // this boot's identity: SSE clients receive it in the volatile `hello`, polling clients in
+        // every response ; a change tells them their cursor belongs to a dead history
+        val bootId: String = UUID.randomUUID().toString()
+
+        /** The current newest id, padded like jeasse keys it: the starting cursor handed to a
+         *  polling client when the retained history is still empty (see eventsSince's contract). */
+        internal fun currentCursor() = "${nextMessageId.get()}".padStart(10, '0')
+
+        internal fun dispatch(event: Event, data: Json) {
+            sse.broadcast(MessageEvent.Builder()
+                .setId("${nextMessageId.incrementAndGet()}".padStart(10, '0'))
+                .setEvent(event.name)
+                .setData(data.toString())
+                .build())
         }
     }
 }

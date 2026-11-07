@@ -491,7 +491,7 @@ onLoad(() => {
   });
 });
 
-// --- Collaborative SSE client ---
+// --- Live sync client (SSE or polling transport) ---
 
 // Workflow order: a change originating at tab i invalidates every tab j >= i.
 // Each mutating event maps to its source tab.
@@ -522,7 +522,8 @@ function markStaleFrom(sourceStep) {
 }
 
 // Single entry point for every tournament-mutating action
-//   collaborative : POST only — the server's SSE echo drives the data effect for everyone, the actor included
+//   sseTransport : POST only ; the server's SSE echo drives the data effect for everyone, the actor
+//                   included (no local effect => no double-apply, observers never stale).
 //   direct        : POST, then apply the local effect on the response + mark downstream tabs stale
 // `effect` is the tournament state change closure (patch a cell, add a row...), not including local-only changes
 //          (like: close the dialog, clear the form, success tick...)
@@ -531,7 +532,7 @@ async function mutate({ method = 'put', url, body = {}, source, effect }) {
   if (readOnly) return 'readonly';              // tab frozen on outdated data — no overwrite path
   let rst = await (api[`${method}Json`]).call(api, url, body);
   if (rst === 'error') return rst;              // api.js already surfaced the error
-  if (!collaborative) {
+  if (!sseTransport) {
     if (effect) effect(rst);                    // local state effect on the response
     markStaleFrom(source || currentStep());     // this op's own cross-tab staleness
   }
@@ -595,9 +596,9 @@ function onCurrentTabAffected(affected) {
 const sseEffects = {};
 function sseEffect(name, fn) { sseEffects[name] = fn; }
 
-// Collaborative-mode dispatch for one event: every affected tab (j >= source) off-screen goes stale,
+// Dispatch of one remote event: every affected tab (j >= source) off-screen goes stale,
 // if it's the current tab then allow finer resolution on players updates (allow concurrent registrations).
-function handleCollaborativeEvent(name, source, data) {
+function handleRemoteEvent(name, source, data) {
   markStaleFrom(source);                                                   // off-screen downstream tabs
   if (TAB_ORDER.indexOf(currentStep()) < TAB_ORDER.indexOf(source)) return; // on-screen tab is upstream → unaffected
   // an in-place patch is only meaningful on the tab the change originated from (downstream tabs derive
@@ -614,14 +615,62 @@ onLoad(() => {
   $('.step').on('click', () => { if (readOnly) { readOnly = false; $('body').removeClass('read-only'); } });
 });
 
+// --- Polling transport (HTTP/1.1) ---
+// Same event feed as SSE, fetched every 20s from the bounded log the api keeps: no held
+// connection (h1's ~6-conn/origin limit stays untouched), same handleRemoteEvent
+// dispatch — so multi-tab and multi-operator work in every deployment, at up-to-20s latency.
+// mutate() stays on its direct branch (immediate local effect); the poll then echoes our own
+// events back, dropped via tabKey (api.js sends it on every mutation).
+const POLL_INTERVAL = 20000;
+let pollCursor = null, pollBoot = null, lastPolled = 0;
+let sseSource = null;
+async function pollEvents() {
+  try {
+    let resp = await fetch(`/api/tour/events?since=${pollCursor === null ? '' : pollCursor}`,
+                           { headers: { 'Accept': 'application/json' } });
+    if (!resp.ok) return;                          // transient server trouble: freshness just ages
+    let feed = await resp.json();
+    if (pollBoot !== null && pollBoot !== feed.boot) return resync('server restart');
+    pollBoot = feed.boot;
+    if (feed.gap) return resync('event gap');
+    for (let event of (feed.events || [])) {
+      let payload = event.data;
+      if (!payload || payload.tab === tabKey || payload.tournament !== tour_id) continue;
+      let source = EVENT_SOURCE_TAB[event.name];
+      if (source) handleRemoteEvent(event.name, source, payload.data);
+    }
+    pollCursor = feed.cursor;
+    lastPolled = Date.now();
+  } catch (e) { /* offline — freshness just ages */ }
+}
+
+// Print/publish freshness guard: has this page heard from the server recently enough to trust
+// what it shows? SSE mode: the stream is live (echoes handle staleness continuously). Polling
+// mode: poll right now — a change to this tab reloads/warns on its own; if we survive that with
+// no warn modal up, the data is current. Unverifiable (offline, disconnected) → operator decides.
+async function freshOrConfirm() {
+  if (typeof tour_id === 'undefined' || typeof sseTransport === 'undefined') return true; // not a tournament page
+  let fresh;
+  if (sseTransport) fresh = sseSource !== null && sseSource.readyState === 1;
+  else {
+    await pollEvents();
+    fresh = lastPolled > 0 && Date.now() - lastPolled < POLL_INTERVAL && !$('#sse-warn-modal').hasClass('shown');
+  }
+  return fresh || confirm($('#confirm-unverified').text().trim());
+}
+
 onLoad(() => {
   if (typeof tour_id === 'undefined') return;
-  // Collaborative mode only opens an SSE stream — it needs one per tab, hence HTTP/2 (or dev). In
-  // direct mode we open none (HTTP/1.1's ~6-conn/origin limit would break multi-tab): mutate()'s local
-  // effect + stale-marking cover the single operator; cross-browser real-time is the accepted degradation.
-  if (!collaborative) return;
+  // The transport follows the connection: SSE needs one held connection per tab, hence HTTP/2
+  // (or dev); over HTTP/1.1 the polling loop delivers the same feed without holding anything.
+  if (!sseTransport) {
+    setInterval(pollEvents, POLL_INTERVAL);
+    pollEvents();
+    // bfcache restore: the cursor replays whatever was missed at the next tick — nothing to do
+    return;
+  }
   // the api webapp is mounted at context /api/tour, so its SSE endpoint is /api/tour/events
-  let source = new EventSource('/api/tour/events');
+  let source = sseSource = new EventSource('/api/tour/events');
   source.addEventListener('history-gap', e => resync('history gap'));
   // `hello` carries the server's boot id: a change across auto-reconnects means the server
   // restarted while this tab held no replay cursor (it only ever saw keep-alive comments)
@@ -633,7 +682,7 @@ onLoad(() => {
   Object.keys(EVENT_SOURCE_TAB).forEach(name => source.addEventListener(name, e => {
     let payload = JSON.parse(e.data);
     if (payload && payload.tournament !== tour_id) return;
-    handleCollaborativeEvent(name, EVENT_SOURCE_TAB[name], payload.data);
+    handleRemoteEvent(name, EVENT_SOURCE_TAB[name], payload.data);
   }));
   source.onerror = () => console.warn('[sse] disconnected (auto-reconnecting)');
   // SSE cleanup

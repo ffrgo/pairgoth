@@ -52,7 +52,7 @@ function clearResults() {
 const results = [ '?', 'w', 'b', '=', 'X', '#', '0' ];
 
 onLoad(()=>{
-  // collaborative echoes: patch the cell in place (game json carries the result symbol in 'r')
+  // remote echoes: patch the cell in place (game json carries the result symbol in 'r')
   sseEffect('ResultUpdated', data => { applyResult({ id: data.data.id, result: data.data.r }); return true; });
   sseEffect('ResultsCleared', () => { clearResultsCells(); return true; });
 
@@ -100,7 +100,8 @@ onLoad(()=>{
       clearResults();
     }
   });
-  $('#publish-results').on('click', e => {
+  $('#publish-results').on('click', async e => {
+    if (!(await freshOrConfirm())) return;
     let form = $('#tournament-infos')[0];
     let code = form.val('shortName');
     if (!code) {

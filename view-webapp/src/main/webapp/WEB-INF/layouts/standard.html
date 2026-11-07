@@ -168,7 +168,12 @@
         $('#lang-list').removeClass('shown');
         $('#help-menu').toggleClass('shown');
       });
-      $('#print').on('click', e => window.print());
+      $('#print').on('click', async e => {
+        // freshness first (another operator may have changed the data), stamp before paper goes out
+        if (typeof freshOrConfirm === 'function' && !(await freshOrConfirm())) return;
+        if (typeof stampPlaying === 'function' && typeof currentStep === 'function' && currentStep() === 'pairing') stampPlaying();
+        window.print();
+      });
       $('.lang').on('click', e => {
         let lang = e.target.closest('.lang').data('lang');
         document.location.href = document.location.href.replace(/\/[a-z]{2}\//, `/${lang}/`);
