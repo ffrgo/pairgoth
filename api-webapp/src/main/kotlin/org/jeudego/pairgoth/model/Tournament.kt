@@ -65,6 +65,9 @@ sealed class Tournament <P: Pairable>(
     // label of the last user action
     var lastAction: String? = null
 
+    var lastSync: Long? = null
+    var lastPairing: Long? = null
+
     // pairing
     open fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         // Minimal check on round number.
@@ -577,6 +580,9 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
     json.getArray("frozen")?.also {
         tournament.frozen = it
     }
+    tournament.lastAction = json.getString("lastAction") ?: default?.lastAction
+    tournament.lastSync = json.getLong("lastSync") ?: default?.lastSync
+    tournament.lastPairing = json.getLong("lastPairing") ?: default?.lastPairing
     return tournament
 }
 
@@ -626,6 +632,12 @@ fun Tournament<*>.toFullJson(): Json.Object {
     }
     if (lastAction != null) {
         json["lastAction"] = lastAction
+    }
+    if (lastSync != null) {
+        json["lastSync"] = lastSync
+    }
+    if (lastPairing != null) {
+        json["lastPairing"] = lastPairing
     }
     return json
 }

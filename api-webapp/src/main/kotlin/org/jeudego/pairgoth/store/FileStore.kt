@@ -101,7 +101,6 @@ class FileStore(pathStr: String): Store {
 
     private fun buildTournament(json: Json.Object): Tournament<*> {
         val tournament = Tournament.fromJson(json, canonicalize = false)
-        tournament.lastAction = json.getString("lastAction")
         var maxPlayerId = 0
         var maxGameId = 0
         val players = json["players"] as Json.Array? ?: Json.Array()

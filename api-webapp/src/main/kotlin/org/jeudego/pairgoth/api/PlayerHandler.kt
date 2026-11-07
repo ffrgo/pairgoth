@@ -82,6 +82,7 @@ object PlayerHandler: PairgothApiHandler {
             "ratings" -> RatingsRefreshed
             else -> PlayersImported
         }
+        if (event == PlayersImported) tournament.lastSync = System.currentTimeMillis()
         if (added.isNotEmpty() || updated.isNotEmpty())
             tournament.dispatchEvent(event, request, Json.Object("added" to added.size, "updated" to updated.size))
         return Json.Object("success" to true,
