@@ -77,9 +77,8 @@ Location	장소
 Log in	로그인
 Luc Vannier	 
 MM bar	MM 바
-Mac Mahon	맥마흔
-Mac Mahon groups	맥마흔 그룹
-MacMahon	맥마흔
+McMahon	맥마흔
+McMahon groups	맥마흔 그룹
 Main time	제한 시간
 Max time	최대 시간
 MM floor	MM 바닥
@@ -243,7 +242,7 @@ Round
 down	내림
 up	올림
 NBW/MMS score	라운드 NBW/MMS
-Special Mac Mahon handling for players absent from a round	라운드에 불참한 선수들에게 특별 맥마흔 처리
+Special McMahon handling for players absent from a round	라운드에 불참한 선수들에게 특별 맥마흔 처리
 MMS score for non-played rounds:	불참한 라운드의 MMS:
 SOS for non-played rounds:	불참한 라운드의 SOS:
 of player	 
@@ -267,7 +266,7 @@ Do not apply secondary criteria for:	부가 기준을 적용하지 않음:
 players with a MMS equal to or stronger than	MMS가
 _BLANK_AFTER_RANK_THRESHOLD_	이상인 선수
 players who won at least half of their games	절반 이상을 이긴 선수
-players above the Mac Mahon bar	맥마흔 바 이상인 선수
+players above the McMahon bar	맥마흔 바 이상인 선수
 _BLANK_COUNTRY_PREFIX Prefer a score gap of	동일 국가 선수끼리 매칭하는 것보다
 _BLANK_CLUB_PREFIX Prefer a score gap of	동일 클럽 선수끼리 매칭하는 것보다
 rather than pairing players of the same country.	점 차이를 선호

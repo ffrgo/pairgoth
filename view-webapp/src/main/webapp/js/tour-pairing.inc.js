@@ -175,7 +175,7 @@ function hideOpponents() {
 }
 
 onLoad(()=>{
-  // note - this handler is also in use for lists on Mac Mahon super groups and teams pages
+  // note - this handler is also in use for lists on McMahon super groups and teams pages
   // CB TODO - there is some code cleaning to to around the listitems reuse and events:
   // the on('click') method should not define specific behaviors for this page, just dispatch custom events
   $('.listitem').on('click', e => {

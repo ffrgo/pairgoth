@@ -168,14 +168,14 @@
 #if($tour.type == 'INDIVIDUAL' && $tour.pairing.type == 'MAC_MAHON')
       <button id="edit-macmahon-groups" class="ui right labeled icon floating button">
         <i class="pencil icon"></i>
-        Mac Mahon groups
+        McMahon groups
       </button>
 #end
 ## team tournaments are typically register on paper: do not propose syncing
 #if($webhook.players && $tour.type == 'INDIVIDUAL')
       <button id="sync-website" class="ui orange right labeled icon floating button" title="Sync players from EGC">
         <i class="fa fa-cloud-download"></i>
-        Sync from EGC
+        Sync from website
       </button>
 #else
       <button id="refresh-ratings" class="ui right labeled icon floating button" title="Refresh ratings of registered players from EGD/FFG">
@@ -395,7 +395,7 @@
 <div id="macmahon-groups" class="wide popup">
   <div class="popup-body">
     <div class="popup-header">
-      Mac Mahon groups
+      McMahon groups
       <label><input type="checkbox" id="mm-allrounds-filter"/> Only players playing all rounds</label>
     </div>
     <div class="popup-content">

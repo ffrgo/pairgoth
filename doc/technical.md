@@ -4,34 +4,25 @@
 
 ## Deployment profiles
 
-pairgoth integrates with an "event" site (a club page, a federation site, an EGC-scale platform) on two
-independent planes: pairgoth **pushing** to the event (the *webhook*), and the event **driving** pairgoth
-(the *API*). Which you set up depends on how pairgoth is reached and how complex the event is —
-**most organizers only need the first row.**
+*Which integration with an event website fits your event.*
+
+pairgoth integrates with an event website (a club page, a federation site, an EGC-scale platform) on two independent planes: pairgoth **pushing** to the website (the *webhook*), and the website **driving** pairgoth (the *API*). Which you set up depends on how pairgoth is reached and how complex the event is. **Most organizers only need the first row.**
 
 | Profile | pairgoth runs… | Integration | Auth | Secrets |
 |---|---|---|---|---|
-| **local-publish** | on the organizer's laptop (not reachable from outside) | pairgoth *pushes* pairings/results/standings to the event site; the operator clicks Publish / Sync | `none` or `sesame` | `webhook.url` + `webhook.secret` |
-| **hosted-sesame** | on a reachable server, one event | the event site *drives* pairgoth over its API (create, push the roster, read pairings/results/standings as JSON) | `sesame` (shared password) | `auth.shared_secret` |
-| **hosted-SSO-ACL** *(advanced — EGC-scale)* | on a reachable server, many events and operators | the event site is an SSO front with per-operator tournament visibility and id allocation | `external` | `auth.shared_secret`, `auth.external.secret` |
+| **local-publish** | on the organizer's laptop (not reachable from outside) | pairgoth *pushes* pairings, results and standings to the event website; the operator clicks **Publish** or **Sync from website** | `none` or `sesame` | `webhook.url` + `webhook.secret` |
+| **hosted-sesame** | on a reachable server, one event | the event website *drives* pairgoth over its API (create, push the roster, read pairings/results/standings as JSON) | `sesame` (shared password) | `auth.shared_secret` |
+| **hosted-SSO-ACL** *(advanced — EGC-scale)* | on a reachable server, many events and operators | the event website is an SSO front with per-operator tournament visibility and id allocation | `external` | `auth.shared_secret`, `auth.external.secret` |
 
-- The two planes are **independent** — configure only what you need. A hosted event that drives the API
-  needs no webhook; a laptop that only publishes needs no API auth beyond `sesame`. Configuring two
-  directions (and two secrets) is only for setups that genuinely want both.
-- A **small organizer** stops at the first one or two rows. The third — per-operator ACL, SSO tickets,
-  an admin store — exists only for multi-tournament platforms (the EGC), and is documented apart under
-  [External (SSO) authentication](#external-sso-authentication); ignore it otherwise.
-- Details by plane: the push side is the [Webhook specification](#pairgoth-webhook-specification); the
-  drive side is the [API specification](#pairgoth-api-specification) (incl. bulk roster import).
-- If the club site runs **WordPress**, the local-publish row needs no development at all: the
-  `wordpress-plugin/` directory of the pairgoth sources holds a ready-made consumer of the publishing
-  endpoints (see its README).
+- Configure only what you need: a hosted event that drives the API needs no webhook, and a laptop that only publishes needs no API authentication beyond `sesame`. The third row (per-operator ACL, SSO tickets, an admin store) exists for multi-tournament platforms such as the EGC and is documented under [External (SSO) authentication](#external-sso-authentication); ignore it otherwise.
+- The push side is specified in the [webhook specification](#pairgoth-webhook-specification), the drive side in the [API specification](#pairgoth-api-specification), bulk roster import included.
+- If the club site runs **WordPress**, the local-publish row needs no development: the `wordpress-plugin/` directory of the pairgoth sources holds a ready-made consumer of the publishing endpoints (see its README).
 
 ## Configuration
 
 *How to tune the `pairgoth.properties` file.*
 
-Pairgoth general configuration is done using the `pairgoth.properties` file in the installation folder.
+Pairgoth reads its configuration from the `pairgoth.properties` file of the working directory (the installation folder when launched from there).
 
 Properties are loaded in this order (later overrides earlier):
 
@@ -48,8 +39,8 @@ env = prod
 ```
 
 Values:
-- `dev` - Development mode: enables CORS headers and additional logging
-- `prod` - Production: for distributed instances
+- `dev` - Development mode: CORS headers, more logging, and live synchronisation always over Server-Sent Events (see [Collaborative editing](#collaborative-editing))
+- `prod` - Production (default)
 
 ### Mode
 
@@ -75,7 +66,7 @@ auth = none
 Values:
 - `none` - No authentication required
 - `sesame` - Shared unique password
-- `oauth` - Email and/or OAuth accounts
+- `oauth` - Accounts of an OAuth provider (see [OAuth configuration](#oauth-configuration))
 - `external` - SSO delegated to a fronting website
 
 #### Secrets overview
@@ -84,11 +75,11 @@ Each secret serves exactly one trust relationship:
 
 | Property | Shared between | Purpose |
 |----------|----------------|---------|
-| `auth.shared_secret` | view ↔ api webapps | encrypts the API bearers — internal, never leaves pairgoth |
+| `auth.shared_secret` | Web UI ↔ API | encrypts the API bearers; internal, never leaves pairgoth |
 | `auth.sesame` | operators ↔ pairgoth | the shared password of the `sesame` mode |
 | `auth.external.secret` | fronting site → pairgoth | encrypts the SSO tickets of the `external` mode |
 | `oauth.<provider>.secret` | pairgoth ↔ OAuth provider | the provider's client secret |
-| `webhook.secret` | pairgoth → tournament website | authenticates outbound webhook publishing |
+| `webhook.secret` | pairgoth → event website | authenticates outbound webhook publishing |
 
 #### Shared secret
 
@@ -98,10 +89,7 @@ When running with authentication enabled:
 auth.shared_secret = <16 ascii characters string>
 ```
 
-This secret is shared between API and View webapps. In standalone mode it is
-auto-generated at startup when not set. In server and client modes, set it
-explicitly — to the same value on both sides — for any real authentication mode
-(with `auth = none` it is not used).
+This secret is shared between the Web UI and the API. In standalone mode it is generated at startup when not set. In server and client modes, set it explicitly, to the same value on both sides, for any authentication mode but `none` (which does not use it).
 
 #### Sesame password
 
@@ -116,40 +104,28 @@ auth.sesame = <password>
 In `external` mode, pairgoth delegates authentication to a fronting website (an event
 site, typically) which owns the accounts and the access rights. The contract:
 
-- The fronting site authenticates the operator, then hands them over to pairgoth on
-  `/sso?ticket=<ticket>&goto=<path>`. The ticket is the payload `email:expiryMillis:nonce`,
-  AES-encrypted (URL-safe base64) with a secret dedicated to this relationship:
+- The fronting site authenticates the operator, then hands them over to pairgoth on `/sso?ticket=<ticket>&goto=<path>`. The ticket is the payload `email:expiryMillis:nonce`, AES-encrypted (URL-safe base64) with a secret dedicated to this relationship:
 
-```
-auth.external.secret = <16+ ascii characters string>
-```
+  ```
+  auth.external.secret = <16+ ascii characters string>
+  ```
 
-  It must expire shortly (~60 seconds) and is accepted once. `goto` is the relative path
-  to land on (default `/index`).
+  The fronting site chooses the expiry; pairgoth refuses a ticket older than two minutes and accepts each one once. `goto` is the relative path to land on (default `/index`).
 - Sessionless requests are redirected to the fronting site's login page:
 
-```
-auth.external.login_url = <url>
-```
+  ```
+  auth.external.login_url = <url>
+  ```
 
-  with the originally requested path appended as the `goto` parameter, so deep links into
-  pairgoth transparently round-trip through the fronting site.
-- Tournament visibility is per operator: the store directory contains one directory per
-  email, holding ACL symlinks `NNNNNN-name.tour` pointing to the root tournament files.
-  The symlinks — and the tournament id allocation — are managed by the fronting site,
-  never by pairgoth. A dangling symlink stands for a provisioned, not-yet-created
-  tournament: the operator lands on a prefilled creation form.
+  with the originally requested path appended as the `goto` parameter, so deep links into pairgoth round-trip through the fronting site.
+- Tournament visibility is per operator: the store directory contains one directory per email, holding ACL symlinks `NNNNNN-name.tour` pointing to the root tournament files. The symlinks, and the tournament id allocation, are managed by the fronting site, never by pairgoth. A dangling symlink stands for a provisioned, not-yet-created tournament: the operator lands on a prefilled creation form.
 - Admin accounts bypass the per-operator view and get the unscoped root store:
 
-```
-auth.external.admin = <comma-separated emails>
-```
+  ```
+  auth.external.admin = <comma-separated emails>
+  ```
 
-- Server-to-server: calling `/sso` with `Accept: application/json` returns
-  `{"bearer": ...}` instead of redirecting — an opaque token for direct API calls
-  (`Authorization: Bearer ...`). This is how the fronting site's backend, with an admin
-  ticket, creates tournaments with explicit ids and reads everything; the internal
-  `auth.shared_secret` never leaves pairgoth.
+- Server-to-server: calling `/sso` with `Accept: application/json` returns `{"bearer": ...}` instead of redirecting, an opaque token for direct API calls (`Authorization: Bearer ...`). This is how the fronting site's backend, with an admin ticket, creates tournaments with explicit ids and reads everything; the internal `auth.shared_secret` never leaves pairgoth.
 
 ### OAuth configuration
 
@@ -185,12 +161,13 @@ webapp.protocol = http
 webapp.host = localhost
 webapp.port = 8080
 webapp.context = /
-webapp.external.url = http://localhost:8080
+# webapp.interface = localhost
+# webapp.external.url = http://localhost:8080
 ```
 
-- `webapp.host` - Host part of the URLs pairgoth builds (not the bind address)
-- `webapp.interface` - Interface to bind to; unset = all interfaces, so other computers on the local network can reach the instance (several operators sharing one standalone). Set `localhost` to keep it private to this computer.
-- `webapp.external.url` - External URL for OAuth redirects and client configuration
+- `webapp.protocol`, `webapp.host`, `webapp.port`, `webapp.context` - The URL pairgoth listens on and builds its links from; `webapp.host` is not the bind address.
+- `webapp.interface` - Interface to bind to. Unset, all interfaces: other computers on the local network can reach the instance (several operators sharing one standalone). Set `localhost` to keep it private to this computer.
+- `webapp.external.url` - The URL seen from outside, for OAuth redirects and client configuration. Unset, it is derived from the three first properties.
 
 ### API connector
 
@@ -232,9 +209,9 @@ When enabled, the plain connector accepts both HTTP/1.1 and h2c on the same port
 
 ### Collaborative editing
 
-Several operators can work on the same tournament at once: changes propagate live to every screen over Server-Sent Events. Results and registration toggles update in place; other affected tabs reload on entry, and a tab with unsaved work prompts to reload or continue read-only.
+Several operators can work on the same tournament at once: every change propagates to every open screen. Results and registration toggles update in place; other affected tabs reload when you enter them, and a tab with unsaved work asks whether to reload or continue read-only. Before printing or publishing, pairgoth checks that the screen is current and warns if it cannot.
 
-Live propagation activates when the browser reaches pairgoth over HTTP/2 (SSE needs its multiplexing — HTTP/1.1 browsers cap concurrent connections per origin); otherwise pairgoth degrades gracefully to single-operator editing. In production that means either HTTPS (HTTP/2 via ALPN) or h2c behind a TLS-terminating proxy (above). Development mode (`env = dev`) always activates it.
+Synchronisation is always on; only the transport depends on how the browser reaches pairgoth. Over HTTP/2 (HTTPS with ALPN, or h2c behind a TLS-terminating proxy, above) and in development mode, changes arrive instantly through Server-Sent Events. Over HTTP/1.1, whose per-origin connection limit forbids a held stream per tab, the page polls every 20 seconds instead.
 
 ### Store
 
@@ -246,7 +223,7 @@ store.file.path = tournamentfiles
 ```
 
 Values for `store`:
-- `file` - Persistent XML files (default)
+- `file` - JSON `.tour` files (default)
 - `memory` - RAM-based (mainly for tests)
 
 The `store.file.path` is relative to the current working directory.
@@ -286,10 +263,10 @@ ratings.date = YYYY-MM-DD
 Upper bound for the ratings snapshot to use, applied globally to all sources. Designed for multi-day events where ratings must not drift mid-tournament.
 
 Behaviour:
-- `ratings.date` not set, or today is before it: dynamic — latest ratings are fetched as usual.
-- Today is on or after `ratings.date`: load the most recent cached snapshot whose date is ≤ `ratings.date`. Cache files past the freeze are kept on disk but ignored at load time.
-- Until a cached snapshot dated ≥ `ratings.date` exists, hourly fetches continue (so the cache grows toward the freeze date). Once one exists, fetches stop for that source.
-- Set in advance and forget: configure on day -N, freeze takes effect automatically on day 0.
+- `ratings.date` unset, or still in the future: the latest ratings are fetched as usual.
+- From `ratings.date` on, pairgoth serves the most recent cached snapshot dated on or before it. Later cache files are kept on disk but ignored.
+- Hourly fetches continue until the cache holds a snapshot dated on or after `ratings.date`, which proves that the snapshot just before it is the final one; then they stop for that source.
+- Set it in advance and forget it: the freeze takes effect by itself on the day.
 
 #### Enable/disable ratings
 
@@ -304,8 +281,6 @@ ratings.<source>.show = true | false
 ```
 
 Whether to show player IDs from this rating source on the registration page.
-
-`enable` makes the source available in the Add Player search
 
 Defaults when unset:
 - EGF: enabled and shown everywhere
@@ -326,7 +301,7 @@ Display label for the source's search button and registration column. Defaults t
 ratings.ext = <url>
 ```
 
-Activates a fourth, generic source: a tournament website's roster served as JSON, searchable in the Add Player popup alongside the rating databases. The source is inactive when the property is unset (no behaviour change otherwise). Schemes: `http://`, `https://`, `file://` (the latter is handy for testing).
+Activates an additional, generic source: an event website's roster served as JSON, searchable in the Add Player popup alongside the rating databases. The source is inactive when the property is unset (no behaviour change otherwise). Schemes: `http://`, `https://`, `file://` (the latter is handy for testing).
 
 The URL serves:
 
@@ -341,7 +316,7 @@ Like any source, `ratings.ext.enable`, `ratings.ext.show` and `ratings.ext.label
 - The global `ratings.date` freeze does **not** apply to ext — freezing it would hide late registrants.
 - The refresh-ratings feature (EGD/FFG/AGA) ignores ext — it is not a ratings authority.
 
-Known limitation: roster caches are date-granular (`EXT-yyyyMMdd.json`) and a same-day refetch is a no-op, so a registration made today only appears in pairgoth tomorrow. Same-day walk-ins can be typed manually in the Add Player popup.
+Roster caches are dated (`EXT-yyyyMMdd.json`); a change in the day's roster is picked up at the next hourly refresh.
 
 #### Rank authority
 
@@ -351,10 +326,10 @@ ratings.rank_authoritative = true | false
 
 Which of the two imported level fields wins when a [bulk import](#pairgoth-api-specification) entry carries a rank and a rating that disagree (the rating falls outside the rank's 100-point band):
 
-- `false` (default): the rating is authoritative. Both values are imported as sent; the registration form shows the pair as unlinked (the rank is an honorary grade, pairing strength comes from the rating).
-- `true`: the rank is authoritative. The rating is snapped to the rank's nominal value (band centre, e.g. 1d → 2100), so every imported player lands with rank and rating linked. In-band ratings are kept as-is (finer-grained). A manual unlink in the registration form does not survive the next sync — level exceptions belong on the source side, or behind the `locked` flag.
+- `false` (default): the rating is authoritative. Both values are imported as sent; the registration form shows the pair as unchained (the rank is an honorary grade, pairing strength comes from the rating).
+- `true`: the rank is authoritative. The rating is snapped to the rank's nominal value (band centre, e.g. 1d → 2100), so every imported player lands with rank and rating chained. In-band ratings are kept as-is (finer-grained). A manual unchain in the registration form does not survive the next sync — level exceptions belong on the source side, or behind the `locked` flag.
 
-Meant for deployments where the event site is the level authority (e.g. an EGC pushing referee-validated ranks).
+Meant for deployments where the event website is the level authority (e.g. an EGC pushing referee-validated ranks).
 
 ### SMTP
 
@@ -391,34 +366,21 @@ ANSI colour in the stdout log. Unset = auto-detect: on for a colour-capable term
 
 ### Webhook
 
-Pairgoth can push content (pairings, results, standings) to an external
-tournament website, and pull registered players from it. See
-[Pairgoth Webhook specification](#pairgoth-webhook-specification) for the
-endpoint contract a consumer must implement.
+Pairgoth can push content (pairings, results, standings) to an event website, and pull registered players from it. See the [webhook specification](#pairgoth-webhook-specification) for the endpoint contract the website must implement.
 
 ```
 webhook.url    = https://my-tournament-site.example/api/pairgoth
 webhook.secret = a-shared-secret
 ```
 
-- `webhook.url` — base URL of the consumer's pairgoth-integration endpoint.
-- `webhook.secret` — shared secret sent on every request as `X-Pairgoth-Secret` header
+- `webhook.url` - Base URL of the website's pairgoth endpoints.
+- `webhook.secret` - Shared secret sent on every request in the `X-Pairgoth-Secret` header.
 
-Behavior:
+Behaviour:
 
-- If `webhook.url` is **unset or blank**, no webhook integration runs and the
-  related UI buttons (Sync from website, Publish pairings/results/standings)
-  are not shown.
-- If `webhook.url` is set, pairgoth performs a `GET /health` against it at
-  startup. **A failed health check is only logged as a warning** (not fatal):
-  the tournament site is normally already running, but a co-located peer (e.g.
-  a sibling docker container) may simply not be up yet — pairgoth keeps
-  serving, probes again from the next tournament page (at most once a minute),
-  and pushes/pulls retry at runtime. A missing `webhook.secret` while
-  `webhook.url` is set is still a fatal misconfiguration.
-- The health answer may list the site's `capabilities`: only the matching
-  buttons are shown (a publish-only site gets no *Sync from website*). A site
-  that doesn't answer, or answers without the field, gets every button.
+- `webhook.url` unset or blank: no webhook integration runs and the related buttons (**Sync from website**, **Publish** pairings, results and standings) are not shown.
+- `webhook.url` set: pairgoth calls `GET /health` on it at startup. **A failed health check is only logged as a warning.** The website is normally already running, but a co-located peer (a sibling docker container, say) may not be up yet; pairgoth keeps serving, probes again from the next tournament page (at most once a minute), and pushes and pulls retry at runtime. A missing `webhook.secret` while `webhook.url` is set is a fatal misconfiguration.
+- The health answer may list the website's `capabilities`: only the matching buttons are shown (a publish-only website gets no **Sync from website**). A website that does not answer, or answers without the field, gets every button.
 
 ### Display
 
@@ -492,7 +454,7 @@ api.external.url = http://api-server:8085/api
 
 ### General remarks
 
-The API expects an `Accept` header of `application/json`, with no encoding or an `UTF-8` encoding. Exceptions are some export operations which can have different MIME types to specify the expected format:
+The API expects an `Accept` header of `application/json`, with the encoding unspecified or `UTF-8`. Export operations accept other media types to select a format:
 - `application/json` - JSON output (default)
 - `application/xml` - OpenGotha XML export
 - `application/egf` - EGF format
@@ -501,36 +463,38 @@ The API expects an `Accept` header of `application/json`, with no encoding or an
 
 GET requests return either an array or an object, as specified below.
 
-POST, PUT and DELETE requests return either the 200 HTTP code with `{ "success": true }` (with an optional `"id"` field for some POST requests), or an invalid HTTP code and (for some errors) the body `{ "success": false, "error": <error message> }`.
+POST, PUT and DELETE requests return either status 200 with `{ "success": true }` (plus an `"id"` field for some POST requests), or an error status with the body `{ "success": false, "error": <error message> }`.
 
-All POST/PUT/DELETE requests use read/write locks for concurrency. GET requests use read locks.
+Writes are serialised by a global lock; reads run concurrently.
 
 When authentication is enabled, all requests require an `Authorization` header.
 
 ### Synopsis
 
-+ /api/tour                  GET POST            Tournaments handling
-+ /api/tour/#tid             GET PUT DELETE      Tournaments handling
-+ /api/tour/#tid/part        GET POST            Registration handling
-+ /api/tour/#tid/part/#pid   GET PUT DELETE      Registration handling
-+ /api/tour/#tid/team        GET POST            Team handling
-+ /api/tour/#tid/team/#tid   GET PUT DELETE      Team handling
-+ /api/tour/#tid/pair/#rn    GET POST PUT DELETE Pairing
-+ /api/tour/#tid/res/#rn     GET PUT DELETE      Results
-+ /api/tour/#tid/standings   GET PUT             Standings
-+ /api/tour/#tid/stand/#rn   GET                 Standings
-+ /api/tour/#tid/explain/#rn GET                 Pairing explanation
-+ /api/token                 GET POST DELETE     Authentication
+```
+/api/tour                           GET POST            Tournaments
+/api/tour/{tid}                     GET PUT DELETE      Tournaments
+/api/tour/{tid}/part                GET POST            Players
+/api/tour/{tid}/part/{pid}          GET PUT DELETE      Players
+/api/tour/{tid}/team                GET POST            Teams
+/api/tour/{tid}/team/{teamid}       GET PUT DELETE      Teams
+/api/tour/{tid}/pair/{round}        GET POST PUT DELETE Pairing
+/api/tour/{tid}/res/{round}         GET PUT DELETE      Results
+/api/tour/{tid}/standings           GET                 Standings after the last round
+/api/tour/{tid}/standings/{round}   GET                 Standings after a round
+/api/tour/{tid}/explain/{round}     GET                 Pairing explanation (disabled)
+/api/token                          GET POST DELETE     Authentication
+```
 
 ### Tournament handling
 
-+ `GET /api/tour` Get a list of known tournaments ids
++ `GET /api/tour` List the known tournaments
 
-    *output* json map (id towards shortName) of known tournaments
+    *output* json map of id to shortName
 
-+ `GET /api/tour/#tid` Get the details of tournament #tid
++ `GET /api/tour/{tid}` Get the details of tournament {tid}
 
-    *output* json object for tournament #tid
+    *output* json object for tournament {tid}
 
     Supports `Accept: application/xml` to get OpenGotha XML export.
 
@@ -560,31 +524,31 @@ When authentication is enabled, all requests require an `Authorization` header.
 
     Tournament types: `INDIVIDUAL`, `PAIRGO`, `RENGO2`, `RENGO3`, `TEAM2`, `TEAM3`, `TEAM4`, `TEAM5`
 
-    *output* `{ "success": true, "id": #tid }`
+    *output* `{ "success": true, "id": {tid} }`
 
-+ `PUT /api/tour/#tid` Modify a tournament
++ `PUT /api/tour/{tid}` Modify a tournament
 
-    *input* json object for updated tournament (only id and updated fields required)
+    *input* json object with the updated fields
 
-    The sparse payload `{ "playing": #rn }` stamps round #rn's pairing as made public (players may be playing). The stamp is monotonic and idempotent; the client's print and publish actions send it, and a first entered result sets it implicitly. Destructive pairing actions ask for confirmation on a stamped round.
+    The sparse payload `{ "playing": {round} }` stamps round {round}'s pairing as made public (players may be playing). The stamp is monotonic and idempotent; the client's print and publish actions send it, and a first entered result sets it implicitly. Destructive pairing actions ask for confirmation on a stamped round.
 
     *output* `{ "success": true }`
 
-+ `DELETE /api/tour/#tid` Delete a tournament
++ `DELETE /api/tour/{tid}` Delete a tournament
 
     *output* `{ "success": true }`
 
 ### Players handling
 
-+ `GET /api/tour/#tid/part` Get a list of registered players
++ `GET /api/tour/{tid}/part` Get a list of registered players
 
     *output* json array of known players
 
-+ `GET /api/tour/#tid/part/#pid` Get registration details for player #pid
++ `GET /api/tour/{tid}/part/{pid}` Get registration details for player {pid}
 
-    *output* json object for player #pid
+    *output* json object for player {pid}
 
-+ `POST /api/tour/#tid/part` Register a new player
++ `POST /api/tour/{tid}/part` Register a new player
 
     *input*
     ```json
@@ -597,19 +561,20 @@ When authentication is enabled, all requests require an `Authorization` header.
       "club": "Club Name",
       "final": true,
       "mmsCorrection": 0,
-      "egfId": "12345678",
-      "ffgId": "12345",
-      "agaId": "12345"
+      "egf": "12345678",
+      "ffg": "12345",
+      "aga": "12345",
+      "ext": "4711"
     }
     ```
 
-    Rank values: -30 (30k) to 8 (9D). Rating in EGF-style (100 = 1 stone).
+    Rank values: -30 (30k) to 8 (9d). Rating in EGF style (100 points = 1 stone). `egf`, `ffg`, `aga` and `ext` are the player's ids in the external databases (see the [reference](reference#external-databases)).
 
-    *output* `{ "success": true, "id": #pid }`
+    *output* `{ "success": true, "id": {pid} }`
 
-+ `POST /api/tour/#tid/part` (with a json **array** body) Bulk-import a roster
++ `POST /api/tour/{tid}/part` (with a json **array** body) Bulk-import a roster
 
-    The array form is an idempotent upsert, meant for an event site pushing its whole roster: each
+    The array form is an idempotent upsert, meant for an event website pushing its whole roster: each
     entry is matched by `id`, else by external id (`ext` → `egf` → `ffg` → `aga`), else created; a
     partial entry merges onto the matched player. The whole roster is applied in one transaction and
     recorded as a single history entry.
@@ -624,15 +589,28 @@ When authentication is enabled, all requests require an `Authorization` header.
     `rating` gets its out-of-band rating snapped to the rank's nominal value before the merge
     (locked players remain immune).
 
-    *output* a journal `{ "success": true, "added": [ "Name Firstname", … ], "updated": [ { "player": "Name Firstname", "changes": "rating 2627→2630, rank 5→6" }, … ], "unchanged": [ "Name Firstname", … ], "failed": [ { "player": "...", "reason": "..." } ], "missing": [ "Name Firstname", … ] }` — each section lists its players (counts are the array lengths); `changes` is a compact field-level diff. E.g. a player already paired in a round the import tries to drop comes back in `failed` rather than aborting the batch. `missing` lists the pre-existing players the payload did not touch: since an import carries the full source roster, those have been removed on the source side — reported only, never deleted (empty for partial payloads, i.e. when `reason` is set).
+    *output* a journal of the import:
 
-+ `PUT /api/tour/#tid/part/#pid` Modify a player registration
+    ```json
+    {
+      "success": true,
+      "added": [ "Name Firstname", … ],
+      "updated": [ { "player": "Name Firstname", "changes": "rating 2627→2630, rank 5→6" }, … ],
+      "unchanged": [ "Name Firstname", … ],
+      "failed": [ { "player": "Name Firstname", "reason": "…" }, … ],
+      "missing": [ { "player": "Name Firstname", "changes": "unregistered from rounds 3, 4" }, … ]
+    }
+    ```
 
-    *input* json object for updated registration (only id and updated fields required)
+    Each section lists its players; `changes` is a compact field-level diff. A player the import tries to drop from a round they are already paired in comes back in `failed` instead of aborting the batch. `missing` lists the registered players the payload did not mention: an import carries the whole roster, so those were removed on the source side. They are never deleted; they are unregistered from the rounds still open to them (the `changes` field says which), and kept otherwise.
+
++ `PUT /api/tour/{tid}/part/{pid}` Modify a player registration
+
+    *input* json object with the updated fields
 
     *output* `{ "success": true }`
 
-+ `DELETE /api/tour/#tid/part/#pid` Delete a player registration
++ `DELETE /api/tour/{tid}/part/{pid}` Delete a player registration
 
     *output* `{ "success": true }`
 
@@ -640,15 +618,15 @@ When authentication is enabled, all requests require an `Authorization` header.
 
 For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
 
-+ `GET /api/tour/#tid/team` Get a list of registered teams
++ `GET /api/tour/{tid}/team` Get a list of registered teams
 
     *output* json array of known teams
 
-+ `GET /api/tour/#tid/team/#teamid` Get registration details for team #teamid
++ `GET /api/tour/{tid}/team/{teamid}` Get registration details for team {teamid}
 
-    *output* json object for team #teamid
+    *output* json object for team {teamid}
 
-+ `POST /api/tour/#tid/team` Register a new team
++ `POST /api/tour/{tid}/team` Register a new team
 
     *input*
     ```json
@@ -660,22 +638,22 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     }
     ```
 
-    *output* `{ "success": true, "id": #teamid }`
+    *output* `{ "success": true, "id": {teamid} }`
 
-+ `PUT /api/tour/#tid/team/#teamid` Modify a team registration
++ `PUT /api/tour/{tid}/team/{teamid}` Modify a team registration
 
-    *input* json object for updated registration (only id and updated fields required)
+    *input* json object with the updated fields
 
     *output* `{ "success": true }`
 
-+ `DELETE /api/tour/#tid/team/#teamid` Delete a team registration
++ `DELETE /api/tour/{tid}/team/{teamid}` Delete a team registration
 
     *output* `{ "success": true }`
 
 
 ### Pairing
 
-+ `GET /api/tour/#tid/pair/#rn` Get pairable players for round #rn
++ `GET /api/tour/{tid}/pair/{round}` Get pairable players for round {round}
 
     *output*
     ```json
@@ -690,30 +668,30 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     - `pairables`: player IDs available for pairing (not skipping, not already paired)
     - `unpairables`: player IDs skipping the round
 
-+ `POST /api/tour/#tid/pair/#rn` Generate pairing for round #rn
++ `POST /api/tour/{tid}/pair/{round}` Generate pairing for round {round}
 
-    *input* `[ "all" ]` or `[ #pid, ... ]`
+    *input* `[ "all" ]` or `[ {pid}, ... ]`
 
     Optional query parameters:
     - `legacy=true` - Use legacy pairing algorithm
     - `weights_output=<file>` - Output weights to file for debugging
     - `append=true` - Append to weights output file
 
-    *output* `[ { "id": #gid, "t": table, "w": #wpid, "b": #bpid, "h": handicap }, ... ]`
+    *output* `[ { "id": {gid}, "t": table, "w": {wpid}, "b": {bpid}, "h": handicap }, ... ]`
 
-+ `PUT /api/tour/#tid/pair/#rn` Manual pairing or table renumbering
++ `PUT /api/tour/{tid}/pair/{round}` Manual pairing or table renumbering
 
     For manual pairing:
-    *input* `{ "id": #gid, "w": #wpid, "b": #bpid, "h": <handicap> }`
+    *input* `{ "id": {gid}, "w": {wpid}, "b": {bpid}, "h": <handicap> }`
 
     For table renumbering:
     *input* `{ "renumber": <game_id or null>, "orderBy": "mms" | "table" }`
 
     *output* `{ "success": true }`
 
-+ `DELETE /api/tour/#tid/pair/#rn` Delete pairing for round #rn
++ `DELETE /api/tour/{tid}/pair/{round}` Delete pairing for round {round}
 
-    *input* `[ "all" ]` or `[ #gid, ... ]`
+    *input* `[ "all" ]` or `[ {gid}, ... ]`
 
     Games with results already entered are skipped unless `"all"` is specified.
 
@@ -721,9 +699,9 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
 
 ### Results
 
-+ `GET /api/tour/#tid/res/#rn` Get results for round #rn
++ `GET /api/tour/{tid}/res/{round}` Get results for round {round}
 
-    *output* `[ { "id": #gid, "res": <result> }, ... ]`
+    *output* `[ { "id": {gid}, "res": <result> }, ... ]`
 
     Result codes:
     - `"w"` - White won
@@ -734,21 +712,21 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     - `"#"` - Both win (unusual)
     - `"0"` - Both lose (unusual)
 
-+ `PUT /api/tour/#tid/res/#rn` Save a result
++ `PUT /api/tour/{tid}/res/{round}` Save a result
 
-    *input* `{ "id": #gid, "res": <result> }`
+    *input* `{ "id": {gid}, "res": <result> }`
 
     *output* `{ "success": true }`
 
-+ `DELETE /api/tour/#tid/res/#rn` Clear all results for round
++ `DELETE /api/tour/{tid}/res/{round}` Clear all results for round
 
     *output* `{ "success": true }`
 
 ### Standings
 
-+ `GET /api/tour/#tid/standings` Get standings after final round
++ `GET /api/tour/{tid}/standings` Get the standings after the last round
 
-    *output* `[ { "id": #pid, "place": place, "<crit>": value }, ... ]`
+    *output* `[ { "id": {pid}, "place": place, "<crit>": value }, ... ]`
 
     Supports multiple output formats via Accept header:
     - `application/json` - JSON (default)
@@ -761,21 +739,21 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
     - `include_preliminary=true` - Include unconfirmed preliminary players (internal use; ignored when `drop_unplayed` is set)
     - `individual_standings=true` - For team tournaments with individual scoring
 
-+ `GET /api/tour/#tid/stand/#rn` Get standings after round #rn
++ `GET /api/tour/{tid}/standings/{round}` Get the standings after round {round}
 
-    Use round `0` for initial standings.
+    Use round `0` for the initial standings.
 
-    *output* `[ { "id": #pid, "place": place, "<crit>": value }, ... ]`
+    *output* `[ { "id": {pid}, "place": place, "<CRIT>": value }, ... ]`
 
-    Criteria names include: `nbw`, `mms`, `sts`, `cps`, `sosw`, `sosm`, `sososw`, `sososm`, `sodosw`, `sodosm`, `cussw`, `cussm`, `dc`, `sdc`, `ext`, `exr`, etc.
+    One key per placement criterion, named as in the [reference](reference#placement-criteria) (`NBW`, `MMS`, `SOSM`…).
 
 ### Pairing explanation
 
-+ `GET /api/tour/#tid/explain/#rn` Get detailed pairing criteria weights for round #rn
++ `GET /api/tour/{tid}/explain/{round}` Get the pairing cost components for round {round}
 
-    *output* Detailed pairing weight analysis and criteria breakdown
+    *output* the weights of every criterion for every game of the round
 
-    Used for debugging and understanding pairing decisions.
+    Disabled in the UI for now: the endpoint re-pairs the round in place and can lose results on a live tournament. Debugging only.
 
 ### Authentication
 
@@ -793,45 +771,40 @@ For team tournaments (PAIRGO, RENGO2, RENGO3, TEAM2-5).
 
     *output* `{ "success": true }`
 
-## Pairgoth Webhook specification
+## Pairgoth webhook specification
 
-*To integrate pairgoth with a tournament website.*
+*To integrate pairgoth with an event website.*
 
 ### General remarks
 
-The webhook is the inverse direction of the [Pairgoth API](#pairgoth-api-specification): pairgoth is the **client**,
-the tournament website is the **server**. The direction is fixed because the tournament director can run pairgoth
-on a venue laptop behind some NAT or firewall — the website cannot reach pairgoth, but pairgoth can reach the website
-outbound.
+The webhook is the inverse direction of the [API](#pairgoth-api-specification): pairgoth is the **client**, the event website is the **server**. The direction is fixed because the tournament director can run pairgoth on a venue laptop behind a NAT or a firewall: the website cannot reach pairgoth, but pairgoth can reach the website.
 
 Pairgoth's role:
 
-- **Pull** registered players from the website on demand (Sync from website).
-- **Push** content (pairings, results, standings) to the website when the operator clicks a Publish button.
+- **Pull** registered players from the website on demand (**Sync from website**).
+- **Push** content (pairings, results, standings) to the website when the operator clicks a **Publish** button.
 
-Configuration is described in [Webhook](#webhook) under the Configuration section. When `webhook.url` is set, pairgoth
-performs `GET <webhook.url>/health` at startup; a failed check is logged as a warning, not fatal.
+The settings are described under [Webhook](#webhook) in the configuration section, health check included.
 
-For a WordPress club site, the publishing half of this specification is already implemented in
-`wordpress-plugin/` (pairings, results and standings; the registration endpoints below are left out).
+For a WordPress club site, the publishing half of this specification is already implemented in `wordpress-plugin/` (pairings, results and standings; the registration endpoints below are left out).
 
-All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate
-it on every `{code}`-scoped endpoint and return `401` on mismatch. `/health` is instance-scoped and **may** be served
-unauthenticated; it must expose nothing beyond `status`, `name` and `version`.
+All requests carry an `X-Pairgoth-Secret` header equal to the value of `webhook.secret`. The website **must** validate it on every `{code}`-scoped endpoint and return `401` on mismatch. `/health` is instance-scoped and **may** be served unauthenticated; it must expose nothing beyond `status`, `name`, `version` and `capabilities`.
 
 JSON responses follow the shape `{ "status": true | false, "message"?: string, … }`. A `false` status reaches the pairgoth UI as the error message.
 
-The path component `{code}` is the tournament's `shortName` — used as a stable, human-meaningful identifier on the website side. `{round}` is a 1-based round number.
+The path component `{code}` is the tournament's `shortName`, a stable, human-meaningful identifier on the website side. `{round}` is a 1-based round number.
 
 ### Synopsis
 
 Pairgoth calls the following endpoints, all relative to `webhook.url`:
 
-+ /health                     GET    Health check (auth optional)
-+ /players/{code}             GET    Pull registered players
-+ /pairings/{code}/{round}    POST   Push pairings or results HTML
-+ /standings/{code}/{round}   POST   Push standings HTML
-+ /presences/{code}/{round}   POST   Push a referee's presence change back
+```
+/health                     GET    Health check (authentication optional)
+/players/{code}             GET    Pull registered players
+/pairings/{code}/{round}    POST   Push pairings or results HTML
+/standings/{code}/{round}   POST   Push standings HTML
+/presences/{code}/{round}   POST   Push a referee's presence change back
+```
 
 ### /health
 
@@ -839,9 +812,9 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
 
     *output* `{ "status": true, "name"?: string, "version"?: string, "capabilities"?: string[] }`
 
-    The `name` is shown in pairgoth's startup log line (`webhook at <url> healthy: <name>`) — useful for the operator to confirm the right backend.
+    The `name` is shown in pairgoth's startup log line (`webhook at <url> healthy: <name>`), so that the operator can confirm the right backend.
 
-    `capabilities` lists the endpoints below the site implements, by their first path segment: `players`, `presences`, `pairings` (which also carries results), `standings`. Pairgoth only offers the corresponding actions (Sync from website, presence write-back, Publish pairings/results, Publish standings). **Absent means all four** — sites predating the field keep working unchanged; a publish-only site should declare `["pairings", "standings"]` rather than let its operators discover a missing route from an error box.
+    `capabilities` lists the endpoints below that the website implements, by their first path segment: `players`, `presences`, `pairings` (which also carries results), `standings`. Pairgoth only offers the corresponding actions (**Sync from website**, presence write-back, **Publish** pairings and results, **Publish** standings). **Absent means all four**, so websites predating the field keep working unchanged; a publish-only website should declare `["pairings", "standings"]` rather than let its operators discover a missing route from an error box.
 
 ### /players/{code}
 
@@ -857,7 +830,7 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
       "id":        12345,         // stable per-website id (used by pairgoth as DatabaseId.EXT)
       "lastname":  "Doe",
       "firstname": "Jane",
-      "country":   "FR",          // ISO-3166 alpha-2; pairgoth normalizes GB → UK
+      "country":   "FR",          // ISO-3166 alpha-2; pairgoth normalises GB → UK
       "club":      "75Pa",
       "rank":      "5k",          // string: "30k".."1k", "1d".."9d", "1p".."9p" (1p..9p doubles as pro flag)
       "rating":    1850,          // optional; if absent, pairgoth derives a default from rank
@@ -866,11 +839,16 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
     }
     ```
 
-    The `id` field is the website's primary key for that player, typically a registration id. Pairgoth stores it as `externalIds[EXT]` and uses it as the **primary** deduplication key on re-sync — taking precedence over `pin`, since a PIN entered wrong on the source side may be corrected later. Without an `id`, players without a PIN duplicate on every re-sync.
+    The `id` field is the website's primary key for that player, typically a registration id. Pairgoth stores it as `externalIds[EXT]` and uses it as the **primary** deduplication key on re-sync, ahead of `pin`, since a PIN entered wrong on the source side may be corrected later. Without an `id`, players without a PIN duplicate on every re-sync.
 
-    **Re-sync semantics.** Pairgoth matches each website player against existing registrants by external id (EXT > EGF > FFG > AGA). Unmatched players are inserted; matched players are updated last-wins on rank, rating, club, country, name and round participation (`rounds`) — the website is treated as the source of truth. Players whose payload is identical to the current registration are counted as unchanged. Registered players the sync does not touch at all have been removed on the website: they are reported as `removed on website (kept here)` — pairgoth never deletes a player on sync, the operator decides. The operator gets a multi-line report (`X added / Y updated / Z unchanged / …`) at the end.
+    **Re-sync semantics.** The website is the source of truth:
 
-    One safeguard is server-enforced: pairgoth refuses to drop a player from a round in which they are already paired. Such rejections are surfaced separately as `N blocked — already paired: <name> (round R), …` so the operator can spot a misordered flow. The intended procedure is **freeze the round on the website first, then resync** — that prevents the website from shipping a `rounds` mask that excludes a paired player.
+    - Each website player is matched against the registered players by external id (EXT, then EGF, FFG, AGA). Unmatched players are added.
+    - Matched players take the website's rank, rating, club, country, name and round participation (`rounds`). Players whose payload equals the current registration count as unchanged.
+    - Registered players the payload does not mention were removed on the website: they are unregistered from the rounds still open to them and otherwise kept, never deleted. The report lists them as missing; the operator decides.
+    - Pairgoth refuses to drop a player from a round they are already paired in. Such rejections are reported apart (`blocked, already paired: <name> (round R)`) so that the operator can spot a misordered flow. The intended procedure is to **freeze the round on the website first, then resync**, so that the website never ships a `rounds` mask excluding a paired player.
+
+    The operator gets the report (`X added / Y updated / Z unchanged / …`) at the end of the sync.
 
 ### /pairings/{code}/{round}
 
@@ -912,14 +890,14 @@ Pairgoth calls the following endpoints, all relative to `webhook.url`:
 
     *output* `{ "status": true }` on success; `{ "status": false, "message": string }` on error.
 
-    The website owns presences (online (un)registration), but the referee may override one on the floor — typically a no-show. Pairgoth pushes only the **changed** entry, for the affected round. The two directions are deliberately asymmetric:
+    The website owns presences, through its online registration, but the referee may override one on the floor, typically for a no-show. Pairgoth pushes only the **changed** entry, for the affected round. The two directions are deliberately asymmetric:
 
-    - **Removal** (the referee marks a player *absent* for a round): applied locally first, then mirrored back best-effort. A push failure is non-fatal — the local change stands and the operator is warned to update the website by hand.
-    - **Addition** (the referee marks a player *present* again): the local change is **gated** on a confirmed push, because the website owns each player's registration choices and may legitimately refuse a round they are not registered for. Pairgoth pushes first and applies the change locally only on success (`{ "status": true }`); on a rejection — or an unreachable website — the local toggle is **aborted** and the website's reason is surfaced to the operator. To accept the round, return `{ "status": true }`; to refuse it, return `{ "status": false, "message": "…" }` with the reason.
+    - **Removal** (the referee marks a player *absent* for a round): applied locally first, then mirrored back as best effort. A push failure is not fatal: the local change stands and the operator is warned to update the website by hand.
+    - **Addition** (the referee marks a player *present* again): the local change is **gated** on a confirmed push, because the website owns each player's registration choices and may legitimately refuse a round they are not registered for. Pairgoth pushes first and applies the change locally only on success (`{ "status": true }`); on a rejection, or an unreachable website, the local toggle is **aborted** and the website's reason is shown to the operator. To accept the round, return `{ "status": true }`; to refuse it, return `{ "status": false, "message": "…" }` with the reason.
 
-    Only website-sourced players (those that have an `id`/`EXT`) are gated or pushed; presence changes on referee-added players apply locally with no push. **Player removal is never synced at all** (see below).
+    Only website-sourced players (those with an `id`, stored as EXT) are gated or pushed; presence changes on referee-added players apply locally with no push.
 
-    Player **removal** is the one operation deliberately left unsynced in both directions: a referee deleting a player in pairgoth, or a registrant withdrawing on the website, must be mirrored manually on the other side. (A website deletion that shipped via `/players/{code}` would otherwise have to delete a player pairgoth may already have paired.)
+    Player **deletion** is deliberately left unsynced in both directions: a referee deleting a player in pairgoth, or a registrant withdrawing on the website, must be mirrored by hand on the other side. A website deletion shipped through `/players/{code}` would otherwise have to delete a player pairgoth may already have paired; it unregisters them from the open rounds instead.
 
 ### Published payload
 
@@ -936,7 +914,7 @@ The HTML pushed to `/pairings/...` and `/standings/...` is **self-contained**: i
 
 Properties:
 
-- The styles are inside a CSS `@layer` named `pairgoth-published`. **Unlayered styles in the consuming page take precedence over the layer**, so the website's own theme wins automatically — the published styles only show through where the website hasn't styled.
+- The styles are inside a CSS `@layer` named `pairgoth-published`. **Unlayered styles in the consuming page take precedence over the layer**, so the website's own theme wins automatically; the published styles only show through where the website has not styled.
 - All selectors are scoped under `.pairgoth-published`, so they don't leak.
 - Each result cell carries `data-result="<code>"` where `<code>` is one of `?` `w` `b` `=` `X` `#` `0`. The website can re-style results without parsing the rendered string (`1-0` / `½-½` etc.).
 - Each table row's `td.t` cell carries `data-table="<n>"` (the table number).
@@ -949,5 +927,5 @@ For all webhook endpoints, error responses should return:
 - `404` for unknown `{code}` (event not found on the website).
 - `4xx`/`5xx` with body `{ "status": false, "message": string }` for other errors. The `message` is surfaced in the pairgoth UI.
 
-If the website returns a non-2xx with no body, pairgoth synthesizes a `{ "status": false, "message": "upstream <status> with no body for <url>" }` so the browser-side parser does not choke.
+If the website returns a non-2xx status with no body, pairgoth synthesises `{ "status": false, "message": "upstream <status> with no body for <url>" }` so that the browser-side parser does not choke.
 

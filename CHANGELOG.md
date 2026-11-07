@@ -25,7 +25,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - Standings tab: country/club and inactive players display options
 - Bulk players import & re-import
 - External authentication: per-operator externally managed ACL of an instance's tournaments (typically for EGC)
-- Multi-operators collaboration using Server-Sent Events streams
+- Multi-operator live synchronisation (Server-Sent Events over HTTP/2, polling over HTTP/1.1)
 - History view of a tournament, allowing to undo up to a specific past user action
 - Perfect pairings browsing: uncommitted pairings (without any result) can be browsed using Next & Prev buttons
 - Per instance tournaments file caching, to avoid re-parsing tournament files at each call (stored files are checked for freshness)

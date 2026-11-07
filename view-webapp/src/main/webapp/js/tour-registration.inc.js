@@ -820,7 +820,7 @@ onLoad(() => {
       }));
     bulkUpdate(players);
   });
-  // Mac Mahon groups dialog "Only players playing all rounds" filter
+  // McMahon groups dialog "Only players playing all rounds" filter
   let mmGroups = ['under-group', 'top-group', 'super-group'].map(id => $('#' + id)[0]).filter(Boolean);
   function mmFooter(box) {
     let onlyAll = $('#macmahon-groups').hasClass('allrounds-only');
@@ -967,13 +967,13 @@ onLoad(() => {
     if (unchanged.length) sections.push({ label: `${unchanged.length} unchanged`, items: unchanged });
 
     if (added.length || updated.length || missing.some(m => m.changes)) {
-      store('refreshReport', { title: 'Sync from EGC', sections });
+      store('refreshReport', { title: 'Sync from website', sections });
       setTimeout(() => window.location.reload(), 200);
     } else if (blocked.length || other.length || missing.length) {
-      showReport('Sync from EGC', sections); // nothing changed but problems to surface
+      showReport('Sync from website', sections); // nothing changed but problems to surface
     } else {
-      showSuccess(unchanged.length ? `Sync from EGC: ${unchanged.length} player(s) already up to date`
-                                   : 'Sync from EGC: nothing to do', true);
+      showSuccess(unchanged.length ? `Sync from website: ${unchanged.length} player(s) already up to date`
+                                   : 'Sync from website: nothing to do', true);
     }
   });
 

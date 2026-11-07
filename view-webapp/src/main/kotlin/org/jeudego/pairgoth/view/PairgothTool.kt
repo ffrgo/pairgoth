@@ -39,7 +39,7 @@ class PairgothTool {
         "RANK" to "Rank",
         "RATING" to "Rating",
         "NBW" to "Number of wins", // Number win
-        "MMS" to "Mac Mahon score", // Macmahon score
+        "MMS" to "McMahon score", // Macmahon score
         "SCOREX" to "Score X", // Score X
         "BDW" to "Board wins (team tournaments)", // Sum of a team's board results
         // TODO "STS" to "Strasbourg score", // Strasbourg score
@@ -52,12 +52,12 @@ class PairgothTool {
         "SOSOSW" to "Sum of opponents SOSW", // Sum of opponent SOS
         "CUSSW" to "Cumulative sum of opponents wins", // Cumulative sum of scores (NBW)
 
-        "SOSM" to "Sum of opponents Mac Mahon score", // Sum of opponents McMahon score
-        "SOSMM1" to "Sum of opponents Mac Mahon score minus 1", // Same as previous group but with McMahon score
-        "SOSMM2" to "Sum of opponents Mac Mahon score minus 2",
-        "SODOSM" to "Sum of defeated opponents Mac Mahon score",
+        "SOSM" to "Sum of opponents McMahon score", // Sum of opponents McMahon score
+        "SOSMM1" to "Sum of opponents McMahon score minus 1", // Same as previous group but with McMahon score
+        "SOSMM2" to "Sum of opponents McMahon score minus 2",
+        "SODOSM" to "Sum of defeated opponents McMahon score",
         "SOSOSM" to "Sum of opponents SOSM",
-        // TODO "CUSSM" to "Cumulative sum of opponents Mac Mahon score",
+        // TODO "CUSSM" to "Cumulative sum of opponents McMahon score",
 
         // TODO "SOSTS" to "Sum of opponents Strasbourg score", // Sum of opponnents Strasbourg score
 

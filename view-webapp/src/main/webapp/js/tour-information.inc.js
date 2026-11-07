@@ -362,7 +362,7 @@ onLoad(() => {
     if (rst !== 'error' && rst !== 'readonly') close_modal();
   });
 
-  // Update parameters forms controls from json (and check Mac Mahon-only fields).
+  // Update parameters forms controls from json (and check McMahon-only fields).
   function patchParametersForm(pairing) {
     let form = $('#parameters-form')[0];
     const set = (name, value) => { let c = form.find(`[name="${name}"]`)[0]; if (c) c.value = value; };
