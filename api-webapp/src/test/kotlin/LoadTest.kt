@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.test
 
 import com.republicate.kson.Json
+import org.jeudego.pairgoth.util.ratingToRank
 import org.ajbrown.namemachine.NameGenerator
 import org.ajbrown.namemachine.NameGeneratorOptions
 import org.junit.jupiter.api.Disabled
@@ -43,7 +44,7 @@ class LoadTest: TestBase() {
                 "country" to countries.random(rand),
                 "club" to "cl${rand.nextInt(100)}",
                 "rating" to rating,
-                "rank" to (rating - 2050)/100,
+                "rank" to ratingToRank(rating),
                 "final" to true,
                 "skip" to (0..ROUNDS - 1).map {
                     rand.nextDouble() < SKIP_RATIO
