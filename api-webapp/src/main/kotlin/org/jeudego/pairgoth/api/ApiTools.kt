@@ -3,18 +3,15 @@ package org.jeudego.pairgoth.api
 import com.republicate.kson.Json
 import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.Game
-import org.jeudego.pairgoth.model.MacMahon
-import org.jeudego.pairgoth.model.Pairable
+import org.jeudego.pairgoth.model.ID
 import org.jeudego.pairgoth.model.PairingType
 import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.TeamTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.getID
 import org.jeudego.pairgoth.model.historyBefore
+import org.jeudego.pairgoth.pairing.DirectConfrontation
 import org.jeudego.pairgoth.pairing.HistoryHelper
-import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
-import kotlin.math.max
-import kotlin.math.min
 
 fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
@@ -58,8 +55,10 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
             Criterion.EXT -> StandingsHandler.nullMap
             Criterion.EXR -> StandingsHandler.nullMap
 
+            // group-relative
             Criterion.SDC -> StandingsHandler.nullMap
             Criterion.DC -> StandingsHandler.nullMap
+            Criterion.EGFDC -> StandingsHandler.nullMap
         }
     }
     val jsonPairables = pairables.values.filter { includePreliminary || it.final }.map { it.toDetailedJson() }
@@ -69,6 +68,31 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
         }
         player["results"] = Json.MutableArray(List(round) { "0=" })
     }
+
+    // direct confrontation: on each group tied on the criteria before the criterion,
+    // rank by games between group members (DC also uses the criteria after)
+    val placementCriteria = pairing.placementParams.criteria
+    val directCriteria = setOf(Criterion.DC, Criterion.SDC, Criterion.EGFDC)
+    val dirIndex = placementCriteria.indexOfFirst { it in directCriteria }
+    if (dirIndex >= 0) {
+        val before = placementCriteria.subList(0, dirIndex).map { it.name }
+        val after = placementCriteria.drop(dirIndex + 1)
+            .filter { it !in directCriteria }.map { it.name }
+        val games = historyBefore(round + 1).flatten()
+        val byId = jsonPairables.associateBy { it.getID()!! }
+        jsonPairables.groupBy { p -> before.map { p.getDouble(it) ?: 0.0 } }.values.forEach { group ->
+            val members = group.map { it.getID()!! }
+            val wins by lazy { DirectConfrontation.netWins(games, members.toSet()) }
+            val afterKey = { id: ID -> after.map { byId[id]!!.getDouble(it) ?: 0.0 } }
+            if (placementCriteria.contains(Criterion.DC))
+                DirectConfrontation.dc(members, wins, afterKey).forEach { (id, dc) -> byId[id]!![Criterion.DC.name] = dc }
+            if (placementCriteria.contains(Criterion.SDC))
+                DirectConfrontation.sdc(members, wins).forEach { (id, sdc) -> byId[id]!![Criterion.SDC.name] = sdc }
+            if (placementCriteria.contains(Criterion.EGFDC))
+                DirectConfrontation.egfdc(members, games).forEach { (id, dc) -> byId[id]!![Criterion.EGFDC.name] = dc }
+        }
+    }
+
     val sortedPairables = jsonPairables.sortedWith { left, right ->
         for (crit in criteria) {
             val lval = left.getDouble(crit.first) ?: 0.0
@@ -82,7 +106,7 @@ fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = f
     }
     var place = 1
     sortedPairables.groupBy { p ->
-        Triple(p.getDouble(criteria[0].first) ?: 0.0, p.getDouble(criteria[1].first)  ?: 0.0, criteria.getOrNull(2)?.let { p.getDouble(it.first)  ?: 0.0 })
+        placementCriteria.map { crit -> p.getDouble(crit.name) ?: 0.0 }
     }.forEach {
         it.value.forEach { p -> p["place"] = place }
         place += it.value.size

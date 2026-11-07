@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Direct-Confrontation, Simple Direct-Confrontation and EGF Direct-Confrontation (as defined by EGF rules) placement criteria
 - Add a 'playing all rounds' filter to the Mc Mahon groups dialog
 - Add a per-week display filter for events lasting more than one week
 - Standings tab: country/club and inactive players display options

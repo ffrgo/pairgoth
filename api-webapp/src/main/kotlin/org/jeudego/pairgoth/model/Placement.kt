@@ -33,9 +33,10 @@ enum class Criterion {
     EXT, // Exploits tentes
     EXR, // Exploits reussis
 
-    // For the two criteria below see the user documentation
+    // For the three criteria below see the user documentation
     SDC, // Simplified direct confrontation
     DC, // Direct confrontation
+    EGFDC, // Direct comparison, as defined by the EGF tournament system rules
 }
 
 class PlacementParams(vararg crit: Criterion) {

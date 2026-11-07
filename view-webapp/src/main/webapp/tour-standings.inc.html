@@ -16,7 +16,16 @@
   <div id="standings-params" class="roundbox">
     <form id="params-form" class="ui form">
       <div class="inline fields">
+#set($placements = [])
 #foreach($placement in $tour.pairing.placement)
+  #set($junk = $placements.add($placement))
+#end
+#foreach($i in [1..4])
+  #if($placements.size() < 4)
+    #set($junk = $placements.add('NONE'))
+  #end
+#end
+#foreach($placement in $placements)
         <div class="criterium field">
   #set($num = $foreach.index + 1)
           <label>Crit #$num</label>
