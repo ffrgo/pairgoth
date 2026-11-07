@@ -27,7 +27,7 @@ Click **New tournament** and fill the information form:
 - **Dates and location** (or *online*).
 - **Rounds** — can be changed later.
 - **Time system** — informative for exports (Fischer, byo-yomi…).
-- **Pairing system** — *Mac Mahon* or *Swiss*. For Mac Mahon, set the **MM bar** and **floor** (rank limits of the McMahon groups), the **handicap correction** (0 = full rank-difference handicap, -1 = handicap reduced by one stone, … down to -9 = even games) and the **no-handicap threshold** (players at or above this rank always play even). See the [pairing documentation](pairing) for the full story.
+- **Pairing system** — *Mac Mahon*, *Swiss* or *French system*. For Mac Mahon, set the **MM bar** and **floor** (rank limits of the McMahon groups), the **handicap correction** (0 = full rank-difference handicap, -1 = handicap reduced by one stone, … down to -9 = even games) and the **no-handicap threshold** (players at or above this rank always play even). See the [pairing documentation](pairing) for the full story.
 
 Save: the tournament is created and the other tabs appear. You can return to this tab anytime (the **Edit** button unlocks the form, **Parameters** opens the advanced pairing parameters).
 

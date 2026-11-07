@@ -5,6 +5,7 @@ import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.model.MainCritParams.SeedMethod.SPLIT_AND_SLIP
 import org.jeudego.pairgoth.model.PairingType.*
 import org.jeudego.pairgoth.pairing.HistoryHelper
+import org.jeudego.pairgoth.pairing.solver.FrenchSolver
 import org.jeudego.pairgoth.pairing.solver.Solver
 import org.jeudego.pairgoth.pairing.solver.MacMahonSolver
 import org.jeudego.pairgoth.pairing.solver.PairingListener
@@ -117,7 +118,7 @@ data class HandicapParams(
     }
 }
 
-enum class PairingType { SWISS, MAC_MAHON, ROUND_ROBIN }
+enum class PairingType { SWISS, MAC_MAHON, FRENCH, ROUND_ROBIN }
 
 data class PairingParams(
     val base: BaseCritParams = BaseCritParams(),
@@ -214,6 +215,24 @@ class MacMahon(
     companion object {}
     override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
         MacMahonSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, pairingPlacement, tournament.usedTables(round), mmFloor, mmBar)
+}
+
+/**
+ * A Swiss with a sliding starting-level bonus (see FrenchSolver). Same parameters as a Swiss;
+ * standings on wins, while the draw orders players on the bonus-carrying score (MMS) then rating.
+ */
+class French(
+    pairingParams: PairingParams = Swiss().pairingParams,
+    placementParams: PlacementParams = PlacementParams(
+        Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
+    )
+): Pairing(FRENCH, pairingParams, placementParams) {
+    companion object {}
+    init {
+        pairingPlacementParams = PlacementParams(Criterion.MMS)
+    }
+    override fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>) =
+        FrenchSolver(round, tournament.rounds, HistoryHelper(tournament.historyBefore(round)), pairables, tournament.pairables, pairingParams, pairingPlacement, tournament.usedTables(round))
 }
 
 class RoundRobin(
@@ -337,6 +356,7 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?, teams: Bool
     val defaultParams = when (type) {
         SWISS -> Swiss()
         MAC_MAHON -> MacMahon()
+        FRENCH -> French()
         ROUND_ROBIN -> RoundRobin()
     }
     // per-key fallback: the existing tournament's params, else the type-appropriate defaults
@@ -353,21 +373,22 @@ fun Pairing.Companion.fromJson(json: Json.Object, default: Pairing?, teams: Bool
             .also { it.add(1, Criterion.BDW) }.take(4).toTypedArray())
         else defaultParams.placementParams
     val placementParams = json.getArray("placement")?.let { PlacementParams.fromJson(it) } ?: default?.placementParams ?: defaultPlacement
-    // an all-NONE list means "same criteria as the standings", and clears any previous setting
-    val pairingPlacement =
-        if (json.containsKey("pairingPlacement"))
-            json.getArray("pairingPlacement")?.let { PlacementParams.fromJson(it) }
-                ?.takeIf { params -> params.criteria.any { it != Criterion.NONE } }
-        else default?.pairingPlacementParams
     return when (type) {
         SWISS -> Swiss(pairingParams, placementParams)
         MAC_MAHON -> MacMahon(pairingParams, placementParams).also { mm ->
             mm.mmFloor = json.getInt("mmFloor") ?: (default as? MacMahon)?.mmFloor ?: -20
             mm.mmBar = json.getInt("mmBar") ?: (default as? MacMahon)?.mmBar ?: 0
         }
+        FRENCH -> French(pairingParams, placementParams)
         ROUND_ROBIN -> RoundRobin(pairingParams, placementParams)
     }.also { pairing ->
-        pairing.pairingPlacementParams = pairingPlacement
+        // an all-NONE list means "same criteria as the standings", and clears any previous setting;
+        // absent, the existing setting is kept (else the type's own default, e.g. French)
+        if (json.containsKey("pairingPlacement"))
+            pairing.pairingPlacementParams = json.getArray("pairingPlacement")?.let { PlacementParams.fromJson(it) }
+                ?.takeIf { params -> params.criteria.any { it != Criterion.NONE } }
+        else if (default != null)
+            pairing.pairingPlacementParams = default.pairingPlacementParams
     }
 }
 

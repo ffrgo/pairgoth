@@ -291,8 +291,8 @@ onLoad(() => {
         stones: form.val('stones')
       }
     }
-    // the seed selects are Swiss-only fields; elsewhere let the server's per-type defaults rule
-    if (tour.pairing.type === 'SWISS') tour.pairing.main = {
+    // the seed selects are Swiss/French-only fields; elsewhere let the server's per-type defaults rule
+    if (tour.pairing.type === 'SWISS' || tour.pairing.type === 'FRENCH') tour.pairing.main = {
       firstSeed: form.val('firstSeed'),
       secondSeed: form.val('secondSeed')
     }
@@ -426,7 +426,7 @@ onLoad(() => {
     let pairing = e.target.value.toLowerCase();
     if (pairing === 'mac_mahon') $('#tournament-infos .mms').removeClass('hidden');
     else $('#tournament-infos .mms').addClass('hidden');
-    if (pairing === 'swiss') $('#tournament-infos .swiss').removeClass('hidden');
+    if (pairing === 'swiss' || pairing === 'french') $('#tournament-infos .swiss').removeClass('hidden');
     else $('#tournament-infos .swiss').addClass('hidden');
   });
 });

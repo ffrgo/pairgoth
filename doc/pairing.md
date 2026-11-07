@@ -15,7 +15,7 @@ Consequences worth knowing:
 - Every weight below only *biases* costs: no criterion is absolute except the impossibility of pairing a player twice with the same opponent (and even that is a very high cost, not a hard rule, so that pairing remains possible in small tournaments).
 - The *explain pairing* link on the pairing tab shows the actual cost components of each game of a round.
 
-In a **Swiss** tournament, players start at score 0 and the main cost is the score difference. In a **Mac Mahon** tournament, players start at their McMahon score (rank-based, clamped between the *floor* and the *bar*), so strong players meet immediately while beginners are protected; handicap can be enabled below a rank threshold.
+In a **Swiss** tournament, players start at score 0 and the main cost is the score difference. In a **Mac Mahon** tournament, players start at their McMahon score (rank-based, clamped between the *floor* and the *bar*), so strong players meet immediately while beginners are protected; handicap can be enabled below a rank threshold. The **French system** sits in between: a Swiss whose rating-based bonus groups shrink round after round, down to a plain Swiss for the last two rounds (see [French system](#french-system)).
 
 ## Pairing Types
 
@@ -23,6 +23,7 @@ In a **Swiss** tournament, players start at score 0 and the main cost is the sco
 |------|-------------|
 | SWISS | Swiss system |
 | MAC_MAHON | MacMahon system |
+| FRENCH | French system |
 | ROUND_ROBIN | Round robin (not implemented) |
 
 ## MacMahon-specific
@@ -31,6 +32,20 @@ In a **Swiss** tournament, players start at score 0 and the main cost is the sco
 |-------|------|-------------|
 | mmFloor | int | MacMahon floor (default: -20 = 20k) |
 | mmBar | int | MacMahon bar (default: 0 = 1D) |
+
+## French system
+
+A Swiss with a sliding Mac Mahon-like bonus, proposed by a French organizer (*système fanfan*, *système français*) as a blend of accelerated Swiss and Amalfi. For a tournament of *r* rounds, at round *k*:
+
+- the players taking part in the round are sorted by starting level (rating) and split into *G* = *r* − *k* groups of equal size (⌊*n*/*G*⌋, the remainder going to the bottom group);
+- the top group gets a bonus of *G* points, the next one *G* − 1, …, the bottom group 1;
+- the pairing score is wins + bonus (shown as MMS), and each score group is drawn by split-and-slip, ordered by starting level.
+
+At round *r* − 1 everyone is in a single group (+1 for all, no effect), and round *r* has no bonus: the last two rounds are a plain Swiss. Compared with a Mac Mahon, it is as if starting levels ran from (*r*−1)d down to 1d at round 1, (*r*−2)d..1d at round 2, …, everyone 1d for the last two rounds: a weak player can still win the tournament by winning every game, but has to beat the top players sooner or later, while games stay closer in level than in Amalfi throughout.
+
+Example — 42 players, 5 rounds: round 1, four groups of 10/10/10/12 with bonus 4/3/2/1; round 2, three groups of 14 with 3/2/1; round 3, two groups of 21 with 2/1; rounds 4 and 5, plain Swiss.
+
+Standings are plain wins (NBW, SOSW, SOSOSW by default); pairing order defaults to the pairing score, then rating. Other defaults and advanced parameters are those of the Swiss: no handicap, no geographical criteria; the Mac Mahon-only settings (floor, bar, handicap correction, MMS for non-played rounds) don't apply, non-played rounds count as `nbwValueAbsent`. Changing the number of rounds during the tournament changes the bonus schedule of the remaining rounds, by construction.
 
 ## Base Parameters
 

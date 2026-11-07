@@ -90,6 +90,7 @@
           <select name="pairing" #if($tour)disabled#end>
             <option value="MAC_MAHON" #if(!$tour || $tour.pairing.type == 'MAC_MAHON') selected #end>Mac Mahon</option>
             <option value="SWISS" #if($tour && $tour.pairing.type == 'SWISS') selected #end>Swiss</option>
+            <option value="FRENCH" #if($tour && $tour.pairing.type == 'FRENCH') selected #end>French</option>
             ## TODO <option value="ROUND_ROBIN" #if($tour && $tour.pairing.type == 'ROUND_ROBIN') selected #end>Round-robin</option>
           </select>
         </div>
@@ -125,7 +126,7 @@
 #levels($limit)
           </select>
         </div>
-        <div class="swiss pairing six wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS') hidden #end">
+        <div class="swiss pairing six wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS' && $tour.pairing.type != 'FRENCH') hidden #end">
           <label>1st round seeding</label>
           <span class="info"></span>
           <select name="firstSeed">
@@ -134,7 +135,7 @@
             <option value="SPLIT_AND_SLIP" #if(!$tour || "$!tour.pairing.main.firstSeed" == "SPLIT_AND_SLIP") selected #end>Split and slip</option>
           </select>
         </div>
-        <div class="swiss pairing six wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS')hidden#end">
+        <div class="swiss pairing six wide field #if(!$tour || $tour && $tour.pairing.type != 'SWISS' && $tour.pairing.type != 'FRENCH')hidden#end">
           <label>Next rounds seeding</label>
           <span class="info"></span>
           <select name="secondSeed">
