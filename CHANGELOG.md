@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Perfect pairings browsing: uncommitted pairings (without any result) can be browsed using Next & Prev buttons
 - Per instance tournaments file caching, to avoid re-parsing tournament files at each call (stored files are checked for freshness)
 
 ### Fixed

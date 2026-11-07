@@ -142,14 +142,16 @@ sealed class Pairing(
     companion object {}
     internal abstract fun solver(tournament: Tournament<*>, round: Int, pairables: List<Pairable>): Solver
     internal fun pair(tournament: Tournament<*>, round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
-        return solver(tournament, round, pairables)
-            .also { solver ->
-                solver.legacyMode = legacyMode
-                listener?.let {
-                    solver.pairingListener = listener
-                }
+        val solver = solver(tournament, round, pairables).also { solver ->
+            solver.legacyMode = legacyMode
+            listener?.let {
+                solver.pairingListener = listener
             }
-            .pair()
+        }
+        val games = solver.pair()
+        // save current perfect matching
+        solver.enumeration?.let { tournament.repairEnumerations[round] = it }
+        return games
     }
 }
 

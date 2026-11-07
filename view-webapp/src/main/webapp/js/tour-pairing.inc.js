@@ -37,6 +37,15 @@ function unpair(games) {
     });
 }
 
+// Navigate alternative optimal pairings of the last paired group (same total weight) ; dir = 'prev' or 'next'.
+// If no prev or next, it boils down to just a reloads.
+function navigatePairing(dir) {
+  api.postJson(`tour/${tour_id}/pair/${activeRound}?nav=${dir}`, {})
+    .then(rst => {
+      if (rst !== 'error') document.location.reload();
+    });
+}
+
 function renumberTables() {
   let payload = {}
   let tablesExclusionControl = $('#exclude-tables');
@@ -200,6 +209,12 @@ onLoad(()=>{
       parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     }
     pair(parts);
+  });
+  $('#pairing-prev').on('click', e => {
+    navigatePairing('prev');
+  });
+  $('#pairing-next').on('click', e => {
+    navigatePairing('next');
   });
   $('#unpair').on('click', e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));

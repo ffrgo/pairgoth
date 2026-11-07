@@ -12,9 +12,9 @@ import org.jgrapht.alg.matching.blossom.v5.KolmogorovWeightedPerfectMatching
 import org.jgrapht.alg.matching.blossom.v5.ObjectiveSense
 import org.jgrapht.graph.DefaultWeightedEdge
 import org.jgrapht.graph.SimpleDirectedWeightedGraph
+import org.jgrapht.graph.SimpleWeightedGraph
 import org.jgrapht.graph.builder.GraphBuilder
 import org.slf4j.LoggerFactory
-import java.io.PrintWriter
 import java.text.DecimalFormat
 import java.util.*
 import kotlin.math.*
@@ -37,6 +37,10 @@ sealed class Solver(
     // For tests and explain feature
     var legacyMode = false
     var pairingListener: PairingListener? = null
+
+    // Lazily populated enumeration of perfect mathcings
+    var enumeration: MatchingEnumeration? = null
+        private set
 
     init {
         history.scoresFactory = this::mainScoreMapFactory
@@ -122,12 +126,20 @@ sealed class Solver(
             pairingSortedPairables.remove(ByePlayer)
         }
 
+        // Remember nodes of a matching to enable perfect matching navigation even with a custom selection
+        val undirected = SimpleWeightedGraph<Pairable, DefaultWeightedEdge>(DefaultWeightedEdge::class.java)
+        nameSortedPairables.forEach { undirected.addVertex(it) }
+        val orientation = HashMap<Set<Pairable>, Pair<Pairable, Pairable>>()
         for (i in nameSortedPairables.indices) {
             for (j in i + 1 until nameSortedPairables.size) {
                 val p = nameSortedPairables[i]
                 val q = nameSortedPairables[j]
-                weight(p, q).let { if (it != Double.NaN) builder.addEdge(p, q, it/1e6) }
-                weight(q, p).let { if (it != Double.NaN) builder.addEdge(q, p, it/1e6) }
+                val wpq = weight(p, q)
+                val wqp = weight(q, p)
+                builder.addEdge(p, q, wpq / 1e6)
+                builder.addEdge(q, p, wqp / 1e6)
+                undirected.addEdge(p, q)?.let { undirected.setEdgeWeight(it, max(wpq, wqp) / 1e6) }
+                orientation[setOf(p, q)] = if (wpq >= wqp) Pair(p, q) else Pair(q, p)
             }
         }
         val graph = builder.build()
@@ -137,6 +149,16 @@ sealed class Solver(
         val sorted = solution.map{
             listOf(graph.getEdgeSource(it), graph.getEdgeTarget(it))
         }.sortedWith(compareBy { min(it[0].place, it[1].place) })
+
+        enumeration = MatchingEnumeration(
+            solver = this,
+            enumerator = PerfectMatchingEnumerator(undirected),
+            orientation = orientation,
+            chosenByePlayer = chosenByePlayer,
+            batch = (nameSortedPairables.map { it.id } +
+                if (chosenByePlayer != ByePlayer) listOf(chosenByePlayer.id) else emptyList()).toSet(),
+            initial = sorted.map { setOf(it[0], it[1]) }.toSet()
+        )
 
         var result = sorted.flatMap { games(white = it[0], black = it[1]) }
         // add game for ByePlayer
@@ -624,5 +646,60 @@ sealed class Solver(
         val table = if (black.id == 0 || white.id == 0) 0 else usedTables.nextClearBit(1)
         usedTables.set(table)
         return listOf(Game(id = nextGameId, table = table, black = black.id, white = white.id, handicap = hd(white = white, black = black), drawnUpDown = dudd(black, white)))
+    }
+
+    /**
+     * Rebuilds a known optimal matching.
+     */
+    fun assemble(pairs: Set<Set<Pairable>>, orientation: Map<Set<Pairable>, Pair<Pairable, Pairable>>, chosenByePlayer: Pairable, freedTables: List<Int>): List<Game> {
+        val sorted = pairs.map { orientation.getValue(it) }
+            .sortedWith(compareBy { min(it.first.place, it.second.place) })
+        val tables = freedTables.sorted().iterator()
+        var result = sorted.map { (white, black) ->
+            val table = if (tables.hasNext()) tables.next() else usedTables.nextClearBit(1).also { usedTables.set(it) }
+            Game(id = nextGameId, table = table, white = white.id, black = black.id, handicap = hd(white = white, black = black), drawnUpDown = dudd(black, white))
+        }
+        if (chosenByePlayer != ByePlayer) result = result + Game(id = nextGameId, table = 0, white = chosenByePlayer.id, black = ByePlayer.id, result = Game.Result.fromSymbol('w'))
+        return result
+    }
+}
+
+/**
+ * Transient, in-memory state backing "find another optimal pairing" for the last pairing operation.
+ */
+class MatchingEnumeration(
+    private val solver: Solver,
+    private val enumerator: PerfectMatchingEnumerator<Pairable>,
+    private val orientation: Map<Set<Pairable>, Pair<Pairable, Pairable>>,
+    private val chosenByePlayer: Pairable,
+    val batch: Set<ID>,
+    initial: Set<Set<Pairable>>
+) {
+    private val history = mutableListOf(initial)
+    private var active = 0
+    private var exhausted = false
+
+    val activeIndex get() = active
+    /** Total number of optimal pairings — known only once the enumeration has been exhausted. */
+    val total get() = if (exhausted) history.size else null
+
+    /** Moves to the next remembered pairing, or generates a new distinct optimum; null if none left. */
+    fun forward(freedTables: List<Int>): List<Game>? {
+        if (active == history.lastIndex) {
+            if (exhausted) return null // don't re-query past the last one once we've hit it
+            var pairs = enumerator.next()?.pairs
+            while (pairs != null && pairs in history) pairs = enumerator.next()?.pairs
+            if (pairs == null) { exhausted = true; return null }
+            history.add(pairs)
+        }
+        active++
+        return solver.assemble(history[active], orientation, chosenByePlayer, freedTables)
+    }
+
+    /** Moves back to the previous remembered pairing; null if already at the first. */
+    fun backward(freedTables: List<Int>): List<Game>? {
+        if (active == 0) return null
+        active--
+        return solver.assemble(history[active], orientation, chosenByePlayer, freedTables)
     }
 }

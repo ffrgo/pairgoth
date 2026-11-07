@@ -8,6 +8,7 @@ import com.republicate.kson.toJsonObject
 import java.time.LocalDate
 import org.jeudego.pairgoth.api.ApiHandler.Companion.badRequest
 import org.jeudego.pairgoth.pairing.HistoryHelper
+import org.jeudego.pairgoth.pairing.solver.MatchingEnumeration
 import org.jeudego.pairgoth.pairing.solver.PairingListener
 import org.jeudego.pairgoth.store.nextGameId
 import org.jeudego.pairgoth.store.nextPlayerId
@@ -16,7 +17,6 @@ import org.jeudego.pairgoth.util.MutableBiMultiMap
 import org.jeudego.pairgoth.util.mutableBiMultiMapOf
 import kotlin.math.max
 import java.util.*
-import kotlin.collections.get
 import kotlin.math.floor
 import kotlin.math.round
 import kotlin.math.roundToInt
@@ -79,10 +79,44 @@ sealed class Tournament <P: Pairable>(
 
     open fun unpair(round: Int) {
         games(round).clear()
+        repairEnumerations.remove(round)
     }
 
     open fun unpair(round: Int, id: ID) {
         games(round).remove(id)
+    }
+
+    // Transient perfect pairings enumerations per round
+    val repairEnumerations = mutableMapOf<Int, MatchingEnumeration>()
+
+    /** Whether the perfect pairings are navigable. */
+    fun canRepair(round: Int): Boolean {
+        if (this is TeamTournament) return false
+        val enumeration = repairEnumerations[round] ?: return false
+        val batchGames = games(round).values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
+        return batchGames.isNotEmpty() && batchGames.none { it.result != Game.Result.UNKNOWN }
+    }
+
+    /** Index of the currently active optimal pairing (0 = the committed one). */
+    fun pairingActiveIndex(round: Int) = repairEnumerations[round]?.activeIndex ?: 0
+
+    /** Total optimal pairings for the round's last batch, or -1 if not yet known. */
+    fun pairingTotal(round: Int) = if (canRepair(round)) (repairEnumerations[round]!!.total ?: -1) else -1
+
+    /**
+     * Tries to find another optimal pairing, returns null if none was found.
+     */
+    fun navigatePairing(round: Int, forward: Boolean): Pair<List<ID>, List<Game>>? {
+        if (!canRepair(round)) return null
+        val enumeration = repairEnumerations[round]!!
+        val roundGames = games(round)
+        val batchGames = roundGames.values.filter { it.white in enumeration.batch || it.black in enumeration.batch }
+        val freedTables = batchGames.map { it.table }.filter { it != 0 }
+        val newGames = (if (forward) enumeration.forward(freedTables) else enumeration.backward(freedTables)) ?: return null
+        val removed = batchGames.map { it.id }
+        removed.forEach { roundGames.remove(it) }
+        newGames.forEach { roundGames[it.id] = it }
+        return removed to newGames
     }
 
     // games per id for each round
