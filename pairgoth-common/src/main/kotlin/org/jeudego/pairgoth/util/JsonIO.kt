@@ -19,7 +19,8 @@ fun Json.toString(writer: Writer) = toString(object: Json.Output {
         return this
     }
     override fun writeString(s: String, from: Int, to: Int): Json.Output {
-        writer.write(s, from, to)
+        // kson passes (from, to-exclusive); Writer.write takes (off, len)
+        writer.write(s, from, to - from)
         return this
     }
 })
