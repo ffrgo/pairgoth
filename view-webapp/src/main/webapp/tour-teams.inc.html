@@ -33,13 +33,18 @@
             <div data-id="$team.id" class="listitem team"><span class="name">$team.name</span><span>#rank($team.rank)#if($team.country) $team.country#end</span></div>
 #end
           </div>
-          <div id="composition" class="hidden multi-select" title="">
+          <div id="composition" class="hidden">
 
           </div>
         </div>
       </div>
     </div>
   </div>
+#if($teams && $teams.size())
+  <div id="print-teams">
+#teamsTable($teams)
+  </div>
+#end
 </div>
 <script type="text/javascript">
   // XXXXXX

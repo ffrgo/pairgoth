@@ -18,6 +18,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Teams tab is now printable, team names editable
 - Advanced parameters edition should not reload the information tab
 
 ## [0.26] - 2026-06-22
