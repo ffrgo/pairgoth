@@ -619,6 +619,11 @@ sealed class Solver(
         var score = 0.0
         val hd = pairing.handicap.handicap(white = p1, black = p2)
         if (hd == 0) {
+            // "If two players meet again, then they get inverse colors" (EGF tournament system rules)
+            val previousWhite = history.lastMeetingWhite(p1, p2)
+            if (previousWhite != null) {
+                return if (previousWhite == p2.id) 1.0 else -1.0
+            }
             if (p1.colorBalance > p2.colorBalance) {
                 score = -1.0
             } else if (p1.colorBalance < p2.colorBalance) {
