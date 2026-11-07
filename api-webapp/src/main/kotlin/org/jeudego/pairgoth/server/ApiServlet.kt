@@ -136,6 +136,10 @@ class ApiServlet: HttpServlet() {
             logger.error(red("could not process call"), ioe)
             reason = ioe.message ?: "unknown i/o exception"
             error(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, reason, ioe)
+        } catch (t: Throwable) {
+            // whatever escapes must still reach the client as json
+            reason = t.message ?: t.javaClass.simpleName
+            error(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, reason, t)
         } finally {
             val builder = StringBuilder()
             builder.append(response.status).append(' ')
