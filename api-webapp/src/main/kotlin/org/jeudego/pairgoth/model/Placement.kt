@@ -18,7 +18,7 @@ enum class Criterion {
     SOSWM1, //-1
     SOSWM2, //-2
     SODOSW, // Sum of defeated opponents NBW
-    SOSOSW, // Sum of opponenent SOS
+    SOSOSW, // Sum of opponents SOSW
     CUSSW, // Cumulative sum of scores (NBW)
 
     SOSM, // Sum of opponents McMahon score
