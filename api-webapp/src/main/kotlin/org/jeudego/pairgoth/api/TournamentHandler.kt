@@ -74,6 +74,12 @@ object TournamentHandler: PairgothApiHandler {
         // Distinguish between a standings criteria change only and deeper parameters changes
         val placementOnly = payload.keys == setOf("pairing") &&
             payload.getObject("pairing")?.keys == setOf("placement")
+        // the advanced-parameters dialog arrives as a sparse {pairing:{base|main|secondary|geo|handicap}}
+        // payload; if it's the case, use a specific event to avoid forcing a refresh of the information tab
+        val paramsOnly = !placementOnly && payload.keys == setOf("pairing") &&
+            payload.getObject("pairing")?.keys?.all {
+                it in setOf("base", "main", "secondary", "geo", "handicap")
+            } == true
         // disallow changing type
         if (payload.getString("type")?.let { it != tournament.type.name } == true) badRequest("tournament type cannot be changed")
         // specific handling for 'excludeTables'
@@ -137,7 +143,11 @@ object TournamentHandler: PairgothApiHandler {
                 clear()
                 putAll(tournament.games(round))
             }
-            updated.dispatchEvent(if (placementOnly) StandingsUpdated else TournamentUpdated, request, updated.toJson())
+            updated.dispatchEvent(when {
+                placementOnly -> StandingsUpdated
+                paramsOnly -> PairingParamsUpdated
+                else -> TournamentUpdated
+            }, request, updated.toJson())
         }
         return Json.Object("success" to true)
     }

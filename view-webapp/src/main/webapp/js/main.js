@@ -477,7 +477,7 @@ onLoad(() => {
 // Each mutating event maps to its source tab.
 const TAB_ORDER = ['information', 'registration', 'teams', 'pairing', 'results', 'standings'];
 const EVENT_SOURCE_TAB = {
-  TournamentUpdated: 'information',
+  TournamentUpdated: 'information', PairingParamsUpdated: 'information',
   PlayerAdded: 'registration', PlayerUpdated: 'registration', PlayerDeleted: 'registration',
   TeamAdded: 'teams', TeamUpdated: 'teams', TeamDeleted: 'teams',
   GamesAdded: 'pairing', GamesDeleted: 'pairing', GameUpdated: 'pairing', TablesRenumbered: 'pairing',
