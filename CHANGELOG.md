@@ -19,6 +19,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Default shared secret was broken in standalone mode
 - Teams tab is now printable, team names editable
 - Advanced parameters edition should not reload the information tab
 
