@@ -2,6 +2,7 @@ package org.jeudego.pairgoth.application
 
 import org.apache.commons.io.FileUtils
 import org.eclipse.jetty.alpn.server.ALPNServerConnectionFactory
+import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory
 import org.eclipse.jetty.http2.server.HTTP2ServerConnectionFactory
 import org.eclipse.jetty.server.HttpConfiguration
 import org.eclipse.jetty.server.HttpConnectionFactory
@@ -228,23 +229,60 @@ private fun launchServer() {
         else -> throw Error("invalid mode: $mode")
     }
     val secure = webappUrl.protocol == "https"
+    val h2c = serverProps.getProperty("webapp.h2c")?.toBoolean() ?: false
+    // unset = every interface, so other computers on the LAN can reach a standalone instance
+    val bindInterface = serverProps.getProperty(if (mode == "server") "api.interface" else "webapp.interface")
 
     // create server
-    val server =
-        if (secure) Server()
-        else Server(webappUrl.port)
+    val server = Server()
 
     server.apply {
         // register webapps
         handler = ContextHandlerCollection(*webAppContexts.toTypedArray())
-        if (secure) {
-            val connector = buildSecureConnector(server, webappUrl.port)
-            addConnector(connector)
-        }
+        val connector =
+            if (secure) buildSecureConnector(server, webappUrl.port)
+            else if (h2c) buildH2cConnector(server, webappUrl.port)
+            else ServerConnector(server).apply { port = webappUrl.port }
+        connector.host = bindInterface
+        addConnector(connector)
         // launch server
         start()
+        checkVersion()
         join()
     }
+}
+
+// Published-version check. Stays silent when offline or disabled (version.check=false).
+private fun checkVersion() {
+    if (serverProps.getProperty("version.check")?.toBoolean() == false) return
+    Thread {
+        try {
+            val current = serverProps.getProperty("version")?.substringBefore('-') ?: return@Thread
+            val body = URL("https://pairgoth.jeudego.org/en").openConnection().apply {
+                connectTimeout = 5000
+                readTimeout = 5000
+            }.getInputStream().use { String(it.readBytes(), StandardCharsets.UTF_8) }
+            val published = Regex("pairgoth v([0-9][0-9.]*)").find(body)?.groupValues?.get(1) ?: return@Thread
+            if (isNewer(published, current)) {
+                val update =
+                    if (File("./.git").exists()) "git pull and rebuild to update"
+                    else "download it from https://pairgoth.jeudego.org"
+                println("pairgoth v$published has been published (you are running v$current): $update")
+            }
+        } catch (t: Throwable) {
+            // stay silent offline
+        }
+    }.apply { isDaemon = true }.start()
+}
+
+private fun isNewer(published: String, current: String): Boolean {
+    val p = published.split('.').map { it.toIntOrNull() ?: 0 }
+    val c = current.split('.').map { it.toIntOrNull() ?: 0 }
+    for (i in 0 until maxOf(p.size, c.size)) {
+        val diff = p.getOrElse(i) { 0 } - c.getOrElse(i) { 0 }
+        if (diff != 0) return diff > 0
+    }
+    return false
 }
 
 private fun createContext(webapp: String, contextPath: String) = WebAppContext().also { context ->
@@ -262,6 +300,16 @@ private fun createContext(webapp: String, contextPath: String) = WebAppContext()
             }
         })
     }
+}
+
+// Cleartext HTTP/2, so a TLS-terminating reverse proxy can keep h2 end-to-end.
+// HTTP/1.1 comes first (the default protocol): browsers never speak h2c, the
+// proxy uses prior knowledge, upgrade-capable clients can switch.
+private fun buildH2cConnector(server: Server, port: Int): ServerConnector {
+    val httpConfig = HttpConfiguration()
+    val connector = ServerConnector(server, HttpConnectionFactory(httpConfig), HTTP2CServerConnectionFactory(httpConfig))
+    connector.port = port
+    return connector
 }
 
 private fun buildSecureConnector(server: Server, port: Int): ServerConnector {

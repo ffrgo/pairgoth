@@ -1,6 +1,7 @@
 package org.jeudego.pairgoth.server
 
 import com.republicate.mailer.SmtpLoop
+import org.jeudego.pairgoth.store.initStore
 import org.jeudego.pairgoth.web.BaseWebappManager
 import javax.servlet.*
 import javax.servlet.annotation.WebListener
@@ -13,6 +14,8 @@ class WebappManager : BaseWebappManager("API Server","api") {
         super.contextInitialized(sce)
 
         logger.info("pairgoth server ${properties["version"]} with profile ${properties["env"]}")
+
+        initStore()
 
         // start smtp loop
         if (properties.containsKey("smtp.host")) {

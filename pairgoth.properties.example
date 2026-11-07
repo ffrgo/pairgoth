@@ -1,5 +1,5 @@
 # Pairgoth configuration — copy to pairgoth.properties and uncomment what you need.
-# Full reference: doc/reference.md › Configuration. Values shown are the defaults.
+# Full reference: doc/technical.md › Configuration. Values shown are the defaults.
 
 # Environment: dev (CORS + extra logging) or prod
 # env = prod
@@ -7,7 +7,7 @@
 # Mode: standalone (web+API) | server (API only) | client (web only)
 # mode = standalone
 
-# Authentication: none | sesame (shared password) | oauth
+# Authentication: none | sesame (shared password) | oauth | external (fronting site SSO)
 # auth = none
 # auth.sesame = <password>                    # for auth=sesame
 # auth.shared_secret = <16 ascii chars>       # shared API/web secret (auto-generated in standalone)
@@ -17,9 +17,15 @@
 # oauth.ffg.client_id = <client_id>
 # oauth.ffg.secret = <client_secret>
 
+# External auth (auth=external): the fronting site owns the accounts, see doc/technical.md
+# auth.external.login_url = <fronting site login page>
+# auth.external.secret = <16 ascii chars>     # SSO ticket secret shared with the fronting site
+# auth.external.admin =                       # comma-separated emails with unrestricted access
+
 # Webapp (UI) connector
 # webapp.protocol = http
-# webapp.host = localhost                     # interface to bind (alias: webapp.interface)
+# webapp.host = localhost                     # host part of the URLs pairgoth builds
+# webapp.interface = localhost                # interface to bind (default: all)
 # webapp.port = 8080
 # webapp.context = /
 # webapp.external.url = http://localhost:8080 # external URL (OAuth redirects, client config)
@@ -27,6 +33,7 @@
 # API connector (standalone: port 8080, context /api/tour)
 # api.protocol = http
 # api.host = localhost
+# api.interface = localhost                   # server mode: interface to bind (default: all)
 # api.port = 8085
 # api.context = /api
 # api.external.url = http://localhost:8085/api
@@ -35,6 +42,10 @@
 # webapp.ssl.key = path/to/localhost.key
 # webapp.ssl.cert = path/to/localhost.crt
 # webapp.ssl.pass = <key passphrase>
+
+# Cleartext HTTP/2 (h2c) on the plain connector, to keep h2 end-to-end behind a
+# TLS-terminating reverse proxy; HTTP/1.1 clients are still served
+# webapp.h2c = false
 
 # Store: file (XML files) | memory (tests)
 # store = file
