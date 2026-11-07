@@ -23,6 +23,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- results were not displayed correctly with blackFirst option set to true
 - Add EU iso for Europe, as EGD does
 - Fix UK/GB iso country bug
 - Late participants registration: participation defaults to false for already paired rounds
