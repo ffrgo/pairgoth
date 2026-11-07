@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Bulk players import & re-import
 - External authentication: per-operator externally managed ACL of an instance's tournaments (typically for EGC)
 - Multi-operators collaboration using Server-Sent Events streams
 - History view of a tournament, allowing to undo up to a specific past user action
