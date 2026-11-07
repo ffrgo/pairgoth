@@ -23,6 +23,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- Fix UK/GB iso country bug
 - Late participants registration: participation defaults to false for already paired rounds
 - Default shared secret was broken in standalone mode
 - Teams tab is now printable, team names editable
