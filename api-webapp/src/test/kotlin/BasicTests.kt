@@ -162,7 +162,7 @@ class BasicTests: TestBase() {
         assertEquals(aTournamentID, resp.getInt("id"), "First tournament should have id #$aTournamentID")
         // filter out "id", and also "komi", "rules" and "gobanSize" which were provided by default
         // also filter out "pairing", which is filled by all default values
-        val cmp = (resp.toMap() - listOf("id", "komi", "rules", "gobanSize", "pairing", "frozen", "syncNeeded")).toJsonObject()
+        val cmp = (resp.toMap() - listOf("id", "komi", "rules", "gobanSize", "pairing", "frozen", "syncNeeded", "playing")).toJsonObject()
         val expected = (aTournament.toMap() - "pairing").toMutableJsonObject().also { map ->
             map["stats"] = Json.Array(
                 Json.Object("participants" to 0, "paired" to 0, "games" to 0, "ready" to 0),

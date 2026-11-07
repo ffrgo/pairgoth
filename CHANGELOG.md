@@ -11,6 +11,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Added
 
+- Printing, publishing or entering results make a round public: ask confirmation for subsequent destructive actions
 - Print result sheets for a custom tables selection
 - Direct-Confrontation, Simple Direct-Confrontation and EGF Direct-Confrontation (as defined by EGF rules) placement criteria
 - Add a 'playing all rounds' filter to the Mc Mahon groups dialog

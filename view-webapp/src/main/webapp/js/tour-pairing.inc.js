@@ -46,6 +46,24 @@ function navigatePairing(dir) {
     });
 }
 
+// Stamp this round's pairing as public (after print/publish/results)
+function stampPlaying() {
+  if (readOnly || $('#paired .listitem').length === 0) return;
+  api.putJson(`tour/${tour_id}`, { playing: activeRound });
+}
+
+// The round's pairing is public, players may already be playing it: confirm before any destructive action.
+let playingWarnResolve = null;
+async function confirmPairingDestruction() {
+  try { if (sessionStorage.getItem('skipPlayingWarn')) return true; } catch (e) {}
+  let tour = await api.getJson(`tour/${tour_id}`);
+  if (tour === 'error' || tour.playing < activeRound) return true;
+  return new Promise(resolve => {
+    playingWarnResolve = resolve;
+    modal('confirm-playing-modal');
+  });
+}
+
 function renumberTables() {
   let payload = {}
   let tablesExclusionControl = $('#exclude-tables');
@@ -210,6 +228,12 @@ onLoad(()=>{
       let tour = await api.getJson(`tour/${tour_id}`);
       if (tour !== 'error' && tour.syncNeeded && !confirm($('#confirm-unsynced-pairing').text())) return;
     }
+    // Launching a round on incomplete previous-round results means pairing on wrong scores: confirm.
+    if (activeRound > 1 && $('#paired .listitem').length === 0) {
+      let previous = await api.getJson(`tour/${tour_id}/pair/${activeRound - 1}`);
+      let missing = previous === 'error' ? 0 : previous.games.filter(g => g.r === '?').length;
+      if (missing > 0 && !confirm(`${$('#confirm-missing-results').text().trim()} (${missing})`)) return;
+    }
     let parts = $('#pairables .selected.listitem').map(item => parseInt(item.data("id")));
     if (parts.length === 0) {
       $('#pairables .listitem').addClass('selected');
@@ -217,19 +241,36 @@ onLoad(()=>{
     }
     pair(parts);
   });
-  $('#pairing-prev').on('click', e => {
-    navigatePairing('prev');
+  $('#pairing-prev').on('click', async e => {
+    if (await confirmPairingDestruction()) navigatePairing('prev');
   });
-  $('#pairing-next').on('click', e => {
-    navigatePairing('next');
+  $('#pairing-next').on('click', async e => {
+    if (await confirmPairingDestruction()) navigatePairing('next');
   });
-  $('#unpair').on('click', e => {
+  $('#unpair').on('click', async e => {
     let games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     if (games.length == 0) {
-      $('#paired .listitem').addClass('selected');
+      // Global unpair: ALWAYS confirm, playing stamp or not
+      let all = $('#paired .listitem');
+      let message = `${$('#confirm-unpair-all').text().trim()} (${all.length})`;
+      let tour = await api.getJson(`tour/${tour_id}`);
+      if (tour !== 'error' && tour.playing >= activeRound) message += '\n' + $('#confirm-players-playing').text().trim();
+      if (!confirm(message)) return;
+      all.addClass('selected');
       games = $('#paired .selected.listitem').map(item => parseInt(item.data("id")));
     }
     unpair(games);
+  });
+  $('#playing-warn-proceed').on('click', e => {
+    if ($('#playing-warn-skip')[0].checked) {
+      try { sessionStorage.setItem('skipPlayingWarn', '1'); } catch (err) {}
+    }
+    close_modal();
+    if (playingWarnResolve) playingWarnResolve(true);
+  });
+  $('#playing-warn-cancel').on('click', e => {
+    close_modal();
+    if (playingWarnResolve) playingWarnResolve(false);
   });
   $('#renumber-tables').on('click', e => {
     renumberTables();
@@ -255,6 +296,11 @@ onLoad(()=>{
     }
     close_modal();
     window.open(url, '_blank');
+    stampPlaying();
+  });
+  // the generic header print, while on this tab, means pairings go out on paper
+  $('#print').on('click', e => {
+    if (currentStep() === 'pairing') stampPlaying();
   });
   $('#pairing-form [name]').on('input', e => {
     $('#update-pairing').removeClass('disabled');
@@ -334,7 +380,10 @@ onLoad(()=>{
       .then(data => {
         if (data === 'error') return;
         if (!data.status) showError(data.message || 'Publish failed');
-        else showSuccess(`Pairings for round ${activeRound} published to website`);
+        else {
+          showSuccess(`Pairings for round ${activeRound} published to website`);
+          stampPlaying();
+        }
       });
   });
 });

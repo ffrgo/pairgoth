@@ -68,6 +68,9 @@ sealed class Tournament <P: Pairable>(
     var lastSync: Long? = null
     var lastPairing: Long? = null
 
+    // highest round whose pairing was made public (printed, published, or a result entered)
+    var playing: Int = 0
+
     // pairing
     open fun pair(round: Int, pairables: List<Pairable>, legacyMode: Boolean = false, listener: PairingListener? = null): List<Game> {
         // Minimal check on round number.
@@ -582,6 +585,7 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
     tournament.lastAction = json.getString("lastAction") ?: default?.lastAction
     tournament.lastSync = json.getLong("lastSync") ?: default?.lastSync
     tournament.lastPairing = json.getLong("lastPairing") ?: default?.lastPairing
+    tournament.playing = json.getInt("playing") ?: default?.playing ?: 0
     return tournament
 }
 
@@ -637,6 +641,9 @@ fun Tournament<*>.toFullJson(): Json.Object {
     }
     if (lastPairing != null) {
         json["lastPairing"] = lastPairing
+    }
+    if (playing > 0) {
+        json["playing"] = playing
     }
     return json
 }
