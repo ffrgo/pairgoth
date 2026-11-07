@@ -59,8 +59,6 @@ sealed class Tournament <P: Pairable>(
     protected val _pairables = mutableMapOf<ID, P>()
     val pairables: Map<ID, Pairable> get() = _pairables
 
-    // frozen standings
-    var frozen: Json.Array? = null
 
     // label of the last user action
     var lastAction: String? = null
@@ -584,9 +582,6 @@ fun Tournament.Companion.fromJson(json: Json.Object, default: Tournament<*>? = n
             tournamentGames[game.getID("id")!!] = Game.fromJson(game)
         }
     }
-    json.getArray("frozen")?.also {
-        tournament.frozen = it
-    }
     tournament.lastAction = json.getString("lastAction") ?: default?.lastAction
     tournament.lastSync = json.getLong("lastSync") ?: default?.lastSync
     tournament.lastPairing = json.getLong("lastPairing") ?: default?.lastPairing
@@ -615,9 +610,6 @@ fun Tournament<*>.toJson() = Json.MutableObject(
     if (tablesExclusion.isNotEmpty()) {
         tour["tablesExclusion"] = tablesExclusion.toJsonArray()
     }
-    if (frozen != null) {
-        tour["frozen"] = frozen
-    }
 }
 
 fun Tournament<*>.toFullJson(): Json.Object {
@@ -634,9 +626,6 @@ fun Tournament<*>.toFullJson(): Json.Object {
     }
     if (tablesExclusion.isNotEmpty()) {
         json["tablesExclusion"] = tablesExclusion.toJsonArray()
-    }
-    if (frozen != null) {
-        json["frozen"] = frozen
     }
     if (lastAction != null) {
         json["lastAction"] = lastAction

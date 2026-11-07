@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import org.jeudego.pairgoth.model.TimeSystem.TimeSystemType.*
 import org.jeudego.pairgoth.model.toJson
-import org.jeudego.pairgoth.server.Event
 import org.jeudego.pairgoth.server.WebappManager
 import java.io.OutputStreamWriter
 import java.nio.charset.StandardCharsets
@@ -320,14 +319,6 @@ ${
                 tournament.pairing.placementParams.criteria.joinToString(";") { line.getString(it.name) ?: "" }
             }")
         }
-    }
-
-    override fun put(request: HttpServletRequest, response: HttpServletResponse): Json? {
-        val tournament = getTournament(request)
-        val sortedPairables = tournament.getSortedPairables(tournament.rounds)
-        tournament.frozen = sortedPairables.toJsonArray()
-        tournament.dispatchEvent(Event.TournamentUpdated, request, tournament.toJson())
-        return Json.Object("status" to "ok")
     }
 
     private val numFormat = DecimalFormat("###0.#")

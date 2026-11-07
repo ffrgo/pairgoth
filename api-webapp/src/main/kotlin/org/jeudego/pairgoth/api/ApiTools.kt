@@ -17,10 +17,6 @@ import org.jeudego.pairgoth.pairing.HistoryHelper
 
 fun Tournament<*>.getSortedPairables(round: Int, includePreliminary: Boolean = false): List<Json.Object> {
 
-    if (frozen != null && round == rounds) {
-        return ArrayList(frozen!!.map { it -> it as Json.Object })
-    }
-
     val history = historyHelper(round + 1)
 
     val neededCriteria = ArrayList(pairing.placementParams.criteria)
