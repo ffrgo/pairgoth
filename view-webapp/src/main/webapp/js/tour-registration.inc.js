@@ -304,7 +304,8 @@ function weekSplit() {
   return { week1, week2, days };
 }
 
-// // For events lasting more than 7 days, split the rounds into the event's two weeks to add a display filter.
+// Keep only players present (≥1 round) in each checked week; both checked = present in both weeks.
+function applyWeekFilter(w1Rounds, w2Rounds) {
   $('#players tbody tr').forEach(tr => {
     let hide = false;
     if (w1Rounds || w2Rounds) {
