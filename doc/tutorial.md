@@ -14,7 +14,7 @@ Pairgoth runs as a local web server and is used from your browser.
 The home page lists your tournaments. Three buttons get you started:
 
 - **New tournament**: create one from scratch (next section).
-- **Import tournament**: load an existing OpenGotha XML file.
+- **Import tournament**: load a Pairgoth `.tour` file or an OpenGotha XML file.
 - **Clone example tournament**: an instant playground to try the workflow without risk.
 
 Each tournament is a plain JSON `.tour` file in the `tournamentfiles` directory (see the [technical documentation](technical#store) to change it). Every change is saved immediately and every previous state is archived: the **Undo** button in the header (the ↶ icon) lists your past actions and restores any earlier state.
@@ -100,7 +100,10 @@ The **Publish** button on the **Standings** tab offers:
 - **FFG**: the French Go Federation `.tou` file.
 - **Website**: push the standings to your event website through the [webhook](technical#pairgoth-webhook-specification). The **Pairing** and **Results** tabs have their own **Publish to website** button.
 
-The OpenGotha XML export of the whole tournament is available through the [API](technical#pairgoth-api-specification), and the `.tour` files themselves are portable JSON: copying them is a complete backup.
+The **Export** button on the **Information** tab saves the whole tournament in one of two formats:
+
+- **Pairgoth**: the `.tour` file itself, portable JSON. This is the complete backup: use it to keep a copy or to move a tournament to another computer.
+- **OpenGotha**: XML, to exchange with OpenGotha. Its format cannot hold everything pairgoth knows (byo-yomi periods and team tournaments, for instance), so importing it back is not a full restore.
 
 ## Connecting to an event website
 

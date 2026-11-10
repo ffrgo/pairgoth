@@ -2,10 +2,23 @@ package org.jeudego.pairgoth.test
 
 import org.jeudego.pairgoth.ext.MacMahon39
 import org.jeudego.pairgoth.ext.OpenGotha
+import org.jeudego.pairgoth.model.Criterion
+import org.jeudego.pairgoth.model.French
+import org.jeudego.pairgoth.model.HandicapParams
+import org.jeudego.pairgoth.model.MacMahon
+import org.jeudego.pairgoth.model.Pairing
+import org.jeudego.pairgoth.model.PairingType
+import org.jeudego.pairgoth.model.PlacementParams
+import org.jeudego.pairgoth.model.Player
+import org.jeudego.pairgoth.model.Rules
+import org.jeudego.pairgoth.model.StandardByoyomi
+import org.jeudego.pairgoth.model.StandardTournament
+import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.util.XmlUtils
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -126,5 +139,54 @@ class ImportExportTests: TestBase() {
             val apiPlayers = TestAPI.get("/api/tour/$id/part").asArray()
             assertEquals(4, apiPlayers.size)
         }
+    }
+
+    private fun tournament(pairing: Pairing, vararg countries: String) = StandardTournament(
+        id = 1, type = Tournament.Type.INDIVIDUAL, name = "Round trip", shortName = "roundtrip",
+        startDate = LocalDate.of(2026, 11, 7), endDate = LocalDate.of(2026, 11, 8), director = "", country = "tr",
+        location = "Bursa", online = false, timeSystem = StandardByoyomi(3600, 30, 1), rounds = 5,
+        pairing = pairing, rules = Rules.JAPANESE, gobanSize = 13, komi = 6.5
+    ).also {
+        countries.forEachIndexed { i, country ->
+            it.players[i + 1] = Player(id = i + 1, name = "Player$i", firstname = "P", rating = 1500, rank = -5, country = country, club = "Bur", final = true)
+        }
+    }
+
+    // McMahon without handicap: the case the import used to take for a Swiss
+    private fun evenMacMahon() = MacMahon().let {
+        MacMahon(it.pairingParams.copy(handicap = HandicapParams(ceiling = 0)), it.placementParams)
+    }
+
+    // what a genuine OpenGotha file looks like: none of our own attributes
+    private fun String.asForeignFile() = replace(Regex("""<GeneralParameterSet [^>]*>""")) { gps ->
+        gps.value.replace(Regex(""" (country|rules|pairingType)="[^"]*""""), "")
+    }
+
+    @Test
+    fun `004 opengotha round trip keeps what the format lacks`() {
+        listOf(evenMacMahon(), French(), MacMahon(placementParams = PlacementParams(Criterion.NBW, Criterion.SOSW))).forEach { pairing ->
+            val exported = OpenGotha.export(tournament(pairing, "FR", "FR", "TR"))
+            assertTrue(!exported.contains("[<") && !exported.contains(">, <"), "criteria should not be written as a list")
+            val imported = OpenGotha.import(XmlUtils.parse(exported))
+            assertEquals(pairing.type, imported.pairing.type)
+            assertEquals("tr", imported.country)
+            assertEquals(Rules.JAPANESE, imported.rules)
+            assertEquals(13, imported.gobanSize)
+            assertEquals(6.5, imported.komi)
+        }
+    }
+
+    @Test
+    fun `005 foreign opengotha file`() {
+        // system from the first placement criterion, as OpenGotha does; country from the players
+        val mm = OpenGotha.import(XmlUtils.parse(OpenGotha.export(tournament(evenMacMahon(), "TR", "TR", "DE")).asForeignFile()))
+        assertEquals(PairingType.MAC_MAHON, mm.pairing.type)
+        assertEquals("tr", mm.country)
+        assertEquals(6.5, mm.komi)
+        assertEquals(13, mm.gobanSize)
+
+        val swiss = OpenGotha.import(XmlUtils.parse(OpenGotha.export(tournament(French())).asForeignFile()))
+        assertEquals(PairingType.SWISS, swiss.pairing.type)
+        assertEquals("eu", swiss.country)
     }
 }

@@ -130,6 +130,17 @@ object OpenGotha {
             }.toTypedArray()
         )
 
+        // country, rules and pairing type are not part of the OpenGotha format: our own exports carry them
+        val country = genParams.country?.takeUnless { it.isBlank() }?.lowercase(Locale.ROOT)
+            ?: ogTournament.players.player.mapNotNull { it.country?.takeUnless { c -> c.isBlank() }?.lowercase(Locale.ROOT) }
+                .groupingBy { it }.eachCount().maxByOrNull { it.value }?.key // most common among the players
+            ?: "eu"
+        val rules = Rules.values().firstOrNull { it.name == genParams.rules }
+            ?: if (country == "fr") Rules.FRENCH else Rules.AGA
+        // without it, the system is the one OpenGotha itself infers from the first placement criterion
+        val pairingType = PairingType.values().firstOrNull { it.name == genParams.pairingType }
+            ?: if (pairgothPlacementParams.criteria.firstOrNull() == Criterion.MMS) PairingType.MAC_MAHON else PairingType.SWISS
+
         val tournament = StandardTournament(
             id = nextTournamentId,
             type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
@@ -138,7 +149,7 @@ object OpenGotha {
             startDate = genParams.beginDate.toLocalDate(),
             endDate = genParams.endDate.toLocalDate(),
             director = genParams.director,
-            country = "fr", // no country in opengotha format
+            country = country,
             location = genParams.location,
             online = genParams.isBInternet ?: false,
             timeSystem = when (genParams.complementaryTimeSystem) {
@@ -148,19 +159,30 @@ object OpenGotha {
                 "FISCHER" -> FischerTime(genParams.basicTime * 60, genParams.fischerTime)
                 else -> throw Error("missing byoyomi type")
             },
-            pairing = when (handParams.hdCeiling) {
-                0 -> Swiss(
-                    pairingParams = pairgothPairingParams,
-                    placementParams = pairgothPlacementParams
-                )
-                else -> MacMahon(
+            pairing = when (pairingType) {
+                PairingType.MAC_MAHON -> MacMahon(
                     pairingParams = pairgothPairingParams,
                     placementParams = pairgothPlacementParams,
                     mmFloor = parseRankOrDefault(genParams.genMMFloor, -30, "MM floor"),
                     mmBar = parseRankOrDefault(genParams.genMMBar, 0, "MM bar")
                 )
+                PairingType.FRENCH -> French(
+                    pairingParams = pairgothPairingParams,
+                    placementParams = pairgothPlacementParams
+                )
+                PairingType.ROUND_ROBIN -> RoundRobin(
+                    pairingParams = pairgothPairingParams,
+                    placementParams = pairgothPlacementParams
+                )
+                PairingType.SWISS -> Swiss(
+                    pairingParams = pairgothPairingParams,
+                    placementParams = pairgothPlacementParams
+                )
             },
-            rounds = genParams.numberOfRounds
+            rounds = genParams.numberOfRounds,
+            rules = rules,
+            gobanSize = genParams.size ?: 19,
+            komi = genParams.komi?.toString()?.toDouble() ?: 7.5
         )
 
         val canonicMap = mutableMapOf<String, Int>()
@@ -351,7 +373,9 @@ object OpenGotha {
                 TimeSystem.TimeSystemType.JAPANESE -> "STDBYOYOMI"
                 TimeSystem.TimeSystemType.CANADIAN -> "CANBYOYOMI"
                 TimeSystem.TimeSystemType.FISCHER -> "FISCHER"
-            } }" director="${
+            } }" country="${
+                tournament.country
+            }" director="${
                 tournament.director.escapeXML()
             }" endDate="${
                 tournament.endDate
@@ -381,6 +405,10 @@ object OpenGotha {
                 tournament.timeSystem.stones
             }" numberOfCategories="1" numberOfRounds="${
                 tournament.rounds
+            }" pairingType="${
+                tournament.pairing.type
+            }" rules="${
+                tournament.rules
             }" shortName="${
                 tournament.shortName
             }" size="${
@@ -404,7 +432,7 @@ object OpenGotha {
                     """<PlacementCriterion name="${
                         tournament.pairing.placementParams.criteria.getOrNull(it)?.name ?: "NULL"
                     }" number="${it + 1}"/>"""
-                }
+                }.joinToString("\n")
             }
             </PlacementCriteria>
             </PlacementParameterSet>

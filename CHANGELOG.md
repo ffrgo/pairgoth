@@ -11,6 +11,9 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
+- OpenGotha import: a McMahon tournament without handicap was imported as a Swiss; komi and goban size were ignored
+- OpenGotha import: the tournament country is the most common one among the players (Europe by default), no longer France
+- OpenGotha export carries the tournament country, rules and system, so that importing it back into pairgoth keeps them
 - Windows installer: bundle Java 21 (0.27 could not start with the bundled Java 11)
 
 ## [0.27] - 2026-11-07
