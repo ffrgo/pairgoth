@@ -15,6 +15,12 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 - OpenGotha import: the tournament country is the most common one among the players (Europe by default), no longer France
 - OpenGotha export carries the tournament country, rules and system, so that importing it back into pairgoth keeps them
 - Windows installer: bundle Java 21 (0.27 could not start with the bundled Java 11)
+- Windows installer: always install to `C:\Program Files\Pairgoth` (reinstalling used to put the new version inside the previous one, in its `jre\bin` folder)
+- Windows uninstaller: keep any `tournamentfiles` folder found in the installation folder
+
+### Changed
+
+- Windows: `pairgoth.properties` now lives with the data in `%LOCALAPPDATA%\Pairgoth` and is no longer overwritten at each install (an existing one is moved there)
 
 ## [0.27] - 2026-11-07
 

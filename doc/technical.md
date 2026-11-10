@@ -22,7 +22,7 @@ pairgoth integrates with an event website (a club page, a federation site, an EG
 
 *How to tune the `pairgoth.properties` file.*
 
-Pairgoth reads its configuration from the `pairgoth.properties` file of the working directory (the installation folder when launched from there).
+Pairgoth reads its configuration from the `pairgoth.properties` file of the working directory (the installation folder when launched from there). On Windows, the installed shortcut starts pairgoth in `%LOCALAPPDATA%\Pairgoth`: that folder holds `pairgoth.properties` next to the `tournamentfiles` and `ratings` folders.
 
 Properties are loaded in this order (later overrides earlier):
 

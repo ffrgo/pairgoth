@@ -7,8 +7,7 @@
 !define COPYRIGHT "(c) FFG 2024"
 !define DESCRIPTION "Go Pairing Software"
 !define INSTALLER_NAME "target/install-pairgoth.exe"
-!define MAIN_APP_EXE "jre\bin\java.exe"
-!define MAIN_APP_ARGS "-jar lib\pairgoth-engine.jar"
+!define MAIN_APP_EXE "pairgoth.bat"
 !define MAIN_APP_ICO "pairgoth.ico"
 !define ICON "resources/pairgoth.ico"
 !define BANNER "resources/banner.bmp"
@@ -18,7 +17,6 @@
 !define INSTALL_TYPE "SetShellVarContext current"
 !define DATA_DIR "$LocalAppdata\Pairgoth"
 !define REG_ROOT "HKCU"
-!define REG_APP_PATH "Software\Microsoft\Windows\CurrentVersion\App Paths\${MAIN_APP_EXE}"
 !define UNINSTALL_PATH "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
 !define REG_START_MENU "Start Menu Folder"
 
@@ -40,7 +38,6 @@ Name "${APP_NAME}"
 Caption "${APP_NAME}"
 OutFile "${INSTALLER_NAME}"
 BrandingText "${APP_NAME}"
-InstallDirRegKey "${REG_ROOT}" "${REG_APP_PATH}" ""
 InstallDir "${INSTALL_DIR}"
 
 ######################################################################
@@ -62,8 +59,6 @@ InstallDir "${INSTALL_DIR}"
 !ifdef LICENSE_TXT
 !insertmacro MUI_PAGE_LICENSE "${LICENSE_TXT}"
 !endif
-
-!insertmacro MUI_PAGE_DIRECTORY
 
 !ifdef REG_START_MENU
 !define MUI_STARTMENUPAGE_DEFAULTFOLDER "${APP_NAME}"
@@ -87,11 +82,6 @@ InstallDir "${INSTALL_DIR}"
 
 ######################################################################
 
-!include "StrFunc.nsh"
-${Using:StrFunc} StrRep
-
-######################################################################
-
 Section -MainProgram
 	${INSTALL_TYPE}
 
@@ -99,18 +89,23 @@ Section -MainProgram
 	SetOutPath "$INSTDIR"
 	File /r "target/files/"
 
-	${StrRep} $1 "${DATA_DIR}" "\" "/"
-
-	FileOpen $0 "pairgoth.properties" w
-	FileWrite $0 "auth = none"
-	FileWrite $0 "$\r$\n"
-	FileWrite $0 "store.file.path = $1/tournamentfiles"
-	FileWrite $0 "$\r$\n"
-	FileWrite $0 "ratings.path = $1/ratings"
-	FileWrite $0 "$\r$\n"
-	FileClose $0
 	SetOutPath "${DATA_DIR}"
 	File /r "target/data/"
+
+	; the configuration lives with the data, where pairgoth.bat starts; never overwrite the user's own
+	IfFileExists "${DATA_DIR}\pairgoth.properties" config_done
+	IfFileExists "$INSTDIR\pairgoth.properties" 0 config_new
+		; earlier installers wrote it in the installation directory
+		ClearErrors
+		CopyFiles /SILENT "$INSTDIR\pairgoth.properties" "${DATA_DIR}"
+		IfErrors config_new
+		Delete "$INSTDIR\pairgoth.properties"
+		Goto config_done
+	config_new:
+		FileOpen $0 "${DATA_DIR}\pairgoth.properties" w
+		FileWrite $0 "auth = none$\r$\n"
+		FileClose $0
+	config_done:
 	SetOutPath "$INSTDIR"
 
 SectionEnd
@@ -124,8 +119,8 @@ WriteUninstaller "$INSTDIR\uninstall.exe"
 !ifdef REG_START_MENU
 !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
 CreateDirectory "$SMPROGRAMS\$SM_Folder"
-CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "${MAIN_APP_ARGS}" "$INSTDIR/${MAIN_APP_ICO}"
-CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "${MAIN_APP_ARGS}" "$INSTDIR/${MAIN_APP_ICO}"
+CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "" "$INSTDIR/${MAIN_APP_ICO}"
+CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "" "$INSTDIR/${MAIN_APP_ICO}"
 CreateShortCut "$SMPROGRAMS\$SM_Folder\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
 
 !ifdef WEB_SITE
@@ -137,7 +132,7 @@ CreateShortCut "$SMPROGRAMS\$SM_Folder\${APP_NAME} Website.lnk" "$INSTDIR\${APP_
 
 !ifndef REG_START_MENU
 CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "${MAIN_APP_ARGS}" "$INSTDIR/${MAIN_APP_ICO}"
+CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}" "" "$INSTDIR/${MAIN_APP_ICO}"
 CreateShortCut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\${MAIN_APP_EXE}"
 CreateShortCut "$SMPROGRAMS\${APP_NAME}\Uninstall ${APP_NAME}.lnk" "$INSTDIR\uninstall.exe"
 
@@ -147,7 +142,10 @@ CreateShortCut "$SMPROGRAMS\${APP_NAME}\${APP_NAME} Website.lnk" "$INSTDIR\${APP
 !endif
 !endif
 
-WriteRegStr ${REG_ROOT} "${REG_APP_PATH}" "" "$INSTDIR\${MAIN_APP_EXE}"
+; earlier installers kept the java.exe path there and reinstalled next to it, inside the previous installation
+DeleteRegKey ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\App Paths\jre\bin\java.exe"
+DeleteRegKey /ifempty ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\App Paths\jre\bin"
+DeleteRegKey /ifempty ${REG_ROOT} "Software\Microsoft\Windows\CurrentVersion\App Paths\jre"
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayName" "${APP_NAME}"
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "UninstallString" "$INSTDIR\uninstall.exe"
 WriteRegStr ${REG_ROOT} "${UNINSTALL_PATH}"  "DisplayIcon" "$INSTDIR\${MAIN_APP_ICO}"
@@ -161,10 +159,43 @@ SectionEnd
 
 ######################################################################
 
+; removes a directory's content, except any "tournamentfiles" folder and what leads to it:
+; tournaments may have been stored under the installation directory
+Function un.RemoveSparingTournaments
+	Exch $R0 ; directory
+	Push $R1 ; search handle
+	Push $R2 ; entry
+	FindFirst $R1 $R2 "$R0\*.*"
+	loop:
+		StrCmp $R2 "" done
+		StrCmp $R2 "." next
+		StrCmp $R2 ".." next
+		IfFileExists "$R0\$R2\*.*" 0 file
+			StrCmp $R2 "tournamentfiles" next
+			Push "$R0\$R2"
+			Call un.RemoveSparingTournaments
+			RMDir "$R0\$R2" ; only when left empty
+			Goto next
+		file:
+			Delete "$R0\$R2"
+		next:
+			FindNext $R1 $R2
+			Goto loop
+	done:
+	FindClose $R1
+	Pop $R2
+	Pop $R1
+	Pop $R0
+FunctionEnd
+
+######################################################################
+
 Section Uninstall
 ${INSTALL_TYPE}
 
-RmDir /r "$INSTDIR"
+Push "$INSTDIR"
+Call un.RemoveSparingTournaments
+RMDir "$INSTDIR"
 
 !ifdef REG_START_MENU
 !insertmacro MUI_STARTMENU_GETFOLDER "Application" $SM_Folder
@@ -189,6 +220,5 @@ Delete "$DESKTOP\${APP_NAME}.lnk"
 RmDir "$SMPROGRAMS\${APP_NAME}"
 !endif
 
-DeleteRegKey ${REG_ROOT} "${REG_APP_PATH}"
 DeleteRegKey ${REG_ROOT} "${UNINSTALL_PATH}"
 SectionEnd
