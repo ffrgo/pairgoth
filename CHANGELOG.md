@@ -7,6 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- Windows installer: bundle Java 21 (0.27 could not start with the bundled Java 11)
+
 ## [0.27] - 2026-11-07
 
 ### Added
