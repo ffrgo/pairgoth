@@ -63,13 +63,14 @@ A Swiss with a sliding McMahon-like bonus, proposed by a French organizer (*syst
 
 - the players taking part in the round are sorted by starting level (rating) and split into *G* = *r* − *k* groups of equal size (⌊*n*/*G*⌋, the remainder going to the bottom group);
 - the top group gets a bonus of *G* points, the next one *G* − 1, …, the bottom group 1;
-- the pairing score is wins + bonus (shown as MMS), and each score group is drawn by split-and-slip, ordered by starting level.
+- the pairing score is wins + bonus (shown as MMS), and each score group is drawn by split-and-slip, ordered by starting level;
+- an odd score group is completed by the strongest player of the next one, who meets the middle player of the odd group, as if added in its last place before the split. Previous draw-ups and draw-downs are not compensated.
 
 At round *r* − 1 everyone is in a single group (+1 for all, no effect), and round *r* has no bonus: the last two rounds are a plain Swiss. Compared with a McMahon, it is as if starting levels ran from (*r*−1)d down to 1d at round 1, (*r*−2)d..1d at round 2, and everyone were 1d for the last two rounds. A weak player can still win the tournament by winning every game, but has to beat the top players sooner or later, while games stay closer in level than in Amalfi throughout.
 
 Example, 42 players, 5 rounds: round 1, four groups of 10/10/10/12 with bonus 4/3/2/1; round 2, three groups of 14 with 3/2/1; round 3, two groups of 21 with 2/1; rounds 4 and 5, plain Swiss.
 
-Standings are plain wins (NBW, SOSW, SOSOSW by default); pairing order defaults to the pairing score, then rating. Other defaults and advanced parameters are those of the Swiss: no handicap, no geographical criteria; the McMahon-only settings (floor, bar, handicap correction, MMS for non-played rounds) don't apply, and non-played rounds count as `nbwValueAbsent`. Changing the number of rounds during the tournament changes the bonus schedule of the remaining rounds, by construction.
+Standings are plain wins (NBW, SOSW, SOSOSW by default); pairing order defaults to the pairing score, then rating. Apart from the two draw-up/draw-down settings above, defaults and advanced parameters are those of the Swiss: no handicap, no geographical criteria; the McMahon-only settings (floor, bar, handicap correction, MMS for non-played rounds) don't apply, and non-played rounds count as `nbwValueAbsent`. Changing the number of rounds during the tournament changes the bonus schedule of the remaining rounds, by construction.
 
 ## Advanced parameters
 
@@ -99,9 +100,9 @@ Weights are costs: the higher a weight, the more the pairing avoids what it pena
 | First seeding method, add a sorting on rating | `firstSeedAddCrit` | Order the group by rating before splitting it (`RATING`), or keep the standings order (`NONE`) | `RATING` |
 | Second seeding method | `secondSeed` | How players of a score group are matched in the later rounds | split and slip |
 | Second seeding method, add a sorting on rating | `secondSeedAddCrit` | Same as above for the second method | `RATING` / `NONE` |
-| Draw-up / draw-down: try to compensate | `upDownCompensate` | When a player must meet someone from another score group, prefer one who was drawn the other way in a previous round | true |
+| Draw-up / draw-down: try to compensate | `upDownCompensate` | When a player must meet someone from another score group, prefer one who was drawn the other way in a previous round | true (French: false) |
 | Pair a player in the … of the upper group | `upDownUpperMode` | Which part of the stronger group gives the player drawn down: `TOP`, `MIDDLE` or `BOTTOM` | `MIDDLE` |
-| … with a player in the … of the lower group | `upDownLowerMode` | Which part of the weaker group gives the player drawn up | `MIDDLE` |
+| … with a player in the … of the lower group | `upDownLowerMode` | Which part of the weaker group gives the player drawn up | `MIDDLE` (French: `TOP`) |
 | *API only* | `scoreWeight` | Weight of pairing players of equal score; the main criterion | 1e11 |
 | *API only* | `upDownWeight` | Weight of the draw-up/draw-down preferences above | 1e8 |
 | *API only* | `maximizeSeeding` | Weight of the seeding method | 5e6 |

@@ -218,11 +218,17 @@ class MacMahon(
 }
 
 /**
- * A Swiss with a sliding starting-level bonus (see FrenchSolver). Same parameters as a Swiss;
- * standings on wins, while the draw orders players on the bonus-carrying score (MMS) then rating.
+ * A Swiss with a sliding starting-level bonus (see FrenchSolver). Same parameters as a Swiss,
+ * except that an odd score group takes the strongest player of the next one, whatever the previous
+ * draws; standings on wins, while the draw orders players on the bonus-carrying score (MMS) then rating.
  */
 class French(
-    pairingParams: PairingParams = Swiss().pairingParams,
+    pairingParams: PairingParams = Swiss().pairingParams.let {
+        it.copy(main = it.main.copy(
+            compensateDrawUpDown = false,
+            drawUpDownLowerMode = MainCritParams.DrawUpDown.TOP
+        ))
+    },
     placementParams: PlacementParams = PlacementParams(
         Criterion.NBW, Criterion.SOSW, Criterion.SOSOSW
     )
