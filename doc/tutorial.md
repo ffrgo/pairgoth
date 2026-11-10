@@ -9,7 +9,7 @@ This walkthrough takes you from installing pairgoth to publishing the final stan
 Pairgoth runs as a local web server and is used from your browser.
 
 - **Windows**: run the installer, then launch pairgoth from the Start menu; a browser opens automatically.
-- **Linux / macOS**: install Java 11 or later, download `pairgoth-engine.jar`, run `java -jar pairgoth-engine.jar`, then open `http://localhost:8080` in your browser.
+- **Linux / macOS**: install Java 17 or later, download `pairgoth-engine.jar`, run `java -jar pairgoth-engine.jar`, then open `http://localhost:8080` in your browser.
 
 The home page lists your tournaments. Three buttons get you started:
 

@@ -21,6 +21,7 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 ### Changed
 
 - Windows: `pairgoth.properties` now lives with the data in `%LOCALAPPDATA%\Pairgoth` and is no longer overwritten at each install (an existing one is moved there)
+- Java 17 is now the minimum to run the jar
 
 ## [0.27] - 2026-11-07
 
