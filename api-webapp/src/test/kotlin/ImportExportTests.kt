@@ -1,9 +1,11 @@
 package org.jeudego.pairgoth.test
 
+import com.republicate.kson.Json
 import org.jeudego.pairgoth.ext.MacMahon39
 import org.jeudego.pairgoth.ext.OpenGotha
 import org.jeudego.pairgoth.model.Criterion
 import org.jeudego.pairgoth.model.French
+import org.jeudego.pairgoth.model.Game
 import org.jeudego.pairgoth.model.HandicapParams
 import org.jeudego.pairgoth.model.MacMahon
 import org.jeudego.pairgoth.model.Pairing
@@ -15,6 +17,7 @@ import org.jeudego.pairgoth.model.StandardByoyomi
 import org.jeudego.pairgoth.model.StandardTournament
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.toJson
+import org.jeudego.pairgoth.store.MemoryStore
 import org.jeudego.pairgoth.util.XmlUtils
 import org.junit.jupiter.api.Test
 import java.nio.charset.StandardCharsets
@@ -188,5 +191,37 @@ class ImportExportTests: TestBase() {
         val swiss = OpenGotha.import(XmlUtils.parse(OpenGotha.export(tournament(French())).asForeignFile()))
         assertEquals(PairingType.SWISS, swiss.pairing.type)
         assertEquals("eu", swiss.country)
+    }
+
+    // Pairgo and rengo have no OpenGotha counterpart: each team is exported as one player, and the
+    // file reads back as an individual tournament.
+    @Test
+    fun `006 rengo teams are exported as players`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", BasicTests.aRengoTournament).asObject().getInt("id")!!
+        fun addPlayer(name: String, firstname: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to firstname, "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id")!!
+        fun addTeam(name: String, vararg players: Int) = TestAPI.post("/api/tour/$tid/team",
+            Json.Object("name" to name, "players" to Json.Array(*players.toTypedArray()))).asObject().getInt("id")!!
+        // three teams: one of them gets the bye; two share their members' names and initials
+        addTeam("Team one", addPlayer("Dupont", "Léa", 1900), addPlayer("Martin", "Rémi", 1800))
+        addTeam("Team two", addPlayer("Dupont", "Luc", 1700), addPlayer("Martin", "Rose", 1600))
+        addTeam("Team three", addPlayer("Le Gall", "Yann", 1500), addPlayer("Durand", "Zoé", 1400))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val games = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("games")!!.map { it as Json.Object }
+        val played = games.single { it.getInt("w") != 0 && it.getInt("b") != 0 }
+        assertEquals(1, games.count { it.getInt("w") == 0 || it.getInt("b") == 0 }, "premise: one team has the bye")
+        TestAPI.put("/api/tour/$tid/res/1", Json.Object("id" to played.getInt("id"), "result" to "b"))
+
+        val exported = TestAPI.getXml("/api/tour/$tid")
+        val imported = OpenGotha.import(XmlUtils.parse(exported))
+        assertEquals(Tournament.Type.INDIVIDUAL, imported.type)
+        assertEquals(
+            setOf("Dupont L. - Martin R.", "Dupont L. - Martin R. (2)", "Le Gall Y. - Durand Z."),
+            imported.players.values.map { "${it.name} ${it.firstname}" }.toSet())
+        val round = imported.games(1).values
+        assertEquals(1, round.count { it.black == 0 }, "the bye is kept")
+        assertEquals(Game.Result.BLACK, round.single { it.black != 0 }.result)
     }
 }

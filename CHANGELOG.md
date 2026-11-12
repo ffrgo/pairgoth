@@ -9,9 +9,17 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ## [0.29]
 
+### Added
+
+- Team tournaments: board wins on the first 4, 3, 2 or 1 boards as placement criteria (BDW4, BDW3, BDW2, BDW1)
+
 ### Changed
 
 - Teams: add players firstname initial in default team name
+
+### Fixed
+
+- OpenGotha export: fixed "both loose", bye players and pairgo/rengo team tournaments (teams named after players)
 
 ## [0.28] - 2026-11-10
 

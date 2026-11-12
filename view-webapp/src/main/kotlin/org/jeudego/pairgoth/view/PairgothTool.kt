@@ -42,6 +42,10 @@ class PairgothTool {
         "MMS" to "McMahon score", // Macmahon score
         "SCOREX" to "Score X", // Score X
         "BDW" to "Board wins (team tournaments)", // Sum of a team's board results
+        "BDW4" to "Board wins on the first 4 boards (team tournaments)",
+        "BDW3" to "Board wins on the first 3 boards (team tournaments)",
+        "BDW2" to "Board wins on the first 2 boards (team tournaments)",
+        "BDW1" to "Board wins on the first board (team tournaments)",
         // TODO "STS" to "Strasbourg score", // Strasbourg score
         // TODO "CPS" to "Cup score", // Cup score
 

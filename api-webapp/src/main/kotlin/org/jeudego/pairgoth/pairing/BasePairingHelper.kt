@@ -151,8 +151,9 @@ abstract class BasePairingHelper(
         Criterion.CUSSW -> pairable.cums
         Criterion.PREV -> previousOrderValue(pairable)
         Criterion.LOTTERY -> lotteryValue(pairable.id)
-        // group-relative standings tie-breaks and BDW are neutral for pairing.
-        Criterion.DC, Criterion.SDC, Criterion.EGFDC, Criterion.BDW -> 0.0
+        // group-relative standings tie-breaks and board wins are neutral for pairing.
+        Criterion.DC, Criterion.SDC, Criterion.EGFDC,
+        Criterion.BDW, Criterion.BDW4, Criterion.BDW3, Criterion.BDW2, Criterion.BDW1 -> 0.0
         else -> throw Error("criterion cannot be evaluated: ${criterion.name}")
     }
 

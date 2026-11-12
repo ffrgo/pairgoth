@@ -249,6 +249,7 @@ Criteria that order the standings. They are applied in sequence: each one only s
 | CPS | Cup score. Not implemented: not offered in the UI, counts 0 in the standings |
 | SCOREX | Score X (congress score): in a McMahon tournament, the McMahon starting score plus the wins, without the points given for rounds not played; in a Swiss or French tournament, the main score (NBW, plus the group bonus for French) |
 | BDW | Number of board wins, i.e. the sum of a team's board results over all rounds (team tournaments only; a jigo counts as half a win). The EGF recommends it as the first tie-break of a team tournament, and new team tournaments start with it. |
+| BDW4, BDW3, BDW2, BDW1 | Number of board wins on the first 4, 3, 2 boards or on the first board only (teams of individual players). The boards of a match follow the rating order of the players the team fields in that round, strongest first. |
 
 #### Opponent-based (W = wins, M = MMS)
 

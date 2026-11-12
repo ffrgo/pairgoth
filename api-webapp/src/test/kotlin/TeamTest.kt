@@ -287,6 +287,43 @@ class TeamTest {
         assertEquals(1, winner.getInt("place"), "and is placed first")
     }
 
+    // BDW3, BDW2, BDW1: board wins on the first boards only, boards being ordered by rating.
+    @Test
+    fun `upper board wins count the first boards only`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", Json.MutableObject(aTeamTournament).set("type", "TEAM3"))
+            .asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        fun addTeam(name: String, players: List<Int>) = TestAPI.post("/api/tour/$tid/team",
+            Json.parse("""{ "name":"$name", "players":$players, "final":true }""")?.asObject() ?: fail("no null"))
+            .asObject().getInt("id") ?: fail("no team id")
+        // registered weakest first: the board order must come from the ratings
+        val alphaPlayers = listOf(addPlayer("Ccc", 1700), addPlayer("Bbb", 1800), addPlayer("Aaa", 1900))
+        val alphas = addTeam("Alphas", alphaPlayers)
+        val gammas = addTeam("Gammas", listOf(addPlayer("Fff", 1400), addPlayer("Eee", 1500), addPlayer("Ddd", 1600)))
+        TestAPI.put("/api/tour/$tid", Json.Object(
+            "pairing" to Json.Object("placement" to Json.Array("MMS", "BDW3", "BDW2", "BDW1"))))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val boards = boards(tid)
+        assertEquals(3, boards.size)
+        assertTrue(alphaPlayers.last() in listOf(boards[0].getInt("w"), boards[0].getInt("b")),
+            "the strongest player sits at the first board")
+        // Alphas win boards 1 and 2, Gammas win board 3
+        boards.forEachIndexed { i, board ->
+            val alphasHoldWhite = alphaPlayers.contains(board.getInt("w"))
+            val alphasWin = i < 2
+            TestAPI.put("/api/tour/$tid/res/1",
+                Json.parse("""{"id":${board.getInt("id")},"result":"${if (alphasHoldWhite == alphasWin) "w" else "b"}"}"""))
+        }
+        val standings = TestAPI.get("/api/tour/$tid/standings/1").asArray().map { it as Json.Object }
+        fun wins(team: Int) = standings.first { it.getInt("id") == team }
+            .let { row -> listOf("BDW3", "BDW2", "BDW1").map { row.getDouble(it) } }
+        assertEquals(listOf(2.0, 2.0, 1.0), wins(alphas))
+        assertEquals(listOf(1.0, 0.0, 0.0), wins(gammas), "a win on the third board counts for BDW3 only")
+    }
+
     // ... but only once every board is in: a half-entered match is pending, not tied.
     @Test
     fun `a half entered team match stays pending`() {

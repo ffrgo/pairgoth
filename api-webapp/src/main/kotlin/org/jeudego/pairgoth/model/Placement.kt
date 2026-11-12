@@ -14,6 +14,10 @@ enum class Criterion {
     CPS, // Cup score
     SCOREX, // Score-X
     BDW, // Number of board wins (team tournaments), OpenGotha's TPL_CRIT_BOARDWINS
+    BDW4, // Board wins on the first 4 boards, OpenGotha's BDW4U
+    BDW3,
+    BDW2,
+    BDW1,
 
     SOSW, // Sum of opponents NBW
     SOSWM1, //-1

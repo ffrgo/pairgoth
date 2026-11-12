@@ -53,6 +53,31 @@ object OpenGotha {
 
     private fun MainCritParams.SeedMethod.format() = toString().replace("_", "")
 
+    // OpenGotha's Player.computeKeyString; Locale.ENGLISH to transform é to É
+    private fun key(name: String, firstname: String) = "$name$firstname".replace(" ", "").uppercase(Locale.ENGLISH)
+    private val Player.key get() = key(name, firstname)
+
+    // Pairgo and rengo have no OpenGotha counterpart: each team is exported as one player named
+    // after its members. OpenGotha shows "name firstname", hence the split at the last member.
+    private fun teamsAsPlayers(tournament: TeamTournament): Map<ID, Player> {
+        val keys = mutableSetOf<String>()
+        return tournament.teams.values.associate { team ->
+            val members = team.teamPlayers.toList()
+            val labels = members.map { if (it.firstname.isBlank()) it.name else "${it.name} ${it.firstname.first()}." }
+            val (name, firstname) = when (members.size) {
+                0 -> team.name to "-"
+                1 -> members[0].name to members[0].firstname.ifBlank { "-" }
+                else -> labels.dropLast(1).joinToString(" - ", postfix = " -") to labels.last()
+            }
+            var unique = firstname
+            var n = 1
+            while (!keys.add(key(name, unique))) unique = "$firstname (${++n})"
+            team.id to Player(team.id, name, unique, team.rating, team.rank, team.country ?: "", team.club ?: "", team.final, team.mmsCorrection).also { player ->
+                (1..tournament.rounds).filterNot { team.canPlay(it) }.forEach { player.skip.add(it) }
+            }
+        }
+    }
+
     fun import(element: Element): Tournament<*> {
 
         val context = JAXBContext.newInstance(ObjectFactory::class.java)
@@ -219,7 +244,7 @@ object OpenGotha {
                     it.externalIds[DatabaseId.EGF] = player.egfPin
                 }
                 it.externalIds
-                canonicMap.put("${player.name.replace(" ", "")}${player.firstName.replace(" ", "")}".uppercase(Locale.ENGLISH), it.id)
+                canonicMap.put(key(player.name, player.firstName), it.id)
             }
         }.associateByTo(tournament.players) { it.id }
         // import games
@@ -239,7 +264,7 @@ object OpenGotha {
                         "RESULT_BLACKWINS" -> Game.Result.BLACK
                         "RESULT_EQUAL" -> Game.Result.JIGO
                         "RESULT_BOTHWIN" -> Game.Result.BOTHWIN
-                        "RESULT_BOTHLOOSE" -> Game.Result.BOTHLOOSE
+                        "RESULT_BOTHLOSE", "RESULT_BOTHLOOSE" -> Game.Result.BOTHLOOSE // the latter from our exports up to 0.28
                         else -> throw Error("unhandled result: ${game.result}")
                     }
                 )
@@ -261,7 +286,6 @@ object OpenGotha {
         return tournament
     }
 
-    // TODO - bye player(s)
     fun export(tournament: Tournament<*>): String {
         // two methods here
         // method 1 (advised because it's more error-proof but more complex to set up) is to assign one by one
@@ -270,14 +294,17 @@ object OpenGotha {
         // ...
         //
         // method 2 (quick and dirty) is to rely on templating:
+        val players: Map<ID, Player> = when {
+            tournament !is TeamTournament -> tournament.players
+            tournament.type.individual -> throw Error("OpenGotha export is not available yet for team tournaments")
+            else -> teamsAsPlayers(tournament)
+        }
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
             <Tournament fullVersionNumber="3.52.03" runningMode="SAL" saveDT="$now" dataVersion="201">
             <Players>
-            ${tournament.pairables.values.map { player ->
-                    player as Player
-                }.joinToString("\n") { player -> 
+            ${players.values.joinToString("\n") { player -> 
                     """<Player agaExpirationDate="" agaId="" club="${
                         player.club.escapeXML()
                     }" country="${
@@ -316,9 +343,7 @@ object OpenGotha {
                     }
                 }.joinToString("\n") { (round, game) ->
                     """<Game blackPlayer="${
-                        (tournament.pairables[game.black]!! as Player).let { black ->
-                            "${black.name.replace(" ", "")}${black.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH).escapeXML() // Use Locale.ENGLISH to transform é to É    
-                        }
+                        players[game.black]!!.key.escapeXML()
                     }" handicap="${
                         game.handicap
                     }" knownColor="true" result="${
@@ -328,36 +353,31 @@ object OpenGotha {
                             Game.Result.WHITE -> "RESULT_WHITEWINS"
                             Game.Result.JIGO -> "RESULT_EQUAL"
                             Game.Result.BOTHWIN -> "RESULT_BOTHWIN"
-                            Game.Result.BOTHLOOSE -> "RESULT_BOTHLOOSE"
+                            Game.Result.BOTHLOOSE -> "RESULT_BOTHLOSE"
                         }
                     }" roundNumber="${
                         round
                     }" tableNumber="${
                         game.table
                     }" whitePlayer="${
-                        (tournament.pairables[game.white]!! as Player).let { white ->
-                            "${white.name.replace(" ", "")}${white.firstname.replace(" ", "")}".uppercase(Locale.ENGLISH).escapeXML() // Use Locale.ENGLISH to transform é to É    
-                        }
+                        players[game.white]!!.key.escapeXML()
                     }"/>"""
                 }
             }
             </Games>
-            <ByePlayer>
+            <ByePlayers>
             ${
                 (1..tournament.lastRound()).map { round ->
                     tournament.games(round).values.filter { g ->
                         g.black == 0 || g.white == 0
                     }.map {
-                        tournament.pairables[
-                                if (it.black == 0) it.white
-                                else it.black
-                        ] as Player
+                        players[if (it.black == 0) it.white else it.black]!!
                     }.map { p ->
-                        "<ByePlayer player=\"${p.name.replace(" ", "")}${p.firstname.replace(" ", "")}\" roundNumber=\"${round}\"/>"
+                        "<ByePlayer player=\"${p.key.escapeXML()}\" roundNumber=\"${round}\"/>"
                     }.joinToString("\n")
                 }.joinToString("\n")
             }
-            </ByePlayer>
+            </ByePlayers>
             <TournamentParameterSet>
             <GeneralParameterSet bInternet="${
                 tournament.online

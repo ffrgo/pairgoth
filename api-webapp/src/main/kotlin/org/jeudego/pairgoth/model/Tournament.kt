@@ -355,7 +355,8 @@ class TeamTournament(
 
     private fun pairIndividualGames(round: Int, game: Game) {
         individualGames.computeIfAbsent(game.id) { id ->
-            // Here white and black just denote the first board color
+            // Here white and black just denote the first board color.
+            // The set's order IS the board order (strongest first): BDW1..4 read it, the file stores it.
             val whitePlayers = teams[game.white]!!.activePlayers(round)
             val blackPlayers = teams[game.black]!!.activePlayers(round)
             whitePlayers.zip(blackPlayers).mapIndexed { i, players ->
