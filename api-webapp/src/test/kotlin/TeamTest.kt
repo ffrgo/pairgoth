@@ -324,6 +324,25 @@ class TeamTest {
         assertEquals(listOf(1.0, 0.0, 0.0), wins(gammas), "a win on the third board counts for BDW3 only")
     }
 
+    // Pairing an odd number of teams used to fail (500): boards were being built for the bye.
+    @Test
+    fun `an odd number of teams can be paired`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", aTeamTournament).asObject().getInt("id") ?: fail("no tournament id")
+        fun addPlayer(name: String, rating: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1,
+                "country" to "FR", "club" to "13Ma", "final" to true)).asObject().getInt("id") ?: fail("no player id")
+        listOf("A", "B", "C").forEachIndexed { i, team ->
+            TestAPI.post("/api/tour/$tid/team", Json.Object("name" to team,
+                "players" to Json.Array(addPlayer("${team}aa", 1900 - 100 * i), addPlayer("${team}bb", 1850 - 100 * i))))
+        }
+        val resp = TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        assertTrue(resp.isArray, "pairing must succeed: $resp")
+        val pairing = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        assertEquals(2, pairing.getArray("games")!!.size, "one match and one bye")
+        assertEquals(2, pairing.getArray("individualGames")!!.size, "boards for the match only")
+    }
+
     // ... but only once every board is in: a half-entered match is pending, not tied.
     @Test
     fun `a half entered team match stays pending`() {

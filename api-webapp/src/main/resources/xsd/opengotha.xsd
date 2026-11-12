@@ -59,6 +59,27 @@
       <xs:element type="ByePlayerType" name="ByePlayer" maxOccurs="unbounded" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
+  <xs:complexType name="BoardType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute type="xs:int" name="boardNumber"/>
+        <xs:attribute type="xs:string" name="player"/>
+        <xs:attribute type="xs:int" name="roundNumber" use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="TeamType">
+    <xs:sequence>
+      <xs:element type="BoardType" name="Board" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="teamName"/>
+    <xs:attribute type="xs:int" name="teamNumber"/>
+  </xs:complexType>
+  <xs:complexType name="TeamsType">
+    <xs:sequence>
+      <xs:element type="TeamType" name="Team" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
   <xs:complexType name="GeneralParameterSetType">
     <xs:simpleContent>
       <xs:extension base="xs:string">
@@ -217,6 +238,7 @@
       <xs:element type="PlayersType" name="Players"/>
       <xs:element type="GamesType" name="Games"/>
       <xs:element type="ByePlayersType" name="ByePlayers"/>
+      <xs:element type="TeamsType" name="Teams" minOccurs="0"/>
       <xs:element type="TournamentParameterSetType" name="TournamentParameterSet"/>
       <xs:element type="TeamTournamentParameterSetType" name="TeamTournamentParameterSet"/>
     </xs:sequence>

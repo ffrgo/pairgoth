@@ -15,6 +15,7 @@ import org.jeudego.pairgoth.model.Player
 import org.jeudego.pairgoth.model.Rules
 import org.jeudego.pairgoth.model.StandardByoyomi
 import org.jeudego.pairgoth.model.StandardTournament
+import org.jeudego.pairgoth.model.Swiss
 import org.jeudego.pairgoth.model.Tournament
 import org.jeudego.pairgoth.model.toJson
 import org.jeudego.pairgoth.store.MemoryStore
@@ -223,5 +224,96 @@ class ImportExportTests: TestBase() {
         val round = imported.games(1).values
         assertEquals(1, round.count { it.black == 0 }, "the bye is kept")
         assertEquals(Game.Result.BLACK, round.single { it.black != 0 }.result)
+    }
+
+    // A team tournament saved by OpenGotha 3.51: 14 teams of 3, 5 rounds. OpenGotha stores players,
+    // games and seats only; teams and matches are rebuilt. Board wins were counted apart, from the file.
+    @Test
+    fun `007 opengotha team tournament`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", getTestFile("opengotha/tournamentfiles/team-lgo-2020.xml").readText(StandardCharsets.UTF_8))
+            .asObject().getInt("id")!!
+        val tour = TestAPI.get("/api/tour/$tid").asObject()
+        assertEquals("TEAM3", tour.getString("type"))
+        assertEquals(listOf("MMS", "BDW", "BDW3", "BDW2", "BDW1", "RATING"), tour.getObject("pairing")!!.getArray("placement")!!.toList())
+        val teams = TestAPI.get("/api/tour/$tid/team").asArray().map { it as Json.Object }
+        assertEquals(14, teams.size)
+        val names = teams.associate { it.getInt("id")!! to it.getString("name")!! }
+        assertEquals(listOf("Zibaut Laurent", "Labbe David", "Tchernishoff Eric"),
+            teams.single { it.getString("name") == "La Rochelle 1" }.getArray("names")!!.toList(), "members come in board order")
+
+        val round1 = TestAPI.get("/api/tour/$tid/pair/1").asObject()
+        val matches = round1.getArray("games")!!.map { it as Json.Object }
+        assertEquals(7, matches.size)
+        assertEquals(21, round1.getArray("individualGames")!!.size)
+        // tables 1 to 3 in the file: Lorient, white on the first board, loses it and wins the two others
+        val first = matches.single { it.getInt("t") == 1 }
+        assertEquals("Lorient" to "Rennes 2", names[first.getInt("w")] to names[first.getInt("b")])
+        assertEquals("w", first.getString("r"))
+        assertEquals(listOf(4, 5, 6, 7), matches.map { it.getInt("t")!! }.sorted().drop(3), "matches are numbered in table order")
+
+        val standings = TestAPI.get("/api/tour/$tid/standings/5").asArray().map { it as Json.Object }
+        fun boardWins(team: String) = standings.single { it.getString("name") == team }
+            .let { row -> listOf("BDW", "BDW3", "BDW2", "BDW1").map { row.getDouble(it) } }
+        assertEquals(listOf(12.0, 12.0, 7.0, 3.0), boardWins("Angers"))
+        assertEquals(listOf(11.0, 11.0, 8.0, 3.0), boardWins("Lorient"))
+        assertEquals(listOf(3.0, 3.0, 0.0, 0.0), boardWins("La Rochelle 2"))
+    }
+
+    // One of ours, through OpenGotha's format and back: teams, substitute, matches, boards and bye.
+    @Test
+    fun `008 team tournament round trip`() {
+        MemoryStore.reset()
+        val tid = TestAPI.post("/api/tour", Json.MutableObject(BasicTests.aTeamTournament).set("type", "TEAM3")).asObject().getInt("id")!!
+        fun addPlayer(name: String, rating: Int, vararg skip: Int) = TestAPI.post("/api/tour/$tid/part",
+            Json.Object("name" to name, "firstname" to "X", "rating" to rating, "rank" to -1, "country" to "FR", "club" to "13Ma",
+                "final" to true, "skip" to Json.Array(*skip.toTypedArray()))).asObject().getInt("id")!!
+        fun addTeam(name: String, vararg players: Int) = TestAPI.post("/api/tour/$tid/team",
+            Json.Object("name" to name, "players" to Json.Array(*players.toTypedArray()))).asObject().getInt("id")!!
+        // the Alphas have a substitute: Add sits out round 1, Aaa round 2
+        addTeam("Alphas", addPlayer("Aaa", 1900, 2), addPlayer("Abb", 1800), addPlayer("Acc", 1700), addPlayer("Add", 1600, 1))
+        addTeam("Betas", addPlayer("Baa", 1850), addPlayer("Bbb", 1750), addPlayer("Bcc", 1650))
+        addTeam("Gammas", addPlayer("Caa", 1500), addPlayer("Cbb", 1400), addPlayer("Ccc", 1300))
+        TestAPI.put("/api/tour/$tid", Json.Object("pairing" to Json.Object("placement" to Json.Array("MMS", "BDW", "BDW2", "SOSOSM"))))
+        TestAPI.post("/api/tour/$tid/pair/1", Json.parse("""["all"]"""))
+        val boards = TestAPI.get("/api/tour/$tid/pair/1").asObject().getArray("individualGames")!!.map { it as Json.Object }
+        assertEquals(3, boards.size, "premise: one match, and a team with the bye")
+        listOf("w", "b", "w").forEachIndexed { i, result ->
+            TestAPI.put("/api/tour/$tid/res/1", Json.Object("id" to boards[i].getInt("id"), "result" to result))
+        }
+
+        // what must survive, by names since ids are reissued
+        fun picture(id: Int): String {
+            val tour = TestAPI.get("/api/tour/$id").asObject()
+            val players = TestAPI.get("/api/tour/$id/part").asArray().map { it as Json.Object }
+            val teams = TestAPI.get("/api/tour/$id/team").asArray().map { it as Json.Object }
+            val who = (players + teams).associate { it.getInt("id") to it.getString("name") } + (0 to "bye")
+            val round = TestAPI.get("/api/tour/$id/pair/1").asObject()
+            fun games(key: String) = round.getArray(key)!!.map { it as Json.Object }
+                .map { "${it.getInt("t")}: ${who[it.getInt("w")]} - ${who[it.getInt("b")]} ${it.getString("r")}" }
+            return listOf(
+                tour.getString("type"), tour.getObject("pairing")!!.getArray("placement"),
+                teams.map { "${it.getString("name")}: ${it.getArray("names")}" }.sorted(),
+                players.map { "${it.getString("name")} skips ${it.getArray("skip") ?: "[]"}" }.sorted(),
+                games("games").sorted(), games("individualGames")
+            ).joinToString("\n")
+        }
+        val before = picture(tid)
+        val copy = TestAPI.post("/api/tour", TestAPI.getXml("/api/tour/$tid")).asObject().getInt("id")!!
+        assertEquals(before, picture(copy))
+        assertTrue(before.contains("Add skips [1]") && before.contains(" - bye"), "premise: a substitute and a bye")
+    }
+
+    // OpenGotha matches criteria names exactly, and names some otherwise than we do (Rating,
+    // SOSW-1...): it used to read ours as "no criterion", and its own failed our import.
+    @Test
+    fun `009 criteria travel under opengotha names`() {
+        val swiss = Swiss(placementParams = PlacementParams(Criterion.NBW, Criterion.SOSWM1, Criterion.RATING, Criterion.EGFDC))
+        val exported = OpenGotha.export(tournament(swiss))
+        listOf("NBW", "SOSW-1", "Rating", "EGFDC", "NULL").forEach {
+            assertTrue(exported.contains("""<PlacementCriterion name="$it""""), "$it is expected among the criteria")
+        }
+        assertTrue(exported.contains("""paiMaAdditionalPlacementCritSystem1="Rating""""))
+        assertEquals(swiss.placementParams.criteria, OpenGotha.import(XmlUtils.parse(exported)).pairing.placementParams.criteria)
     }
 }

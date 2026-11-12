@@ -7,11 +7,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 and this project *will* adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html) with its 1.0.0 release.
 -->
 
-## [0.29]
+## [0.29] - 2026-11-12
 
 ### Added
 
-- Team tournaments: board wins on the first 4, 3, 2 or 1 boards as placement criteria (BDW4, BDW3, BDW2, BDW1)
+- Placement criteria BDW4, BDW3, BDW2 and BDW1 for teams (first nth board wins)
 
 ### Changed
 
@@ -19,7 +19,8 @@ and this project *will* adheres to [Semantic Versioning](https://semver.org/spec
 
 ### Fixed
 
-- OpenGotha export: fixed "both loose", bye players and pairgo/rengo team tournaments (teams named after players)
+- OpenGotha import/export: fixed "both loose", bye players, teams and pairgo/rengo team tournaments (teams named after players)
+- Teams: pairing an odd number of teams was failing
 
 ## [0.28] - 2026-11-10
 

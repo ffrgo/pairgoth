@@ -5,6 +5,7 @@ import jakarta.xml.bind.JAXBElement
 import org.apache.commons.text.StringEscapeUtils
 import java.time.LocalDate
 import org.jeudego.pairgoth.model.*
+import org.jeudego.pairgoth.opengotha.TeamType
 import org.jeudego.pairgoth.opengotha.TournamentType
 import org.jeudego.pairgoth.opengotha.ObjectFactory
 import org.jeudego.pairgoth.store.nextGameId
@@ -48,7 +49,6 @@ object OpenGotha {
         else -> throw Error("Invalid seed system: $str")
     }
 
-    private fun String.titleCase(locale: Locale = Locale.ROOT) = lowercase(locale).replaceFirstChar { it.titlecase(locale) }
     private fun String.escapeXML() = StringEscapeUtils.escapeXml11(this)
 
     private fun MainCritParams.SeedMethod.format() = toString().replace("_", "")
@@ -76,6 +76,114 @@ object OpenGotha {
                 (1..tournament.rounds).filterNot { team.canPlay(it) }.forEach { player.skip.add(it) }
             }
         }
+    }
+
+    // The criteria OpenGotha names otherwise than we do. Those it does not have travel under our
+    // own name: it reads an unknown name as no criterion, and we read it back.
+    private val criteria = mapOf(
+        Criterion.NONE to "NULL",
+        Criterion.CATEGORY to "CAT",
+        Criterion.RANK to "Rank",
+        Criterion.RATING to "Rating",
+        Criterion.SOSWM1 to "SOSW-1",
+        Criterion.SOSWM2 to "SOSW-2",
+        Criterion.SOSMM1 to "SOSM-1",
+        Criterion.SOSMM2 to "SOSM-2"
+    )
+    private val Criterion.ogName get() = criteria[this] ?: name
+    private fun criterion(ogName: String) =
+        criteria.entries.firstOrNull { it.value.equals(ogName, ignoreCase = true) }?.key ?: Criterion.valueOf(ogName.uppercase())
+
+    // Team criteria have their own names; a team's score and SOS follow the pairing system
+    private fun teamCriteria(type: PairingType) = mapOf(
+        (if (type == PairingType.MAC_MAHON) Criterion.MMS else Criterion.NBW) to "TEAMP",
+        (if (type == PairingType.MAC_MAHON) Criterion.SOSM else Criterion.SOSW) to "SOST",
+        Criterion.BDW to "BDW",
+        Criterion.BDW4 to "BDW4U",
+        Criterion.BDW3 to "BDW3U",
+        Criterion.BDW2 to "BDW2U",
+        Criterion.BDW1 to "BDW1U",
+        Criterion.RATING to "MNR"
+    )
+    // our teams have 5 boards at most: more upper boards are all of them
+    private val allBoards = Regex("BDW[5-9]U")
+    private val teamOnly = setOf(Criterion.BDW, Criterion.BDW4, Criterion.BDW3, Criterion.BDW2, Criterion.BDW1)
+
+    // OpenGotha only knows players, their games, and where each player sits in each round: teams
+    // are rebuilt from the seats, matches from the games between two teams.
+    private fun importTeams(tournament: TeamTournament, ogTeams: List<TeamType>, players: Map<String, ID>, rounds: List<Collection<Game>>, byes: Map<Int, List<ID>>) {
+        val size = tournament.type.playersNumber
+        fun name(player: ID) = tournament.players[player]!!.fullName()
+        val teamOf = mutableMapOf<ID, TeamTournament.Team>()
+        // board of each player, per round; OpenGotha fills the seats of all its 20 rounds
+        val seats = (1..tournament.rounds).associateWith { mutableMapOf<ID, Int>() }
+        ogTeams.forEach { ogTeam ->
+            val team = tournament.Team(nextPlayerId, ogTeam.teamName)
+            tournament.teams[team.id] = team
+            ogTeam.board.filter { it.roundNumber == null || it.roundNumber in seats.keys }.sortedBy { it.boardNumber }.forEach { board ->
+                val player = players[board.player] ?: throw Error("player not found: ${board.player}")
+                teamOf.put(player, team)?.takeIf { it !== team }?.let { other ->
+                    throw Error("${name(player)} plays for both ${other.name} and ${team.name}: a player changing team cannot be imported")
+                }
+                team.playerIds.add(player)
+                // before OpenGotha 3.28.04 a seat had no round, and held for all of them
+                (board.roundNumber?.let { listOf(it) } ?: seats.keys).forEach { round -> seats[round]!![player] = board.boardNumber }
+            }
+        }
+        // the members beyond the team's boards are substitutes for that round
+        teamOf.keys.forEach { player ->
+            seats.forEach { (round, seat) -> if ((seat[player] ?: Int.MAX_VALUE) > size) tournament.players[player]!!.skip.add(round) }
+        }
+        rounds.forEachIndexed { index, games ->
+            val round = index + 1
+            val seat = seats[round] ?: emptyMap()
+            fun team(player: ID) = teamOf[player]?.id ?: throw Error("round $round: ${name(player)} plays without a team")
+            val matches = games.groupBy { setOf(team(it.white), team(it.black)) }
+            matches.keys.firstOrNull { it.size == 1 }?.let { throw Error("round $round: two players of ${tournament.teams[it.first()]!!.name} play each other") }
+            matches.keys.flatten().groupingBy { it }.eachCount().entries.firstOrNull { it.value > 1 }?.let {
+                throw Error("round $round: ${tournament.teams[it.key]!!.name} meets several teams")
+            }
+            val ordered = matches.values.map { boards ->
+                boards.sortedWith(compareBy({ minOf(seat[it.white] ?: Int.MAX_VALUE, seat[it.black] ?: Int.MAX_VALUE) }, { it.table }))
+            }.sortedBy { boards -> boards.minOf { it.table } }
+            // our exports spread the boards of table t over the tables (t-1)*size+1 to t*size; otherwise matches are numbered in table order
+            val tables = ordered.map { boards -> (boards.minOf { it.table } - 1) / size + 1 }
+                .let { tables -> if (tables.distinct().size == tables.size) tables else tables.indices.map { it + 1 } }
+            ordered.forEachIndexed { i, boards ->
+                // white and black denote the first board's colours
+                val match = Game(nextGameId, tables[i], team(boards.first().white), team(boards.first().black))
+                boards.forEach { board ->
+                    board.table = match.table
+                    tournament.individualGames.put(match.id, board)
+                }
+                tournament.games(round)[match.id] = match
+            }
+            // a team has the bye when its players have it
+            byes[round].orEmpty().mapNotNull { teamOf[it]?.id }.distinct().forEach { team ->
+                if (tournament.games(round).values.none { it.white == team || it.black == team }) {
+                    Game(id = nextGameId, table = 0, white = team, black = 0, result = Game.Result.WHITE).also { tournament.games(round)[it.id] = it }
+                } else logger.warn("round $round: bye ignored, ${tournament.teams[team]!!.name} is playing")
+            }
+            tournament.propagateIndividualResults(round)
+        }
+    }
+
+    // Where each member sits in a round: the boards as played, else as the pairing would field
+    // them, then the other members, beyond the team's boards.
+    private fun seating(tournament: TeamTournament, team: TeamTournament.Team, round: Int): List<Player> {
+        val match = if (round > tournament.lastRound()) null else tournament.games(round).values.find { it.white == team.id || it.black == team.id }
+        val playing = match?.let { tournament.individualGames[it.id] }?.mapNotNull { board ->
+            listOf(board.white, board.black).firstOrNull { it in team.playerIds }?.let { tournament.players[it] }
+        } ?: team.activePlayers(round)
+        return playing + team.teamPlayers.filter { it !in playing }.sortedByDescending { it.rating }
+    }
+
+    private fun teams(tournament: TeamTournament) = tournament.teams.values.withIndex().joinToString("\n", "<Teams>\n", "\n</Teams>") { (index, team) ->
+        (1..tournament.rounds).flatMap { round ->
+            seating(tournament, team, round).mapIndexed { board, player ->
+                """<Board boardNumber="${board + 1}" player="${player.key.escapeXML()}" roundNumber="$round"/>"""
+            }
+        }.joinToString("\n", """<Team teamName="${team.name.escapeXML()}" teamNumber="${index + 1}">""" + "\n", "\n</Team>")
     }
 
     fun import(element: Element): Tournament<*> {
@@ -120,8 +228,8 @@ object OpenGotha {
                 lastRoundForSeedSystem1 = pairParams.paiMaLastRoundForSeedSystem1,
                 seedSystem1 = parseSeedSystem(pairParams.paiMaSeedSystem1),
                 seedSystem2 = parseSeedSystem(pairParams.paiMaSeedSystem2 ?: "SPLITANDSLIP"),
-                additionalPlacementCritSystem1 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem1.uppercase()),
-                additionalPlacementCritSystem2 = Criterion.valueOf(pairParams.paiMaAdditionalPlacementCritSystem2.uppercase().replace("NULL", "NONE")),
+                additionalPlacementCritSystem1 = criterion(pairParams.paiMaAdditionalPlacementCritSystem1),
+                additionalPlacementCritSystem2 = criterion(pairParams.paiMaAdditionalPlacementCritSystem2),
                 mmsValueAbsent = genParams.genMMS2ValueAbsent.toDouble() / 2.0,
                 nbwValueAbsent = genParams.genNBW2ValueAbsent.toDouble() / 2.0,
                 roundDownScore = genParams.genRoundDownNBWMMS.toBoolean()
@@ -151,7 +259,7 @@ object OpenGotha {
             crit = placmtParams.placementCriteria.placementCriterion.filter {
                 it.name != "NULL"
             }.map {
-                Criterion.valueOf(it.name.uppercase())
+                criterion(it.name)
             }.toTypedArray()
         )
 
@@ -166,49 +274,52 @@ object OpenGotha {
         val pairingType = PairingType.values().firstOrNull { it.name == genParams.pairingType }
             ?: if (pairgothPlacementParams.criteria.firstOrNull() == Criterion.MMS) PairingType.MAC_MAHON else PairingType.SWISS
 
-        val tournament = StandardTournament(
-            id = nextTournamentId,
-            type = Tournament.Type.INDIVIDUAL, // CB for now, TODO
-            name = genParams.name,
-            shortName = genParams.shortName,
-            startDate = genParams.beginDate.toLocalDate(),
-            endDate = genParams.endDate.toLocalDate(),
-            director = genParams.director,
-            country = country,
-            location = genParams.location,
-            online = genParams.isBInternet ?: false,
-            timeSystem = when (genParams.complementaryTimeSystem) {
-                "SUDDENDEATH" -> SuddenDeath(genParams.basicTime * 60)
-                "STDBYOYOMI" -> StandardByoyomi(genParams.basicTime * 60, genParams.stdByoYomiTime, 1) // no periods?
-                "CANBYOYOMI" -> CanadianByoyomi(genParams.basicTime * 60, genParams.canByoYomiTime, genParams.nbMovesCanTime)
-                "FISCHER" -> FischerTime(genParams.basicTime * 60, genParams.fischerTime)
-                else -> throw Error("missing byoyomi type")
-            },
-            pairing = when (pairingType) {
-                PairingType.MAC_MAHON -> MacMahon(
-                    pairingParams = pairgothPairingParams,
-                    placementParams = pairgothPlacementParams,
-                    mmFloor = parseRankOrDefault(genParams.genMMFloor, -30, "MM floor"),
-                    mmBar = parseRankOrDefault(genParams.genMMBar, 0, "MM bar")
-                )
-                PairingType.FRENCH -> French(
-                    pairingParams = pairgothPairingParams,
-                    placementParams = pairgothPlacementParams
-                )
-                PairingType.ROUND_ROBIN -> RoundRobin(
-                    pairingParams = pairgothPairingParams,
-                    placementParams = pairgothPlacementParams
-                )
-                PairingType.SWISS -> Swiss(
-                    pairingParams = pairgothPairingParams,
-                    placementParams = pairgothPlacementParams
-                )
-            },
-            rounds = genParams.numberOfRounds,
-            rules = rules,
-            gobanSize = genParams.size ?: 19,
-            komi = genParams.komi?.toString()?.toDouble() ?: 7.5
-        )
+        // a team tournament, in OpenGotha, is an individual one whose players sit in teams
+        val ogTeams = ogTournament.teams?.team ?: emptyList()
+        val type =
+            if (ogTeams.isEmpty()) Tournament.Type.INDIVIDUAL
+            else ogTournament.teamTournamentParameterSet?.teamGeneralParameterSet?.teamSize.let { size ->
+                Tournament.Type.values().firstOrNull { it.individual && it.playersNumber == size }?.takeIf { it != Tournament.Type.INDIVIDUAL }
+                    ?: throw Error("teams of $size players are not supported")
+            }
+        val placementParams =
+            if (ogTeams.isEmpty()) pairgothPlacementParams
+            else teamCriteria(pairingType).entries.associate { it.value to it.key }.let { ours ->
+                PlacementParams(*ogTournament.teamTournamentParameterSet.teamPlacementParameterSet.placementCriteria.placementCriterion.filter {
+                    it.name != "NULL"
+                }.map {
+                    ours[it.name] ?: if (allBoards.matches(it.name)) Criterion.BDW else criterion(it.name)
+                }.distinct().toTypedArray())
+            }
+
+        val timeSystem = when (genParams.complementaryTimeSystem) {
+            "SUDDENDEATH" -> SuddenDeath(genParams.basicTime * 60)
+            "STDBYOYOMI" -> StandardByoyomi(genParams.basicTime * 60, genParams.stdByoYomiTime, 1) // no periods?
+            "CANBYOYOMI" -> CanadianByoyomi(genParams.basicTime * 60, genParams.canByoYomiTime, genParams.nbMovesCanTime)
+            "FISCHER" -> FischerTime(genParams.basicTime * 60, genParams.fischerTime)
+            else -> throw Error("missing byoyomi type")
+        }
+        val pairing = when (pairingType) {
+            PairingType.MAC_MAHON -> MacMahon(
+                pairingParams = pairgothPairingParams,
+                placementParams = placementParams,
+                mmFloor = parseRankOrDefault(genParams.genMMFloor, -30, "MM floor"),
+                mmBar = parseRankOrDefault(genParams.genMMBar, 0, "MM bar")
+            )
+            PairingType.FRENCH -> French(pairgothPairingParams, placementParams)
+            PairingType.ROUND_ROBIN -> RoundRobin(pairgothPairingParams, placementParams)
+            PairingType.SWISS -> Swiss(pairgothPairingParams, placementParams)
+        }
+        val online = genParams.isBInternet ?: false
+        val gobanSize = genParams.size ?: 19
+        val komi = genParams.komi?.toString()?.toDouble() ?: 7.5
+        val tournament: Tournament<*> =
+            if (type == Tournament.Type.INDIVIDUAL) StandardTournament(
+                nextTournamentId, type, genParams.name, genParams.shortName, genParams.beginDate.toLocalDate(), genParams.endDate.toLocalDate(),
+                genParams.director, country, genParams.location, online, timeSystem, genParams.numberOfRounds, pairing, rules, gobanSize, komi)
+            else TeamTournament(
+                nextTournamentId, type, genParams.name, genParams.shortName, genParams.beginDate.toLocalDate(), genParams.endDate.toLocalDate(),
+                genParams.director, country, genParams.location, online, timeSystem, genParams.numberOfRounds, pairing, rules, gobanSize, komi)
 
         val canonicMap = mutableMapOf<String, Int>()
         // import players
@@ -270,16 +381,20 @@ object OpenGotha {
                 )
             }.associateBy { it.id }.toMutableMap()
         }
-        gamesPerRound.forEachIndexed { index, games ->
-            tournament.games(index + 1).putAll(games)
+        val byes = ogTournament.byePlayers?.byePlayer.orEmpty().groupBy({ it.roundNumber }) {
+            canonicMap[it.player] ?: throw Error("player not found: ${it.player}")
         }
-        // import bye players
-        if (ogTournament.byePlayers != null) {
-            for (byePlayer in ogTournament.byePlayers.byePlayer) {
-                val playerId = canonicMap[byePlayer.player] ?: throw Error("player not found: ${byePlayer.player}")
-                val round = byePlayer.roundNumber
-                val game = Game(id = nextGameId, table = 0, white = playerId, black = 0, result = Game.Result.WHITE)
-                tournament.games(round)[game.id] = game
+        if (tournament is TeamTournament) {
+            importTeams(tournament, ogTeams, canonicMap, gamesPerRound.map { it.values }, byes)
+        } else {
+            gamesPerRound.forEachIndexed { index, games ->
+                tournament.games(index + 1).putAll(games)
+            }
+            byes.forEach { (round, players) ->
+                players.forEach { playerId ->
+                    val game = Game(id = nextGameId, table = 0, white = playerId, black = 0, result = Game.Result.WHITE)
+                    tournament.games(round)[game.id] = game
+                }
             }
         }
 
@@ -294,11 +409,32 @@ object OpenGotha {
         // ...
         //
         // method 2 (quick and dirty) is to rely on templating:
-        val players: Map<ID, Player> = when {
-            tournament !is TeamTournament -> tournament.players
-            tournament.type.individual -> throw Error("OpenGotha export is not available yet for team tournaments")
-            else -> teamsAsPlayers(tournament)
+        val players: Map<ID, Player> = if (tournament is TeamTournament && !tournament.type.individual) teamsAsPlayers(tournament) else tournament.players
+        // teams of individual players: OpenGotha gets the players, their games and their seats
+        val teamTournament = (tournament as? TeamTournament)?.takeIf { it.type.individual }
+        val size = tournament.type.playersNumber
+        // (round, table, game) — in OpenGotha each board of a match has its own table
+        val games = (1..tournament.lastRound()).flatMap { round ->
+            tournament.games(round).values.filter { it.black != 0 && it.white != 0 }.flatMap { game ->
+                if (teamTournament == null) listOf(Triple(round, game.table, game))
+                else teamTournament.individualGames[game.id].orEmpty().mapIndexed { board, boardGame ->
+                    Triple(round, (game.table - 1) * size + board + 1, boardGame)
+                }
+            }
         }
+        // (round, player) — the bye of a team is the bye of its players
+        val byes = (1..tournament.lastRound()).flatMap { round ->
+            tournament.games(round).values.filter { it.black == 0 || it.white == 0 }.flatMap { game ->
+                val id = if (game.black == 0) game.white else game.black
+                (teamTournament?.teams?.get(id)?.activePlayers(round) ?: listOfNotNull(players[id])).map { round to it }
+            }
+        }
+        // board wins only exist for teams, in OpenGotha: its players are ranked on the other criteria
+        val placement = tournament.pairing.placementParams.criteria.filterNot { teamTournament != null && it in teamOnly }
+        // without teams, OpenGotha's defaults
+        val teamPlacement = teamTournament?.let { teamCriteria(it.pairing.type) }?.let { theirs ->
+            (0..5).map { tournament.pairing.placementParams.criteria.getOrNull(it)?.let { crit -> theirs[crit] ?: crit.ogName } ?: "NULL" }
+        } ?: listOf("TEAMP", "BDW", "BDW3U", "BDW2U", "BDW1U", "MNR")
         val now = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmss"))
         val xml = """
             <?xml version="1.0" encoding="UTF-8" standalone="no"?>
@@ -336,12 +472,7 @@ object OpenGotha {
             }
             </Players>
             <Games>
-            ${(1..tournament.lastRound()).map { tournament.games(it) }.flatMapIndexed { index, games ->
-                    games.values.mapNotNull { game ->
-                        if (game.black == 0 || game.white == 0) null
-                        else Pair(index + 1, game)
-                    }
-                }.joinToString("\n") { (round, game) ->
+            ${games.joinToString("\n") { (round, table, game) ->
                     """<Game blackPlayer="${
                         players[game.black]!!.key.escapeXML()
                     }" handicap="${
@@ -358,7 +489,7 @@ object OpenGotha {
                     }" roundNumber="${
                         round
                     }" tableNumber="${
-                        game.table
+                        table
                     }" whitePlayer="${
                         players[game.white]!!.key.escapeXML()
                     }"/>"""
@@ -366,18 +497,9 @@ object OpenGotha {
             }
             </Games>
             <ByePlayers>
-            ${
-                (1..tournament.lastRound()).map { round ->
-                    tournament.games(round).values.filter { g ->
-                        g.black == 0 || g.white == 0
-                    }.map {
-                        players[if (it.black == 0) it.white else it.black]!!
-                    }.map { p ->
-                        "<ByePlayer player=\"${p.key.escapeXML()}\" roundNumber=\"${round}\"/>"
-                    }.joinToString("\n")
-                }.joinToString("\n")
-            }
+            ${byes.joinToString("\n") { (round, player) -> """<ByePlayer player="${player.key.escapeXML()}" roundNumber="$round"/>""" }}
             </ByePlayers>
+            ${teamTournament?.let { teams(it) } ?: ""}
             <TournamentParameterSet>
             <GeneralParameterSet bInternet="${
                 tournament.online
@@ -450,7 +572,7 @@ object OpenGotha {
             ${
                 (0..5).map {
                     """<PlacementCriterion name="${
-                        tournament.pairing.placementParams.criteria.getOrNull(it)?.name ?: "NULL"
+                        placement.getOrNull(it)?.ogName ?: "NULL"
                     }" number="${it + 1}"/>"""
                 }.joinToString("\n")
             }
@@ -465,9 +587,9 @@ object OpenGotha {
             }" paiBaRandom="${
                 tournament.pairing.pairingParams.base.random.toLong()
             }" paiMaAdditionalPlacementCritSystem1="${
-                tournament.pairing.pairingParams.main.additionalPlacementCritSystem1.toString().titleCase()
+                tournament.pairing.pairingParams.main.additionalPlacementCritSystem1.ogName
             }" paiMaAdditionalPlacementCritSystem2="${
-                tournament.pairing.pairingParams.main.additionalPlacementCritSystem2.toString().titleCase()
+                tournament.pairing.pairingParams.main.additionalPlacementCritSystem2.ogName
             }" paiMaAvoidMixingCategories="${
                 tournament.pairing.pairingParams.main.categoriesWeight.toLong()
             }" paiMaCompensateDUDD="${
@@ -511,21 +633,16 @@ object OpenGotha {
             <PublishParameterSet exportToLocalFile="true" htmlAutoScroll="false" print="false"/>
             </TournamentParameterSet>
             <TeamTournamentParameterSet>
-            <TeamGeneralParameterSet teamSize="4"/>
+            <TeamGeneralParameterSet teamSize="${if (teamTournament == null) 4 else size}"/>
             <TeamPlacementParameterSet>
             <PlacementCriteria>
-            <PlacementCriterion name="TEAMP" number="1"/>
-            <PlacementCriterion name="BDW" number="2"/>
-            <PlacementCriterion name="BDW3U" number="3"/>
-            <PlacementCriterion name="BDW2U" number="4"/>
-            <PlacementCriterion name="BDW1U" number="5"/>
-            <PlacementCriterion name="MNR" number="6"/>
+            ${teamPlacement.mapIndexed { i, name -> """<PlacementCriterion name="$name" number="${i + 1}"/>""" }.joinToString("\n")}
             </PlacementCriteria>
             </TeamPlacementParameterSet>
             </TeamTournamentParameterSet>
             </Tournament>
             
-        """.trimIndent()
+        """.trim() // inserted lines have no indent, trimIndent() would leave spaces before the XML declaration
 
         return xml
     }

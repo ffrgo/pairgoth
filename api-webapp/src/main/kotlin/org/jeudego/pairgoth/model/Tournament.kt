@@ -354,6 +354,7 @@ class TeamTournament(
         }
 
     private fun pairIndividualGames(round: Int, game: Game) {
+        if (game.white == 0 || game.black == 0) return // a bye has no boards
         individualGames.computeIfAbsent(game.id) { id ->
             // Here white and black just denote the first board color.
             // The set's order IS the board order (strongest first): BDW1..4 read it, the file stores it.

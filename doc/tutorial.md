@@ -103,7 +103,7 @@ The **Publish** button on the **Standings** tab offers:
 The **Export** button on the **Information** tab saves the whole tournament in one of two formats:
 
 - **Pairgoth**: the `.tour` file itself, portable JSON. This is the complete backup: use it to keep a copy or to move a tournament to another computer.
-- **OpenGotha**: XML, to exchange with OpenGotha. Its format cannot hold everything pairgoth knows (byo-yomi periods and team tournaments, for instance), so importing it back is not a full restore.
+- **OpenGotha**: XML, to exchange with OpenGotha. Its format cannot hold everything pairgoth knows (byo-yomi periods, for instance), so importing it back is not a full restore. Team tournaments go both ways: OpenGotha seats players at the boards of their team round by round and has no team match, so the boards of a match are written at consecutive tables, and the matches are rebuilt from the games when importing. A file where a player changes team between rounds, or where a team meets two teams in the same round, is refused. Pairgo and rengo have no OpenGotha counterpart: each team is exported as one player named after its members, and reads back as an individual tournament.
 
 ## Connecting to an event website
 
